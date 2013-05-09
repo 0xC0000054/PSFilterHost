@@ -1,0 +1,46 @@
+﻿/////////////////////////////////////////////////////////////////////////////////
+//
+// Adobe(R) Photoshop(R) filter host for .NET
+// http://psfilterhost.codeplex.com/
+//
+// This software is provided under the Microsoft Public License:
+//   Copyright (C) 2012-2013 Nicholas Hayes
+// 
+// See LICENSE.txt for complete licensing and attribution information.
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+/* Adapted from PIGeneral.h
+ * Copyright (c) 1992-1998, Adobe Systems Incorporated.
+ * All rights reserved.
+*/
+
+using System;
+using System.Runtime.InteropServices;
+
+namespace PSFilterLoad.PSApi
+{
+    [StructLayout(LayoutKind.Sequential)]
+    internal unsafe struct ReadImageDocumentDesc
+    {
+        public int minVersion;
+        public int maxVersion;
+
+        public int imageMode;
+        public int depth;
+        public VRect bounds;
+        public int hResolution;
+        public int vResolution;
+        public fixed byte redLUT[256];
+        public fixed byte greenLUT[256];
+        public fixed byte blueLUT[256];
+        public IntPtr targetCompositeChannels;
+        public IntPtr targetTransparency;
+        public IntPtr targetLayerMask;
+        public IntPtr mergedCompositeChannels;
+        public IntPtr mergedTransparency;
+        public IntPtr alphaChannels;
+        public IntPtr selection;
+        public IntPtr fileSpec;
+    }
+}

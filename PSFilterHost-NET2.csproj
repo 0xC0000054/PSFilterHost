@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1553F5DB-ED21-46D4-BDF8-28995BF8E82B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PSFilterHostDll</RootNamespace>
+    <AssemblyName>PSFilterHost</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\NET2\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;GDIPLUS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\NET2\Debug\PSFilterHost.XML</DocumentationFile>
+    <CodeAnalysisRuleSet>GlobalizationRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\NET2\Release\</OutputPath>
+    <DefineConstants>TRACE;GDIPLUS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\NET2\Release\PSFilterHost.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.5' ">NET_35_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BGRASurface\BGRASurfaceMemory.cs" />
+    <Compile Include="BGRASurface\ColorBgra16.cs" />
+    <Compile Include="BGRASurface\ColorBgra8.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BGRASurface\MemoryBlock.cs" />
+    <Compile Include="BGRASurface\Surface16.cs" />
+    <Compile Include="BGRASurface\Surface32.cs" />
+    <Compile Include="BGRASurface\Surface64.cs" />
+    <Compile Include="BGRASurface\Surface8.cs" />
+    <Compile Include="BGRASurface\SurfaceBase.cs" />
+    <Compile Include="BGRASurface\SurfaceFactory.cs" />
+    <Compile Include="ColorSpace\CIELab.cs" />
+    <Compile Include="ColorSpace\CIEXYZ.cs" />
+    <Compile Include="ColorSpace\CMYK.cs" />
+    <Compile Include="ColorSpace\ColorSpaceHelper.cs" />
+    <Compile Include="ColorSpace\HSB.cs" />
+    <Compile Include="ColorSpace\HSL.cs" />
+    <Compile Include="ColorSpace\RGB.cs" />
+    <Compile Include="ColorSpace\YUV.cs" />
+    <Compile Include="EnableInfoParser.cs" />
+    <Compile Include="FileEnumerator.cs" />
+    <Compile Include="FilterCollection.cs" />
+    <Compile Include="FilterProgressEventArgs.cs" />
+    <Compile Include="FilterRunExecption.cs" />
+    <Compile Include="PSApi\Memory.cs" />
+    <Compile Include="NativeInterfaces.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="AbortFunc.cs" />
+    <Compile Include="PSApi\AboutRecord.cs" />
+    <Compile Include="PSApi\AdvanceStateProc.cs" />
+    <Compile Include="AETEValue.cs" />
+    <Compile Include="PSApi\BufferProcs.cs" />
+    <Compile Include="PSApi\ChannelPortsProcs.cs" />
+    <Compile Include="PSApi\ColorPicker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PSApi\ColorServicesConstants.cs" />
+    <Compile Include="PSApi\ColorServicesConvert.cs" />
+    <Compile Include="PSApi\ColorServicesProc.cs" />
+    <Compile Include="PSApi\ColorServicesSelector.cs" />
+    <Compile Include="PSApi\DebugFlags.cs" />
+    <Compile Include="PSApi\DescriptorTypes.cs" />
+    <Compile Include="PSApi\DictionaryExtensions.cs" />
+    <Compile Include="PSApi\DisplayPixelsProc.cs" />
+    <Compile Include="PSApi\FilterCase.cs" />
+    <Compile Include="PSApi\FilterCaseInfo.cs" />
+    <Compile Include="PSApi\FilterRecord.cs" />
+    <Compile Include="PSApi\FilterSelector.cs" />
+    <Compile Include="GlobalParameters.cs" />
+    <Compile Include="PSApi\HandleProc.cs" />
+    <Compile Include="PSApi\HostProcs.cs" />
+    <Compile Include="PSApi\ImageModes.cs" />
+    <Compile Include="PSApi\ImageServicesProc.cs" />
+    <Compile Include="ImageSizeTooLargeException.cs" />
+    <Compile Include="PSApi\LoadPsFilter.cs" />
+    <Compile Include="PSApi\NativeConstants.cs" />
+    <Compile Include="PSApi\NativeStructs.cs" />
+    <Compile Include="ParameterData.cs" />
+    <Compile Include="PSApi\PICASuites.cs" />
+    <Compile Include="PSApi\PICASuiteStructs.cs" />
+    <Compile Include="PSApi\PIDescriptorParameters.cs" />
+    <Compile Include="PSApi\PIProperty.cs" />
+    <Compile Include="PSApi\PlatformData.cs" />
+    <Compile Include="PluginData.cs" />
+    <Compile Include="PSApi\PluginAETE.cs" />
+    <Compile Include="PSApi\PlugInInfo.cs" />
+    <Compile Include="PSApi\PlugInMonitor.cs" />
+    <Compile Include="PSApi\PluginPhase.cs" />
+    <Compile Include="PSApi\Point.cs" />
+    <Compile Include="PSApi\ProcessEventProc.cs" />
+    <Compile Include="PSApi\ProgressFunc.cs" />
+    <Compile Include="PSApi\ProgressProc.cs" />
+    <Compile Include="PSApi\PropertyProcs.cs" />
+    <Compile Include="PSApi\PSConstants.cs" />
+    <Compile Include="PSApi\HostPadding.cs" />
+    <Compile Include="PSApi\PSError.cs" />
+    <Compile Include="PSApi\PSImagePlane.cs" />
+    <Compile Include="PSApi\PSPixelMap.cs" />
+    <Compile Include="PSApi\PSProperties.cs" />
+    <Compile Include="PSApi\ReadImageDocumentDesc.cs" />
+    <Compile Include="PSApi\Rect.cs" />
+    <Compile Include="PSApi\RegionExtensions.cs" />
+    <Compile Include="PSApi\ResourceProc.cs" />
+    <Compile Include="PSApi\RGBColor.cs" />
+    <Compile Include="PSApi\SafeLibraryHandle.cs" />
+    <Compile Include="PSApi\SPBasicSuite.cs" />
+    <Compile Include="PSApi\UnsafeNativeMethods.cs" />
+    <Compile Include="PSApi\VPoint.cs" />
+    <Compile Include="PSApi\VRect.cs" />
+    <Compile Include="PseudoResourceCollection.cs" />
+    <Compile Include="PSFilterHost.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PSResource.cs" />
+    <Compile Include="PSApi\SafeNativeMethods.cs" />
+    <Compile Include="ScriptingDataCollection.cs" />
+    <Compile Include="ShellLink.cs" />
+    <Compile Include="ShellLinkCoClass.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

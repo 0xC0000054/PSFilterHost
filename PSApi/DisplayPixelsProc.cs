@@ -1,0 +1,24 @@
+﻿/////////////////////////////////////////////////////////////////////////////////
+//
+// Adobe(R) Photoshop(R) filter host for .NET
+// http://psfilterhost.codeplex.com/
+//
+// This software is provided under the Microsoft Public License:
+//   Copyright (C) 2012-2013 Nicholas Hayes
+// 
+// See LICENSE.txt for complete licensing and attribution information.
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+/* Adapted from PIGeneral.h
+ * Copyright (c) 1992-1998, Adobe Systems Incorporated.
+ * All rights reserved.
+*/
+
+using System.Runtime.InteropServices;
+
+namespace PSFilterLoad.PSApi
+{
+    [UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
+    internal delegate short DisplayPixelsProc(ref PSPixelMap source, ref VRect srcRect, int dstRow, int dstCol,[In, Out] System.IntPtr platformContext);
+}

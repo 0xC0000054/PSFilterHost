@@ -1,0 +1,8 @@
+/HostTest/bin
+/HostTest/obj
+*.user
+*.vsp
+*.suo
+/obj
+/bin
+/Doc
