@@ -38,6 +38,8 @@ namespace PSFilterHostDll
         private PluginAETE aete;
         internal string enableInfo;
         internal ushort supportedModes;
+        internal string[] moduleEntryPoints; 
+
         /// <summary>
         /// The structure containing the dll entrypoint
         /// </summary>
@@ -154,6 +156,7 @@ namespace PSFilterHostDll
             this.enableInfo = string.Empty;
             this.supportedModes = 0;
             this.module = new PIEntrypoint();
+            this.moduleEntryPoints = null;
         }
 
         internal bool IsValid()

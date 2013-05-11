@@ -294,6 +294,25 @@ namespace PSFilterHostDll
 				List<PluginData> pluginData;
 				if (LoadPsFilter.QueryPlugin(item, out pluginData))
 				{
+                    int count = pluginData.Count;
+
+                    if (count > 1)
+                    {
+                        /* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
+                         * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
+                         */
+                        string[] entryPoints = new string[count];
+                        for (int i = 0; i < count; i++)
+                        {
+                            entryPoints[i] = pluginData[i].EntryPoint;
+                        }
+                        
+                        for (int i = 0; i < count; i++)
+                        {
+                            pluginData[i].moduleEntryPoints = entryPoints;
+                        }
+                    }
+
 					pluginInfo.AddRange(pluginData);
 				}
 			}			
