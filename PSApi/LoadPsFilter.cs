@@ -1580,7 +1580,26 @@ namespace PSFilterLoad.PSApi
 
 			try
 			{
-				pdata.module.entryPoint(FilterSelector.filterSelectorAbout, gch.AddrOfPinnedObject(), ref dataPtr, ref result);
+				// If the filter only has one entry point call about on it.
+				if (pdata.moduleEntryPoints == null) 
+				{
+					pdata.module.entryPoint(FilterSelector.filterSelectorAbout, gch.AddrOfPinnedObject(), ref dataPtr, ref result);
+				}
+				else
+				{ 
+					// otherwise call about on all the entry points in the module, per the SDK Docs only one of the entry points will display the about box.
+					foreach (var entryPoint in pdata.moduleEntryPoints)
+					{
+						IntPtr ptr = UnsafeNativeMethods.GetProcAddress(pdata.module.dll, entryPoint);
+
+						pluginEntryPoint ep = (pluginEntryPoint)Marshal.GetDelegateForFunctionPointer(ptr, typeof(pluginEntryPoint));
+						
+						ep(FilterSelector.filterSelectorAbout, gch.AddrOfPinnedObject(), ref dataPtr, ref result);
+
+						GC.KeepAlive(ep);
+					}
+
+				}
 			}
 			finally
 			{
