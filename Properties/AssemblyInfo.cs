@@ -34,7 +34,7 @@ using System.Runtime.InteropServices;
 [assembly: System.Resources.NeutralResourcesLanguage("en-US")]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("016646c4-7bd7-4102-8ea9-459893885aef")]
+[assembly: Guid("7AC4AB63-5920-4E53-9077-B7C1AE5E34CD")]
 
 // Version information for an assembly consists of the following four values:
 //
