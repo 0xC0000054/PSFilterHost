@@ -10,6 +10,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////
+// Paint.NET                                                                   //
+// Copyright (C) dotPDN LLC, Rick Brewster, Tom Jackson, and contributors.     //
+// Portions Copyright (C) Microsoft Corporation. All Rights Reserved.          //
+// See License-pdn.txt for full licensing and attribution details.             //
+//                                                                             //
+/////////////////////////////////////////////////////////////////////////////////
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -822,9 +830,6 @@ namespace PSFilterLoad.PSApi
 
 		private IntPtr filterRecordPtr;
 
-		/// <summary>
-		/// The IntPtr to the PlatformData structure
-		/// </summary>
 		private IntPtr platFormDataPtr;
 
 		private IntPtr bufferProcsPtr;
@@ -865,7 +870,7 @@ namespace PSFilterLoad.PSApi
 		/// The filter progress callback.
 		/// </summary>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-		public void SetProgressFunc(ProgressProc value)
+		internal void SetProgressFunc(ProgressProc value)
 		{
 			if (value == null)
 				throw new ArgumentNullException("value", "value is null.");
@@ -877,7 +882,7 @@ namespace PSFilterLoad.PSApi
 		/// The filter abort callback.
 		/// </summary>
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
-		public void SetAbortFunc(AbortFunc value)
+		internal void SetAbortFunc(AbortFunc value)
 		{
 			if (value == null)
 				throw new ArgumentNullException("value", "value is null.");
@@ -909,7 +914,7 @@ namespace PSFilterLoad.PSApi
 		private GlobalParameters globalParms;
 		private bool isRepeatEffect;
 
-		public ParameterData ParmData
+		internal ParameterData ParmData
 		{
 			get
 			{
@@ -924,7 +929,7 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// Is the filter a repeat Effect.
 		/// </summary>
-		public bool IsRepeatEffect
+		internal bool IsRepeatEffect
 		{
 			set
 			{
@@ -934,7 +939,7 @@ namespace PSFilterLoad.PSApi
 
 		private List<PSResource> pseudoResources;
 
-		public List<PSResource> PseudoResources
+		internal List<PSResource> PseudoResources
 		{
 			get
 			{

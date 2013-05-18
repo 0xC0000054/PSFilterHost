@@ -32,12 +32,12 @@ namespace PSFilterHostDll
 
             protected override bool ReleaseHandle()
             {
-                return NativeMethods.FindClose(handle);
+                return UnsafeNativeMethods.FindClose(handle);
             }
         }
 
         [System.Security.SuppressUnmanagedCodeSecurity]
-        private static class NativeMethods
+        private static class UnsafeNativeMethods
         {
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
             internal static extern SafeFindHandle FindFirstFileW(string fileName, out WIN32_FIND_DATAW data);
@@ -70,7 +70,7 @@ namespace PSFilterHostDll
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        public struct FILETIME
+        private struct FILETIME
         {
             public uint dwLowDateTime;
             public uint dwHighDateTime;
@@ -82,7 +82,7 @@ namespace PSFilterHostDll
 
             var findData = new WIN32_FIND_DATAW();
 
-            using (var findHandle = NativeMethods.FindFirstFileW(directory + @"\*", out findData))
+            using (var findHandle = UnsafeNativeMethods.FindFirstFileW(directory + @"\*", out findData))
             {
                 if (!findHandle.IsInvalid)
                 {
@@ -95,6 +95,9 @@ namespace PSFilterHostDll
                                 if (searchSubDirectories)
                                 {
                                     var subdirectory = Path.Combine(directory,  findData.cFileName);
+
+                                    new FileIOPermission(FileIOPermissionAccess.PathDiscovery, subdirectory);
+
                                     foreach (var file in EnumerateFiles(subdirectory, fileExtension, searchSubDirectories))
                                         yield return file;
                                 }
@@ -109,7 +112,7 @@ namespace PSFilterHostDll
                             }
                         } 
 
-                    } while (NativeMethods.FindNextFileW(findHandle, out findData));
+                    } while (UnsafeNativeMethods.FindNextFileW(findHandle, out findData));
                 }
             }  
             
