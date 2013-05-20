@@ -29,10 +29,8 @@ namespace PSFilterHostDll.BGRASurface
     /// </summary>
     internal sealed class Surface16 : SurfaceBase
     {
-        private bool scaledToPhotoshopRange;
         public Surface16(int width, int height) : base(width, height, 2)
         {
-            this.scaledToPhotoshopRange = false;
         }
 
         /// <summary>
@@ -40,22 +38,17 @@ namespace PSFilterHostDll.BGRASurface
         /// </summary>
         public unsafe void ScaleToPhotoshop16BitRange()
         {
-            if (!scaledToPhotoshopRange)
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
+                ushort* ptrEnd = ptr + width;
+
+                while (ptr < ptrEnd)
                 {
-                    ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
-                    ushort* ptrEnd = ptr + width;
+                    *ptr = (ushort)(((ptr[0] * 32768) + 32767) / 65535);
 
-                    while (ptr < ptrEnd)
-                    {
-                        *ptr = (ushort)(((ptr[0] * 32768) + 32767) / 65535);
-
-                        ptr++;
-                    }
+                    ptr++;
                 }
-
-                scaledToPhotoshopRange = true;
             }
         }
 
@@ -64,23 +57,19 @@ namespace PSFilterHostDll.BGRASurface
         /// </summary>
         private unsafe void ScaleFromPhotoshop16BitRange()
         {
-            if (scaledToPhotoshopRange)
+            for (int y = 0; y < height; y++)
             {
-                for (int y = 0; y < height; y++)
+                ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
+                ushort* ptrEnd = ptr + width;
+
+                while (ptr < ptrEnd)
                 {
-                    ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
-                    ushort* ptrEnd = ptr + width;
+                    *ptr = Scale16(*ptr);
 
-                    while (ptr < ptrEnd)
-                    {
-                        *ptr = Scale16(*ptr);
-
-                        ptr++;
-                    }
+                    ptr++;
                 }
-
-                scaledToPhotoshopRange = false;
             }
+
         }
 
 
@@ -358,7 +347,7 @@ namespace PSFilterHostDll.BGRASurface
                     double srcRightWeight = srcRight - srcRightFloor;
                     int srcRightInt = (int)srcRightFloor;
 
-                    double blueSum = 0;
+                    double graySum = 0;
                     double alphaSum = 0;
 
                     // left fractional edge
@@ -367,7 +356,7 @@ namespace PSFilterHostDll.BGRASurface
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
                         double a = 255.0;
-                        blueSum += srcLeftPtr[0] * srcLeftWeight * a;
+                        graySum += srcLeftPtr[0] * srcLeftWeight * a;
                         alphaSum += a * srcLeftWeight;
                         srcLeftPtr = (ushort*)(srcLeftPtr + srcStride);
                     }
@@ -377,7 +366,7 @@ namespace PSFilterHostDll.BGRASurface
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
                         double a = 255.0;
-                        blueSum += srcRightPtr[0] * srcRightWeight * a;
+                        graySum += srcRightPtr[0] * srcRightWeight * a;
                         alphaSum += a * srcRightWeight;
                         srcRightPtr = (ushort*)(srcRightPtr + srcStride);
                     }
@@ -387,7 +376,7 @@ namespace PSFilterHostDll.BGRASurface
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
                         double a = 255.0;
-                        blueSum += srcTopPtr[0] * srcTopWeight * a;
+                        graySum += srcTopPtr[0] * srcTopWeight * a;
                         alphaSum += a * srcTopWeight;
                         ++srcTopPtr;
                     }
@@ -397,7 +386,7 @@ namespace PSFilterHostDll.BGRASurface
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
                         double a = 255.0;
-                        blueSum += srcBottomPtr[0] * srcBottomWeight * a;
+                        graySum += srcBottomPtr[0] * srcBottomWeight * a;
                         alphaSum += 255.0 * srcBottomWeight;
                         ++srcBottomPtr;
                     }
@@ -409,7 +398,7 @@ namespace PSFilterHostDll.BGRASurface
 
                         for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                         {
-                            blueSum += (double)srcPtr[0] * 255.0;
+                            graySum += (double)srcPtr[0] * 255.0;
                             alphaSum += 255.0;
                             ++srcPtr;
                         }
@@ -418,43 +407,43 @@ namespace PSFilterHostDll.BGRASurface
                     // four corner pixels
                     ushort srcTL = *(ushort*)source.GetPointAddress(srcLeftInt, srcTopInt);
                     double srcTLA = 255.0;
-                    blueSum += srcTL * (srcTopWeight * srcLeftWeight) * srcTLA;
+                    graySum += srcTL * (srcTopWeight * srcLeftWeight) * srcTLA;
                     alphaSum += srcTLA * (srcTopWeight * srcLeftWeight);
 
                     ushort srcTR = *(ushort*)source.GetPointAddress(srcRightInt, srcTopInt);
                     double srcTRA = 255.0;
-                    blueSum += srcTR * (srcTopWeight * srcRightWeight) * srcTRA;
+                    graySum += srcTR * (srcTopWeight * srcRightWeight) * srcTRA;
                     alphaSum += srcTRA * (srcTopWeight * srcRightWeight);
 
                     ushort srcBL = *(ushort*)source.GetPointAddress(srcLeftInt, srcBottomInt);
                     double srcBLA = 255.0;
-                    blueSum += srcBL * (srcBottomWeight * srcLeftWeight) * srcBLA;
+                    graySum += srcBL * (srcBottomWeight * srcLeftWeight) * srcBLA;
                     alphaSum += srcBLA * (srcBottomWeight * srcLeftWeight);
 
                     ushort srcBR = *(ushort*)source.GetPointAddress(srcRightInt, srcBottomInt);
                     double srcBRA = 255.0;
-                    blueSum += srcBR * (srcBottomWeight * srcRightWeight) * srcBRA;
+                    graySum += srcBR * (srcBottomWeight * srcRightWeight) * srcBRA;
                     alphaSum += srcBRA * (srcBottomWeight * srcRightWeight);
 
                     double area = (srcRight - srcLeft) * (srcBottom - srcTop);
 
                     double alpha = alphaSum / area;
-                    double blue;
+                    double gray;
 
                     if (alpha == 0)
                     {
-                        blue = 0;
+                        gray = 0;
                     }
                     else
                     {
-                        blue = blueSum / alphaSum;
+                        gray = graySum / alphaSum;
                     }
 
                     // add 0.5 so that rounding goes in the direction we want it to
-                    blue += 0.5;
+                    gray += 0.5;
                     alpha += 0.5;
 
-                    dstPtr[0] = (ushort)blue;
+                    dstPtr[0] = (ushort)gray;
                     ++dstPtr;
                 }
             }

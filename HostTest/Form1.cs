@@ -156,20 +156,18 @@ namespace HostTest
 			
 		}
 
-
-
 		private bool setRepeatEffect;
 		private void RunPhotoshopFilter_Click(object sender, EventArgs e)
 		{
 			ToolStripItem item = (ToolStripItem)sender;
 			PluginData pluginData = (PluginData)item.Tag;
-			setRepeatEffect = false;
+			this.setRepeatEffect = false;
 			RunPhotoshopFilterImpl(pluginData, false);
 
 			if (setRepeatEffect)
 			{
 				SetRepeatEffectMenuItem(item);
-				setRepeatEffect = false;
+				this.setRepeatEffect = false;
 			}
 		}
 
@@ -215,12 +213,8 @@ namespace HostTest
 
 						if (dstImage.Format == PixelFormats.Rgba64)
 						{
-							FormatConvertedBitmap conv = new FormatConvertedBitmap();
-							conv.BeginInit();
-							conv.Source = this.dstImage;
-							conv.DestinationFormat = PixelFormats.Bgra32;
-							conv.EndInit();
-
+							FormatConvertedBitmap conv = new FormatConvertedBitmap(this.dstImage, PixelFormats.Bgra32, null, 0.0);
+						
 							using (MemoryStream ms = new MemoryStream())
 							{
 								TiffBitmapEncoder enc = new TiffBitmapEncoder();
@@ -255,7 +249,7 @@ namespace HostTest
 
 							this.pseudoResources = host.PseudoResources;
 
-							setRepeatEffect = true;
+							this.setRepeatEffect = true;
 						}
 						this.progressBar1.Value = 0;
 					}
@@ -359,7 +353,7 @@ namespace HostTest
 					int channelCount = format.Masks.Count;
 					int bitsPerChannel = format.BitsPerPixel / channelCount;
 
-					if (bitsPerChannel == 16)
+					if (bitsPerChannel >= 16)
 					{
 						FormatConvertedBitmap conv = new FormatConvertedBitmap();
 						conv.BeginInit();
@@ -440,6 +434,29 @@ namespace HostTest
 				{
 					enc.Save(fs);
 				}            
+			}
+		}
+
+		static class NativeMethods
+		{
+			[DllImport("kernel32.dll", EntryPoint = "SetProcessDEPPolicy")]
+			[return: MarshalAs(UnmanagedType.Bool)]
+			internal static extern bool SetProcessDEPPolicy(uint dwFlags);
+		}
+
+		private void Form1_Load(object sender, EventArgs e)
+		{
+			// Try to Opt-out of DEP on a 32-bit OS as many filters do not support it.
+			if (IntPtr.Size == 4)
+			{
+				try
+				{
+					NativeMethods.SetProcessDEPPolicy(0U); 
+				}
+				catch (EntryPointNotFoundException)
+				{
+					// This method is only present on Vista SP1 or XP SP3 and later. 
+				}
 			}
 		}
 
