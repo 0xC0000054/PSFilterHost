@@ -1013,6 +1013,7 @@ namespace PSFilterLoad.PSApi
 			progressFunc = null;
 			this.pseudoResources = new List<PSResource>();
 			this.handles = new Dictionary<IntPtr, PSHandle>();
+			this.bufferIDs = new List<IntPtr>();
 
 			this.keys = null;
 			this.aete = null;
@@ -1309,7 +1310,6 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
-		private bool saveGlobalDataPointer;
 		/// <summary>
 		/// Save the filter parameters for repeat runs.
 		/// </summary>
@@ -1347,7 +1347,7 @@ namespace PSFilterLoad.PSApi
 					try
 					{
 						IntPtr hPtr = Marshal.ReadIntPtr(filterRecord->parameters);
-
+						
 						if (size == handleSize && Marshal.ReadInt32(filterRecord->parameters, IntPtr.Size) == 0x464f544f)
 						{
 							long ps = 0;
@@ -1396,15 +1396,18 @@ namespace PSFilterLoad.PSApi
 				}
 
 			}
-			if (dataPtr != IntPtr.Zero && saveGlobalDataPointer)
+
+			if (dataPtr != IntPtr.Zero)
 			{    				
 				globalParms.PluginDataIsPSHandle = false;
 			
 				long pluginDataSize = 0L;
-				IntPtr sz = SafeNativeMethods.GlobalSize(dataPtr);
-				if (sz != IntPtr.Zero)
-					pluginDataSize = sz.ToInt64();
 
+				if (!handle_valid(dataPtr))
+				{
+					pluginDataSize = SafeNativeMethods.GlobalSize(dataPtr).ToInt64();
+				}
+				
 				IntPtr pluginData = SafeNativeMethods.GlobalLock(dataPtr);
 
 				try
@@ -1423,28 +1426,26 @@ namespace PSFilterLoad.PSApi
 						globalParms.PluginDataSize = pluginDataSize;
 
 					}
+					else if (handle_valid(pluginData))
+					{
+						int ps = HandleGetSizeProc(pluginData);
+						byte[] dataBuf = new byte[ps];
+
+						IntPtr hPtr = HandleLockProc(pluginData, 0);
+						Marshal.Copy(hPtr, dataBuf, 0, ps);
+						HandleUnlockProc(pluginData);
+						globalParms.SetPluginDataBytes(dataBuf);
+						globalParms.PluginDataSize = ps;
+						globalParms.PluginDataIsPSHandle = true;
+					}
 					else if (pluginDataSize > 0)
 					{
-						if (handle_valid(pluginData))
-						{
-							int ps = HandleGetSizeProc(pluginData);
-							byte[] dataBuf = new byte[ps];
-
-							IntPtr hPtr = HandleLockProc(pluginData, 0);
-							Marshal.Copy(hPtr, dataBuf, 0, ps);
-							HandleUnlockProc(pluginData);
-							globalParms.SetPluginDataBytes(dataBuf);
-							globalParms.PluginDataSize = ps;
-							globalParms.PluginDataIsPSHandle = true;
-						}
-						else
-						{
-							byte[] dataBuf = new byte[pluginDataSize];
-							Marshal.Copy(pluginData, dataBuf, 0, (int)pluginDataSize);
-							globalParms.SetPluginDataBytes(dataBuf);
-							globalParms.PluginDataSize = pluginDataSize;
-						}
+						byte[] dataBuf = new byte[pluginDataSize];
+						Marshal.Copy(pluginData, dataBuf, 0, (int)pluginDataSize);
+						globalParms.SetPluginDataBytes(dataBuf);
+						globalParms.PluginDataSize = pluginDataSize;
 					}
+					
 				}
 				finally
 				{
@@ -1719,7 +1720,7 @@ namespace PSFilterLoad.PSApi
 #endif
 			if (!isRepeatEffect && result == PSError.noErr)
 			{
-				SaveParameters(); // save the parameters again in case the filter shows it's dialog when filterSelectorStart is called.
+				SaveParameters(); 
 			}
 
 			return true;
@@ -1758,8 +1759,6 @@ namespace PSFilterLoad.PSApi
 #endif
 				return false;
 			}
-
-			SaveParameters();
 
 			phase = PluginPhase.Parameters;
 
@@ -1998,8 +1997,7 @@ namespace PSFilterLoad.PSApi
 #endif
 				return false;
 			}
-			// Disable saving of the 'data' pointer for Noise Ninja as it points to a memory mapped file.
-			saveGlobalDataPointer = pdata.Category != "PictureCode";
+
 			useChannelPorts = pdata.Category == "Amico Perry"; // enable the channel ports suite for Luce 2
 
 			ignoreAlpha = IgnoreAlphaChannel(pdata);
@@ -3025,26 +3023,21 @@ namespace PSFilterLoad.PSApi
 			
 			byte* ptr = (byte*)maskData.ToPointer();
 
+			int top = lockRect.Top;
+			int left = lockRect.Left;
 			int maskHeight = Math.Min(lockRect.Bottom, mask.Height);
 			int maskWidth = Math.Min(lockRect.Right, mask.Width);
 
-			for (int y = lockRect.Top; y < maskHeight; y++)
+			for (int y = top; y < maskHeight; y++)
 			{
-				byte* srcRow = tempMask.GetPointAddressUnchecked(lockRect.Left, y);
-				byte* dstRow = ptr + ((y - lockRect.Top) * width);
-				for (int x = lockRect.Left; x < maskWidth; x++)
+				byte* src = tempMask.GetPointAddressUnchecked(left, y);
+				byte* dst = ptr + ((y - top) * width);
+				for (int x = left; x < maskWidth; x++)
 				{
-					if (*srcRow > 0)
-					{
-						*dstRow = 255;
-					}
-					else
-					{
-						*dstRow = 0;
-					}
+					*dst = *src;
 
-					srcRow++;
-					dstRow++;
+					src++;
+					dst++;
 				}
 			}
 
@@ -3273,6 +3266,8 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
+		private List<IntPtr> bufferIDs;
+
 		private short AllocateBufferProc(int size, ref IntPtr bufferID)
 		{
 #if DEBUG
@@ -3282,6 +3277,8 @@ namespace PSFilterLoad.PSApi
 			try
 			{
 				bufferID = Memory.Allocate(size, false);
+
+				this.bufferIDs.Add(bufferID);
 			}
 			catch (OutOfMemoryException)
 			{
@@ -3298,6 +3295,8 @@ namespace PSFilterLoad.PSApi
 			Ping(DebugFlags.BufferSuite, string.Format("Buffer address = {0:X8}, Size = {1}", bufferID.ToInt64(), size));
 #endif
 			Memory.Free(bufferID);
+
+			this.bufferIDs.Remove(bufferID);
 
 		}
 		private IntPtr BufferLockProc(IntPtr bufferID, byte moveHigh)
@@ -3387,6 +3386,7 @@ namespace PSFilterLoad.PSApi
 					
 					break;
 				case ColorServicesSelector.plugIncolorServicesSamplePoint:
+					
 					Point16* point = (Point16*)info.selectorParameter.globalSamplePoint.ToPointer();
 
 					if ((point->h >= 0 && point-> h < source.Width) && (point->v >= 0 && point->v < source.Height))
@@ -3925,9 +3925,11 @@ namespace PSFilterLoad.PSApi
 
 						byte* ptr = (byte*)inData.ToPointer();
 
+						int srcChannelCount = surface.ChannelCount;
+
 						#region Padding code
 
-						if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+						if (surface.BitsPerChannel == 16)
 						{
 							if (top > 0)
 							{
@@ -3960,12 +3962,11 @@ namespace PSFilterLoad.PSApi
 												break;
 										}
 
-										p++;
+										p += srcChannelCount;
 										q += nplanes;
 									}
 								}
 							}
-
 
 							if (left > 0)
 							{
@@ -4036,7 +4037,7 @@ namespace PSFilterLoad.PSApi
 												break;
 										}
 
-										p++;
+										p += srcChannelCount;
 										q += nplanes;
 									}
 
@@ -4114,7 +4115,7 @@ namespace PSFilterLoad.PSApi
 												break;
 										}
 
-										p++;
+										p += srcChannelCount;
 										q += nplanes;
 									}
 								}
@@ -4191,7 +4192,7 @@ namespace PSFilterLoad.PSApi
 												break;
 										}
 
-										p++;
+										p += srcChannelCount;
 										q += nplanes;
 									}
 
@@ -5345,7 +5346,6 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 				Ping(DebugFlags.HandleSuite, string.Format("Handle address = {0:X8}", h.ToInt64()));
 #endif
-				IntPtr parentHandle = IntPtr.Zero;
 				if (!handle_valid(h))
 				{
 					if (SafeNativeMethods.GlobalSize(h).ToInt64() > 0L)
@@ -5662,7 +5662,7 @@ namespace PSFilterLoad.PSApi
 				enc.Save(ms); 
 #endif
 
-				bytes = ReadJpegAPP1(ms.ToArray(), exif);
+				bytes = ReadJpegAPP1(ms.GetBuffer(), exif);
 			}
 
 			return (bytes != null);
@@ -6572,6 +6572,10 @@ namespace PSFilterLoad.PSApi
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// Releases unmanaged resources and performs other cleanup operations before the
+		/// <see cref="LoadPsFilter"/> is reclaimed by garbage collection.
+		/// </summary>
 		~LoadPsFilter()
 		{
 			Dispose(false);
@@ -6751,7 +6755,7 @@ namespace PSFilterLoad.PSApi
 					{
 						Memory.Free(item.Value);
 					}
-					activePICASuites.Clear();
+					activePICASuites = null;
 				}
 #endif
 
@@ -6806,6 +6810,16 @@ namespace PSFilterLoad.PSApi
 						SafeNativeMethods.GlobalFree(dataPtr);
 					}
 					dataPtr = IntPtr.Zero;
+				}
+
+				// free any remaining buffer suite memory.
+				if (bufferIDs.Count > 0)
+				{
+					for (int i = 0; i < bufferIDs.Count; i++)
+					{
+						Memory.Free(bufferIDs[i]);
+					}
+					bufferIDs = null;
 				}
 
 				// free any remaining handles

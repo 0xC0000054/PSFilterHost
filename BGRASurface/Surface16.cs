@@ -33,6 +33,22 @@ namespace PSFilterHostDll.BGRASurface
         {
         }
 
+        public override int ChannelCount
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public override int BitsPerChannel
+        {
+            get
+            {
+                return 16;
+            }
+        }
+
         /// <summary>
         /// Scales the data to the internal 16 bit range used by Adobe® Photoshop®.
         /// </summary>

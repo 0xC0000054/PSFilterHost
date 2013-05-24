@@ -58,6 +58,22 @@ namespace PSFilterHostDll.BGRASurface
 			get { return new Rectangle(0, 0, width, height); }
 		}
 
+		public virtual int ChannelCount
+		{
+			get
+			{
+				return 4;
+			}
+		}
+
+		public virtual int BitsPerChannel
+		{
+			get
+			{
+				return 8;
+			}
+		}
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SurfaceBase"/> class.
 		/// </summary>

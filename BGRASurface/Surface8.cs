@@ -32,6 +32,14 @@ namespace PSFilterHostDll.BGRASurface
         {
         }
 
+        public override int ChannelCount
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
         public override unsafe Bitmap CreateAliasedBitmap()
         {
             Bitmap image = null;

@@ -41,13 +41,13 @@ namespace HostTest
 		private PseudoResourceCollection pseudoResources;
 		private Dictionary<string, ParameterData> parmDict;
 
-		private void button1_Click(object sender, EventArgs e)
+		private void browseFilterBtn_Click(object sender, EventArgs e)
 		{
 			folderBrowserDialog1.SelectedPath = string.Empty;
 			
 			if (folderBrowserDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 			{
-				this.textBox1.Text = folderBrowserDialog1.SelectedPath;
+				this.filterDirectoryTxt.Text = folderBrowserDialog1.SelectedPath;
 				QueryDirectory(folderBrowserDialog1.SelectedPath);
 			}
 		}
@@ -151,6 +151,16 @@ namespace HostTest
 					}
 				}
 				
+			}
+			else
+			{
+				ToolStripItemCollection items = filtersToolStripMenuItem.DropDownItems;
+				int length = items.Count;
+
+				for (int i = 0; i < length; i++)
+				{
+					items[i].Enabled = false;
+				}
 			}
 
 			

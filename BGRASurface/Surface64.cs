@@ -33,6 +33,14 @@ namespace PSFilterHostDll.BGRASurface
         {
         }
 
+        public override int BitsPerChannel
+        {
+            get
+            {
+                return 16;
+            }
+        }
+
         private unsafe void BGRAtoRGBA()
         {
             for (int y = 0; y < height; y++)

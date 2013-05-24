@@ -29,7 +29,7 @@ namespace PSFilterLoad.PSApi
         public int specialColorID;
     }
 
-    [UnmanagedFunctionPointer(System.Runtime.InteropServices.CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short ColorServicesProc(ref ColorServicesInfo info);
 
     [StructLayoutAttribute(LayoutKind.Sequential)]
