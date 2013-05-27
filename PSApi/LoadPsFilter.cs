@@ -1723,6 +1723,13 @@ namespace PSFilterLoad.PSApi
 				SaveParameters(); 
 			}
 
+			filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
+
+			if (filterRecord->autoMask == 1) 
+			{
+				ClipToSelection(); // Clip the rendered image to the selection if the filter does not do it for us.
+			}
+
 			return true;
 		}
 
@@ -1983,6 +1990,87 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
+		private bool writesOutsideSelection;
+		/// <summary>
+		/// Clips the output image to the selection.
+		/// </summary>
+		private unsafe void ClipToSelection()
+		{
+			if ((selectedRegion != null) && !writesOutsideSelection)
+			{
+				int width = source.Width;
+				int height = source.Height;
+				int channelCount = dest.ChannelCount;
+
+				if (dest.BitsPerChannel == 16)
+				{
+					for (int y = 0; y < height; y++)
+					{
+						ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+						ushort* dst = (ushort*)dest.GetRowAddressUnchecked(y);
+						byte* maskByte = mask.GetRowAddressUnchecked(y);
+						for (int x = 0; x < width; x++)
+						{
+							// Copy the source to the destination in areas outside the selection.
+							if (*maskByte == 0)
+							{
+								switch (channelCount)
+								{
+									case 1:
+										*dst = *src;
+										break;
+									case 4:
+										dst[0] = src[0];
+										dst[1] = src[1];
+										dst[2] = src[2];
+										dst[3] = src[3];
+										break;
+								}
+							}
+
+							src += channelCount;
+							dst += channelCount;
+							maskByte++;
+						}
+					}
+				}
+				else
+				{
+					for (int y = 0; y < height; y++)
+					{
+						byte* src = source.GetRowAddressUnchecked(y);
+						byte* dst = dest.GetRowAddressUnchecked(y);
+						byte* maskByte = mask.GetRowAddressUnchecked(y);
+
+						for (int x = 0; x < width; x++)
+						{
+							if (*maskByte == 0)
+							{
+								switch (channelCount)
+								{
+									case 1:
+										*dst = *src;
+										break;
+									case 4:
+										dst[0] = src[0];
+										dst[1] = src[1];
+										dst[2] = src[2];
+										dst[3] = src[3];
+										break;
+								}
+							}
+
+							src += channelCount;
+							dst += channelCount;
+							maskByte++;
+						}
+					}
+				}
+
+			}
+
+		}
+
 		/// <summary>
 		/// Runs a filter from the specified PluginData
 		/// </summary>
@@ -2004,7 +2092,9 @@ namespace PSFilterLoad.PSApi
 
 			if (pdata.FilterInfo != null)
 			{
-				copyToDest = ((pdata.FilterInfo[(filterCase - 1)].flags1 & FilterCaseInfoFlags.PIFilterDontCopyToDestinationBit) == 0);
+				int index = filterCase - 1;
+				copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.PIFilterDontCopyToDestinationBit) == 0);
+				writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.PIFilterWritesOutsideSelectionBit) != 0);
 			}
 
 			if (copyToDest)
@@ -4650,8 +4740,21 @@ namespace PSFilterLoad.PSApi
 
 						getKey = key = subKeys[subClassIndex];
 						AETEValue value = subClassDict[key];
-						type = value.Type;
-						flags = value.Flags;
+						try
+						{
+							type = value.Type;
+						}
+						catch (NullReferenceException)
+						{
+						}
+
+						try
+						{
+							flags = value.Flags;
+						}
+						catch (NullReferenceException)
+						{
+						}
 
 						subClassIndex++;
 					}
@@ -4665,8 +4768,21 @@ namespace PSFilterLoad.PSApi
 						getKey = key = subKeys[subKeyIndex];
 
 						AETEValue value = aeteDict[key];
-						type = value.Type;
-						flags = value.Flags;
+						try
+						{
+							type = value.Type;
+						}
+						catch (NullReferenceException)
+						{
+						}
+
+						try
+						{
+							flags = value.Flags;
+						}
+						catch (NullReferenceException)
+						{
+						}
 
 						subKeyIndex++;
 					}
@@ -4680,8 +4796,21 @@ namespace PSFilterLoad.PSApi
 					getKey = key = keys[getKeyIndex];
 
 					AETEValue value = aeteDict[key];
-					type = value.Type;
-					flags = value.Flags;
+					try
+					{
+						type = value.Type;
+					}
+					catch (NullReferenceException)
+					{
+					}
+
+					try
+					{
+						flags = value.Flags;
+					}
+					catch (NullReferenceException)
+					{
+					}
 
 					getKeyIndex++;
 				}
