@@ -117,10 +117,87 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutPluginsText" xml:space="preserve">
+    <value>About Plugins</value>
+  </data>
+  <data name="ApplyFilterStatusFormat" xml:space="preserve">
+    <value>Applying {0}</value>
+  </data>
+  <data name="EllipseSelectionToolStatusText" xml:space="preserve">
+    <value>Click and drag to draw a elliptical selection on the canvas.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="EllipseSelectToolIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EllipseSelectToolIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MenuViewZoomInIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MenuViewZoomInIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MenuViewZoomOutIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MenuViewZoomOutIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OpenFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\OpenFile.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="openfolderHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\openfolderHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PointerHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PointerHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="RectangleSelectionToolStatusText" xml:space="preserve">
+    <value>Click and drag to draw a rectangle selection on the canvas.</value>
+  </data>
+  <data name="RectangleSelectToolIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\RectangleSelectToolIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Redo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Redo.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="RepeatEffectMenuText" xml:space="preserve">
     <value>Repeat </value>
   </data>
-  <data name="RepeatEffectShortcutKeysText" xml:space="preserve">
-    <value>Ctrl + F</value>
+  <data name="saveHS" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\saveHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="TitleStringFormat" xml:space="preserve">
+    <value>HostTest - {0} @{1}% ({2})</value>
+  </data>
+  <data name="Undo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Undo.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CancelDescription" xml:space="preserve">
+    <value>Return to HostTest</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="CancelIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\CancelIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="CancelText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DontSaveChangesDescription" xml:space="preserve">
+    <value>Discard the unsaved changes to the image.</value>
+  </data>
+  <data name="DontSaveChangesText" xml:space="preserve">
+    <value>Don't Save</value>
+  </data>
+  <data name="eventlogWarn" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\eventlogWarn.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="MenuFileCloseIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MenuFileCloseIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="SaveChangesCaption" xml:space="preserve">
+    <value>Unsaved Changes</value>
+  </data>
+  <data name="SaveChangesDescription" xml:space="preserve">
+    <value>Save changes to the image.</value>
+  </data>
+  <data name="SaveChangesText" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="UnsavedChangesText" xml:space="preserve">
+    <value>{0} has unsaved changes. Would you like to save changes to the image?</value>
   </data>
 </root>

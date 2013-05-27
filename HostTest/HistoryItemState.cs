@@ -10,18 +10,16 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
 namespace HostTest
 {
-    class ToolStripItemComparer : IComparer<ToolStripItem>
+    /// <summary>
+    /// The enum that defines the possible states of a HistoryItem.
+    /// </summary>
+    enum HistoryItemState
     {
-        public int Compare(ToolStripItem x, ToolStripItem y)
-        {
-            return String.CompareOrdinal(x.Text, y.Text);
-        }
+        Disk,
+        Memory,
+        Disposed
     }
-
 }

@@ -20,7 +20,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;CHANNELPORTS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
@@ -31,28 +31,10 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;CHANNELPORTS</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug NET 2.0|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug NET 2.0\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisLogFile>bin\Debug\HostTest.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
-    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
-    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
-    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -63,17 +45,53 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanvasZoomChangingEventArgs.cs" />
+    <Compile Include="ColorToolStripMenuItemcs.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Canvas.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CanvasHistoryState.cs" />
+    <Compile Include="HistoryItem.cs" />
+    <Compile Include="HistoryItemState.cs" />
+    <Compile Include="HistoryStack.cs" />
+    <Compile Include="TaskDialog\ButtonBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TaskDialog\CommandButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TaskDialog\EtchedLine.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TaskDialog\HeaderLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TaskDialog\NativeConstants.cs" />
+    <Compile Include="TaskDialog\TaskButton.cs" />
+    <Compile Include="TaskDialog\TaskDialog.cs" />
+    <Compile Include="TaskDialog\UI.cs" />
+    <Compile Include="TaskDialog\VisualStyleClass.cs" />
+    <Compile Include="Tools\CursorChangedEventArgs.cs" />
+    <Compile Include="Tools\ElipseSelectTool.cs" />
+    <Compile Include="Tools\RectangleSelectTool.cs" />
+    <Compile Include="Tools\SelectionBase.cs" />
+    <Compile Include="Tools\SelectionPathChangedEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ToolStripItemComparer.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Canvas.resx">
+      <DependentUpon>Canvas.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -86,6 +104,45 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OpenFile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\saveHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\openfolderHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EllipseSelectToolIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\RectangleSelectToolIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MenuViewZoomInIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MenuViewZoomOutIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Redo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Undo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PointerHS.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CancelIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MenuFileCloseIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\eventlogWarn.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PSFilterHost.csproj">

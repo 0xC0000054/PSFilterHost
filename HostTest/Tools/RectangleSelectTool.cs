@@ -10,18 +10,19 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 
-namespace HostTest
+namespace HostTest.Tools
 {
-    class ToolStripItemComparer : IComparer<ToolStripItem>
+    /// <summary>
+    /// The rectangle selection tool class.
+    /// </summary>
+    [System.Serializable]
+    class RectangleSelectTool : SelectionBase
     {
-        public int Compare(ToolStripItem x, ToolStripItem y)
+        public RectangleSelectTool() : base()
         {
-            return String.CompareOrdinal(x.Text, y.Text);
         }
-    }
 
+
+    }
 }
