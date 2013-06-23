@@ -32,7 +32,7 @@ namespace HostTest
 	/// <summary>
 	/// The control that displays the loaded Bitmap.
 	/// </summary>
-	internal sealed class Canvas : UserControl
+	internal sealed class Canvas : Control
 	{
 		private Rectangle imageBounds;
 		private Region selectionRegion;
@@ -46,9 +46,14 @@ namespace HostTest
 		private static readonly float[] zoomFactors;
 		private static readonly float minZoom;
 		private static readonly float maxZoom;
-		private float scale;
+		private float zoomFactor;
 		private Bitmap scaledImage;
 		private bool isDirty;
+		private float selectionFactor;
+		private GraphicsPath normalizedPath;
+
+		public event EventHandler<CanvasZoomChangedEventArgs> ZoomChanged;
+		public event EventHandler<CanvasDirtyChangedEventArgs> DirtyChanged;
 
 		static Canvas()
 		{
@@ -63,7 +68,6 @@ namespace HostTest
 		{
 			this.DoubleBuffered = true;
 			base.SetStyle(ControlStyles.UserPaint, true);
-			base.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
 			base.SetStyle(ControlStyles.Selectable, true);
 
 			this.imageBounds = Rectangle.Empty;
@@ -73,10 +77,11 @@ namespace HostTest
 
 			this.path = null;
 			this.selectionClass = null;
-			this.scale = 1f;
+			this.zoomFactor = 1f;
 			this.resetClip = false;
 			this.scaledImage = null;
 			this.isDirty = false;
+			this.normalizedPath = null;
 		}
 
 		public bool IsDirty
@@ -87,7 +92,15 @@ namespace HostTest
 			}
 			set
 			{
-				isDirty = value;
+				if (isDirty != value)
+				{
+					isDirty = value;
+
+					if (DirtyChanged != null)
+					{
+						DirtyChanged.Invoke(this, new CanvasDirtyChangedEventArgs(value));
+					}
+				}
 			}
 		}
 
@@ -106,8 +119,8 @@ namespace HostTest
 					this.MouseMove -= this.selectionClass.MouseMove;
 					this.MouseUp -= this.selectionClass.MouseUp;
 					this.KeyDown -= this.selectionClass.KeyDown;
-					this.selectionClass.OnCursorChanged -= this.OnCursorChanged;
-					this.selectionClass.OnSelectedPathChanged -= this.OnSelectionPathChanged;
+					this.selectionClass.CursorChanged -= this.OnCursorChanged;
+					this.selectionClass.SelectedPathChanged -= this.OnSelectionPathChanged;
 
 					this.selectionClass.Dispose();
 					this.selectionClass = null;
@@ -124,15 +137,13 @@ namespace HostTest
 					this.MouseMove += new MouseEventHandler(selectionClass.MouseMove);
 					this.MouseUp += new MouseEventHandler(selectionClass.MouseUp);
 					this.KeyDown += new KeyEventHandler(selectionClass.KeyDown);
-					selectionClass.OnCursorChanged += new EventHandler<CursorChangedEventArgs>(this.OnCursorChanged);
-					selectionClass.OnSelectedPathChanged += new EventHandler<SelectionPathChangedEventArgs>(this.OnSelectionPathChanged);
+					selectionClass.CursorChanged += new EventHandler<CursorChangedEventArgs>(this.OnCursorChanged);
+					selectionClass.SelectedPathChanged += new EventHandler<SelectionPathChangedEventArgs>(this.OnSelectionPathChanged);
 				}
 
 			}
 		}
 	
-		public event EventHandler<CanvasZoomChangingEventArgs> ZoomChanged;
-
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing)
@@ -177,6 +188,11 @@ namespace HostTest
 					outlinePen2.Dispose();
 					outlinePen2 = null;
 				}
+				if (normalizedPath != null)
+				{
+					normalizedPath.Dispose();
+					normalizedPath = null;
+				}
 
 			}
 			base.Dispose(disposing);
@@ -186,6 +202,7 @@ namespace HostTest
 		{
 			if (e.SelectedPath != null)
 			{
+				this.selectionFactor = this.zoomFactor;
 				this.RenderSelection(e.SelectedPath, false);
 			}
 			else
@@ -210,7 +227,13 @@ namespace HostTest
 			if (selectPath != null && selectPath.PointCount > 2)
 			{
 				this.path = (GraphicsPath)selectPath.Clone();
-				selectionRegion = new Region(selectPath);
+				this.selectionRegion = new Region(selectPath);
+
+				if (normalizedPath != null)
+				{
+					normalizedPath.Dispose();
+					normalizedPath = null;
+				}
 			}
 			else if (deSelect)
 			{
@@ -218,6 +241,12 @@ namespace HostTest
 				{
 					path.Dispose();
 					path = null;
+				}
+
+				if (normalizedPath != null)
+				{
+					normalizedPath.Dispose();
+					normalizedPath = null;
 				}
 
 				if (selectionRegion != null)
@@ -233,38 +262,50 @@ namespace HostTest
 		{
 			resetClip = true;
 			this.Invalidate();
+			this.Update();
 		}
 
 		private bool resetClip;
 		protected override void OnPaint(PaintEventArgs pe)
 		{
-		  
 			if (resetClip)
 			{
-				pe.Graphics.ResetClip();
-				pe.Graphics.SetClip(imageBounds);
+				if (imageBounds.Width < pe.ClipRectangle.Width && imageBounds.Height < pe.ClipRectangle.Height)
+				{				
+					pe.Graphics.ResetClip();
+					pe.Graphics.SetClip(imageBounds);
+				}
+
 				resetClip = false;
 			}
 
-			if (this.checkerBoardBitmap != null && this.image != null)
+			if (this.image != null)
 			{
-				pe.Graphics.Clear(Color.Transparent);
-				pe.Graphics.DrawImageUnscaledAndClipped(this.checkerBoardBitmap, this.imageBounds);
-
-				if (scaledImage != null)
+				CompositingMode oldCM = pe.Graphics.CompositingMode;
+				
+				if (checkerBoardBitmap != null)
 				{
-					pe.Graphics.DrawImage(this.scaledImage, this.imageBounds);
+					pe.Graphics.DrawImage(this.checkerBoardBitmap, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
 				}
 				else
 				{
-					pe.Graphics.DrawImage(this.image, this.imageBounds);
-				}				
+					pe.Graphics.CompositingMode = CompositingMode.SourceCopy;
+				}
 
+				if (scaledImage != null)
+				{
+					pe.Graphics.DrawImage(this.scaledImage, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
+				}
+				else
+				{
+					pe.Graphics.DrawImage(this.image, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
+				}
+
+				pe.Graphics.CompositingMode = oldCM;
+				
 				if (selectionRegion != null)
 				{
 					// draw the selection outline.
-
-					Graphics g = pe.Graphics;
 
 					if (outlinePen1 == null)
 					{
@@ -285,7 +326,9 @@ namespace HostTest
 						outlinePen2.DashPattern = new float[] { 4, 4 };
 						outlinePen2.Color = Color.White;
 						outlinePen2.DashOffset = 4.0f;
-					}
+					}			
+					
+					Graphics g = pe.Graphics;
 
 					PixelOffsetMode oldPOM = g.PixelOffsetMode;
 					g.PixelOffsetMode = PixelOffsetMode.None;
@@ -294,13 +337,15 @@ namespace HostTest
 					g.SmoothingMode = SmoothingMode.AntiAlias;
 
 					// scale the selection region if necessary
-					if (scaledImage != null)
+					if (zoomFactor != selectionFactor)
 					{
+						float factor = this.zoomFactor / this.selectionFactor;
+
 						using (GraphicsPath temp = (GraphicsPath)this.path.Clone())
 						{
 							using (Matrix matrix = new Matrix())
 							{
-								matrix.Scale(this.scale, this.scale);
+								matrix.Scale(factor, factor);
 
 								temp.Transform(matrix);
 							}
@@ -308,7 +353,6 @@ namespace HostTest
 							g.DrawPath(outlinePen1, temp);
 							g.DrawPath(outlinePen2, temp);
 						}
-
 					}
 					else
 					{
@@ -335,13 +379,16 @@ namespace HostTest
 		{
 			checkerBoardBitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
 
-			BitmapData bd = checkerBoardBitmap.LockBits(new Rectangle(0, 0, checkerBoardBitmap.Width, checkerBoardBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+			BitmapData bd = checkerBoardBitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 			try
 			{
-				for (int y = 0; y < checkerBoardBitmap.Height; y++)
+				byte* scan0 = (byte*)bd.Scan0.ToPointer();
+				int stride = bd.Stride;
+
+				for (int y = 0; y < height; y++)
 				{
-					byte* p = (byte*)bd.Scan0.ToPointer() + (y * bd.Stride);
-					for (int x = 0; x < checkerBoardBitmap.Width; x++)
+					byte* p = scan0 + (y * stride);
+					for (int x = 0; x < width; x++)
 					{
 						// This code was taken from Paint.NET
 						byte v = (byte)((((x ^ y) & 8) * 8) + 191); // 8x8 pixel checkerboard tiles.
@@ -357,6 +404,44 @@ namespace HostTest
 				checkerBoardBitmap.UnlockBits(bd);
 			}
 
+		}
+
+		private static unsafe bool HasTransparency(Bitmap source)
+		{
+			if (Image.IsAlphaPixelFormat(source.PixelFormat))
+			{
+				int width = source.Width;
+				int height = source.Height;
+
+				BitmapData bd = source.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+				try
+				{
+					byte* scan0 = (byte*)bd.Scan0.ToPointer();
+					int stride = bd.Stride;
+
+					for (int y = 0; y < height; y++)
+					{
+						byte* ptr = scan0 + (y * stride);
+						byte* ptrEnd = ptr + width;
+						
+						while (ptr < ptrEnd)
+						{
+							if (ptr[3] < 255)
+							{
+								return true;
+							}
+							ptr += 4;
+						}
+					}
+				}
+				finally
+				{
+					source.UnlockBits(bd);
+				}
+			}
+
+			return false;
 		}
 
 		public Bitmap Surface
@@ -378,14 +463,23 @@ namespace HostTest
 							path = null;
 						}
 
+						if (normalizedPath != null)
+						{
+							normalizedPath.Dispose();
+							normalizedPath = null;
+						}
+
 						if (selectionRegion != null)
 						{
 							selectionRegion.Dispose();
 							selectionRegion = null;
 						}
 
-						imageBounds = new Rectangle(0, 0, value.Width, value.Height);
-						this.DrawCheckerBoardBitmap(value.Width, value.Height);
+						if (checkerBoardBitmap != null)
+						{
+							checkerBoardBitmap.Dispose();
+							checkerBoardBitmap = null;
+						}
 
 						if (image != null)
 						{
@@ -393,34 +487,65 @@ namespace HostTest
 							this.image = null;
 						}
 
-						if (value.PixelFormat != PixelFormat.Format32bppArgb)
+						imageBounds = new Rectangle(0, 0, value.Width, value.Height);
+
+						if (HasTransparency(value))
 						{
 							this.image = value.Clone(imageBounds, PixelFormat.Format32bppArgb);
+							this.DrawCheckerBoardBitmap(value.Width, value.Height);
 						}
 						else
 						{
-							this.image = value.Clone(imageBounds, PixelFormat.Format32bppArgb);
+							this.image = value.Clone(imageBounds, PixelFormat.Format24bppRgb);
 						}
+
 						this.Size = new Size(value.Width, value.Height);
 
-						this.ResetZoom();
-						this.isDirty = false;
+						this.ResetZoom(false);
+						this.IsDirty = false;
+
+						this.Invalidate(); 
 					}
 					else
 					{
 						this.CopyFromBitmap(value, new Rectangle(0, 0, value.Width, value.Height));
-						this.isDirty = true;
+						this.IsDirty = true;
 						this.ZoomCanvas();
 					}
 				}
 			}
 		}
 
+		/// <summary>
+		/// Gets the selection clipping path used by the filters.
+		/// </summary>
 		public GraphicsPath ClipPath
 		{
 			get 
 			{
-				return path;
+				if (selectionFactor == 1f)
+				{
+					return path;
+				}
+				else
+				{
+					if (normalizedPath == null && path != null)
+					{
+						normalizedPath = (GraphicsPath)this.path.Clone();
+						float factor = 1f / this.selectionFactor; // scale the selection up to 100%.  
+
+						using (Matrix matrix = new Matrix())
+						{
+							matrix.Scale(factor, factor);
+
+							normalizedPath.Transform(matrix);
+						}
+					}
+
+					return normalizedPath;
+				}
+
+				
 			}
 		}
 
@@ -430,13 +555,65 @@ namespace HostTest
 		/// <param name="source">The source bitmap.</param>
 		/// <param name="bounds">The area of the bitmap to copy.</param>
 		[SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-		private void CopyFromBitmap(Bitmap source, Rectangle bounds)
-		{
-			using (Graphics gr = Graphics.FromImage(this.image))
+		private unsafe void CopyFromBitmap(Bitmap source, Rectangle bounds)
+		{			
+			bool hasAlpha = HasTransparency(source);
+
+			if (hasAlpha && image.PixelFormat != PixelFormat.Format32bppArgb)
 			{
-				gr.DrawImage(source, bounds, bounds, GraphicsUnit.Pixel);
+				this.image.Dispose();
+				this.image = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
 			}
-		}
+			
+			if ((checkerBoardBitmap == null) && hasAlpha)
+			{
+				this.DrawCheckerBoardBitmap(source.Width, source.Height);
+			}
+
+
+			BitmapData srcData = source.LockBits(bounds, ImageLockMode.ReadOnly, source.PixelFormat);
+			BitmapData dstData = this.image.LockBits(bounds, ImageLockMode.WriteOnly, image.PixelFormat);
+			int width = source.Width;
+			int height = source.Height;
+
+			try
+			{
+				byte* srcPtr = (byte*)srcData.Scan0.ToPointer();
+				int srcStride = srcData.Stride;
+				byte* dstPtr = (byte*)dstData.Scan0.ToPointer();
+				int dstStride = dstData.Stride;
+
+				int srcBpp = Image.GetPixelFormatSize(source.PixelFormat) / 8;
+				int dstBpp = Image.GetPixelFormatSize(image.PixelFormat) / 8;
+
+				for (int y = 0; y < height; y++)
+				{
+					byte* src = srcPtr + (y * srcStride);
+					byte* dst = dstPtr + (y * dstStride);
+
+					for (int x = 0; x < width; x++)
+					{
+						dst[0] = src[0];
+						dst[1] = src[1];
+						dst[2] = src[2];
+
+						if (hasAlpha)
+						{
+							dst[3] = src[3];
+						}
+
+						src += srcBpp;
+						dst += dstBpp;
+					}
+				}
+			}
+			finally
+			{
+				source.UnlockBits(srcData);
+				this.image.UnlockBits(dstData);
+			}
+
+		} 
 
 		public CanvasHistoryState ToCanvasHistoryState()
 		{
@@ -459,13 +636,13 @@ namespace HostTest
 		/// </summary>
 		public void ZoomIn()
 		{
-			if (scale < maxZoom)
+			if (zoomFactor < maxZoom)
 			{
 				int index = -1;
 
 				for (int i = 0; i < zoomFactors.Length; i++)
 				{
-					if (zoomFactors[i] > scale)
+					if (zoomFactors[i] > zoomFactor)
 					{
 						index = i;
 						break;
@@ -477,7 +654,7 @@ namespace HostTest
 					index = zoomFactors.Length - 1;
 				}
 
-				this.scale = zoomFactors[index];
+				this.zoomFactor = zoomFactors[index];
 
 				this.ZoomCanvas();
 			}
@@ -490,26 +667,26 @@ namespace HostTest
 		///   <c>true</c> if the image can zoom out; otherwise, <c>false</c>.
 		/// </returns>
 		public bool CanZoomOut()
-		{ 
-			int index = -1;
-
-			for (int i = zoomFactors.Length - 1; i >= 0; i--)
+		{
+			if (zoomFactor > minZoom)
 			{
-				if (zoomFactors[i] < scale)
+				int index = 0;
+
+				for (int i = zoomFactors.Length - 1; i >= 0; i--)
 				{
-					index = i;
-					break;
+					if (zoomFactors[i] < zoomFactor)
+					{
+						index = i;
+						break;
+					}
 				}
+
+				float factor = zoomFactors[index];
+
+				return ((this.image.Width * factor) >= 1f && (this.image.Height * factor) >= 1f); 
 			}
 
-			if (index == -1)
-			{
-				index = 0;
-			}
-
-			float factor = zoomFactors[index];
-
-			return ((image.Width * factor) >= 1f && (image.Height * factor) >= 1f);
+			return false;
 		}
 
 		/// <summary>
@@ -520,7 +697,7 @@ namespace HostTest
 		/// </returns>
 		public bool CanZoomIn()
 		{ 
-			return (this.scale < maxZoom);
+			return (this.zoomFactor < maxZoom);
 		}
 
 		/// <summary>
@@ -528,13 +705,13 @@ namespace HostTest
 		/// </summary>
 		public void ZoomOut()
 		{
-			if (scale > minZoom)
+			if (zoomFactor > minZoom)
 			{
 				int index = -1;
 
 				for (int i = zoomFactors.Length - 1; i >= 0; i--)
 				{
-					if (zoomFactors[i] < scale)
+					if (zoomFactors[i] < zoomFactor)
 					{
 						index = i;
 						break;
@@ -546,7 +723,7 @@ namespace HostTest
 					index = 0;
 				}
 
-				this.scale = zoomFactors[index];
+				this.zoomFactor = zoomFactors[index];
 
 				this.ZoomCanvas();
 			}
@@ -563,26 +740,57 @@ namespace HostTest
 				float ratioX = (float)windowSize.Width / (float)image.Width;
 				float ratioY = (float)windowSize.Height / (float)image.Height;
 
+				this.zoomFactor = ratioX < ratioY ? ratioX : ratioY;
+
+				this.ZoomCanvas();
+			}
+			else
+			{
+				this.ResetZoom(true);
+			}
+		}
+
+		/// <summary>
+		/// Determines whether the image can zoom to fit the specified size.
+		/// </summary>
+		/// <param name="windowSize">Size of the window.</param>
+		/// <returns>
+		///   <c>true</c> if the image can zoom to fit the specified window size; otherwise, <c>false</c>.
+		/// </returns>
+		public bool CanZoomToWindow(Size windowSize)
+		{
+			if (image.Width > windowSize.Width || image.Height > windowSize.Height)
+			{
+				float ratioX = (float)windowSize.Width / (float)image.Width;
+				float ratioY = (float)windowSize.Height / (float)image.Height;
+
 				float ratio = ratioX < ratioY ? ratioX : ratioY;
 
+				return this.zoomFactor != ratio;
+			}
 
-				this.ZoomCanvas(ratio);
+			return false;
+		}
+
+		public void ZoomToActualSize()
+		{
+			this.zoomFactor = 1f;
+			this.ZoomCanvas();
+		}
+
+		private void OnZoomChanged()
+		{
+			if (ZoomChanged != null)
+			{
+				ZoomChanged.Invoke(this, new CanvasZoomChangedEventArgs(zoomFactor));
 			}
 		}
 
 		private void ZoomCanvas()
 		{
-			this.ZoomCanvas(this.scale);
-		}
-
-		private void ZoomCanvas(float ratio)
-		{
 			if ((scaledImage == null) || scaledImage.Width != image.Width || scaledImage.Height != image.Height)
 			{
-				if (ZoomChanged != null)
-				{
-					ZoomChanged.Invoke(this, new CanvasZoomChangingEventArgs(ratio, minZoom, maxZoom));
-				}
+				this.OnZoomChanged();
 
 				if (scaledImage != null)
 				{
@@ -593,12 +801,12 @@ namespace HostTest
 				int imageWidth = this.image.Width;
 				int imageHeight = this.image.Height;
 
-				int scaledWidth = (int)((float)imageWidth * ratio);
-				int scaledHeight = (int)((float)imageHeight * ratio);
+				int scaledWidth = (int)((float)imageWidth * zoomFactor);
+				int scaledHeight = (int)((float)imageHeight * zoomFactor);
 
 				if (scaledWidth != imageWidth && scaledHeight != imageHeight)
 				{
-					this.scaledImage = new Bitmap(scaledWidth, scaledHeight, PixelFormat.Format32bppArgb);
+					this.scaledImage = new Bitmap(scaledWidth, scaledHeight, image.PixelFormat);
 					this.imageBounds = new Rectangle(0, 0, scaledWidth, scaledHeight);
 					
 					using (Graphics gr = Graphics.FromImage(scaledImage))
@@ -622,21 +830,24 @@ namespace HostTest
 			}
 		}
 
-		private void ResetZoom()
+		private void ResetZoom(bool invalidate)
 		{
 			if (scaledImage != null)
 			{
 				scaledImage.Dispose();
 				scaledImage = null;
+
+				this.zoomFactor = 1f;
+
+				this.OnZoomChanged();
+
+				if (invalidate)
+				{
+					this.Invalidate();
+					this.Update();
+				}
 			}
 
-			this.scale = 1f;
-			this.ResetGraphicsClip();
-
-			if (ZoomChanged != null)
-			{
-				ZoomChanged.Invoke(this, new CanvasZoomChangingEventArgs(this.scale, minZoom, maxZoom));
-			}
 		}
 
 		/// <summary>
@@ -647,35 +858,66 @@ namespace HostTest
 		/// <returns>The scaled image.</returns>
 		public Bitmap ResizeCopy(int maxWidth, int maxHeight)
 		{
-			int imageWidth = image.Width;
-			int imageHeight = image.Height;
-
-			float ratioX = (float)maxWidth / (float)imageWidth;
-			float ratioY = (float)maxHeight / (float)imageHeight;
-
-			float ratio = ratioX < ratioY ? ratioX : ratioY;
-
-			int newWidth = (int)((float)imageWidth * ratio);
-			int newHeight = (int)((float)imageHeight * ratio);
-
-			Bitmap scaled = null;
-			using(Bitmap temp = new Bitmap(newWidth, newHeight, PixelFormat.Format32bppArgb))
+			if (image.Width > maxWidth || image.Height > maxHeight)
 			{
-				using (Graphics gr = Graphics.FromImage(temp))
-				{
-					gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-					gr.SmoothingMode = SmoothingMode.HighQuality;
-					gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
-					gr.CompositingQuality = CompositingQuality.HighQuality;
+				int imageWidth = image.Width;
+				int imageHeight = image.Height;
 
-					gr.DrawImage(this.image, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);     
+				float ratioX = (float)maxWidth / (float)imageWidth;
+				float ratioY = (float)maxHeight / (float)imageHeight;
+
+				float ratio = ratioX < ratioY ? ratioX : ratioY;
+
+				int newWidth = (int)((float)imageWidth * ratio);
+				int newHeight = (int)((float)imageHeight * ratio);
+
+				Bitmap scaled = null;
+				using (Bitmap temp = new Bitmap(newWidth, newHeight, image.PixelFormat))
+				{
+					using (Graphics gr = Graphics.FromImage(temp))
+					{
+						gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+						gr.SmoothingMode = SmoothingMode.HighQuality;
+						gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
+						gr.CompositingQuality = CompositingQuality.HighQuality;
+
+						gr.DrawImage(this.image, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);
+					}
+
+					scaled = (Bitmap)temp.Clone();
 				}
 
-				scaled = (Bitmap)temp.Clone();
+
+				return scaled; 
 			}
 
+			return this.image.Clone() as Bitmap;
+		}
 
-			return scaled;
+		public void ResetSize()
+		{
+			if (this.Size != image.Size)
+			{
+				this.Size = new Size(image.Width, image.Height);
+			}
+		}
+
+		protected override void OnMouseWheel(MouseEventArgs e)
+		{
+			base.OnMouseWheel(e);
+
+			if (ModifierKeys == Keys.Control && image != null)
+			{
+				if (e.Delta > 0)
+				{
+					this.ZoomIn();
+				}
+				else
+				{
+					this.ZoomOut();
+				}
+			}
+
 		}
 	   
 		private void InitializeComponent()

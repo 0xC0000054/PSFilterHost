@@ -127,13 +127,13 @@
     <value>Click and drag to draw a elliptical selection on the canvas.</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="EllipseSelectToolIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="EllipseSelectTool" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\EllipseSelectToolIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MenuViewZoomInIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="ZoomIn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MenuViewZoomInIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MenuViewZoomOutIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="ZoomOut" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MenuViewZoomOutIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="OpenFile" type="System.Resources.ResXFileRef, System.Windows.Forms">
@@ -161,7 +161,7 @@
     <value>..\Resources\saveHS.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TitleStringFormat" xml:space="preserve">
-    <value>HostTest - {0} @{1}% ({2})</value>
+    <value>HostTest{0} - {1} @{2}% ({3})</value>
   </data>
   <data name="Undo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Undo.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -169,7 +169,6 @@
   <data name="CancelDescription" xml:space="preserve">
     <value>Return to HostTest</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="CancelIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\CancelIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -185,7 +184,7 @@
   <data name="eventlogWarn" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\eventlogWarn.ico;System.Drawing.Icon, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="MenuFileCloseIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+  <data name="FileClose" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\MenuFileCloseIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="SaveChangesCaption" xml:space="preserve">
@@ -199,5 +198,18 @@
   </data>
   <data name="UnsavedChangesText" xml:space="preserve">
     <value>{0} has unsaved changes. Would you like to save changes to the image?</value>
+  </data>
+  <data name="ActualSize" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MenuViewActualSizeIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ZoomToWindow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\MenuViewZoomToWindowIcon.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NoFiltersStatusText" xml:space="preserve">
+    <value>No filters loaded.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Annotate_info" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Annotate_info.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

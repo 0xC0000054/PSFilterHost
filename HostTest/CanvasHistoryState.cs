@@ -56,16 +56,13 @@ namespace HostTest
         private void Dispose(bool disposing)
         {
             if (!disposed)
-            {
-                if (disposing)
+            {                   
+                this.disposed = true;
+
+                if (disposing && image != null)
                 {
-                    if (image != null)
-                    {
-                        image.Dispose();
-                        image = null;
-                    }
-                  
-                    this.disposed = true;
+                    image.Dispose();
+                    image = null;
                 }
             }
         }

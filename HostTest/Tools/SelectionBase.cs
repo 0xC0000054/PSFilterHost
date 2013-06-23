@@ -35,9 +35,9 @@ namespace HostTest.Tools
     {
 
         [field: NonSerialized]
-        public event EventHandler<SelectionPathChangedEventArgs> OnSelectedPathChanged;
+        public event EventHandler<SelectionPathChangedEventArgs> SelectedPathChanged;
         [field: NonSerialized]
-        public EventHandler<CursorChangedEventArgs> OnCursorChanged;
+        public EventHandler<CursorChangedEventArgs> CursorChanged;
 
         protected Rectangle roi;
         protected bool tracking;
@@ -59,7 +59,7 @@ namespace HostTest.Tools
                 this.selectPoints = new List<Point>();
                 this.selectPoints.Add(new Point(e.X, e.Y));
 
-                this.CursorChanged(Cursors.Cross);
+                this.OnCursorChanged(Cursors.Cross);
             }
         }
 
@@ -79,7 +79,7 @@ namespace HostTest.Tools
         internal void MouseUp(object sender, MouseEventArgs e)
         {
             this.tracking = false;
-            this.CursorChanged(Cursors.Default);    
+            this.OnCursorChanged(Cursors.Default);    
             this.RenderSelection();
         }
 
@@ -141,28 +141,28 @@ namespace HostTest.Tools
             List<Point> trimPoints = this.TrimShapePath(this.selectPoints);
             List<PointF> shapePoints = this.CreateShape(trimPoints);
 
-            if (this.OnSelectedPathChanged != null)
+            if (this.SelectedPathChanged != null)
             {
                 if (shapePoints.Count >= 2)
                 {
                     GraphicsPath path = this.RenderShape(shapePoints);
-                    this.OnSelectedPathChanged(this, new SelectionPathChangedEventArgs(path));
+                    this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(path));
                     path.Dispose();
                 }
                 else
                 {
                     this.roi = Rectangle.Empty;
-                    this.OnSelectedPathChanged(this, new SelectionPathChangedEventArgs(null));
+                    this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(null));
                 }
             }
 
         }
 
-        protected void CursorChanged(Cursor cursor)
+        protected void OnCursorChanged(Cursor cursor)
         {
-            if (this.OnCursorChanged != null)
+            if (this.CursorChanged != null)
             {
-                this.OnCursorChanged(this, new CursorChangedEventArgs(cursor));
+                this.CursorChanged(this, new CursorChangedEventArgs(cursor));
             }
         }
 

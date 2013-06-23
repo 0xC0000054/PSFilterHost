@@ -39,10 +39,10 @@ namespace PSFilterHostDll
         [System.Security.SuppressUnmanagedCodeSecurity]
         private static class UnsafeNativeMethods
         {
-            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
             internal static extern SafeFindHandle FindFirstFileW(string fileName, out WIN32_FIND_DATAW data);
 
-            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool FindNextFileW(SafeFindHandle hndFindFile, out WIN32_FIND_DATAW lpFindFileData);
 
@@ -54,7 +54,6 @@ namespace PSFilterHostDll
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct WIN32_FIND_DATAW 
         {
-    
             public uint dwFileAttributes;
             public FILETIME ftCreationTime;
             public FILETIME ftLastAccessTime;

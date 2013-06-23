@@ -165,8 +165,12 @@ namespace HostTest
             {
                 if (!disposed && disposing)
                 {
-                    this.canvas.Dispose();
                     this.disposed = true;
+                    if (canvas != null)
+                    {
+                        this.canvas.Dispose();
+                        this.canvas = null;
+                    } 
                 }
 
             }

@@ -70,6 +70,26 @@ namespace HostTest.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ActualSize {
+            get {
+                object obj = ResourceManager.GetObject("ActualSize", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Annotate_info {
+            get {
+                object obj = ResourceManager.GetObject("Annotate_info", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Applying {0}.
         /// </summary>
         internal static string ApplyFilterStatusFormat {
@@ -136,9 +156,9 @@ namespace HostTest.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap EllipseSelectToolIcon {
+        internal static System.Drawing.Bitmap EllipseSelectTool {
             get {
-                object obj = ResourceManager.GetObject("EllipseSelectToolIcon", resourceCulture);
+                object obj = ResourceManager.GetObject("EllipseSelectTool", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -156,30 +176,19 @@ namespace HostTest.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap MenuFileCloseIcon {
+        internal static System.Drawing.Bitmap FileClose {
             get {
-                object obj = ResourceManager.GetObject("MenuFileCloseIcon", resourceCulture);
+                object obj = ResourceManager.GetObject("FileClose", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized string similar to No filters loaded..
         /// </summary>
-        internal static System.Drawing.Bitmap MenuViewZoomInIcon {
+        internal static string NoFiltersStatusText {
             get {
-                object obj = ResourceManager.GetObject("MenuViewZoomInIcon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap MenuViewZoomOutIcon {
-            get {
-                object obj = ResourceManager.GetObject("MenuViewZoomOutIcon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("NoFiltersStatusText", resourceCulture);
             }
         }
         
@@ -289,7 +298,7 @@ namespace HostTest.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HostTest - {0} @{1}% ({2}).
+        ///   Looks up a localized string similar to HostTest{0} - {1} @{2}% ({3}).
         /// </summary>
         internal static string TitleStringFormat {
             get {
@@ -313,6 +322,36 @@ namespace HostTest.Properties {
         internal static string UnsavedChangesText {
             get {
                 return ResourceManager.GetString("UnsavedChangesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZoomIn {
+            get {
+                object obj = ResourceManager.GetObject("ZoomIn", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZoomOut {
+            get {
+                object obj = ResourceManager.GetObject("ZoomOut", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ZoomToWindow {
+            get {
+                object obj = ResourceManager.GetObject("ZoomToWindow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

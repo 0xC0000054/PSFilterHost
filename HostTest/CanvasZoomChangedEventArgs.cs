@@ -14,11 +14,9 @@ using System;
 
 namespace HostTest
 {
-    internal sealed class CanvasZoomChangingEventArgs : EventArgs
+    internal sealed class CanvasZoomChangedEventArgs : EventArgs
     {
         private readonly float newScale;
-        private readonly float minScale;
-        private readonly float maxScale;
 
         public float NewZoom
         {
@@ -27,28 +25,10 @@ namespace HostTest
                 return newScale;
             }
         }
-
-        public float MinZoom
-        {
-            get
-            {
-                return minScale;
-            }
-        }
-
-        public float MaxZoom
-        {
-            get
-            {
-                return maxScale;
-            }
-        }
-
-        public CanvasZoomChangingEventArgs(float scale, float min, float max)
+       
+        public CanvasZoomChangedEventArgs(float scale)
         {
             this.newScale = scale;
-            this.minScale = min;
-            this.maxScale = max;
         }
     }
 }
