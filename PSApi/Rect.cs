@@ -23,6 +23,11 @@ namespace PSFilterLoad.PSApi
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2218:OverrideGetHashCodeOnOverridingEquals"), StructLayout(LayoutKind.Sequential)]
     internal struct Rect16
     {
+        static Rect16()
+        { 
+            Empty = new Rect16(); 
+        }
+
         public short top;
         public short left;
         public short bottom;
@@ -52,6 +57,7 @@ namespace PSFilterLoad.PSApi
             return ("Top=" + this.top.ToString() + ",Bottom=" + this.bottom.ToString() + ",Left=" + this.left.ToString() + ",Right=" + this.right.ToString()); 
         }
 #endif
+        public static readonly Rect16 Empty;
 
     }
 #pragma warning restore 0659

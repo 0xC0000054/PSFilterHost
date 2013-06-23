@@ -327,6 +327,10 @@ namespace HostTest
 
 				filterThread.Join();
 				filterThread = null;
+
+				this.toolStripProgressBar1.Value = 0;
+				this.toolStripProgressBar1.Visible = false;
+				this.toolStripStatusLabel1.Text = string.Empty;
 			}
 		}
 
@@ -450,12 +454,6 @@ namespace HostTest
 
 					}
 
-					base.Invoke(new Action(delegate()
-					{
-						this.toolStripProgressBar1.Value = 0;
-						this.toolStripProgressBar1.Visible = false;
-						this.toolStripStatusLabel1.Text = string.Empty;
-					}));
 				}
 			}
 			catch (FileNotFoundException ex)
@@ -679,7 +677,7 @@ namespace HostTest
 
 			if (!string.IsNullOrEmpty(srcImageTempFileName))
 			{
-				System.IO.File.Delete(srcImageTempFileName);
+				File.Delete(srcImageTempFileName);
 				this.srcImageTempFileName = string.Empty;
 			}
 		}
@@ -888,6 +886,12 @@ namespace HostTest
 
 		private void Form1_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			if (filterThread != null)
+			{
+				e.Cancel = true;
+				return;
+			}
+
 			if (canvas.IsDirty)
 			{
 				TaskButton save = new TaskButton(Resources.saveHS, Resources.SaveChangesText, Resources.SaveChangesDescription);

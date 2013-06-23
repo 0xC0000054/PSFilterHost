@@ -131,7 +131,7 @@ namespace PSFilterHostDll.BGRASurface
 
 		}
 
-		protected static ushort Scale16(ushort x)
+		protected static ushort Fix16BitRange(ushort x)
 		{
 			int value = x * 2; // double the value and clamp between 0 and 65535.
 			
@@ -170,11 +170,6 @@ namespace PSFilterHostDll.BGRASurface
 		public unsafe byte* GetPointAddressUnchecked(int x, int y)
 		{
 			return (((byte*)scan0.VoidStar + (y * stride)) + (x * bytesPerPixel));
-		}
-
-		public unsafe byte GetPointUnchecked(int x, int y)
-		{
-			return *GetPointAddressUnchecked(x, y);
 		}
 
 		/// <summary>
@@ -264,6 +259,7 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			if (!disposed && disposing)
 			{
+				this.disposed = true;
 				if (scan0 != null)
 				{
 					this.scan0.Dispose();

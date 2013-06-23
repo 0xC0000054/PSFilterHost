@@ -64,9 +64,6 @@ namespace PSFilterLoad.PSApi
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetWindowText(IntPtr hWnd, string lpString);
 
-        [DllImport("kernel32.dll", EntryPoint = "GlobalAlloc")]
-        internal static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
-
         [DllImport("kernel32.dll", EntryPoint = "GlobalSize")]
         internal static extern IntPtr GlobalSize([In()] System.IntPtr hMem);
 
@@ -83,7 +80,6 @@ namespace PSFilterLoad.PSApi
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GlobalUnlock([In()] System.IntPtr hMem);
 
-
         [DllImport("gdi32.dll", EntryPoint = "GetRegionData")]
         internal unsafe static extern uint GetRegionData([In()] System.IntPtr hrgn, uint nCount, NativeStructs.RGNDATA* lpRgnData);
 
@@ -97,5 +93,8 @@ namespace PSFilterLoad.PSApi
         [DllImport("gdi32.dll", EntryPoint = "DeleteDC")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool DeleteDC([In()] System.IntPtr hdc);
+
+        [DllImport("kernel32.dll", EntryPoint = "SetErrorMode")]
+        internal static extern uint SetErrorMode(uint uMode);
     }
 }

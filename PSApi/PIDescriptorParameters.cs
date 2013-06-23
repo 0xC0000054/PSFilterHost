@@ -25,49 +25,49 @@ namespace PSFilterLoad.PSApi
     internal delegate IntPtr OpenWriteDescriptorProc();
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short CloseWriteDescriptorProc(System.IntPtr param0, ref System.IntPtr param1);
+    internal delegate short CloseWriteDescriptorProc(IntPtr descriptor, ref IntPtr descriptorHandle);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutIntegerProc([In()]System.IntPtr param0, [In()]uint param1, [In()]int param2);
+    internal delegate short PutIntegerProc([In()]IntPtr descriptor, [In()]uint key, [In()]int data);
    
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutFloatProc(System.IntPtr param0, uint param1, ref double param2);
+    internal delegate short PutFloatProc([In()]IntPtr descriptor, uint key, ref double param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutUnitFloatProc([In()]System.IntPtr param0, uint param1, uint param2, ref double param3);
+    internal delegate short PutUnitFloatProc([In()]IntPtr descriptor, [In()]uint param1, [In()]uint param2, [In()]ref double param3);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutBooleanProc([In()]System.IntPtr param0, uint param1, [In()]byte param2);
+    internal delegate short PutBooleanProc([In()]IntPtr descriptor, [In()]uint param1, [In()]byte param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutTextProc([In()]System.IntPtr param0, [In()]uint param1, [In(), MarshalAs(UnmanagedType.SysInt)]IntPtr param2);
+    internal delegate short PutTextProc([In()]IntPtr descriptor, [In()]uint param1, [In(), MarshalAs(UnmanagedType.SysInt)]IntPtr param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutAliasProc(System.IntPtr param0, uint param1, [In()]System.IntPtr param2);
+    internal delegate short PutAliasProc([In()]IntPtr descriptor, [In()]uint param1, [In()]IntPtr param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutEnumeratedProc(System.IntPtr param0, uint key, uint type, uint value);
+    internal delegate short PutEnumeratedProc([In()]IntPtr descriptor, [In()]uint key, [In()]uint type, [In()]uint value);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutClassProc(System.IntPtr param0, uint param1, uint param2);
+    internal delegate short PutClassProc([In()]IntPtr descriptor, [In()]uint param1, [In()]uint param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutSimpleReferenceProc(System.IntPtr param0, uint param1, ref PIDescriptorSimpleReference param2);
+    internal delegate short PutSimpleReferenceProc([In()]IntPtr descriptor, [In()]uint param1, [In()]PIDescriptorSimpleReference param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutObjectProc(System.IntPtr param0, uint param1, uint param2, System.IntPtr param3);
+    internal delegate short PutObjectProc([In()]IntPtr descriptor, [In()]uint key, [In()]uint param2, [In()]IntPtr param3);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutCountProc(System.IntPtr param0, uint param1, uint count);
+    internal delegate short PutCountProc([In()]IntPtr descriptor, [In()]uint param1, [In()]uint count);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutStringProc(System.IntPtr param0, uint param1, IntPtr param2);
+    internal delegate short PutStringProc([In()]IntPtr descriptor, [In()]uint param1, [In()]IntPtr param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutScopedClassProc(System.IntPtr param0, uint param1, uint param2);
+    internal delegate short PutScopedClassProc([In()]IntPtr descriptor, [In()]uint param1, [In()]uint param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PutScopedObjectProc(System.IntPtr param0, uint param1, uint param2, ref System.IntPtr param3);
+    internal delegate short PutScopedObjectProc([In()]IntPtr descriptor, [In()]uint param1, [In()]uint param2, [In()]IntPtr param3);
 
     [StructLayout(LayoutKind.Sequential)]
     internal unsafe struct PIDescriptorSimpleReference__keyData
@@ -87,58 +87,58 @@ namespace PSFilterLoad.PSApi
     }
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate IntPtr OpenReadDescriptorProc(System.IntPtr param0, IntPtr param1);
+    internal delegate IntPtr OpenReadDescriptorProc(IntPtr descriptor, IntPtr param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short CloseReadDescriptorProc(System.IntPtr param0);
+    internal delegate short CloseReadDescriptorProc(IntPtr descriptor);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate byte GetKeyProc(System.IntPtr param0, ref uint key, ref uint type, ref int flags);
+    internal delegate byte GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetIntegerProc(System.IntPtr param0, ref int param1);
+    internal delegate short GetIntegerProc(IntPtr descriptor, ref int param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetFloatProc(System.IntPtr param0, ref double param1);
+    internal delegate short GetFloatProc(IntPtr descriptor, ref double param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetUnitFloatProc(System.IntPtr param0, ref uint param1, ref double param2);
+    internal delegate short GetUnitFloatProc(IntPtr descriptor, ref uint param1, ref double param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetBooleanProc(System.IntPtr param0, ref byte param1);
+    internal delegate short GetBooleanProc(IntPtr descriptor, ref byte param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetTextProc(System.IntPtr param0, ref System.IntPtr param1);
+    internal delegate short GetTextProc(IntPtr descriptor, ref IntPtr param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetAliasProc(System.IntPtr param0, ref System.IntPtr param1);
+    internal delegate short GetAliasProc(IntPtr descriptor, ref IntPtr param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetEnumeratedProc(System.IntPtr param0, ref uint param1);
+    internal delegate short GetEnumeratedProc(IntPtr descriptor, ref uint param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetClassProc(System.IntPtr param0, ref uint param1);
+    internal delegate short GetClassProc(IntPtr descriptor, ref uint param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetSimpleReferenceProc(System.IntPtr param0, ref PIDescriptorSimpleReference param1);
+    internal delegate short GetSimpleReferenceProc(IntPtr descriptor, ref PIDescriptorSimpleReference param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetObjectProc(System.IntPtr param0, ref uint param1, ref System.IntPtr param2);
+    internal delegate short GetObjectProc(IntPtr descriptor, ref uint param1, ref IntPtr param2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetCountProc(System.IntPtr param0, ref uint param1);
+    internal delegate short GetCountProc(IntPtr descriptor, ref uint param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetStringProc(System.IntPtr param0, System.IntPtr param1);
+    internal delegate short GetStringProc(IntPtr descriptor, IntPtr param1);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetPinnedIntegerProc(System.IntPtr param0, int param1, int param2, ref int param3);
+    internal delegate short GetPinnedIntegerProc(IntPtr descriptor, int param1, int param2, ref int param3);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetPinnedFloatProc(System.IntPtr param0, ref double param1, ref double param2, ref double param3);
+    internal delegate short GetPinnedFloatProc(IntPtr descriptor, ref double param1, ref double param2, ref double param3);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short GetPinnedUnitFloatProc(System.IntPtr param0, ref double param1, ref double param2, ref uint param3, ref double param4);
+    internal delegate short GetPinnedUnitFloatProc(IntPtr descriptor, ref double param1, ref double param2, ref uint param3, ref double param4);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct WriteDescriptorProcs
@@ -194,26 +194,25 @@ namespace PSFilterLoad.PSApi
     internal struct PIDescriptorParameters
     {
         public short descriptorParametersVersion;
-        public short playInfo;
-        public short recordInfo;
+        public PlayInfo playInfo;
+        public RecordInfo recordInfo;
         public IntPtr descriptor;
         public IntPtr writeDescriptorProcs;
         public IntPtr readDescriptorProcs;
     }
 
-
-    internal static class RecordInfo
+    internal enum RecordInfo : short
     {
-        public const short plugInDialogOptional = 0;
-        public const short plugInDialogRequired = 1;
-        public const short plugInDialogNone = 2;
+        plugInDialogOptional = 0,
+        plugInDialogRequired = 1,
+        plugInDialogNone = 2
     }
 
-    internal static class PlayInfo 
+    internal enum PlayInfo : short
     {
-        public const short plugInDialogDontDisplay = 0;
-        public const short plugInDialogDisplay = 1;
-        public const short plugInDialogSilent = 2;
+        plugInDialogDontDisplay = 0,
+        plugInDialogDisplay = 1,
+        plugInDialogSilent = 2
     }
 
 

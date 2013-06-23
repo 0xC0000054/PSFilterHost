@@ -23,7 +23,7 @@ namespace PSFilterHostDll
         internal interface IShellLinkW
         {
             /// <summary>Retrieves the path and file name of a Shell link object</summary>
-            void GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, IntPtr pfd, int fFlags);
+            void GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, IntPtr pfd, uint fFlags);
             /// <summary>Retrieves the list of item identifiers for a Shell link object</summary>
             void GetIDList(out IntPtr ppidl);
             /// <summary>Sets the pointer to an item identifier list (PIDL) for a Shell link object.</summary>

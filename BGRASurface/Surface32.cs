@@ -515,7 +515,7 @@ namespace PSFilterHostDll.BGRASurface
             for (int y = 0; y < height; y++)
             {
                 byte* ptr = this.GetRowAddressUnchecked(y);
-                byte* endPtr = ptr + stride;
+                byte* endPtr = ptr + width;
 
                 while (ptr < endPtr)
                 {

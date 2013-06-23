@@ -60,8 +60,7 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propImageMode = 0x6d6f6465U;
         /// <summary>
-        /// Interplolation Mode - 'intp';
-        /// Uses the InterpolationMethod enum.
+        /// Interpolation Mode - 'intp';
         /// </summary>
         public const uint propInterpolationMethod = 0x696E7470U;
         /// <summary>
@@ -93,11 +92,11 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propRulerUnits = 0x72756c72U;
         /// <summary>
-        /// Ruler origin horizontal
+        /// Ruler origin horizontal - 'rorH'
         /// </summary>
         public const uint propRulerOriginH = 0x726f7248U;
         /// <summary>
-        /// Ruler origin vertical
+        /// Ruler origin vertical - 'rorV'
         /// </summary>
         public const uint propRulerOriginV = 0x726f7256U;
         /// <summary>

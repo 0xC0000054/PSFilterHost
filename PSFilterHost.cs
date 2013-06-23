@@ -170,9 +170,6 @@ namespace PSFilterHostDll
 		}
 #endif
 
-
-
-
 		/// <summary>
 		/// Gets or sets the filter parameters used for the 'Repeat Effect' command.
 		/// </summary>
@@ -226,8 +223,6 @@ namespace PSFilterHostDll
 			this.abortFunc = abortCallback;
 		}
 
-
-
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
@@ -262,7 +257,7 @@ namespace PSFilterHostDll
 					foreach (var file in links)
 					{
 						shortcut.Load(file);
-						string path = shortcut.Path;
+						string path = ShortcutHelper.FixWoW64ShortcutPath(shortcut.Path);
 
 						if (File.Exists(path) && Path.GetExtension(path).Equals(".8bf", StringComparison.OrdinalIgnoreCase))
 						{
@@ -280,7 +275,7 @@ namespace PSFilterHostDll
 					foreach (var item in links)
 					{
 						shortcut.Load(item);
-						string path = shortcut.Path;
+						string path = ShortcutHelper.FixWoW64ShortcutPath(shortcut.Path);
 
 						if (File.Exists(path) && Path.GetExtension(path).Equals(".8bf", StringComparison.OrdinalIgnoreCase))
 						{
@@ -290,33 +285,41 @@ namespace PSFilterHostDll
 				}
 			}
 #endif
-
-			foreach (var item in files)
+			// prevent any dialog from showing for missing DLLs.
+			uint oldErrorMode = SafeNativeMethods.SetErrorMode(NativeConstants.SEM_FAILCRITICALERRORS);
+			try
 			{
-				List<PluginData> pluginData;
-				if (LoadPsFilter.QueryPlugin(item, out pluginData))
+				foreach (var item in files)
 				{
-					int count = pluginData.Count;
-
-					if (count > 1)
+					List<PluginData> pluginData;
+					if (LoadPsFilter.QueryPlugin(item, out pluginData))
 					{
-						/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
-						 * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
-						 */
-						string[] entryPoints = new string[count];
-						for (int i = 0; i < count; i++)
-						{
-							entryPoints[i] = pluginData[i].EntryPoint;
-						}
-						
-						for (int i = 0; i < count; i++)
-						{
-							pluginData[i].moduleEntryPoints = entryPoints;
-						}
-					}
+						int count = pluginData.Count;
 
-					pluginInfo.AddRange(pluginData);
+						if (count > 1)
+						{
+							/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
+							 * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
+							 */
+							string[] entryPoints = new string[count];
+							for (int i = 0; i < count; i++)
+							{
+								entryPoints[i] = pluginData[i].EntryPoint;
+							}
+
+							for (int i = 0; i < count; i++)
+							{
+								pluginData[i].moduleEntryPoints = entryPoints;
+							}
+						}
+
+						pluginInfo.AddRange(pluginData);
+					}
 				}
+			}
+			finally
+			{
+				SafeNativeMethods.SetErrorMode(oldErrorMode);
 			}			
 				
 			return new FilterCollection(pluginInfo);
@@ -373,6 +376,10 @@ namespace PSFilterHostDll
 				{
 					result = lps.RunPlugin(pluginData);
 				}
+				catch (FileNotFoundException)
+				{
+					throw;
+				}
 				catch (Exception ex)
 				{
 					throw new FilterRunException(ex.Message, ex);
@@ -385,6 +392,7 @@ namespace PSFilterHostDll
 					this.dest = new Bitmap(lps.Dest.CreateAliasedBitmap());
 #else
 					this.dest = lps.Dest.CreateAliasedBitmapSource().Clone();
+					this.dest.Freeze();
 #endif
 					
 

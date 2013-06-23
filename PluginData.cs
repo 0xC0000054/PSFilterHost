@@ -27,8 +27,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// The class that encapsulates an Adobe® Photoshop® filter plugin
     /// </summary>
-    public sealed class PluginData
-
+    public sealed class PluginData 
     {
         private string fileName;
         private string entryPoint;
@@ -162,6 +161,17 @@ namespace PSFilterHostDll
         internal bool IsValid()
         {
             return (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(entryPoint));
+        }
+
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return (this.fileName.GetHashCode() ^ this.category.GetHashCode() ^ this.title.GetHashCode() ^ this.entryPoint.GetHashCode());
         }
     }
 

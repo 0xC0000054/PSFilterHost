@@ -54,7 +54,7 @@ namespace PSFilterHostDll
             {
                 StringBuilder sb = new StringBuilder(260);
 
-                shellLink.GetPath(sb, sb.MaxCapacity, IntPtr.Zero, 0);
+                shellLink.GetPath(sb, sb.MaxCapacity, IntPtr.Zero, 0U);
 
                 return sb.ToString();
             }

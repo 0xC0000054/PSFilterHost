@@ -50,7 +50,7 @@ namespace PSFilterHostDll.BGRASurface
         }
 
         /// <summary>
-        /// Scales the data to the internal 16 bit range used by Adobe® Photoshop®.
+        /// Scales the data to the internal 16 bit range used by Adobe(R) Photoshop(R).
         /// </summary>
         public unsafe void ScaleToPhotoshop16BitRange()
         {
@@ -69,7 +69,7 @@ namespace PSFilterHostDll.BGRASurface
         }
 
         /// <summary>
-        /// Scales the data from the internal 16 bit range used by Adobe® Photoshop®.
+        /// Scales the data from the internal 16 bit range used by Adobe(R) Photoshop(R).
         /// </summary>
         private unsafe void ScaleFromPhotoshop16BitRange()
         {
@@ -80,7 +80,7 @@ namespace PSFilterHostDll.BGRASurface
 
                 while (ptr < ptrEnd)
                 {
-                    *ptr = Scale16(*ptr);
+                    *ptr = Fix16BitRange(*ptr);
 
                     ptr++;
                 }
@@ -316,8 +316,7 @@ namespace PSFilterHostDll.BGRASurface
                     {
                         gray = graySum / alphaSum;
 
-                        // add 0.5 to ensure truncation to uint results in rounding
-                        alpha += 0.5;
+                        // add 0.5 to ensure truncation to ushort results in rounding
                         gray += 0.5;
                     }
 
@@ -457,7 +456,6 @@ namespace PSFilterHostDll.BGRASurface
 
                     // add 0.5 so that rounding goes in the direction we want it to
                     gray += 0.5;
-                    alpha += 0.5;
 
                     dstPtr[0] = (ushort)gray;
                     ++dstPtr;

@@ -2,6 +2,7 @@
 /HostTest/obj
 *.user
 *.vsp
+*.psess
 *.suo
 /obj
 /bin

@@ -15,23 +15,27 @@ using System;
 namespace PSFilterLoad.PSApi
 {
 #if DEBUG
-    [Flags]
-    enum DebugFlags
-    {
-        None = 0,
-        AdvanceState = 1,
-        BufferSuite = 2,
-        Call = 4,
-        ChannelPorts = 8,
-        ColorServices = 16,        
-        DescriptorParameters = 32,
-        DisplayPixels = 64,
-        Error = 128,
-        HandleSuite = 256,
-        ImageServices = 512,
-        MiscCallbacks = 1024,
-        PiPL = 2048,
-        SPBasicSuite = 4096
-    }
+	[Flags]
+	enum DebugFlags
+	{
+		None = 0,
+		AdvanceState = (1 << 0),
+		BufferSuite = (1 << 1),
+		Call = (1 << 2),
+		ChannelPorts = (1 << 3),
+		ColorServices = (1 << 4),
+		DescriptorParameters = (1 << 5),
+		DisplayPixels = (1 << 6),
+		Error = (1 << 7),
+		HandleSuite = (1 << 8),
+		ImageServices = (1 << 9),
+		MiscCallbacks = (1 << 10),
+		PiPL = (1 << 11),
+		PropertySuite = (1 << 12),
+		ResourceSuite = (1 << 13),
+#if PICASUITES
+		SPBasicSuite = (1 << 14)
+#endif   
+	}
 #endif
 }

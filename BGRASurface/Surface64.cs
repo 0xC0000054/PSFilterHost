@@ -60,7 +60,7 @@ namespace PSFilterHostDll.BGRASurface
         }
 
         /// <summary>
-        /// Scales the data to the internal 16 bit range used by Adobe® Photoshop®.
+        /// Scales the data to the internal 16 bit range used by Adobe(R) Photoshop(R).
         /// </summary>
         public unsafe void ScaleToPhotoshop16BitRange()
         {
@@ -82,7 +82,7 @@ namespace PSFilterHostDll.BGRASurface
         }
 
         /// <summary>
-        /// Scales the data from the internal 16 bit range used by Adobe® Photoshop®.
+        /// Scales the data from the internal 16 bit range used by Adobe(R) Photoshop(R).
         /// </summary>
         private unsafe void ScaleFromPhotoshop16BitRange()
         {
@@ -93,10 +93,10 @@ namespace PSFilterHostDll.BGRASurface
 
                 while (ptr < ptrEnd)
                 {
-                    ptr->B = Scale16(ptr->B);
-                    ptr->G = Scale16(ptr->G);
-                    ptr->R = Scale16(ptr->R);
-                    ptr->A = Scale16(ptr->A);
+                    ptr->B = Fix16BitRange(ptr->B);
+                    ptr->G = Fix16BitRange(ptr->G);
+                    ptr->R = Fix16BitRange(ptr->R);
+                    ptr->A = Fix16BitRange(ptr->A);
 
                     ptr++;
                 }
@@ -564,11 +564,11 @@ namespace PSFilterHostDll.BGRASurface
             for (int y = 0; y < height; y++)
             {
                 ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
-                ushort* endPtr = ptr + stride;
+                ushort* endPtr = ptr + width;
 
                 while (ptr < endPtr)
                 {
-                    ptr[3] = 32768; // The internal 16-bit range of Adobe® Photoshop® is 0 to 32768.
+                    ptr[3] = 32768; // Per the SDK the 16-bit range is 0 to 32768.
 
                     ptr += 4;
                 }
