@@ -52,6 +52,9 @@ namespace HostTest
 		private float selectionFactor;
 		private GraphicsPath normalizedPath;
 
+		private bool resetClip;
+		private int suspendPaintCounter;
+
 		public event EventHandler<CanvasZoomChangedEventArgs> ZoomChanged;
 		public event EventHandler<CanvasDirtyChangedEventArgs> DirtyChanged;
 
@@ -261,13 +264,52 @@ namespace HostTest
 		private void ResetGraphicsClip()
 		{
 			resetClip = true;
-			this.Invalidate();
-			this.Update();
+			if (suspendPaintCounter == 0)
+			{
+				this.Invalidate();
+				this.Update(); 
+			}
 		}
 
-		private bool resetClip;
+		/// <summary>
+		/// Suspends the redrawing of the canvas.
+		/// </summary>
+		public void SuspendPaint()
+		{
+			this.suspendPaintCounter++;
+		}
+
+		/// <summary>
+		/// Resumes the redrawing of the canvas.
+		/// </summary>
+		public void ResumePaint()
+		{
+			this.suspendPaintCounter--;
+
+			if (suspendPaintCounter == 0)
+			{
+				if (base.InvokeRequired)
+				{
+					base.BeginInvoke(new Action(delegate()
+						{
+							this.Invalidate();
+							this.Update(); 
+						}));
+				}
+				else
+				{
+					this.Invalidate();
+					this.Update(); 
+				}
+			}
+		}
+
 		protected override void OnPaint(PaintEventArgs pe)
 		{
+#if DEBUG
+			System.Diagnostics.Debug.Assert(suspendPaintCounter == 0);
+#endif
+
 			if (resetClip)
 			{
 				if (imageBounds.Width < pe.ClipRectangle.Width && imageBounds.Height < pe.ClipRectangle.Height)
@@ -841,7 +883,7 @@ namespace HostTest
 
 				this.OnZoomChanged();
 
-				if (invalidate)
+				if (invalidate && suspendPaintCounter == 0)
 				{
 					this.Invalidate();
 					this.Update();
@@ -884,7 +926,7 @@ namespace HostTest
 						gr.DrawImage(this.image, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);
 					}
 
-					scaled = (Bitmap)temp.Clone();
+					scaled = temp.Clone() as Bitmap;
 				}
 
 

@@ -50,6 +50,7 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.loadFiltersMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshFiltersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,11 +77,11 @@
             this.zoomToWindowBtn = new System.Windows.Forms.ToolStripButton();
             this.zoomToActualSizeBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.canvas = new HostTest.Canvas();
             this.primaryColorBtn = new HostTest.ColorToolStripMenuItem();
             this.secondaryColorBtn = new HostTest.ColorToolStripMenuItem();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.canvas = new HostTest.Canvas();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -107,6 +108,7 @@
             this.saveToolStripMenuItem,
             this.toolStripSeparator1,
             this.loadFiltersMenuItem,
+            this.refreshFiltersToolStripMenuItem,
             this.toolStripSeparator4,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -118,7 +120,7 @@
             this.openToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("openToolStripMenuItem.Image")));
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.openToolStripMenuItem.Text = "&Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -128,33 +130,44 @@
             this.saveToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("saveToolStripMenuItem.Image")));
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.saveToolStripMenuItem.Text = "&Save...";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(206, 6);
             // 
             // loadFiltersMenuItem
             // 
             this.loadFiltersMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFiltersMenuItem.Image")));
             this.loadFiltersMenuItem.Name = "loadFiltersMenuItem";
-            this.loadFiltersMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.loadFiltersMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.O)));
+            this.loadFiltersMenuItem.Size = new System.Drawing.Size(209, 22);
             this.loadFiltersMenuItem.Text = "&Load Filters...";
             this.loadFiltersMenuItem.Click += new System.EventHandler(this.loadFiltersMenuItem_Click);
+            // 
+            // refreshFiltersToolStripMenuItem
+            // 
+            this.refreshFiltersToolStripMenuItem.Enabled = false;
+            this.refreshFiltersToolStripMenuItem.Image = global::HostTest.Properties.Resources.refresh;
+            this.refreshFiltersToolStripMenuItem.Name = "refreshFiltersToolStripMenuItem";
+            this.refreshFiltersToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.refreshFiltersToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
+            this.refreshFiltersToolStripMenuItem.Text = "&Refresh Filters";
+            this.refreshFiltersToolStripMenuItem.Click += new System.EventHandler(this.refreshFiltersToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(206, 6);
             // 
             // exitToolStripMenuItem
             // 
-            this.exitToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("exitToolStripMenuItem.Image")));
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(209, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -221,6 +234,10 @@
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
             this.aboutToolStripMenuItem.Text = "&About...";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // folderBrowserDialog1
+            // 
+            this.folderBrowserDialog1.Description = "Select a folder containing Adobe® Photoshop® filters.";
             // 
             // openFileDialog1
             // 
@@ -365,6 +382,34 @@
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(26, 6);
             // 
+            // panel1
+            // 
+            this.panel1.AutoScroll = true;
+            this.panel1.AutoScrollMargin = new System.Drawing.Size(3, 3);
+            this.panel1.Controls.Add(this.canvas);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(29, 24);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1025, 646);
+            this.panel1.TabIndex = 10;
+            // 
+            // colorDialog1
+            // 
+            this.colorDialog1.FullOpen = true;
+            this.colorDialog1.SolidColorOnly = true;
+            // 
+            // canvas
+            // 
+            this.canvas.IsDirty = false;
+            this.canvas.Location = new System.Drawing.Point(3, 3);
+            this.canvas.Name = "canvas";
+            this.canvas.SelectionType = null;
+            this.canvas.Size = new System.Drawing.Size(800, 600);
+            this.canvas.Surface = null;
+            this.canvas.TabIndex = 9;
+            this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
+            this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
+            // 
             // primaryColorBtn
             // 
             this.primaryColorBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -388,34 +433,6 @@
             this.secondaryColorBtn.Text = "toolStripButton2";
             this.secondaryColorBtn.ToolTipText = "Secondary color";
             this.secondaryColorBtn.Click += new System.EventHandler(this.secondaryColorBtn_Click);
-            // 
-            // panel1
-            // 
-            this.panel1.AutoScroll = true;
-            this.panel1.AutoScrollMargin = new System.Drawing.Size(3, 3);
-            this.panel1.Controls.Add(this.canvas);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(29, 24);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1025, 646);
-            this.panel1.TabIndex = 10;
-            // 
-            // canvas
-            // 
-            this.canvas.IsDirty = false;
-            this.canvas.Location = new System.Drawing.Point(3, 3);
-            this.canvas.Name = "canvas";
-            this.canvas.SelectionType = null;
-            this.canvas.Size = new System.Drawing.Size(800, 600);
-            this.canvas.Surface = null;
-            this.canvas.TabIndex = 9;
-            this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
-            this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
-            // 
-            // colorDialog1
-            // 
-            this.colorDialog1.FullOpen = true;
-            this.colorDialog1.SolidColorOnly = true;
             // 
             // Form1
             // 
@@ -487,6 +504,7 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutPluginsMenuItem;
         private System.Windows.Forms.ToolStripSeparator aboutMenuToolStripSeparator;
+        private System.Windows.Forms.ToolStripMenuItem refreshFiltersToolStripMenuItem;
     }
 }
 

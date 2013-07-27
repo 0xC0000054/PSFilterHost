@@ -132,8 +132,7 @@ namespace HostTest
 
                 using (MemoryStream stream = new MemoryStream(temp))
                 {
-                    PngBitmapDecoder dec = new PngBitmapDecoder(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                    this.image = dec.Frames[0].Clone();
+                    this.image = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
                 }
             }
 

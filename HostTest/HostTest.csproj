@@ -35,6 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -72,6 +73,7 @@
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -107,6 +109,7 @@
     <Compile Include="HistoryItem.cs" />
     <Compile Include="HistoryItemState.cs" />
     <Compile Include="HistoryStack.cs" />
+    <Compile Include="StringLogicalComparer.cs" />
     <Compile Include="TaskDialog\ButtonBase.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -124,6 +127,9 @@
     <Compile Include="TaskDialog\TaskDialog.cs" />
     <Compile Include="TaskDialog\UI.cs" />
     <Compile Include="TaskDialog\VisualStyleClass.cs" />
+    <Compile Include="ToolStripMenuItemEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Tools\CursorChangedEventArgs.cs" />
     <Compile Include="Tools\ElipseSelectTool.cs" />
     <Compile Include="Tools\RectangleSelectTool.cs" />
@@ -206,11 +212,15 @@
   <ItemGroup>
     <None Include="Resources\Annotate_info.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF $(PlatformName) == x86 (
 call "$(DevEnvDir)..\tools\vsvars32.bat"
-editbin.exe /NXCOMPAT:NO "$(TargetPath)" )</PostBuildEvent>
+editbin.exe /NXCOMPAT:NO "$(TargetPath)" 
+editbin.exe /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
