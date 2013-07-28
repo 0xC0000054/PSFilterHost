@@ -18,6 +18,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// The exception that is thrown when a filter returns an error.
     /// </summary>
+    /// <threadsafety static="true" instance="false" />
     [Serializable]
     public sealed class FilterRunException : Exception, ISerializable
     {

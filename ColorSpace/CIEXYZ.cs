@@ -50,48 +50,27 @@ namespace Devcorp.Controls.Design
 		#endregion
 
 		#region Accessors
-		/// <summary>
-		/// Gets or sets X component.
-		/// </summary>
 		public double X
 		{
 			get
 			{
 				return this.x;
 			}
-			set
-			{
-				this.x = (value>0.9505)? 0.9505 : ((value<0)? 0 : value);
-			}
 		}
 
-		/// <summary>
-		/// Gets or sets Y component.
-		/// </summary>
 		public double Y
 		{
 			get
 			{
 				return this.y;
 			}
-			set
-			{
-				this.y = (value>1.0)? 1.0 : ((value<0)?0 : value);
-			}
 		}
 
-		/// <summary>
-		/// Gets or sets Z component.
-		/// </summary>
 		public double Z
 		{
 			get
 			{
 				return this.z;
-			}
-			set
-			{
-				this.z = (value>1.089)? 1.089 : ((value<0)? 0 : value);
 			}
 		}
 

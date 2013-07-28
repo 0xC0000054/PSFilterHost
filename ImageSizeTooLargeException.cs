@@ -18,14 +18,14 @@ namespace PSFilterHostDll
     /// <summary>
     /// The exception that is thrown when the image size exceeds 32000 pixels in width or height.
     /// </summary>
+    /// <threadsafety static="true" instance="false" />
     [Serializable]
     public sealed class ImageSizeTooLargeException : Exception, ISerializable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class.
         /// </summary>
-        public ImageSizeTooLargeException()
-            : base("An ImageSizeTooLargeException has occured")
+        public ImageSizeTooLargeException() : base()
         {
         }
         /// <summary>

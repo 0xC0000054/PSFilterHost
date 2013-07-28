@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET_35_OR_GREATER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -38,10 +38,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\PSFilterHost.XML</DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) == 2.0">$(DefineConstants);GDIPLUS</DefineConstants>
     <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= 3.5">$(DefineConstants);NET_35_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= 4.0">$(DefineConstants);NET_40_OR_GREATER</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -85,7 +87,7 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0' " />
+    <Reference Include="WindowsBase" Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0'" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BGRASurface\BGRASurfaceMemory.cs" />
@@ -107,9 +109,11 @@
     <Compile Include="ColorSpace\HSB.cs" />
     <Compile Include="ColorSpace\HSL.cs" />
     <Compile Include="ColorSpace\RGB.cs" />
-    <Compile Include="ColorSpace\YUV.cs" />
     <Compile Include="EnableInfoParser.cs" />
     <Compile Include="FileEnumerator.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HostInformation.cs" />
+    <Compile Include="HostRulerUnits.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterProgressEventArgs.cs" />

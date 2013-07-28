@@ -29,7 +29,6 @@ namespace PSFilterLoad.PSApi
 	/// </summary>
 	internal static class Memory 
 	{
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
 		private static IntPtr hHeap = SafeNativeMethods.GetProcessHeap();
 
 		/// <summary>
@@ -38,7 +37,6 @@ namespace PSFilterLoad.PSApi
 		/// <param name="size">The size of the memory to allocate.</param>
 		/// <param name="zeroFill">if <c>true</c> the allocated memory will be set to zero.</param>
 		/// <returns>A pointer to the allocated block of memory.</returns>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "HeapAlloc")]
 		public static IntPtr Allocate(long size, bool zeroFill)
 		{
 			if (hHeap == IntPtr.Zero)
@@ -73,7 +71,6 @@ namespace PSFilterLoad.PSApi
 		/// Frees the block of memory allocated by Allocate().
 		/// </summary>
 		/// <param name="hMem">The block to free.</param>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object)"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "HeapFree")]
 		public static void Free(IntPtr hMem)
 		{
 			if (hHeap != IntPtr.Zero)
@@ -99,7 +96,6 @@ namespace PSFilterLoad.PSApi
 		/// <param name="pv">The pointer to the block to resize.</param>
 		/// <param name="newSize">The new size of the block.</param>
 		/// <returns>The pointer to the resized block.</returns>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "HeapAlloc")]
 		public static IntPtr ReAlloc(IntPtr pv, long newSize)
 		{
 			if (hHeap == IntPtr.Zero)

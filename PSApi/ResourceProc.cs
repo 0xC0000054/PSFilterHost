@@ -24,7 +24,7 @@ namespace PSFilterLoad.PSApi
     internal delegate short CountPIResourcesProc(uint type);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate System.IntPtr GetPIResourceProc(uint type, short index);
+    internal delegate IntPtr GetPIResourceProc(uint type, short index);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate void DeletePIResourceProc(uint type, short index);
@@ -32,7 +32,7 @@ namespace PSFilterLoad.PSApi
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate short AddPIResourceProc(uint type, IntPtr data);
 
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct ResourceProcs
     {
         public short resourceProcsVersion;

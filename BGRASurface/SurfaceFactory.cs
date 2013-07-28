@@ -153,7 +153,6 @@ namespace PSFilterHostDll.BGRASurface
 						ColorBgra16* dst = (ColorBgra16*)surface.GetRowAddressUnchecked(y);
 						for (int x = 0; x < width; x++)
 						{
-
 							dst->R = src[0];
 							dst->G = src[1];
 							dst->B = src[2];
@@ -218,7 +217,7 @@ namespace PSFilterHostDll.BGRASurface
 				case ImageModes.plugInModeRGB48:
 					return new Surface64(width, height);
 				default:
-					throw new InvalidEnumArgumentException();
+					throw new InvalidEnumArgumentException("mode", (int)mode, typeof(ImageModes));
 			}
 		}
 	}

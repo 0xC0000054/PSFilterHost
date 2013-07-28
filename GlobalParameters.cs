@@ -19,16 +19,21 @@ namespace PSFilterHostDll
     /// <summary>
     /// The class that encapsulates the filter's global parameter data.
     /// </summary>
+    /// <threadsafety static="true" instance="false" />
     [Serializable]
     public sealed class GlobalParameters : ISerializable
     {
-        private long parameterDataSize;
+        internal enum DataStorageMethod
+        {
+            HandleSuite,
+            OTOFHandle,
+            RawBytes
+        }
+
         private byte[] parameterDataBytes;
-        private bool parameterDataIsPSHandle;
-        private long pluginDataSize;
+        private DataStorageMethod parameterDataStorageMethod;
         private byte[] pluginDataBytes;
-        private bool pluginDataIsPSHandle;
-        private int storeMethod;
+        private DataStorageMethod pluginDataStorageMethod;
 
         /// <summary>
         /// Gets the parameter data bytes.
@@ -49,32 +54,20 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Gets the size of the parameter data.
+        /// Gets or sets the storage method of the parameter data.
         /// </summary>
-        public long ParameterDataSize
+        /// <value>
+        /// The parameter data storage method.
+        /// </value>
+        internal DataStorageMethod ParameterDataStorageMethod
         {
             get
             {
-                return parameterDataSize;
+                return parameterDataStorageMethod;
             }
-            internal set
+            set
             {
-                parameterDataSize = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets if the parameter data a PS Handle.
-        /// </summary>
-        public bool ParameterDataIsPSHandle
-        {
-            get
-            {
-                return parameterDataIsPSHandle;
-            }
-            internal set
-            {
-                parameterDataIsPSHandle = value;
+                parameterDataStorageMethod = value;
             }
         }
 
@@ -95,76 +88,46 @@ namespace PSFilterHostDll
         {
             pluginDataBytes = data;
         }
+
         /// <summary>
-        /// Gets the size of the plugin data.
+        /// Gets or sets the storage method of the plugin data.
         /// </summary>
-        public long PluginDataSize
+        /// <value>
+        /// The plugin data storage method.
+        /// </value>
+        internal DataStorageMethod PluginDataStorageMethod
         {
             get
             {
-                return pluginDataSize;
+                return pluginDataStorageMethod;
             }
-            internal set
+            set
             {
-                pluginDataSize = value;
+                pluginDataStorageMethod = value;
             }
         }
-
-        /// <summary>
-        /// Gets if the plugin data is a PS Handle.
-        /// </summary>
-        public bool PluginDataIsPSHandle
-        {
-            get
-            {
-                return pluginDataIsPSHandle;
-            }
-            internal set
-            {
-                pluginDataIsPSHandle = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the store method.
-        /// </summary>
-        public int StoreMethod
-        {
-            get
-            {
-                return storeMethod;
-            }
-            internal set
-            {
-                storeMethod = value;
-            }
-        }
-
+       
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GlobalParameters"/> class.
         /// </summary>
         public GlobalParameters()
         {
-            this.parameterDataSize = 0;
             this.parameterDataBytes = null;
-            this.parameterDataIsPSHandle = false;
-            this.pluginDataSize = 0;
+            this.parameterDataStorageMethod = DataStorageMethod.HandleSuite;
             this.pluginDataBytes = null;
-            this.pluginDataIsPSHandle = false;
-            this.storeMethod = 0;
+            this.pluginDataStorageMethod = DataStorageMethod.HandleSuite;
         }
         private GlobalParameters(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new System.ArgumentNullException("info");
+                throw new ArgumentNullException("info");
 
-            this.parameterDataSize = info.GetInt64("parameterDataSize");
             this.parameterDataBytes = (byte[])info.GetValue("parameterDataBytes", typeof(byte[]));
-            this.parameterDataIsPSHandle = info.GetBoolean("parameterDataIsPSHandle");
-            this.pluginDataSize = info.GetInt64("pluginDataSize");
+            this.parameterDataStorageMethod = (DataStorageMethod)info.GetValue("parameterDataStorageMethod", typeof(DataStorageMethod));
+
             this.pluginDataBytes = (byte[])info.GetValue("pluginDataBytes", typeof(byte[]));
-            this.pluginDataIsPSHandle = info.GetBoolean("pluginDataIsPSHandle");
-            this.storeMethod = info.GetInt32("storeMethod");
+            this.pluginDataStorageMethod = (DataStorageMethod)info.GetValue("pluginDataStorageMethod", typeof(DataStorageMethod));
         }
         /// <summary>
         /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
@@ -175,19 +138,17 @@ namespace PSFilterHostDll
         /// The caller does not have the required permission.
         ///   </exception>
         ///   <exception cref="T:System.ArgumentNullException">The SerializationInfo is null.</exception>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new System.ArgumentNullException("info");
+                throw new ArgumentNullException("info");
 
-            info.AddValue("parameterDataSize", this.parameterDataSize);
             info.AddValue("parameterDataBytes", this.parameterDataBytes, typeof(byte[]));
-            info.AddValue("parameterDataIsPSHandle", this.parameterDataIsPSHandle);
-            info.AddValue("pluginDataSize", this.pluginDataSize);
+            info.AddValue("parameterDataStorageMethod", this.parameterDataStorageMethod, typeof(DataStorageMethod));
+
             info.AddValue("pluginDataBytes", this.pluginDataBytes, typeof(byte[]));
-            info.AddValue("pluginDataIsPSHandle", this.pluginDataIsPSHandle);
-            info.AddValue("storeMethod", this.storeMethod);
+            info.AddValue("pluginDataStorageMethod", this.pluginDataStorageMethod, typeof(DataStorageMethod));
         }
     }
 }

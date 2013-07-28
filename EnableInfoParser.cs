@@ -52,29 +52,36 @@ namespace PSFilterHostDll
 		private char[] chars;
 		private int index;
 		private int length;
-		private bool supports16Bit;
 
 		private const string inFunction = "in";
 		private const string psImageMode = "PSHOP_ImageMode";
 		private const string psImageDepth = "PSHOP_ImageDepth";
 
-		public EnableInfoParser(bool grayScale)
-		{
-			keywords  = new List<string>(new[] { psImageMode, psImageDepth });
-			constants = new List<string>(new[] { "true", "false", "GrayScaleMode", "RGBMode", "Gray16Mode", "RGB48Mode" });
+		private const string RGBMode = "RGBMode";
+		private const string RGB48Mode = "RGB48Mode";
+		private const string GrayScaleMode = "GrayScaleMode";
+		private const string Gray16Mode = "Gray16Mode";
 
-			imageMode =  grayScale ? "Gray16Mode" : "RGB48Mode";
-			
+		public EnableInfoParser()
+		{
+			keywords = new List<string>(new[] { psImageMode, psImageDepth });
+			constants = new List<string>(new[] { "true", "false", GrayScaleMode, RGBMode, Gray16Mode, RGB48Mode });
+
 			index = 0;
-			supports16Bit = false;
+		}
+
+		public EnableInfoParser(bool grayScale) : this()
+		{
+			imageMode = grayScale ? Gray16Mode : RGB48Mode;
 		}
 
 
 		public bool Parse(string info)
 		{
-			chars = info.ToCharArray();
+			this.chars = info.ToCharArray();
+			this.length = chars.Length;
 
-			length = chars.Length; 
+			bool supports16Bit = false;
 
 			while (index < length && !supports16Bit)
 			{
@@ -83,13 +90,13 @@ namespace PSFilterHostDll
 				switch (exp.type)
 				{
 					case TokenTypes.Function: // parse the in() function
-						ParseFunction(); 
+						supports16Bit = ParseFunction(); 
 						break;
 					case TokenTypes.Constant: // enable all modes
-						this.supports16Bit = (exp.value == "true" && length == 4);
+						supports16Bit = (exp.value == "true" && length == 4);
 						break;
 					case TokenTypes.Or: // the || PSHOP_ImageDepth == 16 case
-						ParseOr();
+						supports16Bit = ParseOr();
 						break;
 
 				} 
@@ -98,6 +105,59 @@ namespace PSFilterHostDll
 			return supports16Bit;
 		}
 
+		private bool SupportsMode(string mode)
+		{
+			this.imageMode = mode;
+
+			bool supportsMode = false;
+
+			while (index < length && !supportsMode)
+			{
+				Expression exp = this.NextToken();
+
+				switch (exp.type)
+				{
+					case TokenTypes.Function: // parse the in() function
+						supportsMode = ParseFunction();
+						break;
+					case TokenTypes.Constant: // enable all modes
+						supportsMode = (exp.value == "true" && length == 4);
+						break;
+				}
+			}
+
+			return supportsMode;
+		}
+
+		public ushort GetSupportedModes(string info)
+		{
+			this.chars = info.ToCharArray();
+			this.length = chars.Length;
+
+			ushort modes = 0;
+
+			if (SupportsMode(RGBMode))
+			{
+				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsRGBColor;
+			}
+
+			if (SupportsMode(GrayScaleMode))
+			{
+				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsGrayScale;
+			}
+
+			if (SupportsMode(RGB48Mode))
+			{
+				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsRGB48;
+			}
+
+			if (SupportsMode(Gray16Mode))
+			{
+				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsGray16;
+			}
+
+			return modes;
+		}
 
 		private void SkipWhitespace()
 		{
@@ -191,7 +251,7 @@ namespace PSFilterHostDll
 			return exp;
 		}
 
-		private void ParseFunction()
+		private bool ParseFunction()
 		{
 			SkipWhitespace();
 			int argCount = 1;
@@ -227,13 +287,15 @@ namespace PSFilterHostDll
 				{
 					if (split[i] == imageMode)
 					{
-						this.supports16Bit = true;
+						return true;
 					}
 				}
 			}
+
+			return false;
 		}
 
-		private void ParseOr()
+		private bool ParseOr()
 		{
 			Expression keyword = this.NextToken();
 
@@ -247,10 +309,11 @@ namespace PSFilterHostDll
 				
 				Expression depth = this.NextToken();
 
-				this.supports16Bit = depth.intValue == 16; 
+				return depth.intValue == 16; 
 				
 			}
-		
+
+			return false;
 		}
 	}
 }

@@ -19,6 +19,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// The collection that contains the filter's scripting data.
     /// </summary>
+    /// <threadsafety static="true" instance="false" />
     [Serializable]
     public sealed class ScriptingDataCollection
     {
@@ -30,7 +31,7 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Gets the count.
+        /// Gets the number of items in the collection.
         /// </summary>
         public int Count
         {

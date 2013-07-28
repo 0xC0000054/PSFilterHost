@@ -18,6 +18,7 @@ namespace PSFilterHostDll
 	/// <summary>
 	/// The class encapsulates the Pseudo–Resources used by the filters. 
 	/// </summary>
+    /// <threadsafety static="true" instance="false" />
 	public sealed class PSResource : IEquatable<PSResource>
 	{
 		private uint key;

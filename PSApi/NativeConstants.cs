@@ -12,7 +12,7 @@
 
 namespace PSFilterLoad.PSApi
 {
-    static class NativeConstants
+    internal static class NativeConstants
     {
         internal const int GPTR = 64;
 
@@ -23,21 +23,13 @@ namespace PSFilterLoad.PSApi
         internal const uint MEM_RELEASE = 0x8000;
 
         internal const int PAGE_NOACCESS = 1;
-
         internal const int PAGE_READONLY = 2;
-
         internal const int PAGE_READWRITE = 4;
-
         internal const int PAGE_WRITECOPY = 8;
-
         internal const int PAGE_EXECUTE = 16;
-
         internal const int PAGE_EXECUTE_READ = 32;
-
         internal const int PAGE_EXECUTE_READWRITE = 64;
-
         internal const int PAGE_EXECUTE_WRITECOPY = 128;
-
         internal const int PAGE_GUARD = 256;
 
         internal const uint SEM_FAILCRITICALERRORS = 1U;

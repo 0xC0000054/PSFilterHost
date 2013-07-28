@@ -41,8 +41,8 @@ namespace PSFilterLoad.PSApi
         [DllImport("kernel32.dll", SetLastError = false)]
         internal static extern UIntPtr HeapSize(IntPtr hHeap, uint dwFlags, IntPtr lpMem);
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Portability", "CA1901:PInvokeDeclarationsShouldBePortable", MessageId = "3"), DllImport("kernel32.dll", SetLastError = true)]
-        internal static extern unsafe uint HeapSetInformation(IntPtr HeapHandle, int HeapInformationClass, void* HeapInformation, uint HeapInformationLength);
+        [DllImport("kernel32.dll", SetLastError = true)]
+        internal static extern unsafe uint HeapSetInformation(IntPtr HeapHandle, int HeapInformationClass, void* HeapInformation, UIntPtr HeapInformationLength);
 
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern IntPtr VirtualAlloc(IntPtr lpAddress, UIntPtr dwSize, uint flAllocationType, uint flProtect);

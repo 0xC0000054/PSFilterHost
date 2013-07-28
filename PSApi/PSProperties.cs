@@ -20,15 +20,17 @@ namespace PSFilterLoad.PSApi
     internal static class PSProperties
     {
         /// <summary>
-        /// The big nudge distance Horizontal; 10 pixels default.
+        /// The horizontal big nudge distance, 16.16 fixed point value - 'bndH'
         /// </summary>
+        /// <remarks>The horizontal distance in pixels to move when using the shift key, default 10 pixels.</remarks>
         public const uint propBigNudgeH = 0x626e6448U;
         /// <summary>
-        /// The big nudge distance Vertical; 10 pixels default.
+        /// The vertical big nudge distance, 16.16 fixed point value - 'bndV'
         /// </summary>
+        /// <remarks>The vertical distance in pixels to move when using the shift key, default 10 pixels.</remarks>
         public const uint propBigNudgeV = 0x626e6456U;
         /// <summary>
-        /// The file caption - 'capt'
+        /// The caption of the document - 'capt'
         /// </summary>
         public const uint propCaption = 0x63617074U;
         /// <summary>
@@ -36,23 +38,28 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propChannelName = 0x6e6d6368U;
         /// <summary>
-        /// The file copyright - 'cpyr' 
+        /// The copyright status of the document - 'cpyr'
         /// </summary>
         public const uint propCopyright = 0x63707972U;
         /// <summary>
-        /// The file EXIF data - 'EXIF' 
+        /// The new copyright property from 5.0, a get only version of propCopyright - 'cpyR'
+        /// </summary>
+        public const uint propCopyright2 = 0x63707952U;
+        /// <summary>
+        /// The document EXIF data - 'EXIF' 
         /// </summary>
         public const uint propEXIFData = 0x45584946U;
         /// <summary>
-        /// The file XMP data - 'xmpd' 
+        /// The document XMP data - 'xmpd' 
         /// </summary>
         public const uint propXMPData = 0x786d7064U;
         /// <summary>
-        /// Major grid size - 'grmj' 
+        /// Major grid size, 16.16 fixed point value - 'grmj'      
         /// </summary>
+        /// <remarks>Measured in inches unless <see cref="propRulerUnits"/> is pixels, and then in pixels.</remarks>
         public const uint propGridMajor = 0x67726d6aU;
         /// <summary>
-        /// Minor grid size - 'grmn'
+        /// Minor grid size, the number of subdivisions per <see cref="propGridMajor"/> - 'grmn'
         /// </summary>
         public const uint propGridMinor = 0x67726d6eU;
         /// <summary>
@@ -60,7 +67,7 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propImageMode = 0x6d6f6465U;
         /// <summary>
-        /// Interpolation Mode - 'intp';
+        /// Interpolation Mode - 'intp'
         /// </summary>
         public const uint propInterpolationMethod = 0x696E7470U;
         /// <summary>
@@ -92,11 +99,11 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propRulerUnits = 0x72756c72U;
         /// <summary>
-        /// Ruler origin horizontal - 'rorH'
+        /// Ruler origin horizontal, 16.16 fixed point value - 'rorH'
         /// </summary>
         public const uint propRulerOriginH = 0x726f7248U;
         /// <summary>
-        /// Ruler origin vertical - 'rorV'
+        /// Ruler origin vertical, 16.16 fixed point value - 'rorV'
         /// </summary>
         public const uint propRulerOriginV = 0x726f7256U;
         /// <summary>
@@ -104,16 +111,32 @@ namespace PSFilterLoad.PSApi
         /// </summary>
         public const uint propSerialString = 0x73737472U;
         /// <summary>
-        /// The file's URL - 'URL '
+        /// The property that indicates if the file has a digital signature or watermark - 'watr'
+        /// </summary>
+        public const uint propWatermark = 0x77617472U;
+        /// <summary>
+        /// The URL of the document - 'URL '
         /// </summary>
         public const uint propURL = 0x55524c20U;
         /// <summary>
-        /// The file title - 'titl'
+        /// The title of the document - 'titl'
         /// </summary>
         public const uint propTitle = 0x7469746cU;
         /// <summary>
         /// The watch suspension level - 'wtch'
         /// </summary>
         public const uint propWatchSuspension = 0x77746368U;
+        /// <summary>
+        /// The width of the current document in pixels - 'docW'  
+        /// </summary>
+        public const uint propDocumentWidth = 0x646f6357U;
+        /// <summary>
+        /// The height of the current document in pixels - 'docH'  
+        /// </summary>
+        public const uint propDocumentHeight = 0x646f6348U;
+        /// <summary>
+        /// Tool tip display - 'tltp'
+        /// </summary>
+        public const uint propToolTips = 0x746c7470U;
     }
 }

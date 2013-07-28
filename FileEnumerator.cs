@@ -15,20 +15,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Security.Permissions;
 using Microsoft.Win32.SafeHandles;
 
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// Enumerates through a directory using the native Win32 API.
+    /// Enumerates through a directory using the native API.
     /// </summary>
     internal static class FileEnumerator
     {
+
+#if NET_40_OR_GREATER
+        [SecurityCritical()]
+#else
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
         private sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
-            [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
-            internal SafeFindHandle() : base(true) { }
+            private SafeFindHandle() : base(true) { }
 
             protected override bool ReleaseHandle()
             {
@@ -36,7 +42,7 @@ namespace PSFilterHostDll
             }
         }
 
-        [System.Security.SuppressUnmanagedCodeSecurity]
+        [SuppressUnmanagedCodeSecurity]
         private static class UnsafeNativeMethods
         {
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
@@ -46,7 +52,7 @@ namespace PSFilterHostDll
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool FindNextFileW(SafeFindHandle hndFindFile, out WIN32_FIND_DATAW lpFindFileData);
 
-            [DllImport("kernel32.dll"), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+            [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool FindClose(IntPtr handle);
         }
@@ -89,19 +95,19 @@ namespace PSFilterHostDll
                     {
                         if ((findData.dwFileAttributes & 16U) != 0U)
                         {
-                            if (findData.cFileName != "." && findData.cFileName != "..")
+                            if (searchSubDirectories)
                             {
-                                if (searchSubDirectories)
+                                if (findData.cFileName != "." && findData.cFileName != "..")
                                 {
-                                    var subdirectory = Path.Combine(directory,  findData.cFileName);
+                                    var subdirectory = Path.Combine(directory, findData.cFileName);
 
-                                    new FileIOPermission(FileIOPermissionAccess.PathDiscovery, subdirectory);
+                                    new FileIOPermission(FileIOPermissionAccess.PathDiscovery, subdirectory).Demand();
 
                                     foreach (var file in EnumerateFiles(subdirectory, fileExtension, searchSubDirectories))
                                         yield return file;
                                 }
                             }
-                        } 
+                        }
                         else
                         {
                             if (string.Compare(Path.GetExtension(findData.cFileName), fileExtension, StringComparison.OrdinalIgnoreCase) == 0)
@@ -117,6 +123,7 @@ namespace PSFilterHostDll
             
         }
 
+#if !NET_35_OR_GREATER
         internal static string[] GetFiles(string directory, string fileExtension, bool searchSubDirectories)
         {
             var files = FileEnumerator.EnumerateFiles(directory, fileExtension, searchSubDirectories);
@@ -124,6 +131,7 @@ namespace PSFilterHostDll
             List<string> list = new List<string>(files);
 
             return list.ToArray();
-        } 
+        }  
+#endif
     }
 }

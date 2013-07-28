@@ -38,7 +38,7 @@ namespace PSFilterLoad.PSApi
 	}
 
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-	internal delegate short ReadPixelsProc(IntPtr port, ref PSScaling scaling, ref VRect writeRect, ref PixelMemoryDesc destination, ref VRect wroteRect);
+	internal delegate short ReadPixelsProc([In()] IntPtr port, [In()] ref PSScaling scaling, [In()] ref VRect writeRect, [In()] ref PixelMemoryDesc destination, ref VRect wroteRect);
 
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate short WriteBasePixelsProc(IntPtr port, ref VRect writeRect, PixelMemoryDesc source);

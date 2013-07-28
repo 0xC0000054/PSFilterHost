@@ -18,6 +18,7 @@ namespace PSFilterHostDll
 	/// <summary>
 	/// The class containing the results of searching a directory for filters.
 	/// </summary>
+	/// <threadsafety static="true" instance="false" />
 	public sealed class FilterCollection : ReadOnlyCollection<PluginData>
 	{
 		/// <summary>

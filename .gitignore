@@ -4,6 +4,10 @@
 *.vsp
 *.psess
 *.suo
+*.Cache
 /obj
 /bin
-/Doc
+/Doc/Help
+/Doc/obj
+/_UpgradeReport_Files
+UpgradeLog*.XML

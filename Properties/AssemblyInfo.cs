@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle(".NET host library for 3rd party Adobe\u00AE Photoshop\u00AE filters")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("PSFilterHost Team")]
 [assembly: AssemblyProduct("PSFilterHost Library")]
 [assembly: AssemblyCopyright("Copyright © 2012-2013 Nicholas Hayes")]
 [assembly: AssemblyTrademark("")]
@@ -46,5 +46,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.4")]
-[assembly: AssemblyFileVersion("1.0.0.4")]
+[assembly: AssemblyVersion("1.0.0.5")]
+[assembly: AssemblyFileVersion("1.0.0.5")]

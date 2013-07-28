@@ -25,11 +25,16 @@ using System.Windows.Media.Imaging;
 using System.Linq;
 #endif
 
+#if NET_40_OR_GREATER
+using System.Security;
+#endif
+
 namespace PSFilterHostDll
 {
 	/// <summary>
 	/// The class that enumerates and runs the Adobe® Photoshop® filters.
 	/// </summary>
+	/// <threadsafety static="true" instance="false" />
 	public sealed class PSFilterHost : IDisposable
 	{
 #if GDIPLUS
@@ -48,7 +53,8 @@ namespace PSFilterHostDll
 		private Region selectedRegion;
 		private IntPtr owner;
 		private AbortFunc abortFunc;
-		private List<PSResource> pseudoResources; 
+		private List<PSResource> pseudoResources;
+		private HostInformation hostInfo;
 
 		/// <summary>
 		/// The event fired when the filter updates it's progress. 
@@ -56,28 +62,56 @@ namespace PSFilterHostDll
 		public event EventHandler<FilterProgressEventArgs> UpdateProgress;
 
 #if GDIPLUS
-		 /// <summary>
+
+#if NET_40_OR_GREATER
+		/// <summary>
 		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
 		/// </summary>
-		/// <param name="sourceImage">The source image.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
 		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// </summary>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
 		public PSFilterHost(Bitmap sourceImage, IntPtr parentWindowHandle)
 			: this(sourceImage, Color.Black, Color.White, null, parentWindowHandle)
 		{
 		}
 
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
 		/// </summary>
-		/// <param name="sourceImage">The source image.</param>
-		/// <param name="primary">The primary color.</param>
-		/// <param name="secondary">The secondary color.</param>
-		/// <param name="selectedRegion">The selected region.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="primary">The primary (foreground) color of the host application.</param>
+		/// <param name="secondary">The secondary (background) color of the host application.</param>
+		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
 		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// </summary>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="primary">The primary (foreground) color of the host application.</param>
+		/// <param name="secondary">The secondary (background) color of the host application.</param>
+		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif		
 		public PSFilterHost(Bitmap sourceImage, Color primary, Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
 		{
 			if (sourceImage == null)
@@ -113,27 +147,55 @@ namespace PSFilterHostDll
 			}
 		}
 #else
+
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
 		/// </summary>
-		/// <param name="sourceImage">The source image.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
 		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// </summary>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
 		public PSFilterHost(BitmapSource sourceImage, IntPtr parentWindowHandle) : this(sourceImage, System.Windows.Media.Colors.Black, System.Windows.Media.Colors.White, null, parentWindowHandle)
 		{
 		}
 
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
 		/// </summary>
-		/// <param name="sourceImage">The source image.</param>
-		/// <param name="primary">The primary color.</param>
-		/// <param name="secondary">The secondary color.</param>
-		/// <param name="selectedRegion">The selected region.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="primary">The primary (foreground) color of the host application.</param>
+		/// <param name="secondary">The secondary (background) color of the host application.</param>
+		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
 		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// </summary>
+		/// <param name="sourceImage">The image to filter.</param>
+		/// <param name="primary">The primary (foreground) color of the host application.</param>
+		/// <param name="secondary">The secondary (background) color of the host application.</param>
+		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <exception cref="System.ArgumentNullException">The source image is null.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
 		public PSFilterHost(BitmapSource sourceImage,  System.Windows.Media.Color primary,  System.Windows.Media.Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
 		{
 			if (sourceImage == null)
@@ -155,6 +217,7 @@ namespace PSFilterHostDll
 			this.owner = parentWindowHandle;
 			this.pseudoResources = null;
 			this.abortFunc = null;
+			this.hostInfo = null;
 			PSFilterHostDll.BGRASurface.BGRASurfaceMemory.CreateHeap();
 		}
 
@@ -189,12 +252,29 @@ namespace PSFilterHostDll
 		}
 
 		/// <summary>
+		/// Gets or sets the host information used by the filters.
+		/// </summary>
+		/// <value>
+		/// The host information.
+		/// </value>
+		public HostInformation HostInfo
+		{
+			get
+			{
+				return hostInfo;
+			}
+			set
+			{
+				hostInfo = value;
+			}
+		}
+
+		/// <summary>
 		/// Gets or sets the pseudo resources used by the plug-ins.
 		/// </summary>
 		/// <value>
 		/// The pseudo resources.
 		/// </value>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public PseudoResourceCollection PseudoResources
 		{
 			get
@@ -223,6 +303,8 @@ namespace PSFilterHostDll
 			this.abortFunc = abortCallback;
 		}
 
+
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
@@ -231,7 +313,20 @@ namespace PSFilterHostDll
 		/// <returns>A new <see cref="FilterCollection"/> containing the list of loaded filters.</returns>
 		/// <exception cref="System.ArgumentException">The directory string is null or empty.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The specified directory was not found.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Queries the directory for filters to load.
+		/// </summary>
+		/// <param name="directory">The directory to query.</param>
+		/// <param name="searchSubDirectories">if set to <c>true</c> search the subdirectories.</param>
+		/// <returns>A new <see cref="FilterCollection"/> containing the list of loaded filters.</returns>
+		/// <exception cref="System.ArgumentException">The directory string is null or empty.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">The specified directory was not found.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
 		public static FilterCollection QueryDirectory(string directory, bool searchSubDirectories)
 		{
 			if (string.IsNullOrEmpty(directory))
@@ -286,7 +381,7 @@ namespace PSFilterHostDll
 			}
 #endif
 			// prevent any dialog from showing for missing DLLs.
-			uint oldErrorMode = SafeNativeMethods.SetErrorMode(NativeConstants.SEM_FAILCRITICALERRORS);
+			uint oldErrorMode = SafeNativeMethods.SetErrorMode(SafeNativeMethods.SetErrorMode(0U) | NativeConstants.SEM_FAILCRITICALERRORS); 
 			try
 			{
 				foreach (var item in files)
@@ -325,7 +420,8 @@ namespace PSFilterHostDll
 			return new FilterCollection(pluginInfo);
 		}
 
-	  
+
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Runs the specified filter.
 		/// </summary>
@@ -333,12 +429,29 @@ namespace PSFilterHostDll
 		/// <returns>
 		/// True if successful; false if the user canceled the dialog.
 		/// </returns>
-		/// <exception cref="System.ArgumentNullException">The pluginData is null.</exception>
+		/// <exception cref="System.ArgumentNullException">The <paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <exception cref="ImageSizeTooLargeException">The width or height of the source image exceeds 32000 pixels.</exception>
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else      
+		/// <summary>
+		/// Runs the specified filter.
+		/// </summary>
+		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
+		/// <returns>
+		/// True if successful; false if the user canceled the dialog.
+		/// </returns>
+		/// <exception cref="System.ArgumentNullException">The <paramref name="pluginData"/> is null.</exception>
+		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
+		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
+		/// <exception cref="FilterRunException">The filter returns an error.</exception>
+		/// <exception cref="ImageSizeTooLargeException">The width or height of the source image exceeds 32000 pixels.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission> 
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
 		public bool RunFilter(PluginData pluginData)
 		{
 			if (pluginData == null)
@@ -363,7 +476,7 @@ namespace PSFilterHostDll
 
 				if (filterParameters != null)
 				{
-					lps.ParmData = filterParameters;
+					lps.ParameterData = filterParameters;
 					lps.IsRepeatEffect = true;
 				}
 
@@ -371,6 +484,11 @@ namespace PSFilterHostDll
 				{
 					lps.PseudoResources = pseudoResources;
 				}
+
+				if (hostInfo != null)
+				{
+					lps.HostInformation = hostInfo;
+				}  
 
 				try
 				{
@@ -410,8 +528,9 @@ namespace PSFilterHostDll
 					} 
 #endif
 
-					this.filterParameters = lps.ParmData;
+					this.filterParameters = lps.ParameterData;
 					this.pseudoResources = lps.PseudoResources;
+					this.hostInfo = lps.HostInformation;
 				}
 				else if (!string.IsNullOrEmpty(lps.ErrorMessage))
 				{
@@ -422,6 +541,7 @@ namespace PSFilterHostDll
 			return result;
 		}
 
+#if NET_40_OR_GREATER
 		/// <summary>
 		/// Shows the filter's about dialog.
 		/// </summary>
@@ -430,21 +550,32 @@ namespace PSFilterHostDll
 		/// <exception cref="System.ArgumentNullException">The pluginData is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
-		[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]       
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Shows the filter's about dialog.
+		/// </summary>
+		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
+		/// <param name="parentWindowHandle">The parent window handle.</param>
+		/// <exception cref="System.ArgumentNullException">The pluginData is null.</exception>
+		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
+		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]        
+#endif
 		public static void ShowAboutDialog(PluginData pluginData, IntPtr parentWindowHandle)
 		{
 			if (pluginData == null)
 				throw new ArgumentNullException("pluginData", "pluginData is null.");
 
-			using (LoadPsFilter lps = new LoadPsFilter(parentWindowHandle))
+			string errorMessage = string.Empty;
+			
+			bool result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
+			if (!result && !string.IsNullOrEmpty(errorMessage))
 			{
-				bool result = lps.ShowAboutDialog(pluginData);
-				if (!result && !string.IsNullOrEmpty(lps.ErrorMessage))
-				{
-					throw new FilterRunException(lps.ErrorMessage);
-				}
+				throw new FilterRunException(errorMessage);
 			}
-		   
 		}
 
 		private void OnFilterReportProgress(int done, int total)

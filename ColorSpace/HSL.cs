@@ -45,9 +45,6 @@ namespace Devcorp.Controls.Design
 		#endregion
 
 		#region Accessors
-		/// <summary>
-		/// Gets or sets the hue component.
-		/// </summary>
 		[Description("Hue component"),]
 		public double Hue 
 		{ 
@@ -55,15 +52,8 @@ namespace Devcorp.Controls.Design
 			{
 				return hue;
 			} 
-			set
-			{ 
-				hue = (value>360)? 360 : ((value<0)?0:value); 
-			} 
 		} 
 
-		/// <summary>
-		/// Gets or sets saturation component.
-		/// </summary>
 		[Description("Saturation component"),]
 		public double Saturation 
 		{ 
@@ -71,25 +61,14 @@ namespace Devcorp.Controls.Design
 			{
 				return saturation;
 			} 
-			set
-			{ 
-				saturation = (value>1)? 1 : ((value<0)?0:value); 
-			} 
 		} 
 
-		/// <summary>
-		/// Gets or sets the luminance component.
-		/// </summary>
-		[Description("Luminance component"),]
+        [Description("Luminance component"),]
 		public double Luminance 
 		{ 
 			get
 			{
 				return luminance;
-			} 
-			set
-			{ 
-				luminance = (value>1)? 1 : ((value<0)? 0 : value); 
 			} 
 		}
 

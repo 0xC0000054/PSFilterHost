@@ -20,7 +20,7 @@ namespace PSFilterLoad.PSApi
     internal static class PSConstants
     {
         /// <summary>
-        /// Photoshop's host signature - '8BIM'
+        /// The signature of Adobe(R) Photoshop(R) - '8BIM'
         /// </summary>
         public const uint kPhotoshopSignature = 0x3842494dU;
 
@@ -98,16 +98,6 @@ namespace PSFilterLoad.PSApi
             public const byte hostDoesNotSupportSampling = 0;
             public const byte hostSupportsIntegralSampling = 1;
             public const byte hostSupportsFractionalSampling = 2;
-        }
-
-        /// <summary>
-        /// The RulerUnit constants used by PSProperties.propRulerUnits 
-        /// </summary>
-        internal static class RulerUnits
-        {
-            public const int Pixels = 0;
-            public const int Inches = 1;
-            public const int Centimeters = 2;
         }
 
         /// <summary>

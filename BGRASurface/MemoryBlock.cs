@@ -39,14 +39,6 @@ namespace PSFilterHostDll.BGRASurface
 
         private bool disposed = false;
 
-        public MemoryBlock Parent
-        {
-            get
-            {
-                return this.parentBlock;
-            }
-        }
-
         public long Length
         {
             get

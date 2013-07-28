@@ -18,6 +18,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// The class that contains the filter's global and scripting parameters.
     /// </summary>
+    /// <threadsafety static="true" instance="false" />
     [Serializable]
     public sealed class ParameterData 
     {
@@ -36,7 +37,7 @@ namespace PSFilterHostDll
         }
        
         /// <summary>
-        /// Gets the collection of  AETE scripting values.
+        /// Gets the collection of AETE scripting values.
         /// </summary>
         public ScriptingDataCollection ScriptingData
         {

@@ -93,13 +93,6 @@ namespace Devcorp.Controls.Design
 
 		#endregion
 
-		public CIELab(double l, double a, double b) 
-		{
-			this.l = l;
-			this.a = a;
-			this.b = b;
-		}
-
 		#region Methods
 		public override bool Equals(Object obj) 
 		{

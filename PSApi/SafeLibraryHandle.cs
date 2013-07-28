@@ -10,9 +10,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using System.Security.Permissions;
 using Microsoft.Win32.SafeHandles;
 
+#if !NET_40_OR_GREATER
+using System.Security.Permissions;
+#endif
 /* The following code is quoted from Mike Stall's blog 
  * Type-safe Managed wrappers for kernel32!GetProcAddress
  * http://blogs.msdn.com/b/jmstall/archive/2007/01/06/typesafe-getprocaddress.aspx
@@ -20,11 +22,11 @@ using Microsoft.Win32.SafeHandles;
 
 namespace PSFilterLoad.PSApi
 {  
-	/// <summary>
-	/// See http://msdn.microsoft.com/msdnmag/issues/05/10/Reliability/ 
-	/// for more about safe handles.
-	/// </summary>
-	[SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+#if NET_40_OR_GREATER
+	[System.Security.SecurityCritical()]
+#else
+	[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif	
 	internal sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
 		/// <summary>

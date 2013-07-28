@@ -20,14 +20,8 @@ using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
 #pragma warning disable 0659
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2218:OverrideGetHashCodeOnOverridingEquals"), StructLayout(LayoutKind.Sequential)]
     internal struct Rect16
     {
-        static Rect16()
-        { 
-            Empty = new Rect16(); 
-        }
-
         public short top;
         public short left;
         public short bottom;
@@ -40,15 +34,17 @@ namespace PSFilterLoad.PSApi
                 Rect16 rect = (Rect16)obj;
                 return Equals(rect);
             }
-            else
-            {
-                return false;
-            }
-
+            
+            return false;
         }
         public bool Equals(Rect16 rect)
         {
             return (this.left == rect.left && this.top == rect.top && this.right == rect.right && this.bottom == rect.bottom);
+        }
+
+        public override int GetHashCode()
+        {
+            return (this.left.GetHashCode() ^ this.top.GetHashCode() ^ this.bottom.GetHashCode() ^ this.right.GetHashCode());
         }
 
 #if DEBUG
@@ -57,7 +53,7 @@ namespace PSFilterLoad.PSApi
             return ("Top=" + this.top.ToString() + ",Bottom=" + this.bottom.ToString() + ",Left=" + this.left.ToString() + ",Right=" + this.right.ToString()); 
         }
 #endif
-        public static readonly Rect16 Empty;
+        public static readonly Rect16 Empty = new Rect16();
 
     }
 #pragma warning restore 0659

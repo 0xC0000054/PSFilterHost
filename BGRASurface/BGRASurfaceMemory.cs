@@ -20,8 +20,9 @@
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
 using System;
-using PSFilterLoad.PSApi;
 using System.Globalization;
+using System.Security.Permissions;
+using PSFilterLoad.PSApi;
 
 namespace PSFilterHostDll.BGRASurface
 {    
@@ -31,16 +32,15 @@ namespace PSFilterHostDll.BGRASurface
 		/// <summary>
 		/// Creates the heap.
 		/// </summary>
-		[System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand, UnmanagedCode = true)]
 		public static unsafe void CreateHeap()
 		{
 			if (hHeap == IntPtr.Zero)
 			{
-				SafeNativeMethods.HeapSetInformation(IntPtr.Zero, 1, null, 0);
+                SafeNativeMethods.HeapSetInformation(IntPtr.Zero, 1, null, new UIntPtr(0U)); // HeapEnableTerminationOnCorruption
 				hHeap = SafeNativeMethods.HeapCreate(0, IntPtr.Zero, IntPtr.Zero);
 				uint info = 2; // low fragmentation heap
 
-				SafeNativeMethods.HeapSetInformation(hHeap, 0, (void*)&info, 4);
+				SafeNativeMethods.HeapSetInformation(hHeap, 0, (void*)&info, new UIntPtr(4U));
 			}
 		}
 
