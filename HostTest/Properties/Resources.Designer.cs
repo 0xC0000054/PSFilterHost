@@ -308,7 +308,7 @@ namespace HostTest.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HostTest{0} - {1} @{2}% ({3}).
+        ///   Looks up a localized string similar to {0} - {1} @{2}% ({3}).
         /// </summary>
         internal static string TitleStringFormat {
             get {

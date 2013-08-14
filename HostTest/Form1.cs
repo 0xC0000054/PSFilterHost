@@ -23,6 +23,7 @@ using HostTest.Properties;
 using HostTest.Tools;
 using PSFilterHostDll;
 using System.Threading;
+using System.Reflection;
 
 namespace HostTest
 {
@@ -36,7 +37,7 @@ namespace HostTest
 		private bool setRepeatEffect;
 		private bool setFilterApplyText;
 		private string filterName;
-		private string versionString;
+		private string titleString;
 		private string imageFileName;
 		private string imageType;
 		private Size panelClientSize;
@@ -46,7 +47,7 @@ namespace HostTest
 		private HostInformation hostInfo;
 
 		private static readonly string[] imageFileExtensions = WICHelpers.GetDecoderFileExtensions();
-
+		
 		public Form1()
 		{
 			InitializeComponent();
@@ -67,13 +68,11 @@ namespace HostTest
 
 			if (IntPtr.Size == 8)
 			{
-				this.versionString = " x64";
-				this.Text += versionString;
+				this.Text += " x64";
 			}
-			else
-			{
-				this.versionString = string.Empty;
-			}
+
+			this.titleString = this.Text;
+			
 			this.messageFilter = new AbortMessageFilter();
 			Application.AddMessageFilter(this.messageFilter);
 
@@ -107,6 +106,11 @@ namespace HostTest
 			[DllImport("kernel32.dll", EntryPoint = "SetProcessDEPPolicy")]
 			[return: MarshalAs(UnmanagedType.Bool)]
 			internal static extern bool SetProcessDEPPolicy(uint dwFlags);
+
+			[DllImport("kernel32.dll", EntryPoint = "SetErrorMode")]
+			internal static extern uint SetErrorMode(uint uMode);
+
+			internal const uint SEM_FAILCRITICALERRORS = 1U;
 		}
 
 		private void Form1_Load(object sender, EventArgs e)
@@ -123,6 +127,9 @@ namespace HostTest
 					// This method is only present on Vista SP1 or XP SP3 and later. 
 				}
 			}
+ 
+			// Disable the error dialog that is shown when a filter cannot find a missing dependency.
+			NativeMethods.SetErrorMode(NativeMethods.SEM_FAILCRITICALERRORS);
 
 			base.BeginInvoke(new Action(delegate() // Load the filters and any image on the command line asynchronously on the UI thread. 
 			{
@@ -361,6 +368,7 @@ namespace HostTest
 		{
 			if (filterThread == null)
 			{
+				this.Cursor = Cursors.WaitCursor;
 				filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, repeatEffect)) { IsBackground = true, Priority = ThreadPriority.AboveNormal };
 				filterThread.Start();
 
@@ -372,6 +380,7 @@ namespace HostTest
 				filterThread.Join();
 				filterThread = null;
 
+				this.Cursor = Cursors.Default;
 				this.toolStripProgressBar1.Value = 0;
 				this.toolStripProgressBar1.Visible = false;
 				this.toolStripStatusLabel1.Text = string.Empty;
@@ -384,11 +393,26 @@ namespace HostTest
 			{
 				this.srcImageTempFileName = Path.GetTempFileName();
 
+				BitmapMetadata metaData = null;
+
+				try
+				{
+					metaData = this.srcImage.Metadata as BitmapMetadata;
+				}
+				catch (NotSupportedException)
+				{
+				}
+
+				if (metaData != null)
+				{
+					metaData = MetaDataHelper.ConvertMetaDataToTIFF(metaData); // As WIC does not automatically convert between meta-data formats we have to do it manually.
+				}
+				
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Create, FileAccess.Write))
 				{
-					TiffBitmapEncoder enc = new TiffBitmapEncoder();
-					enc.Frames.Add(BitmapFrame.Create(this.srcImage));
-					enc.Save(stream);
+					TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+					encoder.Frames.Add(BitmapFrame.Create(this.srcImage, null, metaData, null));
+					encoder.Save(stream);
 				}  
 			}
 		}
@@ -429,6 +453,8 @@ namespace HostTest
 				{
 					srcTemp = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
 				}
+
+				hostInfo.Caption = MetaDataHelper.GetIPTCCaption(srcTemp);
 			}
 
 			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
@@ -464,9 +490,12 @@ namespace HostTest
 
 						FormatConvertedBitmap convertedImage = null;
 
-						if (dstImage.Format == PixelFormats.Rgba64)
+						int channelCount = dstImage.Format.Masks.Count;
+						int bitsPerChannel = dstImage.Format.BitsPerPixel / channelCount;
+
+						if (bitsPerChannel >= 16)
 						{
-							convertedImage = new FormatConvertedBitmap(this.dstImage, PixelFormats.Bgra32, null, 0.0);
+							convertedImage = new FormatConvertedBitmap(this.dstImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0);
 						}
 
 						this.canvas.SuspendPaint();
@@ -498,6 +527,7 @@ namespace HostTest
 							}
 
 							this.pseudoResources = host.PseudoResources;
+							this.hostInfo = host.HostInfo;
 							this.setRepeatEffect = true;
 						}
 
@@ -519,6 +549,10 @@ namespace HostTest
 				}
 
 				ShowErrorMessage(message);
+			}
+			catch (ImageSizeTooLargeException ex)
+			{
+				ShowErrorMessage(ex.Message);
 			}
 			finally
 			{
@@ -650,6 +684,19 @@ namespace HostTest
 					this.imageType = "RGB/";
 				}
 
+				// Set the meta data manually as some codecs may not implement all the properties required for BitmapMetadata.Clone() to succeed.
+				BitmapMetadata metaData = null;
+
+				try
+				{
+					metaData = srcImage.Metadata as BitmapMetadata;
+				}
+				catch (NotSupportedException)
+				{
+				}
+
+
+
 				this.panel1.SuspendLayout();
 
 				if (bitsPerChannel >= 16)
@@ -663,7 +710,7 @@ namespace HostTest
 					using (MemoryStream ms = new MemoryStream())
 					{
 						PngBitmapEncoder enc = new PngBitmapEncoder();
-						enc.Frames.Add(BitmapFrame.Create(conv));
+						enc.Frames.Add(BitmapFrame.Create(conv, null, metaData, null));
 						enc.Save(ms);
 
 						this.canvas.Surface = new Bitmap(ms, true);
@@ -676,7 +723,7 @@ namespace HostTest
 					using (MemoryStream ms = new MemoryStream())
 					{
 						PngBitmapEncoder enc = new PngBitmapEncoder();
-						enc.Frames.Add(BitmapFrame.Create(srcImage));
+						enc.Frames.Add(BitmapFrame.Create(srcImage, null, metaData, null));
 						enc.Save(ms);
 
 						this.canvas.Surface = new Bitmap(ms, true);
@@ -708,7 +755,7 @@ namespace HostTest
 				}
 				else
 				{
-					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.versionString, this.imageFileName, 100, this.imageType });
+					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.titleString, this.imageFileName, 100, this.imageType });
 				}
 
 				this.panel1.ResumeLayout(true);
@@ -882,7 +929,7 @@ namespace HostTest
 				percent = (int)Math.Round(e.NewZoom * 100f);
 			}
 
-			this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.versionString, this.imageFileName, percent, this.imageType });
+			this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.titleString, this.imageFileName, percent, this.imageType });
 		}
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)

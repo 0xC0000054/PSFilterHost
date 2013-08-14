@@ -97,7 +97,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1054, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1034, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -250,7 +250,7 @@
             this.toolStripProgressBar1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 670);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1054, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1034, 22);
             this.statusStrip1.TabIndex = 7;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -390,7 +390,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(29, 24);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1025, 646);
+            this.panel1.Size = new System.Drawing.Size(1005, 646);
             this.panel1.TabIndex = 10;
             // 
             // colorDialog1
@@ -439,13 +439,12 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1054, 692);
+            this.ClientSize = new System.Drawing.Size(1034, 692);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(1070, 730);
             this.Name = "Form1";
             this.Text = "HostTest";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
@@ -482,7 +481,7 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private Canvas canvas;
+        private HostTest.Canvas canvas;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ToolStripButton zoomInBtn;
         private System.Windows.Forms.ToolStripButton zoomOutBtn;
@@ -490,8 +489,8 @@
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private ColorToolStripMenuItem primaryColorBtn;
-        private ColorToolStripMenuItem secondaryColorBtn;
+        private HostTest.ColorToolStripMenuItem primaryColorBtn;
+        private HostTest.ColorToolStripMenuItem secondaryColorBtn;
         private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ToolStripButton pointerSelectBtn;
         private System.Windows.Forms.ToolStripButton rectangleSelectBtn;
