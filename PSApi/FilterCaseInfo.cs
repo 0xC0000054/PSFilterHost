@@ -41,22 +41,24 @@ namespace PSFilterLoad.PSApi
         filterDataHandlingForegroundZap = 11,
     }
     /// <summary>
-    /// The bit flags for the FilterCaseInfo.flag1 field.
+    /// The processing flags for the FilterCaseInfo structure.
     /// </summary>
-    internal static class FilterCaseInfoFlags
+    [Flags]
+    internal enum FilterCaseInfoFlags : byte
     {
-        public const byte PIFilterDontCopyToDestinationBit = (1 << 0);
-        public const byte PIFilterWorksWithBlankDataBit = (1 << 1);
-        public const byte PIFilterFiltersLayerMaskBit = (1 << 2);
-        public const byte PIFilterWritesOutsideSelectionBit = (1 << 3);
+        None = 0,
+        PIFilterDontCopyToDestinationBit = (1 << 0),
+        PIFilterWorksWithBlankDataBit = (1 << 1),
+        PIFilterFiltersLayerMaskBit = (1 << 2),
+        PIFilterWritesOutsideSelectionBit = (1 << 3)
     }
 
-    [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1)]
+    [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1), Serializable]
     struct FilterCaseInfo
     {
         public FilterDataHandling inputHandling;
         public FilterDataHandling outputHandling;
-        public byte flags1;
+        public FilterCaseInfoFlags flags1;
         public byte flags2; 
     }
 

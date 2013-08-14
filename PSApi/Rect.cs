@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
 #pragma warning disable 0659
-    internal struct Rect16
+    internal struct Rect16 : System.IEquatable<Rect16>
     {
         public short top;
         public short left;

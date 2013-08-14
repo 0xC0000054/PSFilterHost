@@ -28,7 +28,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
+    <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>
@@ -36,9 +36,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CodeAnalysisRuleSet>BasicDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>ExtendedDesignGuidelineRules.ruleset</CodeAnalysisRuleSet>
     <DocumentationFile>bin\Release\PSFilterHost.XML</DocumentationFile>
-    <DebugSymbols>false</DebugSymbols>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) == 2.0">$(DefineConstants);GDIPLUS</DefineConstants>
@@ -82,6 +82,9 @@
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0' " />
     <Reference Include="System" />
@@ -110,10 +113,13 @@
     <Compile Include="ColorSpace\HSL.cs" />
     <Compile Include="ColorSpace\RGB.cs" />
     <Compile Include="EnableInfoParser.cs" />
+    <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostInformation.cs" />
-    <Compile Include="HostRulerUnits.cs" />
+    <Compile Include="HostRulerUnit.cs" />
+    <Compile Include="PSApi\IPTCData.cs" />
+    <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterProgressEventArgs.cs" />
@@ -192,7 +198,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PSResource.cs" />
     <Compile Include="PSApi\SafeNativeMethods.cs" />
-    <Compile Include="ScriptingDataCollection.cs" />
     <Compile Include="ShellLink.cs" />
     <Compile Include="ShellLinkCoClass.cs" />
   </ItemGroup>

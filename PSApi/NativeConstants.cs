@@ -31,7 +31,5 @@ namespace PSFilterLoad.PSApi
         internal const int PAGE_EXECUTE_READWRITE = 64;
         internal const int PAGE_EXECUTE_WRITECOPY = 128;
         internal const int PAGE_GUARD = 256;
-
-        internal const uint SEM_FAILCRITICALERRORS = 1U;
     }
 }

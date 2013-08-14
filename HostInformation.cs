@@ -26,7 +26,7 @@ namespace PSFilterHostDll
         private Uri url;
         private bool copyRight;
         private bool waterMark;
-        private HostRulerUnits rulerUnit;
+        private HostRulerUnit rulerUnit;
 
         /// <summary>
         /// Gets or sets the title of the document.
@@ -76,7 +76,7 @@ namespace PSFilterHostDll
         /// <remarks>
         /// This can be set by a filter.
         /// </remarks>
-        public Uri URL
+        public Uri Url
         {
             get
             {
@@ -131,13 +131,13 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Gets or sets the ruler units of the document.
+        /// Gets or sets the ruler measurement unit of the document.
         /// </summary>
         /// <value>
-        /// The ruler units of the document.
+        /// The ruler measurement unit of the document.
         /// </value>
-        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Ruler units cannot be set as it does not use a valid value, as defined in the <see cref="HostRulerUnits"/> enumeration.</exception>
-        public HostRulerUnits RulerUnits
+        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Ruler unit cannot be set as it does not use a valid value, as defined in the <see cref="HostRulerUnit"/> enumeration.</exception>
+        public HostRulerUnit RulerUnit
         {
             get
             {
@@ -145,9 +145,9 @@ namespace PSFilterHostDll
             }
             set
             {
-                if (!Enum.IsDefined(typeof(HostRulerUnits), value))
+                if (!Enum.IsDefined(typeof(HostRulerUnit), value))
                 {
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(HostRulerUnits));
+                    throw new InvalidEnumArgumentException("value", (int)value, typeof(HostRulerUnit));
                 }
 
                 rulerUnit = value;
@@ -164,7 +164,7 @@ namespace PSFilterHostDll
             this.url = null;
             this.copyRight = false;
             this.waterMark = false;
-            this.rulerUnit = HostRulerUnits.Pixels;
+            this.rulerUnit = HostRulerUnit.Pixels;
         }
     }
 }

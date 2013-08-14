@@ -108,6 +108,7 @@ namespace PSFilterHostDll
 		private bool SupportsMode(string mode)
 		{
 			this.imageMode = mode;
+			this.index = 0;
 
 			bool supportsMode = false;
 

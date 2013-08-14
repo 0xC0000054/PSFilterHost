@@ -21,7 +21,7 @@ namespace PSFilterHostDll
     /// </summary>
     /// <threadsafety static="true" instance="false" />
     [Serializable]
-    public sealed class GlobalParameters : ISerializable
+    internal sealed class GlobalParameters : ISerializable
     {
         internal enum DataStorageMethod
         {
@@ -39,7 +39,7 @@ namespace PSFilterHostDll
         /// Gets the parameter data bytes.
         /// </summary>
         /// <returns>The parameter data bytes.</returns>
-        public byte[] GetParameterDataBytes()
+        internal byte[] GetParameterDataBytes()
         {
             return parameterDataBytes;
         }
@@ -72,16 +72,16 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Gets the plugin data bytes.
+        /// Gets the plug-in data bytes.
         /// </summary>
-        /// <returns>The plugin data bytes.</returns>
-        public byte[] GetPluginDataBytes()
+        /// <returns>The plug-in data bytes.</returns>
+        internal byte[] GetPluginDataBytes()
         {
             return pluginDataBytes;
         }
 
         /// <summary>
-        /// Sets the plugin data bytes.
+        /// Sets the plug-in data bytes.
         /// </summary>
         /// <param name="data">The data.</param>
         internal void SetPluginDataBytes(byte[] data)
@@ -90,10 +90,10 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Gets or sets the storage method of the plugin data.
+        /// Gets or sets the storage method of the plug-in data.
         /// </summary>
         /// <value>
-        /// The plugin data storage method.
+        /// The plug-in data storage method.
         /// </value>
         internal DataStorageMethod PluginDataStorageMethod
         {
@@ -111,7 +111,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// Initializes a new instance of the <see cref="GlobalParameters"/> class.
         /// </summary>
-        public GlobalParameters()
+        internal GlobalParameters()
         {
             this.parameterDataBytes = null;
             this.parameterDataStorageMethod = DataStorageMethod.HandleSuite;
@@ -137,12 +137,12 @@ namespace PSFilterHostDll
         /// <exception cref="T:System.Security.SecurityException">
         /// The caller does not have the required permission.
         ///   </exception>
-        ///   <exception cref="T:System.ArgumentNullException">The SerializationInfo is null.</exception>
+        /// <exception cref="System.ArgumentNullException"><paramref name="info"/> is null.</exception>
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException("info", "info is null.");
 
             info.AddValue("parameterDataBytes", this.parameterDataBytes, typeof(byte[]));
             info.AddValue("parameterDataStorageMethod", this.parameterDataStorageMethod, typeof(DataStorageMethod));

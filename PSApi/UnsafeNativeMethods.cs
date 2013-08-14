@@ -22,11 +22,11 @@ namespace PSFilterLoad.PSApi
         internal delegate bool EnumResNameDelegate([In()] IntPtr hModule, [In()] IntPtr lpszType, [In()] IntPtr lpszName, [In()] IntPtr lParam);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        internal static extern SafeLibraryHandle LoadLibraryW([In()] string lpFileName);
+        internal static extern SafeLibraryHandle LoadLibraryW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool EnumResourceNamesW([In()] IntPtr hModule, [In()] string lpszType, EnumResNameDelegate lpEnumFunc, [In()] IntPtr lParam);
+        internal static extern bool EnumResourceNamesW([In()] IntPtr hModule, [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszType, [In()] EnumResNameDelegate lpEnumFunc, [In()] IntPtr lParam);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         internal static extern IntPtr FindResourceW([In()] IntPtr hModule, [In()] IntPtr lpName, [In()] IntPtr lpType);

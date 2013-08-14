@@ -10,8 +10,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using System;
+
 namespace PSFilterLoad.PSApi
 {
+    [Serializable]
     internal struct AETEParameter
     {
         public string name;
@@ -21,6 +24,7 @@ namespace PSFilterLoad.PSApi
         public short flags;
     }
 
+    [Serializable]
     internal struct AETEEnums
     {
         public uint type;
@@ -28,6 +32,7 @@ namespace PSFilterLoad.PSApi
         public AETEEnum[] enums;
     }
 
+    [Serializable]
     internal struct AETEEnum
     {
         public string name;
@@ -35,6 +40,7 @@ namespace PSFilterLoad.PSApi
         public string desc;
     }
 
+    [Serializable]
     internal sealed class AETEEvent
     {
         public string vendor;
@@ -48,10 +54,11 @@ namespace PSFilterLoad.PSApi
         public AETEEnums[] enums;
     }
 
+    [Serializable]
     internal sealed class PluginAETE
     {
-        public short major;
-        public short minor;
+        public int major;
+        public int minor;
         public short suiteLevel;
         public short suiteVersion;
         public AETEEvent scriptEvent;

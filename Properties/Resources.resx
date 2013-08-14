@@ -120,44 +120,35 @@
   <data name="AlphaChannelName" xml:space="preserve">
     <value>Alpha</value>
   </data>
-  <data name="BadParameters" xml:space="preserve">
-    <value>Bad parameters.</value>
-    <comment>BadParameters description</comment>
+  <data name="FilterBadParameters" xml:space="preserve">
+    <value>A problem with the filter module interface.</value>
   </data>
   <data name="BlueChannelName" xml:space="preserve">
     <value>Blue</value>
   </data>
   <data name="DiskFullError" xml:space="preserve">
     <value>Disk full.</value>
-    <comment>DiskFull description</comment>
   </data>
-  <data name="errHostDoesNotSupportColStep" xml:space="preserve">
+  <data name="HostDoesNotSupportColStep" xml:space="preserve">
     <value>This host does not support colBytes other than 1.</value>
-    <comment>ThisPlugInDoesNotSupportColBytesOtherThan1 description</comment>
   </data>
-  <data name="errPlugInHostInsufficient" xml:space="preserve">
+  <data name="PlugInHostInsufficient" xml:space="preserve">
     <value>Requires services not provided by this host.</value>
-    <comment>RequiresServicesNotProvidedByThisPlugIn description</comment>
   </data>
-  <data name="errPlugInPropertyUndefined" xml:space="preserve">
+  <data name="PlugInPropertyUndefined" xml:space="preserve">
     <value>A requested property could not be found.</value>
-    <comment>ARequestedPropertyCouldNotBeFound description</comment>
   </data>
   <data name="FileIOError" xml:space="preserve">
     <value>File I/O error.</value>
-    <comment>FileIOError description</comment>
   </data>
   <data name="FileOpenError" xml:space="preserve">
     <value>File open error.</value>
-    <comment>FileOpenError description</comment>
   </data>
   <data name="FileReadError" xml:space="preserve">
     <value>File read error.</value>
-    <comment>FileReadError description</comment>
   </data>
   <data name="FileWriteError" xml:space="preserve">
     <value>File write error.</value>
-    <comment>FileWriteError description</comment>
   </data>
   <data name="GreenChannelName" xml:space="preserve">
     <value>Green</value>
@@ -173,15 +164,12 @@
   </data>
   <data name="InvalidSamplePoint" xml:space="preserve">
     <value>Invalid sample point.</value>
-    <comment>InvalidSamplePoint description</comment>
   </data>
   <data name="NullHandleError" xml:space="preserve">
     <value>Null handle error.</value>
-    <comment>NullHandleError description</comment>
   </data>
   <data name="OutOfMemoryError" xml:space="preserve">
     <value>Out of memory.</value>
-    <comment>OutOfMemory description</comment>
   </data>
   <data name="PiMIDefaultCategoryName" xml:space="preserve">
     <value>Other</value>
@@ -191,11 +179,10 @@
     <value>Red</value>
   </data>
   <data name="UnknownErrorCodeFormat" xml:space="preserve">
-    <value>error code = {0}</value>
+    <value>error code: {0}</value>
   </data>
-  <data name="UnsupportedImageMode" xml:space="preserve">
-    <value>Unsupported image mode.</value>
-    <comment>UnsupportedImageMode description</comment>
+  <data name="FilterBadModeFormat" xml:space="preserve">
+    <value>The filter does not support {0} images.</value>
   </data>
   <data name="LoadFilterFailed" xml:space="preserve">
     <value>LoadFilter failed.</value>
@@ -204,24 +191,39 @@
     <value>Selection Mask</value>
   </data>
   <data name="UnknownChannelPort" xml:space="preserve">
-    <value>Unknown port.</value>
+    <value>Unknown channel port.</value>
   </data>
   <data name="UnsupportedChannelBitOffset" xml:space="preserve">
-    <value>Unsupported bit offset.</value>
+    <value>Unsupported channel bit offset.</value>
   </data>
   <data name="UnsupportedChannelColumnBits" xml:space="preserve">
-    <value>Unsupported column bits.</value>
+    <value>Unsupported channel column bits.</value>
   </data>
   <data name="UnsupportedChannelDepth" xml:space="preserve">
-    <value>Unsupported depth.</value>
+    <value>Unsupported channel depth.</value>
   </data>
   <data name="UnsupportedChannelDepthConversion" xml:space="preserve">
-    <value>Unsupported depth conversion.</value>
+    <value>Unsupported channel depth conversion.</value>
   </data>
   <data name="UnsupportedChannelRowBits" xml:space="preserve">
-    <value>Unsupported row bits.</value>
+    <value>Unsupported channel row bits.</value>
   </data>
   <data name="GrayChannelName" xml:space="preserve">
     <value>Gray</value>
+  </data>
+  <data name="Gray16Mode" xml:space="preserve">
+    <value>16-bit Grayscale</value>
+  </data>
+  <data name="GrayScaleMode" xml:space="preserve">
+    <value>8-bit Grayscale</value>
+  </data>
+  <data name="RGB48Mode" xml:space="preserve">
+    <value>16-bit RGB</value>
+  </data>
+  <data name="RGBMode" xml:space="preserve">
+    <value>8-bit RGB</value>
+  </data>
+  <data name="BlankDataNotSupported" xml:space="preserve">
+    <value>The filter does not support processing completely transparent images.</value>
   </data>
 </root>

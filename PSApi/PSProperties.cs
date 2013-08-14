@@ -30,7 +30,7 @@ namespace PSFilterLoad.PSApi
         /// <remarks>The vertical distance in pixels to move when using the shift key, default 10 pixels.</remarks>
         public const uint propBigNudgeV = 0x626e6456U;
         /// <summary>
-        /// The caption of the document - 'capt'
+        /// The caption of the document as an IPTC-NAA record - 'capt'
         /// </summary>
         public const uint propCaption = 0x63617074U;
         /// <summary>

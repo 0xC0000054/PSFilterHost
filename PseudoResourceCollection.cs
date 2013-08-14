@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -20,6 +21,7 @@ namespace PSFilterHostDll
     /// The collection of Pseudo-Resources used by the filters.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
+    [Serializable]
     public sealed class PseudoResourceCollection : ReadOnlyCollection<PSResource>
     {
         internal PseudoResourceCollection(IList<PSResource> list) : base(list)

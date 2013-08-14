@@ -15,7 +15,7 @@ using System;
 namespace PSFilterHostDll
 {
 	/// <summary>
-	/// The class that encapsulates the filter's AETE scripting data.
+	/// The class that encapsulates an AETE scripting parameter.
 	/// </summary>
 	[Serializable]
 	internal sealed class AETEValue

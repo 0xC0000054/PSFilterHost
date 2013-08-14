@@ -15,7 +15,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// The ruler measurement unit used by the host application
     /// </summary>
-    public enum HostRulerUnits : int
+    public enum HostRulerUnit : int
     {
         /// <summary>
         /// Measurement unit in pixels.

@@ -14,9 +14,7 @@ using System;
 using System.Runtime.InteropServices;
 using PSFilterLoad.PSApi;
 
-#if GDIPLUS
-using System.Drawing.Imaging;
-#else
+#if !GDIPLUS
 using System.Windows.Media;
 #endif
 
@@ -25,9 +23,10 @@ namespace PSFilterHostDll
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate int pluginEntryPoint(short selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
     /// <summary>
-    /// The class that encapsulates an Adobe® Photoshop® filter plugin
+    /// The class that encapsulates an Adobe® Photoshop® filter plug-in.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
+    [Serializable]
     public sealed class PluginData : IEquatable<PluginData>
     {
         private string fileName;
@@ -43,6 +42,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// The structure containing the dll entrypoint
         /// </summary>
+        [NonSerialized]
         internal PIEntrypoint module;
 
         /// <summary>

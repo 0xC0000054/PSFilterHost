@@ -11,6 +11,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
 
 namespace PSFilterHostDll
 {
@@ -18,8 +20,9 @@ namespace PSFilterHostDll
 	/// <summary>
 	/// The class encapsulates the Pseudo–Resources used by the filters. 
 	/// </summary>
-    /// <threadsafety static="true" instance="false" />
-	public sealed class PSResource : IEquatable<PSResource>
+	/// <threadsafety static="true" instance="false" />
+	[Serializable]
+	public sealed class PSResource : IEquatable<PSResource>, ISerializable
 	{
 		private uint key;
 		private int index;
@@ -135,6 +138,36 @@ namespace PSFilterHostDll
 		internal bool Equals(uint otherKey)
 		{
 			return (this.key == otherKey);
+		}
+
+		private PSResource(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+				throw new ArgumentNullException("info", "info is null.");
+
+			this.key = info.GetUInt32("key");
+			this.index = info.GetInt32("index");
+			this.data = (byte[])info.GetValue("data", typeof(byte[]));
+		}
+
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="info"/> is null.</exception>
+        /// <exception cref="T:System.Security.SecurityException">
+        /// The caller does not have the required permission.
+        ///   </exception>
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+				throw new ArgumentNullException("info", "info is null.");
+
+			info.AddValue("key", this.key);
+			info.AddValue("index", this.index);
+			info.AddValue("data", this.data, typeof(byte[]));
 		}
 	}
 }

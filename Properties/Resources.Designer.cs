@@ -70,11 +70,11 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Bad parameters..
+        ///   Looks up a localized string similar to The filter does not support processing completely transparent images..
         /// </summary>
-        internal static string BadParameters {
+        internal static string BlankDataNotSupported {
             get {
-                return ResourceManager.GetString("BadParameters", resourceCulture);
+                return ResourceManager.GetString("BlankDataNotSupported", resourceCulture);
             }
         }
         
@@ -93,33 +93,6 @@ namespace PSFilterHostDll.Properties {
         internal static string DiskFullError {
             get {
                 return ResourceManager.GetString("DiskFullError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This host does not support colBytes other than 1..
-        /// </summary>
-        internal static string errHostDoesNotSupportColStep {
-            get {
-                return ResourceManager.GetString("errHostDoesNotSupportColStep", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Requires services not provided by this host..
-        /// </summary>
-        internal static string errPlugInHostInsufficient {
-            get {
-                return ResourceManager.GetString("errPlugInHostInsufficient", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A requested property could not be found..
-        /// </summary>
-        internal static string errPlugInPropertyUndefined {
-            get {
-                return ResourceManager.GetString("errPlugInPropertyUndefined", resourceCulture);
             }
         }
         
@@ -160,6 +133,33 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The filter does not support {0} images..
+        /// </summary>
+        internal static string FilterBadModeFormat {
+            get {
+                return ResourceManager.GetString("FilterBadModeFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A problem with the filter module interface..
+        /// </summary>
+        internal static string FilterBadParameters {
+            get {
+                return ResourceManager.GetString("FilterBadParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 16-bit Grayscale.
+        /// </summary>
+        internal static string Gray16Mode {
+            get {
+                return ResourceManager.GetString("Gray16Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gray.
         /// </summary>
         internal static string GrayChannelName {
@@ -169,11 +169,29 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 8-bit Grayscale.
+        /// </summary>
+        internal static string GrayScaleMode {
+            get {
+                return ResourceManager.GetString("GrayScaleMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Green.
         /// </summary>
         internal static string GreenChannelName {
             get {
                 return ResourceManager.GetString("GreenChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This host does not support colBytes other than 1..
+        /// </summary>
+        internal static string HostDoesNotSupportColStep {
+            get {
+                return ResourceManager.GetString("HostDoesNotSupportColStep", resourceCulture);
             }
         }
         
@@ -259,6 +277,24 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Requires services not provided by this host..
+        /// </summary>
+        internal static string PlugInHostInsufficient {
+            get {
+                return ResourceManager.GetString("PlugInHostInsufficient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A requested property could not be found..
+        /// </summary>
+        internal static string PlugInPropertyUndefined {
+            get {
+                return ResourceManager.GetString("PlugInPropertyUndefined", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Red.
         /// </summary>
         internal static string RedChannelName {
@@ -268,7 +304,25 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown port..
+        ///   Looks up a localized string similar to 16-bit RGB.
+        /// </summary>
+        internal static string RGB48Mode {
+            get {
+                return ResourceManager.GetString("RGB48Mode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 8-bit RGB.
+        /// </summary>
+        internal static string RGBMode {
+            get {
+                return ResourceManager.GetString("RGBMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown channel port..
         /// </summary>
         internal static string UnknownChannelPort {
             get {
@@ -277,7 +331,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to error code = {0}.
+        ///   Looks up a localized string similar to error code: {0}.
         /// </summary>
         internal static string UnknownErrorCodeFormat {
             get {
@@ -286,7 +340,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported bit offset..
+        ///   Looks up a localized string similar to Unsupported channel bit offset..
         /// </summary>
         internal static string UnsupportedChannelBitOffset {
             get {
@@ -295,7 +349,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported column bits..
+        ///   Looks up a localized string similar to Unsupported channel column bits..
         /// </summary>
         internal static string UnsupportedChannelColumnBits {
             get {
@@ -304,7 +358,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported depth..
+        ///   Looks up a localized string similar to Unsupported channel depth..
         /// </summary>
         internal static string UnsupportedChannelDepth {
             get {
@@ -313,7 +367,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported depth conversion..
+        ///   Looks up a localized string similar to Unsupported channel depth conversion..
         /// </summary>
         internal static string UnsupportedChannelDepthConversion {
             get {
@@ -322,20 +376,11 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unsupported row bits..
+        ///   Looks up a localized string similar to Unsupported channel row bits..
         /// </summary>
         internal static string UnsupportedChannelRowBits {
             get {
                 return ResourceManager.GetString("UnsupportedChannelRowBits", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported image mode..
-        /// </summary>
-        internal static string UnsupportedImageMode {
-            get {
-                return ResourceManager.GetString("UnsupportedImageMode", resourceCulture);
             }
         }
     }

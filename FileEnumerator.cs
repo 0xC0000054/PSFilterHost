@@ -123,15 +123,5 @@ namespace PSFilterHostDll
             
         }
 
-#if !NET_35_OR_GREATER
-        internal static string[] GetFiles(string directory, string fileExtension, bool searchSubDirectories)
-        {
-            var files = FileEnumerator.EnumerateFiles(directory, fileExtension, searchSubDirectories);
-
-            List<string> list = new List<string>(files);
-
-            return list.ToArray();
-        }  
-#endif
     }
 }
