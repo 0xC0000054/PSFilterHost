@@ -728,7 +728,7 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 						else
 						{
-							Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", plugInFileName));
+							Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", pluginFileName));
 						}
 #endif
 

@@ -177,76 +177,96 @@ namespace PSFilterHostDll
 		{
 			SkipWhitespace();
 
-			StringBuilder sb = new StringBuilder();
-
 			Expression exp = new Expression();
 
-			if (chars[index] >= '0' && chars[index] <= '9') 
+			if (index < length)
 			{
-				while (Char.IsDigit(chars[index]))
+				if (chars[index] >= '0' && chars[index] <= '9')
 				{
-					sb.Append(chars[index]);
-					index++;
-
-					if (index == length)
+					StringBuilder sb = new StringBuilder();
+					while (Char.IsDigit(chars[index]))
 					{
-						break;
-					} 
+						sb.Append(chars[index]);
+						index++;
 
+						if (index == length)
+						{
+							break;
+						}
+					}
+					exp.intValue = int.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture);
+					exp.type = TokenTypes.Number;
 				}
-				exp.intValue = int.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture);
-				exp.type = TokenTypes.Number;
-			}
-			else if (Char.IsLetter(chars[index]))
-			{
-				while (Char.IsLetter(chars[index]) || chars[index] == '_')
+				else if (Char.IsLetter(chars[index]))
 				{
-					sb.Append(chars[index]);
-					index++;
+					int startIndex = index;
 
-					if (index == length)
+					while (Char.IsLetter(chars[index]) || chars[index] == '_')
 					{
-						break;
-					} 
-				}
-				exp.value = sb.ToString();
-				
-				if (exp.value == inFunction) 
-				{
-					exp.type = TokenTypes.Function;
-				}
-				else if (keywords.Contains(exp.value))
-				{
-					exp.type = TokenTypes.Keyword;
-				}
-				else if (constants.Contains(exp.value))
-				{
-					exp.type = TokenTypes.Constant;
-				}
-			}
-			else
-			{
-				switch (chars[index])
-				{
-					case '|':
-						exp.value = "||";
-						exp.type = TokenTypes.Or;
-						index += 2;
-						break;
-					case '=':
-						exp.value = "==";
-						exp.type = TokenTypes.Equals;
-						index += 2;
-						break;
-					case '(':
-						exp.type = TokenTypes.LParen;
 						index++;
-						break;
-					case ')':
-						exp.type = TokenTypes.RParen;
-						index++;
-						break;
+
+						if (index == length)
+						{
+							break;
+						}
+					}
+
+					exp.value = new string(chars, startIndex, index - startIndex);
+
+					if (exp.value == inFunction)
+					{
+						exp.type = TokenTypes.Function;
+					}
+					else if (keywords.Contains(exp.value))
+					{
+						exp.type = TokenTypes.Keyword;
+					}
+					else if (constants.Contains(exp.value))
+					{
+						exp.type = TokenTypes.Constant;
+					}
 				}
+				else
+				{
+					switch (chars[index])
+					{
+						case '|':
+							if (chars[index + 1] == '|')
+							{
+								exp.value = "||";
+								exp.type = TokenTypes.Or;
+								index += 2;
+							}
+							else
+							{
+								index++;
+							}
+							break;
+						case '=':
+							if (chars[index + 1] == '=')
+							{
+								exp.value = "==";
+								exp.type = TokenTypes.Equals;
+								index += 2;
+							}
+							else
+							{
+								index++;
+							}
+							break;
+						case '(':
+							exp.type = TokenTypes.LParen;
+							index++;
+							break;
+						case ')':
+							exp.type = TokenTypes.RParen;
+							index++;
+							break;
+						default:
+							index++;
+							break;
+					}
+				} 
 			}
 
 			return exp;
@@ -257,29 +277,30 @@ namespace PSFilterHostDll
 			SkipWhitespace();
 			int argCount = 1;
 
-			int startIndex = index + 1; 
-			int i2 = startIndex;
-			while (chars[i2] != ')')
+			if (chars[index] == '(')
 			{
-				if (chars[i2] == ',')
+				index++;
+			}
+
+			int startIndex = index;
+			
+			while (chars[index] != ')')
+			{
+				if (chars[index] == ',')
 				{
 					argCount++;
 				}
-				i2++;
+				index++;
 			}
 
-			int len = i2 - startIndex;
-
-			index += len;
-
+			string args = new string(chars, startIndex, index - startIndex);
+			
 			if (index < length)
 			{
-				index += 1; // skip the ) char 
+				index++; // Skip the closing parentheses.
 			}
 
-			string args = new string(chars, startIndex, len);
-
-			string[] split = args.Split(new char[] {' ', ','}, StringSplitOptions.RemoveEmptyEntries); // remove spaces from the strings
+			string[] split = args.Split(new char[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries); // remove spaces from the strings
 			int sLength = split.Length;
 
 			if (split[0] == psImageMode)
@@ -304,14 +325,12 @@ namespace PSFilterHostDll
 			{
 				Expression equal = this.NextToken();
 
-#if DEBUG
-				System.Diagnostics.Debug.Assert(equal.type == TokenTypes.Equals);
-#endif
-				
-				Expression depth = this.NextToken();
+				if (equal.type == TokenTypes.Equals)
+				{
+					Expression depth = this.NextToken();
 
-				return depth.intValue == 16; 
-				
+					return depth.intValue == 16;  
+				}
 			}
 
 			return false;
