@@ -16,14 +16,13 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HostTest.Properties;
 using HostTest.Tools;
 using PSFilterHostDll;
-using System.Threading;
-using System.Reflection;
 
 namespace HostTest
 {
@@ -45,6 +44,7 @@ namespace HostTest
 		private string srcImageTempFileName;
 		private string currentPluginDirectory;
 		private HostInformation hostInfo;
+		private BitmapMetadata srcMetaData;
 
 		private static readonly string[] imageFileExtensions = WICHelpers.GetDecoderFileExtensions();
 		
@@ -65,6 +65,7 @@ namespace HostTest
 			this.srcImageTempFileName = string.Empty;
 			this.currentPluginDirectory = string.Empty;
 			this.hostInfo = new HostInformation();
+			this.srcMetaData = null;
 
 			if (IntPtr.Size == 8)
 			{
@@ -76,6 +77,30 @@ namespace HostTest
 			this.messageFilter = new AbortMessageFilter();
 			Application.AddMessageFilter(this.messageFilter);
 
+			this.openFileDialog1.Filter = WICHelpers.GetOpenDialogFilterString();
+		
+			PaintDotNet.SystemLayer.UI.InitScaling(this);
+			
+			ScaleToolStripImageSize(this.menuStrip1);
+			ScaleToolStripImageSize(this.toolStrip1);
+		}
+
+		/// <summary>
+		/// Scales the size of the tool strip images to match the system DPI setting.
+		/// </summary>
+		/// <param name="toolStrip">The tool strip.</param>
+		private static void ScaleToolStripImageSize(ToolStrip toolStrip)
+		{
+			Size scaledImageSize = PaintDotNet.SystemLayer.UI.ScaleSize(toolStrip.ImageScalingSize);
+
+			if (toolStrip.ImageScalingSize != scaledImageSize)
+			{
+				// Temporarily disable the AutoSize property so the new ImageScalingSize will be used during layout, see http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstrip.imagescalingsize.aspx.
+				toolStrip.AutoSize = false;  
+				toolStrip.ImageScalingSize = scaledImageSize;
+				toolStrip.PerformLayout();
+				toolStrip.AutoSize = true;
+			}
 		}
 
 		private void ProcessCommandLine()
@@ -177,7 +202,7 @@ namespace HostTest
 			{
 				if (filtersToolStripMenuItem.HasDropDownItems)
 				{
-					this.filtersToolStripMenuItem.DropDownItems.Clear(); 
+					this.filtersToolStripMenuItem.DropDownItems.Clear();
 				}
 
 				if (aboutPluginsMenuItem.HasDropDownItems)
@@ -185,37 +210,35 @@ namespace HostTest
 					this.aboutPluginsMenuItem.DropDownItems.Clear();
 				}
 
-				FilterCollection list = PSFilterHost.QueryDirectory(path, true);
+				Dictionary<string, ToolStripMenuItemEx> filterList = new Dictionary<string, ToolStripMenuItemEx>();
+				List<ToolStripItem> filterAbout = new List<ToolStripItem>();
 
-				if (list.Count > 0)
+				foreach (var plug in PSFilterHost.EnumerateFilters(path, true))
 				{
-					Dictionary<string, ToolStripMenuItemEx> filterList = new Dictionary<string, ToolStripMenuItemEx>(list.Count);
-					List<ToolStripItem> filterAbout = new List<ToolStripItem>(list.Count);
+					ToolStripMenuItem child = new ToolStripMenuItem(plug.Title, null, new EventHandler(RunPhotoshopFilter_Click)) { Name = plug.Title, Tag = plug };
+					ToolStripMenuItem aboutItem = new ToolStripMenuItem(plug.Title, null, new EventHandler(ShowFilterAboutDialog)) { Tag = plug };
 
-					foreach (var plug in list)
+					if (filterList.ContainsKey(plug.Category))
 					{
-						ToolStripMenuItem child = new ToolStripMenuItem(plug.Title, null, new EventHandler(RunPhotoshopFilter_Click)) { Name = plug.Title, Tag = plug };
-						ToolStripMenuItem aboutItem = new ToolStripMenuItem(plug.Title, null, new EventHandler(ShowFilterAboutDialog)) { Tag = plug };
+						ToolStripMenuItemEx parent = filterList[plug.Category];
 
-						if (filterList.ContainsKey(plug.Category))
+						if (!parent.SubMenuItems.ContainsKey(plug.Title))
 						{
-							ToolStripMenuItem parent = filterList[plug.Category];
-
-							if (!parent.DropDownItems.ContainsKey(plug.Title))
-							{
-								parent.DropDownItems.Add(child);
-								filterAbout.Add(aboutItem);
-							}
-
-						}
-						else
-						{
-							ToolStripMenuItemEx parent = new ToolStripMenuItemEx(plug.Category, null, new ToolStripItem[] { child });
-							filterList.Add(plug.Category, parent);
+							parent.SubMenuItems.Add(child);
 							filterAbout.Add(aboutItem);
 						}
-					}
 
+					}
+					else
+					{
+						ToolStripMenuItemEx parent = new ToolStripMenuItemEx(plug.Category, child);
+						filterList.Add(plug.Category, parent);
+						filterAbout.Add(aboutItem);
+					}
+				}
+
+				if (filterList.Count > 0)
+				{
 					ToolStripMenuItemEx[] filters = new ToolStripMenuItemEx[filterList.Values.Count];
 					filterList.Values.CopyTo(filters, 0);
 
@@ -224,18 +247,9 @@ namespace HostTest
 					Array.Sort<ToolStripItem>(filters, comparer);
 
 					// sort the items in the sub menus.
-					int menuCount = filters.Length;
-					for (int i = 0; i < menuCount; i++)
+					for (int i = 0; i < filters.Length; i++)
 					{
-						ToolStripMenuItem menu = filters[i];
-
-						ToolStripMenuItem[] items = new ToolStripMenuItem[menu.DropDownItems.Count];
-						menu.DropDownItems.CopyTo(items, 0);
-
-						Array.Sort<ToolStripItem>(items, comparer);
-
-						menu.DropDownItems.Clear();
-						menu.DropDownItems.AddRange(items);
+						filters[i].SubMenuItems.Sort(comparer);
 					}
 
 					filterAbout.Sort(comparer);
@@ -268,6 +282,14 @@ namespace HostTest
 					}
 				}
 			}
+			catch (ArgumentNullException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (ArgumentException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
 			catch (DirectoryNotFoundException ex)
 			{
 				ShowErrorMessage(ex.Message);
@@ -285,15 +307,13 @@ namespace HostTest
 				PixelFormat format = srcImage.Format;
 
 				ToolStripItemCollection items = filtersToolStripMenuItem.DropDownItems;
-				int length = items.Count;
-
-				for (int i = 0; i < length; i++)
+				for (int i = 0; i < items.Count; i++)
 				{
-					ToolStripMenuItem menu = (ToolStripMenuItem)items[i];
+					ToolStripMenuItemEx menu = items[i] as ToolStripMenuItemEx;
 
-					if (menu.HasDropDownItems)
+					if (menu != null)
 					{
-						ToolStripItemCollection nodes = menu.DropDownItems;
+						var nodes = menu.SubMenuItems;
 						int nCount = nodes.Count;
 						List<bool> catEnabled = new List<bool>(nCount);
 
@@ -310,9 +330,11 @@ namespace HostTest
 					}
 					else
 					{
-						PluginData data = (PluginData)menu.Tag;
+						ToolStripItem repeatMenuItem = items[i];
 
-						menu.Enabled = data.SupportsImageMode(format);
+						PluginData data = (PluginData)repeatMenuItem.Tag;
+
+						repeatMenuItem.Enabled = data.SupportsImageMode(format);
 					}
 				}
 				
@@ -320,9 +342,7 @@ namespace HostTest
 			else
 			{
 				ToolStripItemCollection items = filtersToolStripMenuItem.DropDownItems;
-				int length = items.Count;
-
-				for (int i = 0; i < length; i++)
+				for (int i = 0; i < items.Count; i++)
 				{
 					items[i].Enabled = false;
 				}
@@ -439,7 +459,7 @@ namespace HostTest
 				}));
 			}
 
-			BitmapSource srcTemp = null;
+			BitmapSource image = null;
 
 			if (dstImage == null)
 			{
@@ -451,10 +471,14 @@ namespace HostTest
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Open, FileAccess.Read))
 				{
-					srcTemp = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+					image = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
 				}
 
-				hostInfo.Caption = MetaDataHelper.GetIPTCCaption(srcTemp);
+				hostInfo.Caption = MetaDataHelper.GetIPTCCaption(image);
+			}
+			else
+			{
+				image = BitmapFrame.Create(dstImage, null, srcMetaData, null); // Create a new BitmapFrame so the source image's meta-data is available to the filters.
 			}
 
 			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
@@ -464,7 +488,7 @@ namespace HostTest
 				System.Windows.Media.Color primary = GDIPlusToWPFColor(this.primaryColorBtn.RectangleColor);
 				System.Windows.Media.Color secondary = GDIPlusToWPFColor(this.secondaryColorBtn.RectangleColor);
 
-				using (PSFilterHost host = new PSFilterHost(dstImage ?? srcTemp, primary, secondary, selection, owner))
+				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))
 				{
 					host.SetAbortCallback(new AbortFunc(messageFilter.AbortFilter));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
@@ -695,7 +719,8 @@ namespace HostTest
 				{
 				}
 
-
+				this.srcMetaData = metaData.Clone();
+				this.srcMetaData.Freeze();
 
 				this.panel1.SuspendLayout();
 
@@ -756,6 +781,11 @@ namespace HostTest
 				else
 				{
 					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.titleString, this.imageFileName, 100, this.imageType });
+
+					this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
+					this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
+					this.zoomToWindowBtn.Enabled = this.canvas.CanZoomToWindow(this.panel1.ClientSize);
+					this.zoomToActualSizeBtn.Enabled = this.canvas.CanZoomToActualSize();
 				}
 
 				this.panel1.ResumeLayout(true);
@@ -765,10 +795,8 @@ namespace HostTest
 				this.pointerSelectBtn.Enabled = true;
 				this.rectangleSelectBtn.Enabled = true;
 				this.elipseSelectBtn.Enabled = true;
-				this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
-				this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
 
-				historyStack.Clear();
+				this.historyStack.Clear();
 
 				this.canvas.IsDirty = false;
 				this.dstImage = null;
@@ -795,45 +823,70 @@ namespace HostTest
 		{
 			if (dstImage != null)
 			{
-				if (dstImage.Format == PixelFormats.Bgra32 || dstImage.Format == PixelFormats.Bgr24)
+				int bitsPerChannel = dstImage.Format.BitsPerPixel / dstImage.Format.Masks.Count;
+
+				if (bitsPerChannel >= 16)
 				{
-					saveFileDialog1.Filter = "BMP (*.BMP, *.DIB, *.RLE)|*.BMP;*.DIB;*.RLE|JPEG (*.JPG, *.JPEG, *.JPE, *.JFIF)|*.JPG;*.JPEG;*.JPE;*.JFIF|PNG (*.PNG)|*.PNG|TIFF (*.TIF, *.TIFF)|*.TIF;*.TIFF";
-					saveFileDialog1.FilterIndex = 3;
+					this.saveFileDialog1.Filter = "PNG Image (*.png)|*.png|TIFF Image (*.tiff, *.tif)|*.tiff;*.tif|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
+					this.saveFileDialog1.FilterIndex = 1;
 				}
 				else
 				{
-					saveFileDialog1.Filter = "PNG (*.PNG)|*.PNG|TIFF (*.TIF, *.TIFF)|*.TIF;*.TIFF";
-					saveFileDialog1.FilterIndex = 1;
+					this.saveFileDialog1.Filter = "Bitmap Image (*.bmp, *.dib, *.rle)|*.bmp;*.dib;*.rle|GIF Image (*.gif)|*.gif|JPEG Image (*.jpeg, *.jpe, *.jpg, *.jfif, *.exif)|*.jpeg;*.jpe;*.jpg;*.jfif;*.exif|PNG Image (*.png)|*.png|TIFF Image (*.tiff, *.tif)|*.tiff;*.tif|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
+					this.saveFileDialog1.FilterIndex = 3;
 				}
 
 				if (saveFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 				{
-					string path = saveFileDialog1.FileName;
+					string path = this.saveFileDialog1.FileName;
 					string ext = Path.GetExtension(path).ToLowerInvariant();
-					BitmapEncoder enc = null;
+					BitmapEncoder encoder = null;
 
 					if (ext == ".bmp" || ext == ".dib" || ext == ".rle")
 					{
-						enc = new BmpBitmapEncoder();
+						encoder = new BmpBitmapEncoder();
+					}
+					else if (ext == ".gif")
+					{
+						encoder = new GifBitmapEncoder();
 					}
 					else if (ext == ".jpg" || ext == ".jpeg" || ext == ".jpe" || ext == ".jiff")
 					{
-						enc = new JpegBitmapEncoder();
+						encoder = new JpegBitmapEncoder();
 					}
 					else if (ext == ".png")
 					{
-						enc = new PngBitmapEncoder();
+						encoder = new PngBitmapEncoder();
 					}
 					else if (ext == ".tif" || ext == ".tiff")
 					{
-						enc = new TiffBitmapEncoder();
+						encoder = new TiffBitmapEncoder();
+					}
+					else if (ext == ".wdp" || ext == ".jxr")
+					{
+						encoder = new WmpBitmapEncoder();
 					}
 
-					enc.Frames.Add(BitmapFrame.Create(dstImage));
+					BitmapMetadata metaData = null;
+
+					try
+					{
+						metaData = this.srcImage.Metadata as BitmapMetadata;
+					}
+					catch (NotSupportedException)
+					{
+					}
+
+					if (metaData != null)
+					{
+						metaData = MetaDataHelper.ConvertSaveMetaDataFormat(metaData, encoder);
+					}
+
+					encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, null));
 
 					using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
 					{
-						enc.Save(fs);
+						encoder.Save(fs);
 					}
 
 					this.canvas.IsDirty = false;
@@ -845,14 +898,15 @@ namespace HostTest
 		{
 			if (!pointerSelectBtn.Checked)
 			{
-				rectangleSelectBtn.Checked = false;
-				elipseSelectBtn.Checked = false;
-				pointerSelectBtn.Checked = true;
+				this.rectangleSelectBtn.Checked = false;
+				this.elipseSelectBtn.Checked = false;
+				this.pointerSelectBtn.Checked = true;
+				this.toolStripStatusLabel1.Text = string.Empty;
 			}
 
 			if (canvas.SelectionType != null)
 			{
-				canvas.SelectionType = null;
+				this.canvas.SelectionType = null;
 			}
 		}
 
@@ -860,9 +914,9 @@ namespace HostTest
 		{
 			if (!rectangleSelectBtn.Checked)
 			{
-				pointerSelectBtn.Checked = false;
-				elipseSelectBtn.Checked = false;
-				rectangleSelectBtn.Checked = true;
+				this.pointerSelectBtn.Checked = false;
+				this.elipseSelectBtn.Checked = false;
+				this.rectangleSelectBtn.Checked = true;
 				this.toolStripStatusLabel1.Text = Resources.RectangleSelectionToolStatusText;
 			}
 
@@ -876,15 +930,15 @@ namespace HostTest
 		{
 			if (!elipseSelectBtn.Checked)
 			{
-				pointerSelectBtn.Checked = false;
-				rectangleSelectBtn.Checked = false;
-				elipseSelectBtn.Checked = true;
+				this.pointerSelectBtn.Checked = false;
+				this.rectangleSelectBtn.Checked = false;
+				this.elipseSelectBtn.Checked = true;
 				this.toolStripStatusLabel1.Text = Resources.EllipseSelectionToolStatusText;
 			}
 
-			if ((canvas.SelectionType == null) || canvas.SelectionType.GetType() != typeof(ElipseSelectTool))
+			if ((canvas.SelectionType == null) || canvas.SelectionType.GetType() != typeof(EllipseSelectTool))
 			{
-				this.canvas.SelectionType = new ElipseSelectTool();
+				this.canvas.SelectionType = new EllipseSelectTool();
 			}
 		}
 
@@ -916,7 +970,7 @@ namespace HostTest
 			this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
 			this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
 
-			this.zoomToActualSizeBtn.Enabled = this.canvas.CanZoomIn();
+			this.zoomToActualSizeBtn.Enabled = this.canvas.CanZoomToActualSize();
 			this.zoomToWindowBtn.Enabled = this.canvas.CanZoomToWindow(panelClientSize);
 
 			int percent = 0;
@@ -934,12 +988,12 @@ namespace HostTest
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			historyStack.StepBackward(this.canvas, ref this.dstImage);
+			this.historyStack.StepBackward(this.canvas, ref this.dstImage);
 		}
 
 		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			historyStack.StepForward(this.canvas, ref this.dstImage);
+			this.historyStack.StepForward(this.canvas, ref this.dstImage);
 		}
 
 		private void primaryColorBtn_Click(object sender, EventArgs e)
@@ -979,12 +1033,12 @@ namespace HostTest
 
 				using (Bitmap bmp = this.canvas.ResizeCopy(96, 96))
 				{
-					TaskButton result = TaskDialog.Show(this, Resources.eventlogWarn, Resources.SaveChangesCaption, bmp, true, actionText,
+					TaskButton result = TaskDialog.Show(this, Resources.Warning, Resources.SaveChangesCaption, bmp, true, actionText,
 								new TaskButton[] { save, discard, cancel }, save, cancel, width96);
 
 					if (result == save)
 					{
-						saveToolStripMenuItem_Click(this, EventArgs.Empty);
+						this.saveToolStripMenuItem_Click(this, EventArgs.Empty);
 					}
 					else if (result == cancel)
 					{
@@ -1004,9 +1058,9 @@ namespace HostTest
 			if (!panel1.ClientSize.IsEmpty && panelClientSize != panel1.ClientSize && canvas.Surface != null)
 			{
 				this.canvas.ResetSize();
-				panelClientSize = panel1.ClientSize;
+				this.panelClientSize = panel1.ClientSize;
 
-				zoomToWindowBtn_Click(this, EventArgs.Empty);                
+				this.zoomToWindowBtn_Click(this, EventArgs.Empty);                
 			}
 		}
 

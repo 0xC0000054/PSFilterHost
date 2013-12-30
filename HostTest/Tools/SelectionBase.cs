@@ -39,9 +39,8 @@ namespace HostTest.Tools
         [field: NonSerialized]
         public EventHandler<CursorChangedEventArgs> CursorChanged;
 
-        protected Rectangle roi;
-        protected bool tracking;
-        protected List<Point> selectPoints;
+        private bool tracking;
+        private List<Point> selectPoints;
 
         public SelectionBase()
         {
@@ -130,30 +129,32 @@ namespace HostTest.Tools
         {
             // the PointF structure is used by the ElipseSelectTool.
             GraphicsPath path = new GraphicsPath();
-            this.roi = PointsToRectangle(shapePoints[0], shapePoints[shapePoints.Count - 1]);
-            path.AddRectangle(roi);
+            Rectangle bounds = PointsToRectangle(shapePoints[0], shapePoints[shapePoints.Count - 1]);
+            path.AddRectangle(bounds);
 
             return path;
         }
 
         protected void RenderSelection()
         {
-            List<Point> trimPoints = this.TrimShapePath(this.selectPoints);
-            List<PointF> shapePoints = this.CreateShape(trimPoints);
-
-            if (this.SelectedPathChanged != null)
+            if (selectPoints != null)
             {
-                if (shapePoints.Count >= 2)
+                List<Point> trimPoints = this.TrimShapePath(this.selectPoints);
+                List<PointF> shapePoints = this.CreateShape(trimPoints);
+
+                if (this.SelectedPathChanged != null)
                 {
-                    GraphicsPath path = this.RenderShape(shapePoints);
-                    this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(path));
-                    path.Dispose();
-                }
-                else
-                {
-                    this.roi = Rectangle.Empty;
-                    this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(null));
-                }
+                    if (shapePoints.Count >= 2)
+                    {
+                        GraphicsPath path = this.RenderShape(shapePoints);
+                        this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(path));
+                        path.Dispose();
+                    }
+                    else
+                    {
+                        this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(null));
+                    }
+                } 
             }
 
         }

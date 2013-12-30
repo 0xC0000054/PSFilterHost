@@ -25,7 +25,7 @@ namespace PSFilterHostDll
 		/// Initializes a new instance of the <see cref="FilterCollection"/> class.
 		/// </summary>
 		/// <param name="pluginData">The data.</param>
-		internal FilterCollection(IList<PluginData> pluginData) : base(pluginData)
+		internal FilterCollection(IEnumerable<PluginData> pluginData) : base(new List<PluginData>(pluginData))
 		{
 		}
 	}

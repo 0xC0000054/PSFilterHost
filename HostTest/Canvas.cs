@@ -214,12 +214,12 @@ namespace HostTest
 			}
 			
 		}
+
 		private void OnCursorChanged(object sender, CursorChangedEventArgs e)
 		{
 			this.Cursor = e.NewCursor;
 		}
 		
-
 		/// <summary>
 		/// Renders the selection.
 		/// </summary>
@@ -808,7 +808,7 @@ namespace HostTest
 
 				float ratio = ratioX < ratioY ? ratioX : ratioY;
 
-				return this.zoomFactor != ratio;
+				return (this.zoomFactor != ratio);
 			}
 
 			return false;
@@ -818,6 +818,11 @@ namespace HostTest
 		{
 			this.zoomFactor = 1f;
 			this.ZoomCanvas();
+		}
+
+		public bool CanZoomToActualSize()
+		{
+			return (this.zoomFactor != 1f);
 		}
 
 		private void OnZoomChanged()
@@ -914,8 +919,11 @@ namespace HostTest
 				int newHeight = (int)((float)imageHeight * ratio);
 
 				Bitmap scaled = null;
-				using (Bitmap temp = new Bitmap(newWidth, newHeight, image.PixelFormat))
+				Bitmap temp = null;
+
+				try
 				{
+					temp = new Bitmap(newWidth, newHeight, image.PixelFormat);
 					using (Graphics gr = Graphics.FromImage(temp))
 					{
 						gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -926,11 +934,19 @@ namespace HostTest
 						gr.DrawImage(this.image, new Rectangle(0, 0, newWidth, newHeight), new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);
 					}
 
-					scaled = temp.Clone() as Bitmap;
+					scaled = temp;
+					temp = null;
+				}
+				finally
+				{
+					if (temp != null)
+					{
+						temp.Dispose();
+						temp = null;
+					}
 				}
 
-
-				return scaled; 
+				return scaled;
 			}
 
 			return this.image.Clone() as Bitmap;

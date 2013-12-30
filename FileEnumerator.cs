@@ -55,6 +55,19 @@ namespace PSFilterHostDll
             [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool FindClose(IntPtr handle);
+
+            [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
+            internal static extern uint GetFileAttributesW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+        }
+
+        private static class NativeConstants
+        {
+            internal const uint FILE_ATTRIBUTE_DIRECTORY = 16U;
+            internal const uint FILE_ATTRIBUTE_REPARSE_POINT = 1024U;
+            internal const uint INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
+            internal const int ERROR_FILE_NOT_FOUND = 2;
+            internal const int ERROR_PATH_NOT_FOUND = 3;
+            internal const int ERROR_ACCESS_DENIED = 5;
         }
  
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -81,44 +94,99 @@ namespace PSFilterHostDll
             public uint dwHighDateTime;
         }
 
-        internal static IEnumerable<string> EnumerateFiles(string directory, string fileExtension, bool searchSubDirectories)
+        private static string GetPermissionPath(string path, bool searchSubDirectories)
+        {
+            char end = path[path.Length - 1];
+
+            if (!searchSubDirectories)
+            {
+                if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
+                {
+                    return path + ".";
+                }
+
+                return path + Path.DirectorySeparatorChar + "."; // Demand permission for the current directory only
+            }
+
+            if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
+            {
+                return path;
+            }
+
+            return path + Path.DirectorySeparatorChar; // Demand permission for the current directory and all subdirectories.
+        }
+
+        private static void CheckDirectoryAccess(string fullPath)
+        {
+            uint attributes = UnsafeNativeMethods.GetFileAttributesW(fullPath);
+
+            if (attributes == NativeConstants.INVALID_FILE_ATTRIBUTES)
+            {
+                int error = Marshal.GetLastWin32Error();
+
+                switch (error)
+                {
+                    case NativeConstants.ERROR_FILE_NOT_FOUND:
+                    case NativeConstants.ERROR_PATH_NOT_FOUND:
+                        throw new DirectoryNotFoundException();
+                    case NativeConstants.ERROR_ACCESS_DENIED:
+                        throw new UnauthorizedAccessException(PSFilterHostDll.Properties.Resources.PathAccessDenied);
+                    default:
+                        break;
+                }
+            }
+        }
+
+        internal static IEnumerable<string> EnumerateFiles(string directory, string[] fileExtensions, bool searchSubDirectories)
         {             
             // Adapted from: http://weblogs.asp.net/podwysocki/archive/2008/10/16/functional-net-fighting-friction-in-the-bcl-with-directory-getfiles.aspx
+            string fullPath = Path.GetFullPath(directory);
 
+            CheckDirectoryAccess(fullPath);
+
+            new FileIOPermission(FileIOPermissionAccess.PathDiscovery, GetPermissionPath(fullPath, searchSubDirectories)).Demand();
+
+            Queue<string> directories = new Queue<string>();
+            directories.Enqueue(fullPath);
+            
             var findData = new WIN32_FIND_DATAW();
 
-            using (var findHandle = UnsafeNativeMethods.FindFirstFileW(directory + @"\*", out findData))
+            while (directories.Count > 0)
             {
-                if (!findHandle.IsInvalid)
+                string path = directories.Dequeue();
+
+                using (var findHandle = UnsafeNativeMethods.FindFirstFileW(Path.Combine(path, "*"), out findData))
                 {
-                    do
+                    if (!findHandle.IsInvalid)
                     {
-                        if ((findData.dwFileAttributes & 16U) != 0U)
+                        do
                         {
-                            if (searchSubDirectories)
+                            if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY)
                             {
-                                if (findData.cFileName != "." && findData.cFileName != "..")
+                                if (searchSubDirectories)
                                 {
-                                    var subdirectory = Path.Combine(directory, findData.cFileName);
+                                    if (findData.cFileName != "." && findData.cFileName != ".." && (findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+                                    {
+                                        var subdirectory = Path.Combine(path, findData.cFileName);
 
-                                    new FileIOPermission(FileIOPermissionAccess.PathDiscovery, subdirectory).Demand();
-
-                                    foreach (var file in EnumerateFiles(subdirectory, fileExtension, searchSubDirectories))
-                                        yield return file;
+                                        directories.Enqueue(subdirectory);
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
-                            if (string.Compare(Path.GetExtension(findData.cFileName), fileExtension, StringComparison.OrdinalIgnoreCase) == 0)
+                            else
                             {
-                                var filePath = Path.Combine(directory, findData.cFileName);
-                                yield return filePath;
+                                for (int i = 0; i < fileExtensions.Length; i++)
+                                {
+                                    if (findData.cFileName.EndsWith(fileExtensions[i], StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        yield return Path.Combine(path, findData.cFileName);
+                                    } 
+                                }
                             }
-                        } 
 
-                    } while (UnsafeNativeMethods.FindNextFileW(findHandle, out findData));
-                }
+                        } while (UnsafeNativeMethods.FindNextFileW(findHandle, out findData));
+                    }
+                } 
             }  
             
         }

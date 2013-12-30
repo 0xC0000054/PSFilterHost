@@ -132,7 +132,9 @@ namespace HostTest
 
                 using (MemoryStream stream = new MemoryStream(temp))
                 {
-                    this.image = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    BitmapFrame frame = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                    this.image = new WriteableBitmap(frame); // Copy the frame using a WriteableBitmap to fix the threading issue with the BitmapFrameDecoder.
+                    this.image.Freeze();
                 }
             }
 

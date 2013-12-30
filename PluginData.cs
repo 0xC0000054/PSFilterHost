@@ -212,9 +212,6 @@ namespace PSFilterHostDll
         /// <returns>
         ///   <c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        /// <exception cref="T:System.NullReferenceException">
-        /// The <paramref name="obj"/> parameter is null.
-        ///   </exception>
         public override bool Equals(object obj)
         {
             PluginData other = obj as PluginData;

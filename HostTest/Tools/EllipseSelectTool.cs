@@ -29,9 +29,9 @@ namespace HostTest.Tools
     /// The elliptical selection tool class.
     /// </summary>
     [System.Serializable]
-    internal class ElipseSelectTool : SelectionBase
+    internal class EllipseSelectTool : SelectionBase
     {
-        public ElipseSelectTool() : base()
+        public EllipseSelectTool() : base()
         {
         }
 
@@ -61,8 +61,8 @@ namespace HostTest.Tools
         protected override GraphicsPath RenderShape(List<PointF> shapePoints)
         {
             GraphicsPath path = new GraphicsPath();
-            this.roi = PointsToRectangle(shapePoints[0], shapePoints[shapePoints.Count - 1]);
-            path.AddEllipse(roi);
+            Rectangle bounds = PointsToRectangle(shapePoints[0], shapePoints[shapePoints.Count - 1]);
+            path.AddEllipse(bounds);
 
             return path;
         }

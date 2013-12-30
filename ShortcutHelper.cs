@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -39,9 +38,12 @@ namespace PSFilterHostDll
             [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false)]
             internal static extern IntPtr GetProcAddress([In()] IntPtr hModule, [In(), MarshalAs(UnmanagedType.LPStr)] string lpProcName);
 
-            [DllImport("kernel32.dll", EntryPoint = "IsWow64Process")]
+            [DllImport("kernel32.dll", ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
             internal static extern bool IsWow64Process([In()] IntPtr hProcess, [MarshalAs(UnmanagedType.Bool)] out bool Wow64Process);
+
+            [DllImport("kernel32.dll", ExactSpelling = true)]
+            internal static extern IntPtr GetCurrentProcess();
         }
 
         private static bool IsWoW64Process()
@@ -55,7 +57,7 @@ namespace PSFilterHostDll
                     if (SafeNativeMethods.GetProcAddress(hMod, "IsWow64Process") != IntPtr.Zero)
                     {
                         bool isWow64 = false;
-                        if (SafeNativeMethods.IsWow64Process(Process.GetCurrentProcess().Handle, out isWow64))
+                        if (SafeNativeMethods.IsWow64Process(SafeNativeMethods.GetCurrentProcess(), out isWow64))
                         {
                             return isWow64;
                         }
@@ -68,9 +70,9 @@ namespace PSFilterHostDll
 
         private static bool IsWin7OrLater()
         {
-            Version os = Environment.OSVersion.Version;
+            OperatingSystem os = Environment.OSVersion;
 
-            return (os.Major > 6 || (os.Major == 6 && os.Minor >= 1));
+            return (os.Platform == PlatformID.Win32NT && (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 1)));
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HostTest</RootNamespace>
     <AssemblyName>HostTest</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
@@ -77,12 +77,17 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AssemblyName>$(AssemblyName)64</AssemblyName>
   </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -134,7 +139,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Tools\CursorChangedEventArgs.cs" />
-    <Compile Include="Tools\ElipseSelectTool.cs" />
+    <Compile Include="Tools\EllipseSelectTool.cs" />
     <Compile Include="Tools\RectangleSelectTool.cs" />
     <Compile Include="Tools\SelectionBase.cs" />
     <Compile Include="Tools\SelectionPathChangedEventArgs.cs" />
@@ -165,9 +170,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="app.manifest" />
     <None Include="Resources\OpenFile.png" />
   </ItemGroup>
   <ItemGroup>
@@ -202,9 +208,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\MenuFileCloseIcon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\eventlogWarn.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PSFilterHost.csproj">

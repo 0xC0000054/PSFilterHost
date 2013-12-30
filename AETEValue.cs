@@ -77,6 +77,13 @@ namespace PSFilterHostDll
 			this.size = size;
 			this.value = value;
 		}
-	} 
+	}
+
+	[Serializable]
+	internal struct UnitFloat
+	{
+		public uint unit;
+		public double value;
+	}
   
 }

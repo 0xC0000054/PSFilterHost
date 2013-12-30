@@ -14,8 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Security.Permissions;
 using PSFilterLoad.PSApi;
 using PSFilterHostDll.Properties;
 
@@ -25,6 +23,8 @@ using System.Windows.Media.Imaging;
 
 #if NET_40_OR_GREATER
 using System.Security;
+#else
+using System.Security.Permissions;
 #endif
 
 namespace PSFilterHostDll
@@ -128,16 +128,27 @@ namespace PSFilterHostDll
 			if (sourceImage == null)
 				throw new ArgumentNullException("sourceImage", "sourceImage is null.");
 
-			if (sourceImage.Width > 32000 || sourceImage.Height > 32000)
+			int imageWidth = 0;
+			int imageHeight = 0;
+
+#if GDIPLUS
+			imageWidth = sourceImage.Width;
+			imageHeight = sourceImage.Height;
+#else
+			imageWidth = sourceImage.PixelWidth;
+			imageHeight = sourceImage.PixelHeight;
+#endif
+
+			if (imageWidth > 32000 || imageHeight > 32000)
 			{
 				string message = string.Empty;
-				if (sourceImage.Width > 32000 && sourceImage.Height > 32000)
+				if (imageWidth > 32000 && imageHeight > 32000)
 				{
 					message = Resources.ImageSizeTooLarge;
 				}
 				else
 				{
-					if (sourceImage.Width > 32000)
+					if (imageWidth > 32000)
 					{
 						message = Resources.ImageWidthTooLarge;
 					}
@@ -260,7 +271,7 @@ namespace PSFilterHostDll
 		/// Sets the abort function callback delegate.
 		/// </summary>
 		/// <param name="abortCallback">The abort callback.</param>
-		/// <exception cref="System.ArgumentNullException">The abortCallback is null.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="abortCallback"/> is null.</exception>
 		public void SetAbortCallback(AbortFunc abortCallback)
 		{
 			if (abortCallback == null)
@@ -274,92 +285,128 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
-		/// <param name="directory">The directory to query.</param>
-		/// <param name="searchSubDirectories">if set to <c>true</c> search the subdirectories.</param>
-		/// <returns>A new <see cref="FilterCollection"/> containing the list of loaded filters.</returns>
-		/// <exception cref="System.ArgumentException">The directory string is null or empty.</exception>
-		/// <exception cref="System.IO.DirectoryNotFoundException">The specified directory was not found.</exception>
+		/// <param name="path">The directory to query.</param>
+		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
+		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
 		[SecurityCritical()]
 #else
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
-		/// <param name="directory">The directory to query.</param>
-		/// <param name="searchSubDirectories">if set to <c>true</c> search the subdirectories.</param>
-		/// <returns>A new <see cref="FilterCollection"/> containing the list of loaded filters.</returns>
-		/// <exception cref="System.ArgumentException">The directory string is null or empty.</exception>
-		/// <exception cref="System.IO.DirectoryNotFoundException">The specified directory was not found.</exception>
+		/// <param name="path">The directory to query.</param>
+		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
+		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static FilterCollection QueryDirectory(string directory, bool searchSubDirectories)
+		public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
 		{
-			if (string.IsNullOrEmpty(directory))
-				throw new ArgumentException("directory is null or empty.", "directory");
+			if (path == null)
+				throw new ArgumentNullException("path", "path is null");
 
-			new FileIOPermission(FileIOPermissionAccess.PathDiscovery, directory).Demand();
+			var filters = PSFilterHost.EnumerateFilters(path, searchSubdirectories);
 
-			List<PluginData> pluginInfo = new List<PluginData>();
+			return new FilterCollection(filters);
+		}
 
-			List<string> files = new List<string>();
 
-			foreach (var path in FileEnumerator.EnumerateFiles(directory, ".8bf", searchSubDirectories))
+#if NET_40_OR_GREATER
+		/// <summary>
+		/// Enumerates the directory for filters to load.
+		/// </summary>
+		/// <param name="path">The directory to query.</param>
+		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
+		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Enumerates the directory for filters to load.
+		/// </summary>
+		/// <param name="path">The directory to query.</param>
+		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
+		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
+		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
+		{
+			if (path == null)
+				throw new ArgumentNullException("path is null.", "path");
+
+			using (ShellLink shortcut = new ShellLink())
 			{
-				files.Add(path);
-			}
-
-			IEnumerable<string> links = FileEnumerator.EnumerateFiles(directory, ".lnk", searchSubDirectories);
-			if (links.Any())
-			{
-				using (ShellLink shortcut = new ShellLink())
+				foreach (var file in FileEnumerator.EnumerateFiles(path, new string[] { ".8bf", ".lnk" }, searchSubdirectories))
 				{
-					foreach (var file in links)
+					if (file.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
 					{
 						shortcut.Load(file);
-						string path = ShortcutHelper.FixWoW64ShortcutPath(shortcut.Path);
+						string linkPath = shortcut.Path;
 
-						if (File.Exists(path) && Path.GetExtension(path).Equals(".8bf", StringComparison.OrdinalIgnoreCase))
+						if (linkPath.EndsWith(".8bf", StringComparison.OrdinalIgnoreCase))
 						{
-							files.Add(path);
+							foreach (var item in QueryFilter(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
+							{
+								yield return item;
+							}
 						}
 					}
-				}
-			}
-
-
-			foreach (var item in files)
-			{
-				List<PluginData> pluginData;
-				if (LoadPsFilter.QueryPlugin(item, out pluginData))
-				{
-					int count = pluginData.Count;
-
-					if (count > 1)
+					else
 					{
-						/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
-							* Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
-							*/
-						string[] entryPoints = new string[count];
-						for (int i = 0; i < count; i++)
+						foreach (var item in QueryFilter(file))
 						{
-							entryPoints[i] = pluginData[i].EntryPoint;
-						}
-
-						for (int i = 0; i < count; i++)
-						{
-							pluginData[i].moduleEntryPoints = entryPoints;
+							yield return item;
 						}
 					}
-
-					pluginInfo.AddRange(pluginData);
 				}
 			}
-				
-				
-			return new FilterCollection(pluginInfo);
+		}
+
+		private static IEnumerable<PluginData> QueryFilter(string path)
+		{
+			List<PluginData> pluginData = LoadPsFilter.QueryPlugin(path);
+
+			int count = pluginData.Count;
+
+			if (count > 1)
+			{
+				/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
+				 * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
+				 */
+				string[] entryPoints = new string[count];
+				for (int j = 0; j < count; j++)
+				{
+					entryPoints[j] = pluginData[j].EntryPoint;
+				}
+
+				for (int j = 0; j < count; j++)
+				{
+					pluginData[j].moduleEntryPoints = entryPoints;
+				}
+			}
+
+			return pluginData;
 		}
 
 
@@ -371,7 +418,7 @@ namespace PSFilterHostDll
 		/// <returns>
 		/// True if successful; false if the user canceled the dialog.
 		/// </returns>
-		/// <exception cref="System.ArgumentNullException">The <paramref name="pluginData"/> is null.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
@@ -385,7 +432,7 @@ namespace PSFilterHostDll
 		/// <returns>
 		/// True if successful; false if the user canceled the dialog.
 		/// </returns>
-		/// <exception cref="System.ArgumentNullException">The <paramref name="pluginData"/> is null.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
@@ -487,7 +534,7 @@ namespace PSFilterHostDll
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
 		/// <param name="parentWindowHandle">The parent window handle.</param>
-		/// <exception cref="System.ArgumentNullException">The pluginData is null.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
 		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
@@ -498,7 +545,7 @@ namespace PSFilterHostDll
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
 		/// <param name="parentWindowHandle">The parent window handle.</param>
-		/// <exception cref="System.ArgumentNullException">The pluginData is null.</exception>
+		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>

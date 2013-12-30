@@ -24,6 +24,30 @@ namespace PSFilterLoad.PSApi
 #if !GDIPLUS
     internal static class MetaDataConverter
     {
+        private static void CopySubBlockRecursive(ref BitmapMetadata parent, BitmapMetadata child, string query)
+        {
+            if (!parent.ContainsQuery(query))
+            {
+                parent.SetQuery(query, new BitmapMetadata(child.Format));
+            }
+
+            foreach (var tag in child)
+            {
+                object value = child.GetQuery(tag);
+
+                BitmapMetadata subBlock = value as BitmapMetadata;
+
+                if (subBlock != null)
+                {
+                    CopySubBlockRecursive(ref parent, subBlock, query + tag);
+                }
+                else
+                {
+                    parent.SetQuery(query + tag, value);
+                }
+            }
+        }
+
         /// <summary>
         /// Converts the IFD meta data to JPEG format.
         /// </summary>
@@ -42,7 +66,7 @@ namespace PSFilterLoad.PSApi
                 {
                     exifData = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
                 }
-                catch (IOException) 
+                catch (IOException)
                 {
                     // WINCODEC_ERR_INVALIDQUERYREQUEST
                 }
@@ -64,18 +88,7 @@ namespace PSFilterLoad.PSApi
 
                     if (exifSub != null)
                     {
-                        string baseQuery = "/app1/ifd/exif" + tag;
-
-                        if (!jpegMetaData.ContainsQuery(baseQuery))
-                        {
-                            jpegMetaData.SetQuery(baseQuery, new BitmapMetadata(exifSub.Format));
-                        }
-
-                        foreach (var subTag in exifSub)
-                        {
-                            object subValue = exifSub.GetQuery(subTag);
-                            jpegMetaData.SetQuery(baseQuery + subTag, subValue);
-                        }
+                        CopySubBlockRecursive(ref jpegMetaData, exifSub, "/app1/ifd/exif" + tag);
                     }
                     else
                     {
@@ -104,8 +117,6 @@ namespace PSFilterLoad.PSApi
                 catch (NotSupportedException)
                 {
                 }
-
-               
             }
             else
             {
@@ -115,7 +126,7 @@ namespace PSFilterLoad.PSApi
                 {
                     xmpData = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
                 }
-                catch (IOException) 
+                catch (IOException)
                 {
                     // WINCODEC_ERR_INVALIDQUERYREQUEST
                 }
@@ -139,7 +150,7 @@ namespace PSFilterLoad.PSApi
 
                 if (!jpegMetaData.ContainsQuery("/xmp"))
                 {
-                    jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp")); 
+                    jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
                 }
 
                 foreach (var tag in xmpData)
@@ -149,18 +160,7 @@ namespace PSFilterLoad.PSApi
 
                     if (xmpSub != null)
                     {
-                        string baseQuery = "/xmp" + tag;
-
-                        if (!jpegMetaData.ContainsQuery(baseQuery))
-                        {
-                            jpegMetaData.SetQuery(baseQuery, new BitmapMetadata(xmpSub.Format));
-                        }
-
-                        foreach (var subTag in xmpSub)
-                        {
-                            object subValue = xmpSub.GetQuery(subTag);
-                            jpegMetaData.SetQuery(baseQuery + subTag, subValue);
-                        }
+                        CopySubBlockRecursive(ref jpegMetaData, xmpSub, "/xmp" + tag);
                     }
                     else
                     {
@@ -168,10 +168,43 @@ namespace PSFilterLoad.PSApi
                     }
 
                 }
-
             }
-            
+
             return jpegMetaData;
+        }
+
+        /// <summary>
+        /// Loads the PNG XMP meta data using a dummy TIFF.
+        /// </summary>
+        /// <param name="xmp">The XMP string to load.</param>
+        /// <returns>The loaded XMP block, or null.</returns>
+        private static BitmapMetadata LoadPNGMetaData(string xmp)
+        {
+            // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+            BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+
+            tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+            tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+                TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+                encoder.Save(stream);
+
+                BitmapDecoder dec = TiffBitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+
+                if (dec.Frames.Count == 1)
+                {
+                    BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
+                    BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
+
+                    return block;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -190,7 +223,7 @@ namespace PSFilterLoad.PSApi
                 {
                     textChunk = metadata.GetQuery("/iTXt") as BitmapMetadata;
                 }
-                catch (IOException) 
+                catch (IOException)
                 {
                     // WINCODEC_ERR_INVALIDQUERYREQUEST
                 }
@@ -201,20 +234,39 @@ namespace PSFilterLoad.PSApi
 
                     if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
                     {
-                        string data = textChunk.GetQuery("/TextEntry") as string;
+                        string xmp = textChunk.GetQuery("/TextEntry") as string;
 
-                        if (!string.IsNullOrEmpty(data))
+                        if (!string.IsNullOrEmpty(xmp))
                         {
-                            BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
+                            BitmapMetadata xmpData = LoadPNGMetaData(xmp);
 
-                            if (!jpegMetaData.ContainsQuery("/xmp"))
+                            if (xmpData != null)
                             {
-                                jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
+                                BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
+
+                                if (!jpegMetaData.ContainsQuery("/xmp"))
+                                {
+                                    jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
+                                }
+
+                                foreach (var tag in xmpData)
+                                {
+                                    object value = xmpData.GetQuery(tag);
+                                    BitmapMetadata xmpSub = value as BitmapMetadata;
+
+                                    if (xmpSub != null)
+                                    {
+                                        CopySubBlockRecursive(ref jpegMetaData, xmpSub, "/xmp" + tag);
+                                    }
+                                    else
+                                    {
+                                        jpegMetaData.SetQuery("/xmp" + tag, value);
+                                    }
+
+                                }
+
+                                return jpegMetaData;
                             }
-
-                            jpegMetaData.SetQuery("/xmp", Encoding.UTF8.GetBytes(data)); // The XMP specification requires the packet to be a UTF8 encoded byte array.
-
-                            return jpegMetaData;
                         }
                     }
 

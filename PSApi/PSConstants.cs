@@ -25,6 +25,11 @@ namespace PSFilterLoad.PSApi
         public const uint kPhotoshopSignature = 0x3842494dU;
 
         /// <summary>
+        /// The signature used when a plug-in works with any host.
+        /// </summary>
+        public const uint noRequiredHost = 0x20202020U;
+
+        /// <summary>
         /// The filter type code - '8BFM'
         /// </summary>
         public const uint filterKind = 0x3842464dU; 
@@ -109,8 +114,32 @@ namespace PSFilterLoad.PSApi
             public const int Bilinear = 2;
             public const int Bicubic = 3;
         }
+
+        /// <summary>
+        /// The padding constants used by the FilterRecord input, output and mask padding fields.
+        /// </summary>
+        internal static class Padding
+        {
+            public const short plugInWantsEdgeReplication = -1;
+            public const short plugInDoesNotWantPadding = -2;
+            public const short plugInWantsErrorOnBoundsException = -3;
+        }
+
+        /// <summary>
+        /// The layout constants for the data presented to the plug-ins.
+        /// </summary>
+        internal static class Layout
+        {
+            /// <summary>
+            /// Rows, columns, planes with colbytes = # planes
+            /// </summary>
+            public const short piLayoutTraditional = 0;
+            public const short piLayoutRowsColumnsPlanes = 1;
+            public const short piLayoutRowsPlanesColumns = 2;
+            public const short piLayoutColumnsRowsPlanes = 3;
+            public const short piLayoutColumnsPlanesRows = 4;
+            public const short piLayoutPlanesRowsColumns = 5;
+            public const short piLayoutPlanesColumnsRows = 6;
+        }
     }
-
-  
-
 }
