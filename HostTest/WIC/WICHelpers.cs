@@ -4,7 +4,7 @@
 // http://psfilterhost.codeplex.com/
 //
 // This software is provided under the Microsoft Public License:
-//   Copyright (C) 2012-2013 Nicholas Hayes
+//   Copyright (C) 2012-2014 Nicholas Hayes
 // 
 // Portions Copyright (C) Microsoft Corporation. All Rights Reserved. 
 //
