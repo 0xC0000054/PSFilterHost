@@ -543,34 +543,38 @@ namespace PSFilterHostDll.BGRASurface
         {
             for (int y = 0; y < height; y++)
             {
-                ushort* ptr = (ushort*)GetRowAddressUnchecked(y);
-                ushort* endPtr = ptr + width;
+                ColorBgra16* ptr = (ColorBgra16*)GetRowAddressUnchecked(y);
+                ColorBgra16* endPtr = ptr + width;
 
                 while (ptr < endPtr)
                 {
-                    if (ptr[3] < 32768)
+                    if (ptr->A < 32768)
                     {
                         return true;
                     }
-                    ptr += 4;
+                    ptr++;
                 }
             }
 
             return false;
         }
 
-        public override unsafe void SetAlphaToOpaque()
+        protected override unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
         {
-            for (int y = 0; y < height; y++)
+            int top = rect.Top;
+            int left = rect.Left;
+            int right = rect.Right;
+            int bottom = rect.Bottom;
+
+            for (int y = top; y < bottom; y++)
             {
-                ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
-                ushort* endPtr = ptr + width;
+                ColorBgra16* ptr = (ColorBgra16*)this.GetPointAddressUnchecked(left, y);
 
-                while (ptr < endPtr)
+                for (int x = left; x < right; x++)
                 {
-                    ptr[3] = 32768; // Per the SDK the 16-bit range is 0 to 32768.
+                    ptr->A = 32768; // Per the SDK the 16-bit range is 0 to 32768.
 
-                    ptr += 4;
+                    ptr++;
                 }
             }
         }

@@ -42,11 +42,33 @@ namespace PSFilterHostDll
             }
         }
 
+        private enum FindExInfoLevel : int
+        {
+            Standard = 0,
+            Basic,
+            MaxInfoLevel
+        }
+
+        private enum FindExSearchOps : int
+        {
+            NameMatch = 0,
+            LimitToDirectories,
+            LimitToDevices
+        }
+
+        [Flags]
+        private enum FindExAdditionalFlags : uint
+        {
+            None = 0U,
+            CaseSensitive = 1U,
+            LargeFetch = 2U
+        }
+
         [SuppressUnmanagedCodeSecurity]
         private static class UnsafeNativeMethods
         {
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-            internal static extern SafeFindHandle FindFirstFileW(string fileName, out WIN32_FIND_DATAW data);
+            internal static extern SafeFindHandle FindFirstFileExW([In(), MarshalAs(UnmanagedType.LPWStr)] string fileName, [In()] FindExInfoLevel infoLevel, out WIN32_FIND_DATAW data, [In()] FindExSearchOps searchOp, [In()] IntPtr searchFilter, [In()] FindExAdditionalFlags flags);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
@@ -92,6 +114,13 @@ namespace PSFilterHostDll
         {
             public uint dwLowDateTime;
             public uint dwHighDateTime;
+        }
+
+        private static bool IsWin7OrLater()
+        {
+            OperatingSystem os = Environment.OSVersion;
+
+            return (os.Platform == PlatformID.Win32NT && (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 1)));
         }
 
         private static string GetPermissionPath(string path, bool searchSubDirectories)
@@ -151,11 +180,21 @@ namespace PSFilterHostDll
             
             var findData = new WIN32_FIND_DATAW();
 
+            FindExInfoLevel infoLevel = FindExInfoLevel.Standard;
+            FindExAdditionalFlags flags = FindExAdditionalFlags.None;
+
+            if (IsWin7OrLater())
+            {
+                // Suppress the querying of short filenames and use a larger buffer on Windows 7 and later.
+                infoLevel = FindExInfoLevel.Basic;
+                flags = FindExAdditionalFlags.LargeFetch;
+            }
+
             while (directories.Count > 0)
             {
                 string path = directories.Dequeue();
 
-                using (var findHandle = UnsafeNativeMethods.FindFirstFileW(Path.Combine(path, "*"), out findData))
+                using (var findHandle = UnsafeNativeMethods.FindFirstFileExW(Path.Combine(path, "*"), infoLevel, out findData, FindExSearchOps.NameMatch, IntPtr.Zero, flags))
                 {
                     if (!findHandle.IsInvalid)
                     {

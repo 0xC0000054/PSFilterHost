@@ -436,7 +436,7 @@ namespace HostTest
 							// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
 							BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 
-							//tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+							tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 							tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data));
 
 							using (MemoryStream stream = new MemoryStream())
@@ -920,9 +920,12 @@ namespace HostTest
 				}
 				else
 				{
-					return (ushort)((((byte0 << 8) | (byte1 << 16)) | (byte2 << 24)) | byte3);
+					return (ushort)((((byte0 << 24) | (byte1 << 16)) | (byte2 << 8)) | byte3);
 				}
 			}
+
+			private const ushort IntelByteOrder = 0x4949;
+			private const ushort XmpTag = 700;
 
 			/// <summary>
 			/// Extracts the XMP packet from a TIFF file.
@@ -935,7 +938,7 @@ namespace HostTest
 
 				ushort byteOrder = reader.ReadUInt16();
 
-				bool littleEndian = byteOrder == 0x4949;
+				bool littleEndian = byteOrder == IntelByteOrder;
 
 				reader.BaseStream.Position += 2L; // skip the TIFF signature.
 
@@ -950,7 +953,7 @@ namespace HostTest
 				{
 					IFD ifd = new IFD(reader, littleEndian);
 
-					if (ifd.tag == 700)
+					if (ifd.tag == XmpTag)
 					{
 						xmpIfd = ifd;
 						break;

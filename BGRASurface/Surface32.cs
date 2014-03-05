@@ -70,22 +70,22 @@ namespace PSFilterHostDll.BGRASurface
         } 
 #endif
 
-      
+
         public override unsafe bool HasTransparency()
         {
             for (int y = 0; y < height; y++)
             {
-                byte* ptr = this.GetRowAddressUnchecked(y);
-                byte* endPtr = ptr + width;
+                ColorBgra8* ptr = (ColorBgra8*)this.GetRowAddressUnchecked(y);
+                ColorBgra8* endPtr = ptr + width;
 
                 while (ptr < endPtr)
                 {
-                    if (ptr[3] < 255)
+                    if (ptr->A < 255)
                     {
                         return true;
                     }
 
-                    ptr += 4;
+                    ptr++;
                 }
             }
 
@@ -510,18 +510,22 @@ namespace PSFilterHostDll.BGRASurface
             BGRASurfaceMemory.Free(rColCacheIP);
         }
 
-        public override unsafe void SetAlphaToOpaque()
+        protected override unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
         {
-            for (int y = 0; y < height; y++)
+            int top = rect.Top;
+            int left = rect.Left;
+            int right = rect.Right;
+            int bottom = rect.Bottom;
+
+            for (int y = top; y < bottom; y++)
             {
-                byte* ptr = this.GetRowAddressUnchecked(y);
-                byte* endPtr = ptr + width;
+                ColorBgra8* ptr = (ColorBgra8*)this.GetPointAddressUnchecked(left, y);
 
-                while (ptr < endPtr)
+                for (int x = left; x < right; x++)
                 {
-                    ptr[3] = 255;
+                    ptr->A = 255;
 
-                    ptr += 4;
+                    ptr++;
                 }
             }
         }

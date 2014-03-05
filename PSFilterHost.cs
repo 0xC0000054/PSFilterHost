@@ -180,7 +180,7 @@ namespace PSFilterHostDll
 				this.selectedRegion = null;
 			}
 			this.owner = parentWindowHandle;
-			this.pseudoResources = null;
+			this.pseudoResources = new List<PSResource>();
 			this.abortFunc = null;
 			this.hostInfo = null;
 			PSFilterHostDll.BGRASurface.BGRASurfaceMemory.CreateHeap();
@@ -190,10 +190,14 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Gets the destination image.
 		/// </summary>
+		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		public Bitmap Dest
 		{
 			get
 			{
+				if (disposed)
+					throw new ObjectDisposedException("PSFilterHost");
+
 				return dest;
 			}
 		} 
@@ -201,10 +205,14 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Gets the destination image.
 		/// </summary>
+		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		public BitmapSource Dest
 		{
 			get
 			{
+				if (disposed)
+					throw new ObjectDisposedException("PSFilterHost");
+
 				return dest;
 			}
 		} 
@@ -285,12 +293,13 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
-		/// <param name="path">The directory to query.</param>
+		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
 		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
@@ -299,12 +308,13 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Queries the directory for filters to load.
 		/// </summary>
-		/// <param name="path">The directory to query.</param>
+		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
 		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
@@ -325,12 +335,13 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Enumerates the directory for filters to load.
 		/// </summary>
-		/// <param name="path">The directory to query.</param>
+		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
 		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
@@ -339,12 +350,13 @@ namespace PSFilterHostDll
 		/// <summary>
 		/// Enumerates the directory for filters to load.
 		/// </summary>
-		/// <param name="path">The directory to query.</param>
+		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories">if set to <c>true</c> search the subdirectories.</param>
 		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
@@ -366,7 +378,7 @@ namespace PSFilterHostDll
 
 						if (linkPath.EndsWith(".8bf", StringComparison.OrdinalIgnoreCase))
 						{
-							foreach (var item in QueryFilter(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
+							foreach (var item in LoadPsFilter.QueryPlugin(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
 							{
 								yield return item;
 							}
@@ -374,7 +386,7 @@ namespace PSFilterHostDll
 					}
 					else
 					{
-						foreach (var item in QueryFilter(file))
+						foreach (var item in LoadPsFilter.QueryPlugin(file))
 						{
 							yield return item;
 						}
@@ -382,33 +394,6 @@ namespace PSFilterHostDll
 				}
 			}
 		}
-
-		private static IEnumerable<PluginData> QueryFilter(string path)
-		{
-			List<PluginData> pluginData = LoadPsFilter.QueryPlugin(path);
-
-			int count = pluginData.Count;
-
-			if (count > 1)
-			{
-				/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
-				 * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
-				 */
-				string[] entryPoints = new string[count];
-				for (int j = 0; j < count; j++)
-				{
-					entryPoints[j] = pluginData[j].EntryPoint;
-				}
-
-				for (int j = 0; j < count; j++)
-				{
-					pluginData[j].moduleEntryPoints = entryPoints;
-				}
-			}
-
-			return pluginData;
-		}
-
 
 #if NET_40_OR_GREATER
 		/// <summary>
@@ -467,7 +452,7 @@ namespace PSFilterHostDll
 					lps.IsRepeatEffect = true;
 				}
 
-				if (pseudoResources != null)
+				if (pseudoResources.Count > 0)
 				{
 					lps.PseudoResources = pseudoResources;
 				}
@@ -487,6 +472,11 @@ namespace PSFilterHostDll
 				}
 				catch (Exception ex)
 				{
+					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is System.Threading.ThreadAbortException)
+					{
+						throw;
+					}
+
 					throw new FilterRunException(ex.Message, ex);
 				}
 
@@ -556,12 +546,15 @@ namespace PSFilterHostDll
 			if (pluginData == null)
 				throw new ArgumentNullException("pluginData", "pluginData is null.");
 
-			string errorMessage = string.Empty;
-			
-			bool result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
-			if (!result && !string.IsNullOrEmpty(errorMessage))
+			if (pluginData.HasAboutBox)
 			{
-				throw new FilterRunException(errorMessage);
+				string errorMessage = string.Empty;
+
+				bool result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
+				if (!result && !string.IsNullOrEmpty(errorMessage))
+				{
+					throw new FilterRunException(errorMessage);
+				} 
 			}
 		}
 

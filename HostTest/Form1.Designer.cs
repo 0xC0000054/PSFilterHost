@@ -67,7 +67,9 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.canvas = new HostTest.Canvas();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.pointerSelectBtn = new System.Windows.Forms.ToolStripButton();
             this.rectangleSelectBtn = new System.Windows.Forms.ToolStripButton();
             this.elipseSelectBtn = new System.Windows.Forms.ToolStripButton();
@@ -77,15 +79,14 @@
             this.zoomToWindowBtn = new System.Windows.Forms.ToolStripButton();
             this.zoomToActualSizeBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.canvas = new HostTest.Canvas();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.primaryColorBtn = new HostTest.ColorToolStripMenuItem();
             this.secondaryColorBtn = new HostTest.ColorToolStripMenuItem();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            this.toolStrip1.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -186,7 +187,7 @@
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            this.undoToolStripMenuItem.Text = "Undo";
+            this.undoToolStripMenuItem.Text = "&Undo";
             this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
             // 
             // redoToolStripMenuItem
@@ -195,14 +196,14 @@
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
-            this.redoToolStripMenuItem.Text = "Redo";
+            this.redoToolStripMenuItem.Text = "&Redo";
             this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // filtersToolStripMenuItem
             // 
             this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
             this.filtersToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
-            this.filtersToolStripMenuItem.Text = "Filters";
+            this.filtersToolStripMenuItem.Text = "F&ilters";
             // 
             // helpToolStripMenuItem
             // 
@@ -218,7 +219,7 @@
             // 
             this.aboutPluginsMenuItem.Name = "aboutPluginsMenuItem";
             this.aboutPluginsMenuItem.Size = new System.Drawing.Size(149, 22);
-            this.aboutPluginsMenuItem.Text = "About Plugins";
+            this.aboutPluginsMenuItem.Text = "About &Plugins";
             this.aboutPluginsMenuItem.Visible = false;
             // 
             // aboutMenuToolStripSeparator
@@ -248,7 +249,7 @@
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripProgressBar1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 670);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 632);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1034, 22);
             this.statusStrip1.TabIndex = 7;
@@ -266,27 +267,34 @@
             this.toolStripProgressBar1.Size = new System.Drawing.Size(100, 16);
             this.toolStripProgressBar1.Visible = false;
             // 
-            // toolStrip1
+            // panel1
             // 
-            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Left;
-            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.pointerSelectBtn,
-            this.rectangleSelectBtn,
-            this.elipseSelectBtn,
-            this.toolStripSeparator2,
-            this.zoomInBtn,
-            this.zoomOutBtn,
-            this.zoomToWindowBtn,
-            this.zoomToActualSizeBtn,
-            this.toolStripSeparator3,
-            this.primaryColorBtn,
-            this.secondaryColorBtn});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(29, 646);
-            this.toolStrip1.TabIndex = 8;
-            this.toolStrip1.Text = "toolStrip1";
+            this.panel1.AutoScroll = true;
+            this.panel1.AutoScrollMargin = new System.Drawing.Size(3, 3);
+            this.panel1.BackColor = System.Drawing.Color.Silver;
+            this.panel1.Controls.Add(this.canvas);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(29, 24);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(1005, 608);
+            this.panel1.TabIndex = 10;
+            // 
+            // canvas
+            // 
+            this.canvas.IsDirty = false;
+            this.canvas.Location = new System.Drawing.Point(3, 3);
+            this.canvas.Name = "canvas";
+            this.canvas.SelectionType = null;
+            this.canvas.Size = new System.Drawing.Size(800, 600);
+            this.canvas.Surface = null;
+            this.canvas.TabIndex = 9;
+            this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
+            this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
+            // 
+            // colorDialog1
+            // 
+            this.colorDialog1.FullOpen = true;
+            this.colorDialog1.SolidColorOnly = true;
             // 
             // pointerSelectBtn
             // 
@@ -382,33 +390,27 @@
             this.toolStripSeparator3.Name = "toolStripSeparator3";
             this.toolStripSeparator3.Size = new System.Drawing.Size(26, 6);
             // 
-            // panel1
+            // toolStrip1
             // 
-            this.panel1.AutoScroll = true;
-            this.panel1.AutoScrollMargin = new System.Drawing.Size(3, 3);
-            this.panel1.Controls.Add(this.canvas);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(29, 24);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1005, 646);
-            this.panel1.TabIndex = 10;
-            // 
-            // colorDialog1
-            // 
-            this.colorDialog1.FullOpen = true;
-            this.colorDialog1.SolidColorOnly = true;
-            // 
-            // canvas
-            // 
-            this.canvas.IsDirty = false;
-            this.canvas.Location = new System.Drawing.Point(3, 3);
-            this.canvas.Name = "canvas";
-            this.canvas.SelectionType = null;
-            this.canvas.Size = new System.Drawing.Size(800, 600);
-            this.canvas.Surface = null;
-            this.canvas.TabIndex = 9;
-            this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
-            this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
+            this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Left;
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.pointerSelectBtn,
+            this.rectangleSelectBtn,
+            this.elipseSelectBtn,
+            this.toolStripSeparator2,
+            this.zoomInBtn,
+            this.zoomOutBtn,
+            this.zoomToWindowBtn,
+            this.zoomToActualSizeBtn,
+            this.toolStripSeparator3,
+            this.primaryColorBtn,
+            this.secondaryColorBtn});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 24);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(29, 608);
+            this.toolStrip1.TabIndex = 8;
+            this.toolStrip1.Text = "toolStrip1";
             // 
             // primaryColorBtn
             // 
@@ -434,12 +436,17 @@
             this.secondaryColorBtn.ToolTipText = "Secondary color";
             this.secondaryColorBtn.Click += new System.EventHandler(this.secondaryColorBtn_Click);
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
+            // 
             // Form1
             // 
             this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1034, 692);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(1034, 654);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
@@ -447,18 +454,13 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "HostTest";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
-            this.Load += new System.EventHandler(this.Form1_Load);
-            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
-            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
-            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -480,30 +482,31 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
         private HostTest.Canvas canvas;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.ToolStripButton zoomInBtn;
-        private System.Windows.Forms.ToolStripButton zoomOutBtn;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private HostTest.ColorToolStripMenuItem primaryColorBtn;
-        private HostTest.ColorToolStripMenuItem secondaryColorBtn;
         private System.Windows.Forms.ColorDialog colorDialog1;
-        private System.Windows.Forms.ToolStripButton pointerSelectBtn;
-        private System.Windows.Forms.ToolStripButton rectangleSelectBtn;
-        private System.Windows.Forms.ToolStripButton elipseSelectBtn;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripButton zoomToActualSizeBtn;
-        private System.Windows.Forms.ToolStripButton zoomToWindowBtn;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutPluginsMenuItem;
         private System.Windows.Forms.ToolStripSeparator aboutMenuToolStripSeparator;
         private System.Windows.Forms.ToolStripMenuItem refreshFiltersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton pointerSelectBtn;
+        private System.Windows.Forms.ToolStripButton rectangleSelectBtn;
+        private System.Windows.Forms.ToolStripButton elipseSelectBtn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripButton zoomInBtn;
+        private System.Windows.Forms.ToolStripButton zoomOutBtn;
+        private System.Windows.Forms.ToolStripButton zoomToWindowBtn;
+        private System.Windows.Forms.ToolStripButton zoomToActualSizeBtn;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private ColorToolStripMenuItem primaryColorBtn;
+        private ColorToolStripMenuItem secondaryColorBtn;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

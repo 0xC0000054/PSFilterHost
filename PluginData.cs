@@ -21,7 +21,7 @@ using System.Windows.Media;
 namespace PSFilterHostDll
 {
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int pluginEntryPoint(short selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
+    internal delegate void pluginEntryPoint(short selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
     /// <summary>
     /// The class that encapsulates an Adobe® Photoshop® filter plug-in.
     /// </summary>
@@ -37,7 +37,8 @@ namespace PSFilterHostDll
         private PluginAETE aete;
         internal string enableInfo;
         internal ushort? supportedModes;
-        internal string[] moduleEntryPoints; 
+        internal string[] moduleEntryPoints;
+        private bool hasAboutBox;
 
         /// <summary>
         /// The structure containing the dll entrypoint
@@ -89,10 +90,22 @@ namespace PSFilterHostDll
             get { return aete; }
             set { aete = value; }
         }
+        
+        /// <summary>
+        /// Gets a value indicating whether this filter has an about box.
+        /// </summary>
+        /// <value>
+        /// 	<c>true</c> if this filter has an about box; otherwise, <c>false</c>.
+        /// </value>
+        public bool HasAboutBox
+        {
+            get { return hasAboutBox; }
+            internal set { hasAboutBox = value; }
+        }
 
 #if !GDIPLUS
         /// <summary>
-        ///Checks if the filter supports processing images in the current <see cref="System.Windows.Media.PixelFormat"/>.
+        /// Checks if the filter supports processing images in the current <see cref="System.Windows.Media.PixelFormat"/>.
         /// </summary>
         /// <param name="mode">The <see cref="System.Windows.Media.PixelFormat"/> of the image to process.</param>
         /// <returns><c>true</c> if the filter can process the image; otherwise <c>false</c>.</returns>
@@ -181,6 +194,7 @@ namespace PSFilterHostDll
             this.supportedModes = null;
             this.module = new PIEntrypoint();
             this.moduleEntryPoints = null;
+            this.hasAboutBox = true;
         }
 
         /// <summary>
