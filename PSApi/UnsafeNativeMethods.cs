@@ -23,7 +23,7 @@ namespace PSFilterLoad.PSApi
         internal delegate bool EnumResNameDelegate([In()] IntPtr hModule, [In()] IntPtr lpszType, [In()] IntPtr lpszName, [In()] IntPtr lParam);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-        internal static extern SafeLibraryHandle LoadLibraryW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+        internal static extern SafeLibraryHandle LoadLibraryExW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName, [In()] IntPtr hFile, [In()] uint dwFlags);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

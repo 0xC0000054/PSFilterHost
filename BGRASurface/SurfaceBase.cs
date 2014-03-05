@@ -250,9 +250,25 @@ namespace PSFilterHostDll.BGRASurface
 			return false;
 		}
 
-		public unsafe virtual void SetAlphaToOpaque()
+		public void SetAlphaToOpaque()
 		{
-			
+			SetAlphaToOpaqueImpl(this.Bounds);
+		}
+
+		public void SetAlphaToOpaque(Rectangle[] scans)
+		{
+			if (scans == null)
+				throw new ArgumentNullException("scans");
+
+			for (int i = 0; i < scans.Length; i++)
+			{
+				SetAlphaToOpaqueImpl(scans[i]);
+			}
+		}
+
+		protected unsafe virtual void SetAlphaToOpaqueImpl(Rectangle rect)
+		{
+
 		}
 
 		private void Dispose(bool disposing)

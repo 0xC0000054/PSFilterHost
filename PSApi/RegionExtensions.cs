@@ -22,6 +22,7 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace PSFilterLoad.PSApi
@@ -65,6 +66,31 @@ namespace PSFilterLoad.PSApi
 			return bounds; 
 		}
 
+		public static Rectangle[] GetRegionScansReadOnlyInt(this Region region)
+		{
+			Rectangle[] scans = new Rectangle[0];
+			using (NullGraphics nullGraphics = new NullGraphics())
+			{
+				IntPtr hRgn = IntPtr.Zero;
+
+				try
+				{
+					hRgn = region.GetHrgn(nullGraphics.Graphics);
+					GetRegionScans(hRgn, out scans);
+				}
+				finally
+				{
+					if (hRgn != IntPtr.Zero)
+					{
+						SafeNativeMethods.DeleteObject(hRgn);
+						hRgn = IntPtr.Zero;
+					}
+				}
+			}
+
+			return scans;
+		}
+
 		private unsafe static void GetRegionScans(IntPtr hRgn, out Rectangle[] scans)
 		{
 			uint bytes = 0;
@@ -93,7 +119,7 @@ namespace PSFilterLoad.PSApi
 			// But if we retry several times and it still messes up then we will finally give up.
 			if (bytes == 0)
 			{
-				throw new Win32Exception(error, "GetRegionData returned " + bytes.ToString() + ", GetLastError() = " + error.ToString());
+				throw new Win32Exception(error, "GetRegionData returned " + bytes.ToString(CultureInfo.CurrentCulture) + ", GetLastError() = " + error.ToString(CultureInfo.CurrentCulture));
 			}
 
 			byte* data;

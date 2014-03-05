@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET_35_OR_GREATER</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -114,13 +114,14 @@
     <Compile Include="ColorSpace\HSL.cs" />
     <Compile Include="ColorSpace\RGB.cs" />
     <Compile Include="EnableInfoParser.cs" />
-    <Compile Include="EnumerableExtensions.cs" />
+    <Compile Include="Enumerable.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
+    <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterProgressEventArgs.cs" />

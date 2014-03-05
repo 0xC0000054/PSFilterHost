@@ -52,11 +52,33 @@ namespace PSFilterLoad.PSApi
 			}
 			catch (OverflowException ex)
 			{
-				throw new OutOfMemoryException(string.Format("Overflow while trying to allocate {0} bytes", size.ToString("N")), ex);
+				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", size), ex);
 			}
 			if (block == IntPtr.Zero)
 			{
-				throw new OutOfMemoryException(string.Format("HeapAlloc returned a null pointer while trying to allocate {0} bytes", size.ToString("N")));
+				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", size));
+			}
+
+			if (size > 0L)
+			{
+				GC.AddMemoryPressure(size);
+			}
+
+			return block;
+		}
+
+		/// <summary>
+		/// Allocates a block of memory with the PAGE_EXECUTE permission.
+		/// </summary>
+		/// <param name="size">The size of the memory to allocate.</param>
+		/// <returns>A pointer to the allocated block of memory.</returns>
+		public static IntPtr AllocateExecutable(long size)
+		{
+			IntPtr block = SafeNativeMethods.VirtualAlloc(IntPtr.Zero, new UIntPtr((ulong)size), NativeConstants.MEM_COMMIT, NativeConstants.PAGE_EXECUTE_READWRITE);
+
+			if (block == IntPtr.Zero)
+			{
+				throw new OutOfMemoryException("VirtualAlloc returned a null pointer");
 			}
 
 			if (size > 0L)
@@ -80,13 +102,33 @@ namespace PSFilterLoad.PSApi
 				{
 					int error = Marshal.GetLastWin32Error();
 
-					throw new InvalidOperationException(string.Format("HeapFree returned an error {0}", error.ToString("X8", System.Globalization.CultureInfo.InvariantCulture)));
+					throw new InvalidOperationException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapFree returned an error 0x{0:X8}", error));
 				}
 
 				if (size > 0L)
 				{
 					GC.RemoveMemoryPressure(size);
 				}
+			}
+		}
+
+
+		/// <summary>
+		/// Frees the block of memory allocated by AllocateExecutable().
+		/// </summary>
+		/// <param name="hMem">The block to free.</param>
+		/// <param name="size">The size of the allocated block.</param>
+		public static void FreeExecutable(IntPtr hMem, long size)
+		{
+			if (!SafeNativeMethods.VirtualFree(hMem, UIntPtr.Zero, NativeConstants.MEM_RELEASE))
+			{
+				int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+				throw new InvalidOperationException("VirtualFree returned an error: " + error.ToString(System.Globalization.CultureInfo.InvariantCulture));
+			}
+
+			if (size > 0L)
+			{
+				GC.RemoveMemoryPressure(size);
 			}
 		}
 
@@ -113,11 +155,11 @@ namespace PSFilterLoad.PSApi
 			}
 			catch (OverflowException ex)
 			{
-				throw new OutOfMemoryException(string.Format("Overflow while trying to allocate {0} bytes", newSize.ToString("N")), ex);
+				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", newSize), ex);
 			}
 			if (block == IntPtr.Zero)
 			{
-				throw new OutOfMemoryException(string.Format("HeapAlloc returned a null pointer while trying to allocate {0} bytes", newSize.ToString("N")));
+				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", newSize));
 			}
 
 			if (oldSize > 0L)
