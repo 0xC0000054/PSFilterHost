@@ -117,24 +117,43 @@
     <Compile Include="HistoryItemState.cs" />
     <Compile Include="HistoryStack.cs" />
     <Compile Include="MetaDataHelper.cs" />
+    <Compile Include="PaintDotNet\ColorPicker\ColorGradientControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PaintDotNet\ColorPicker\ColorPickerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PaintDotNet\ColorPicker\ColorRectangleControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PaintDotNet\ColorPicker\ColorWheel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PaintDotNet\ColorPicker\HsvColor.cs" />
+    <Compile Include="PaintDotNet\ColorPicker\IndexEventArgs.cs" />
+    <Compile Include="PaintDotNet\ColorPicker\RgbColor.cs" />
+    <Compile Include="PaintDotNet\ColorPicker\SwatchControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="PaintDotNet\ColorPicker\Utility.cs" />
     <Compile Include="StringLogicalComparer.cs" />
-    <Compile Include="TaskDialog\ButtonBase.cs">
+    <Compile Include="PaintDotNet\TaskDialog\ButtonBase.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="TaskDialog\CommandButton.cs">
+    <Compile Include="PaintDotNet\TaskDialog\CommandButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="TaskDialog\EtchedLine.cs">
+    <Compile Include="PaintDotNet\EtchedLine.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="TaskDialog\HeaderLabel.cs">
+    <Compile Include="PaintDotNet\HeaderLabel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="TaskDialog\NativeConstants.cs" />
-    <Compile Include="TaskDialog\TaskButton.cs" />
-    <Compile Include="TaskDialog\TaskDialog.cs" />
-    <Compile Include="TaskDialog\UI.cs" />
-    <Compile Include="TaskDialog\VisualStyleClass.cs" />
+    <Compile Include="PaintDotNet\NativeConstants.cs" />
+    <Compile Include="PaintDotNet\TaskDialog\TaskButton.cs" />
+    <Compile Include="PaintDotNet\TaskDialog\TaskDialog.cs" />
+    <Compile Include="PaintDotNet\UI.cs" />
+    <Compile Include="PaintDotNet\VisualStyleClass.cs" />
     <Compile Include="ToolStripMenuItemEx.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -159,6 +178,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Canvas.resx">
       <DependentUpon>Canvas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PaintDotNet\ColorPicker\ColorPickerForm.resx">
+      <DependentUpon>ColorPickerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

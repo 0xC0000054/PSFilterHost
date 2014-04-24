@@ -53,6 +53,7 @@ namespace PSFilterHostDll
 		private AbortFunc abortFunc;
 		private List<PSResource> pseudoResources;
 		private HostInformation hostInfo;
+		private PickColor pickColor;
 
 		/// <summary>
 		/// The event fired when the filter updates it's progress. 
@@ -126,7 +127,9 @@ namespace PSFilterHostDll
 #endif
 		{
 			if (sourceImage == null)
+			{
 				throw new ArgumentNullException("sourceImage", "sourceImage is null.");
+			}
 
 			int imageWidth = 0;
 			int imageHeight = 0;
@@ -196,7 +199,9 @@ namespace PSFilterHostDll
 			get
 			{
 				if (disposed)
+				{
 					throw new ObjectDisposedException("PSFilterHost");
+				}
 
 				return dest;
 			}
@@ -211,7 +216,9 @@ namespace PSFilterHostDll
 			get
 			{
 				if (disposed)
+				{
 					throw new ObjectDisposedException("PSFilterHost");
+				}
 
 				return dest;
 			}
@@ -283,11 +290,27 @@ namespace PSFilterHostDll
 		public void SetAbortCallback(AbortFunc abortCallback)
 		{
 			if (abortCallback == null)
-				throw new ArgumentNullException("abortCallback", "abortCallback is null.");
+			{
+				throw new ArgumentNullException("abortCallback");
+			}
 
 			this.abortFunc = abortCallback;
 		}
 
+		/// <summary>
+		/// Sets the pick color function callback delegate.
+		/// </summary>
+		/// <param name="pickerCallback">The color picker callback.</param>
+		/// <exception cref="System.ArgumentNullException"><paramref name="pickerCallback"/> is null.</exception>
+		public void SetPickColorCallback(PickColor pickerCallback)
+		{
+			if (pickerCallback == null)
+			{
+				throw new ArgumentNullException("pickerCallback");
+			}
+
+			this.pickColor = pickerCallback;
+		}
 
 #if NET_40_OR_GREATER
 		/// <summary>
@@ -323,7 +346,9 @@ namespace PSFilterHostDll
 		public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
 		{
 			if (path == null)
+			{
 				throw new ArgumentNullException("path", "path is null");
+			}
 
 			var filters = PSFilterHost.EnumerateFilters(path, searchSubdirectories);
 
@@ -365,7 +390,9 @@ namespace PSFilterHostDll
 		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
 		{
 			if (path == null)
+			{
 				throw new ArgumentNullException("path is null.", "path");
+			}
 
 			using (ShellLink shortcut = new ShellLink())
 			{
@@ -427,10 +454,14 @@ namespace PSFilterHostDll
 		public bool RunFilter(PluginData pluginData)
 		{
 			if (pluginData == null)
+			{
 				throw new ArgumentNullException("pluginData", "pluginData is null.");
-			
+			}
+
 			if (disposed)
+			{
 				throw new ObjectDisposedException("PSFilterHost");
+			}
 
 			bool result = false;
 
@@ -439,6 +470,11 @@ namespace PSFilterHostDll
 				if (abortFunc != null)
 				{
 					lps.SetAbortFunc(abortFunc);
+				}
+
+				if (pickColor != null)
+				{
+					lps.SetPickColor(pickColor);
 				}
 
 				if (UpdateProgress != null)
@@ -544,7 +580,9 @@ namespace PSFilterHostDll
 		public static void ShowAboutDialog(PluginData pluginData, IntPtr parentWindowHandle)
 		{
 			if (pluginData == null)
+			{
 				throw new ArgumentNullException("pluginData", "pluginData is null.");
+			}
 
 			if (pluginData.HasAboutBox)
 			{

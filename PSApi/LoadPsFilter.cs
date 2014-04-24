@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using PSFilterHostDll;
@@ -80,8 +81,8 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// The Windows-1252 Western European encoding
 		/// </summary>
-		private static readonly Encoding windows1252Encoding = Encoding.GetEncoding(1252);
-		private static readonly char[] trimChars = new char[] { ' ', '\0' };
+		private static readonly Encoding Windows1252Encoding = Encoding.GetEncoding(1252);
+		private static readonly char[] TrimChars = new char[] { ' ', '\0' };
 		/// <summary>
 		/// Reads a Pascal String into a string.
 		/// </summary>
@@ -106,7 +107,7 @@ namespace PSFilterLoad.PSApi
 		{
 			int length = (int)ptr[0];
 
-			return new string((sbyte*)ptr, 1, length, windows1252Encoding).Trim(trimChars);
+			return new string((sbyte*)ptr, 1, length, Windows1252Encoding).Trim(TrimChars);
 		}
 
 
@@ -120,7 +121,7 @@ namespace PSFilterLoad.PSApi
 		{
 			length = (int)ptr[0] + 1; // skip the first byte
 			
-			return new string((sbyte*)ptr, 1, ptr[0], windows1252Encoding);
+			return new string((sbyte*)ptr, 1, ptr[0], Windows1252Encoding);
 		}
 
 		private struct QueryAETE
@@ -355,10 +356,10 @@ namespace PSFilterLoad.PSApi
 #endif
 			int version = Marshal.ReadInt32(lockRes, 2);
 
-			if (version != 0)
+			if (version != PSConstants.latestPIPLVersion)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("Invalid PiPL version in {0}: {1},  Expected version 0", query.fileName, version));
+				System.Diagnostics.Debug.WriteLine(string.Format("Invalid PiPL version in {0}: {1},  Expected version {2}", query.fileName, version, PSConstants.latestPIPLVersion));
 #endif
 				return true;
 			}
@@ -528,7 +529,7 @@ namespace PSFilterLoad.PSApi
 			string data = Marshal.PtrToStringAnsi(ptr);
 			length = data.Length + 1; // skip the trailing null
 
-			return data.Trim(trimChars);
+			return data.Trim(TrimChars);
 		}
 
 		private static unsafe bool EnumPiMI(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, IntPtr lParam)
@@ -735,9 +736,10 @@ namespace PSFilterLoad.PSApi
 						}
 						else if (UnsafeNativeMethods.EnumResourceNamesW(dll.DangerousGetHandle(), "PiMI", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiMI), callback))
 						{
+							// If there are no PiPL resources scan for Photoshop 2.5's PiMI resources.
 							queryFilter = (QueryFilter)GCHandle.FromIntPtr(callback).Target;
 
-							pluginData.AddRange(queryFilter.plugins); // if there are no PiPL resources scan for Photoshop 2.5's PiMI resources. 
+							pluginData.AddRange(queryFilter.plugins); 
 						}
 #if DEBUG
 						else
@@ -805,6 +807,7 @@ namespace PSFilterLoad.PSApi
 		}
 
 		private static readonly int OTOFHandleSize = IntPtr.Size + 4;
+		private const int OTOFSignature = 0x464f544f;
 		struct PSHandle
 		{
 			public IntPtr pointer;
@@ -949,7 +952,9 @@ namespace PSFilterLoad.PSApi
 		internal void SetProgressFunc(ProgressProc value)
 		{
 			if (value == null)
-				throw new ArgumentNullException("value", "value is null.");
+			{
+				throw new ArgumentNullException("value");
+			}
 
 			progressFunc = value;
 		}
@@ -960,14 +965,26 @@ namespace PSFilterLoad.PSApi
 		internal void SetAbortFunc(AbortFunc value)
 		{
 			if (value == null)
-				throw new ArgumentNullException("value", "value is null.");
+			{
+				throw new ArgumentNullException("value");
+			}
 
 			abortFunc = value;
 		}
 
+		internal void SetPickColor(PickColor value)
+		{
+			if (value == null)
+			{
+				throw new ArgumentNullException("value");
+			}
+
+			pickColor = value;
+		}
+
 		static AbortFunc abortFunc;
 		static ProgressProc progressFunc;
-
+		static PickColor pickColor;
 
 		private SurfaceBase source;
 		private SurfaceBase dest;
@@ -997,6 +1014,11 @@ namespace PSFilterLoad.PSApi
 			}
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("value");
+				}
+
 				globalParameters = value.GlobalParameters;
 				if (value.ScriptingData != null)
 				{
@@ -1025,6 +1047,11 @@ namespace PSFilterLoad.PSApi
 			}
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("value");
+				}
+
 				pseudoResources = value;
 			}
 		}
@@ -1039,6 +1066,11 @@ namespace PSFilterLoad.PSApi
 			}
 			set
 			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("value");
+				}
+
 				hostInfo = value;
 			}
 		}
@@ -1073,7 +1105,9 @@ namespace PSFilterLoad.PSApi
 #endif
 		{
 			if (sourceImage == null)
+			{
 				throw new ArgumentNullException("sourceImage");
+			}
 
 			this.dataPtr = IntPtr.Zero;
 			this.phase = PluginPhase.None;
@@ -1087,11 +1121,12 @@ namespace PSFilterLoad.PSApi
 			this.errorMessage = string.Empty;
 			this.filterParametersHandle = IntPtr.Zero;
 			this.pluginDataHandle = IntPtr.Zero;
-			this.inputHandling = FilterDataHandling.filterDataHandlingNone;
-			this.outputHandling = FilterDataHandling.filterDataHandlingNone;
+			this.inputHandling = FilterDataHandling.None;
+			this.outputHandling = FilterDataHandling.None;
 
 			abortFunc = null;
 			progressFunc = null;
+			pickColor = null;
 			this.pseudoResources = new List<PSResource>();
 			this.handles = new Dictionary<IntPtr, PSHandle>();
 			this.bufferIDs = new List<IntPtr>();
@@ -1132,7 +1167,7 @@ namespace PSFilterLoad.PSApi
 #endif
 
 			this.selectedRegion = null;
-			this.filterCase = FilterCase.filterCaseEditableTransparencyNoSelection;
+			this.filterCase = FilterCase.EditableTransparencyNoSelection;
 
 			if (selection != null)
 			{
@@ -1142,7 +1177,7 @@ namespace PSFilterLoad.PSApi
 				if (!selectionBounds.IsEmpty && selectionBounds != source.Bounds)
 				{
 					this.selectedRegion = selection.Clone();
-					this.filterCase = FilterCase.filterCaseEditableTransparencyWithSelection;
+					this.filterCase = FilterCase.EditableTransparencyWithSelection;
 				}
 			}
 
@@ -1150,11 +1185,11 @@ namespace PSFilterLoad.PSApi
 			{
 				switch (filterCase)
 				{
-					case FilterCase.filterCaseEditableTransparencyNoSelection:
-						filterCase = FilterCase.filterCaseFlatImageNoSelection;
+					case FilterCase.EditableTransparencyNoSelection:
+						filterCase = FilterCase.FlatImageNoSelection;
 						break;
-					case FilterCase.filterCaseEditableTransparencyWithSelection:
-						filterCase = FilterCase.filterCaseFlatImageWithSelection;
+					case FilterCase.EditableTransparencyWithSelection:
+						filterCase = FilterCase.FlatImageWithSelection;
 						break;
 				}
 			}
@@ -1207,7 +1242,7 @@ namespace PSFilterLoad.PSApi
 
 		private bool IgnoreAlphaChannel(PluginData data)
 		{
-			if (filterCase < FilterCase.filterCaseEditableTransparencyNoSelection)
+			if (filterCase < FilterCase.EditableTransparencyNoSelection)
 			{
 				return true; // Return true for the FlatImage cases as we do not have any transparency.
 			}
@@ -1219,11 +1254,11 @@ namespace PSFilterLoad.PSApi
 			{
 				switch (filterCase)
 				{
-					case FilterCase.filterCaseEditableTransparencyNoSelection:
-						filterCase = FilterCase.filterCaseFlatImageNoSelection;
+					case FilterCase.EditableTransparencyNoSelection:
+						filterCase = FilterCase.FlatImageNoSelection;
 						break;
-					case FilterCase.filterCaseEditableTransparencyWithSelection:
-						filterCase = FilterCase.filterCaseFlatImageWithSelection;
+					case FilterCase.EditableTransparencyWithSelection:
+						filterCase = FilterCase.FlatImageWithSelection;
 						break;
 				}
 
@@ -1233,19 +1268,19 @@ namespace PSFilterLoad.PSApi
 			int filterCaseIndex = filterCase - 1;
 
 			// If the EditableTransparency cases are not supported use the other modes.
-			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.filterDataHandlingCantFilter)
+			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 			{
 				/* use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases 				* or image does not have any transparency */
 
-				if (data.FilterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.filterDataHandlingCantFilter || !source.HasTransparency())
+				if (data.FilterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter || !source.HasTransparency())
 				{
 					switch (filterCase)
 					{
-						case FilterCase.filterCaseEditableTransparencyNoSelection:
-							filterCase = FilterCase.filterCaseFlatImageNoSelection;
+						case FilterCase.EditableTransparencyNoSelection:
+							filterCase = FilterCase.FlatImageNoSelection;
 							break;
-						case FilterCase.filterCaseEditableTransparencyWithSelection:
-							filterCase = FilterCase.filterCaseFlatImageWithSelection;
+						case FilterCase.EditableTransparencyWithSelection:
+							filterCase = FilterCase.FlatImageWithSelection;
 							break;
 					}
 					return true;
@@ -1254,11 +1289,11 @@ namespace PSFilterLoad.PSApi
 				{
 					switch (filterCase)
 					{
-						case FilterCase.filterCaseEditableTransparencyNoSelection:
-							filterCase = FilterCase.filterCaseProtectedTransparencyNoSelection;
+						case FilterCase.EditableTransparencyNoSelection:
+							filterCase = FilterCase.ProtectedTransparencyNoSelection;
 							break;
-						case FilterCase.filterCaseEditableTransparencyWithSelection:
-							filterCase = FilterCase.filterCaseProtectedTransparencyWithSelection;
+						case FilterCase.EditableTransparencyWithSelection:
+							filterCase = FilterCase.ProtectedTransparencyWithSelection;
 							break;
 					}
 
@@ -1367,6 +1402,8 @@ namespace PSFilterLoad.PSApi
 
 			if (!string.IsNullOrEmpty(pdata.EntryPoint))
 			{
+				new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, pdata.FileName).Demand();
+
 				pdata.module.dll = UnsafeNativeMethods.LoadLibraryExW(pdata.FileName, IntPtr.Zero, 0U);
 
 				if (!pdata.module.dll.IsInvalid)
@@ -1435,7 +1472,7 @@ namespace PSFilterLoad.PSApi
 						{
 							IntPtr hPtr = Marshal.ReadIntPtr(parameters);
 
-							if (size == OTOFHandleSize && Marshal.ReadInt32(parameters, IntPtr.Size) == 0x464f544f)
+							if (size == OTOFHandleSize && Marshal.ReadInt32(parameters, IntPtr.Size) == OTOFSignature)
 							{
 								long ps = SafeNativeMethods.GlobalSize(hPtr).ToInt64();
 								if (ps > 0L)
@@ -1517,7 +1554,7 @@ namespace PSFilterLoad.PSApi
 						globalParameters.SetPluginDataBytes(dataBuf);
 						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 					}
-					else if (pluginDataSize == OTOFHandleSize && Marshal.ReadInt32(pluginData, IntPtr.Size) == 0x464f544f)
+					else if (pluginDataSize == OTOFHandleSize && Marshal.ReadInt32(pluginData, IntPtr.Size) == OTOFSignature)
 					{
 						IntPtr hPtr = Marshal.ReadIntPtr(pluginData);
 						long ps = SafeNativeMethods.GlobalSize(hPtr).ToInt64();
@@ -1559,8 +1596,6 @@ namespace PSFilterLoad.PSApi
 				return;
 			}
 
-			byte[] sig = new byte[4] { 0x4f, 0x54, 0x4f, 0x46 }; // OTOF
-
 			FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 
 			byte[] parameterDataBytes = globalParameters.GetParameterDataBytes();
@@ -1594,7 +1629,7 @@ namespace PSFilterLoad.PSApi
 						Marshal.Copy(parameterDataBytes, 0, filterParametersHandle, parameterDataBytes.Length);
 
 						Marshal.WriteIntPtr(filterRecord->parameters, filterParametersHandle);
-						Marshal.Copy(sig, 0, new IntPtr(filterRecord->parameters.ToInt64() + (long)IntPtr.Size), 4);
+						Marshal.WriteInt32(filterRecord->parameters, IntPtr.Size, OTOFSignature);
 						break;
 					case GlobalParameters.DataStorageMethod.RawBytes:
 
@@ -1638,7 +1673,7 @@ namespace PSFilterLoad.PSApi
 						Marshal.Copy(pluginDataBytes, 0, pluginDataHandle, pluginDataBytes.Length);
 
 						Marshal.WriteIntPtr(dataPtr, pluginDataHandle);
-						Marshal.Copy(sig, 0, new IntPtr(dataPtr.ToInt64() + (long)IntPtr.Size), 4);
+						Marshal.WriteInt32(dataPtr, IntPtr.Size, OTOFSignature);
 						break;
 					case GlobalParameters.DataStorageMethod.RawBytes:
 
@@ -1682,7 +1717,7 @@ namespace PSFilterLoad.PSApi
 					// If the filter only has one entry point call about on it.
 					if (pdata.moduleEntryPoints == null)
 					{
-						pdata.module.entryPoint(FilterSelector.filterSelectorAbout, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
+						pdata.module.entryPoint(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
 					}
 					else
 					{
@@ -1693,7 +1728,7 @@ namespace PSFilterLoad.PSApi
 
 							pluginEntryPoint ep = (pluginEntryPoint)Marshal.GetDelegateForFunctionPointer(ptr, typeof(pluginEntryPoint));
 
-							ep(FilterSelector.filterSelectorAbout, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
+							ep(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
 
 							GC.KeepAlive(ep);
 						}
@@ -1771,7 +1806,7 @@ namespace PSFilterLoad.PSApi
 			Ping(DebugFlags.Call, "Before FilterSelectorStart");
 #endif
 
-			pdata.module.entryPoint(FilterSelector.filterSelectorStart, filterRecordPtr, ref dataPtr, ref result);
+			pdata.module.entryPoint(FilterSelector.Start, filterRecordPtr, ref dataPtr, ref result);
 
 #if DEBUG
 			Ping(DebugFlags.Call, "After FilterSelectorStart");
@@ -1799,7 +1834,7 @@ namespace PSFilterLoad.PSApi
 				Ping(DebugFlags.Call, "Before FilterSelectorContinue");
 #endif
 
-				pdata.module.entryPoint(FilterSelector.filterSelectorContinue, filterRecordPtr, ref dataPtr, ref result);
+				pdata.module.entryPoint(FilterSelector.Continue, filterRecordPtr, ref dataPtr, ref result);
 
 #if DEBUG
 				Ping(DebugFlags.Call, "After FilterSelectorContinue");
@@ -1816,7 +1851,7 @@ namespace PSFilterLoad.PSApi
 					Ping(DebugFlags.Call, "Before FilterSelectorFinish");
 #endif
 
-					pdata.module.entryPoint(FilterSelector.filterSelectorFinish, filterRecordPtr, ref dataPtr, ref result);
+					pdata.module.entryPoint(FilterSelector.Finish, filterRecordPtr, ref dataPtr, ref result);
 
 #if DEBUG
 					Ping(DebugFlags.Call, "After FilterSelectorFinish");
@@ -1834,7 +1869,7 @@ namespace PSFilterLoad.PSApi
 				if (AbortProc()) // Per the SDK the host can call filterSelectorFinish in between filterSelectorContinue calls if it detects a cancel request.
 				{
 					result = PSError.noErr;
-					pdata.module.entryPoint(FilterSelector.filterSelectorFinish, filterRecordPtr, ref dataPtr, ref result);
+					pdata.module.entryPoint(FilterSelector.Finish, filterRecordPtr, ref dataPtr, ref result);
 
 					if (result != PSError.noErr)
 					{
@@ -1854,7 +1889,7 @@ namespace PSFilterLoad.PSApi
 			Ping(DebugFlags.Call, "Before FilterSelectorFinish");
 #endif
 
-			pdata.module.entryPoint(FilterSelector.filterSelectorFinish, filterRecordPtr, ref dataPtr, ref result);
+			pdata.module.entryPoint(FilterSelector.Finish, filterRecordPtr, ref dataPtr, ref result);
 
 #if DEBUG
 			Ping(DebugFlags.Call, "After FilterSelectorFinish");
@@ -1888,7 +1923,7 @@ namespace PSFilterLoad.PSApi
 			Ping(DebugFlags.Call, "Before filterSelectorParameters");
 #endif
 
-			pdata.module.entryPoint(FilterSelector.filterSelectorParameters, filterRecordPtr, ref dataPtr, ref result);
+			pdata.module.entryPoint(FilterSelector.Parameters, filterRecordPtr, ref dataPtr, ref result);
 #if DEBUG
 			unsafe
 			{
@@ -1991,8 +2026,8 @@ namespace PSFilterLoad.PSApi
 					filterRecord->inColumnBytes = ignoreAlpha ? 3 : 4;
 				}
 
-				if (filterCase == FilterCase.filterCaseProtectedTransparencyNoSelection ||
-					filterCase == FilterCase.filterCaseProtectedTransparencyWithSelection)
+				if (filterCase == FilterCase.ProtectedTransparencyNoSelection ||
+					filterCase == FilterCase.ProtectedTransparencyWithSelection)
 				{
 					filterRecord->planes = 3;
 					filterRecord->outLayerPlanes = 0;
@@ -2063,7 +2098,7 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 			Ping(DebugFlags.Call, "Before filterSelectorPrepare");
 #endif
-			pdata.module.entryPoint(FilterSelector.filterSelectorPrepare, filterRecordPtr, ref dataPtr, ref result);
+			pdata.module.entryPoint(FilterSelector.Prepare, filterRecordPtr, ref dataPtr, ref result);
 
 #if DEBUG
 			Ping(DebugFlags.Call, "After filterSelectorPrepare");
@@ -2294,12 +2329,12 @@ namespace PSFilterLoad.PSApi
 			if (pdata.FilterInfo != null)
 			{
 				int index = filterCase - 1;
-				copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.PIFilterDontCopyToDestinationBit) == FilterCaseInfoFlags.None);
-				writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.PIFilterWritesOutsideSelectionBit) != FilterCaseInfoFlags.None);
+				copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
+				writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
 				
-				bool worksWithBlankData = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.PIFilterWorksWithBlankDataBit) != FilterCaseInfoFlags.None);
+				bool worksWithBlankData = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
 
-				if ((filterCase == FilterCase.filterCaseEditableTransparencyNoSelection || filterCase == FilterCase.filterCaseEditableTransparencyWithSelection) && !worksWithBlankData)
+				if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) && !worksWithBlankData)
 				{
 					// If the filter does not support processing completely transparent (blank) images return an error message.
 					if (IsBlankImage())
@@ -2312,7 +2347,7 @@ namespace PSFilterLoad.PSApi
 
 			if (copyToDest)
 			{
-				dest.CopySurface(source); // copy the source image to the dest image if the filter does not write to all the pixels.
+				dest.CopySurface(source); // Copy the source image to the dest image if the filter does not write to all the pixels.
 			}
 
 			if (ignoreAlpha)
@@ -3509,7 +3544,7 @@ namespace PSFilterLoad.PSApi
 		/// </summary>
 		private unsafe void PreProcessInputData()
 		{
-			if (inputHandling != FilterDataHandling.filterDataHandlingNone && (filterCase == FilterCase.filterCaseEditableTransparencyNoSelection || filterCase == FilterCase.filterCaseEditableTransparencyWithSelection))
+			if (inputHandling != FilterDataHandling.None && (filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection))
 			{
 				int width = source.Width;
 				int height = source.Height;
@@ -3527,29 +3562,29 @@ namespace PSFilterLoad.PSApi
 							{
 								switch (inputHandling)
 								{
-									case FilterDataHandling.filterDataHandlingBlackMat:
+									case FilterDataHandling.BlackMat:
 										break;
-									case FilterDataHandling.filterDataHandlingGrayMat:
+									case FilterDataHandling.GrayMat:
 										break;
-									case FilterDataHandling.filterDataHandlingWhiteMat:
+									case FilterDataHandling.WhiteMat:
 										break;
-									case FilterDataHandling.filterDataHandlingDefringe:
+									case FilterDataHandling.Defringe:
 										break;
-									case FilterDataHandling.filterDataHandlingBlackZap:
+									case FilterDataHandling.BlackZap:
 										ptr[0] = ptr[1] = ptr[2] = 0;
 										break;
-									case FilterDataHandling.filterDataHandlingGrayZap:
+									case FilterDataHandling.GrayZap:
 										ptr[0] = ptr[1] = ptr[2] = 128;
 										break;
-									case FilterDataHandling.filterDataHandlingWhiteZap:
+									case FilterDataHandling.WhiteZap:
 										ptr[0] = ptr[1] = ptr[2] = 255;
 										break;
-									case FilterDataHandling.filterDataHandlingBackgroundZap:
+									case FilterDataHandling.BackgroundZap:
 										ptr[2] = secondaryColor[0];
 										ptr[1] = secondaryColor[1];
 										ptr[0] = secondaryColor[2];
 										break;
-									case FilterDataHandling.filterDataHandlingForegroundZap:
+									case FilterDataHandling.ForegroundZap:
 										ptr[2] = primaryColor[0];
 										ptr[1] = primaryColor[1];
 										ptr[0] = primaryColor[2];
@@ -3575,29 +3610,29 @@ namespace PSFilterLoad.PSApi
 							{
 								switch (inputHandling)
 								{
-									case FilterDataHandling.filterDataHandlingBlackMat:
+									case FilterDataHandling.BlackMat:
 										break;
-									case FilterDataHandling.filterDataHandlingGrayMat:
+									case FilterDataHandling.GrayMat:
 										break;
-									case FilterDataHandling.filterDataHandlingWhiteMat:
+									case FilterDataHandling.WhiteMat:
 										break;
-									case FilterDataHandling.filterDataHandlingDefringe:
+									case FilterDataHandling.Defringe:
 										break;
-									case FilterDataHandling.filterDataHandlingBlackZap:
+									case FilterDataHandling.BlackZap:
 										ptr[0] = ptr[1] = ptr[2] = 0;
 										break;
-									case FilterDataHandling.filterDataHandlingGrayZap:
+									case FilterDataHandling.GrayZap:
 										ptr[0] = ptr[1] = ptr[2] = 128;
 										break;
-									case FilterDataHandling.filterDataHandlingWhiteZap:
+									case FilterDataHandling.WhiteZap:
 										ptr[0] = ptr[1] = ptr[2] = 255;
 										break;
-									case FilterDataHandling.filterDataHandlingBackgroundZap:
+									case FilterDataHandling.BackgroundZap:
 										ptr[2] = secondaryColor[0];
 										ptr[1] = secondaryColor[1];
 										ptr[0] = secondaryColor[2];
 										break;
-									case FilterDataHandling.filterDataHandlingForegroundZap:
+									case FilterDataHandling.ForegroundZap:
 										ptr[2] = primaryColor[0];
 										ptr[1] = primaryColor[1];
 										ptr[0] = primaryColor[2];
@@ -3619,8 +3654,8 @@ namespace PSFilterLoad.PSApi
 		/// </summary>
 		private unsafe void PostProcessOutputData()
 		{
-			if ((filterCase == FilterCase.filterCaseEditableTransparencyNoSelection || filterCase == FilterCase.filterCaseEditableTransparencyWithSelection) &&
-				outputHandling == FilterDataHandling.filterDataHandlingFillMask)
+			if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) &&
+				outputHandling == FilterDataHandling.FillMask)
 			{
 				if ((selectedRegion != null) && !writesOutsideSelection)
 				{
@@ -3686,24 +3721,29 @@ namespace PSFilterLoad.PSApi
 		private unsafe short ColorServicesProc(ref ColorServicesInfo info)
 		{
 #if DEBUG
-			Ping(DebugFlags.ColorServices, string.Format("selector = {0}", info.selector));
+			Ping(DebugFlags.ColorServices, string.Format("selector: {0}", info.selector));
 #endif
 			short err = PSError.noErr;
 			switch (info.selector)
 			{
-				case ColorServicesSelector.plugIncolorServicesChooseColor:
+				case ColorServicesSelector.ChooseColor:
 
-					string title = StringFromPString(info.selectorParameter.pickerPrompt);
+					string prompt = StringFromPString(info.selectorParameter.pickerPrompt);
 
-					using (ColorPicker picker = new ColorPicker(title))
+					if (pickColor != null)
 					{
-						picker.Color = Color.FromArgb(info.colorComponents[0], info.colorComponents[1], info.colorComponents[2]);
+						ColorPickerResult result = new ColorPickerResult(info.colorComponents[0], info.colorComponents[1], info.colorComponents[2]);
 
-						if (picker.ShowDialog() == DialogResult.OK)
+						if (pickColor(prompt, ref result))
 						{
-							info.colorComponents[0] = picker.Color.R;
-							info.colorComponents[1] = picker.Color.G;
-							info.colorComponents[2] = picker.Color.B;
+							info.colorComponents[0] = result.R;
+							info.colorComponents[1] = result.G;
+							info.colorComponents[2] = result.B;
+
+							if (info.resultSpace == ColorSpace.ChosenSpace)
+							{
+								info.resultSpace = ColorSpace.RGBSpace;
+							}
 
 							err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
 						}
@@ -3712,26 +3752,51 @@ namespace PSFilterLoad.PSApi
 							err = PSError.userCanceledErr;
 						}
 					}
+					else
+					{
+						using (ColorPicker picker = new ColorPicker(prompt))
+						{
+							picker.Color = Color.FromArgb(info.colorComponents[0], info.colorComponents[1], info.colorComponents[2]);
+
+							if (picker.ShowDialog() == DialogResult.OK)
+							{
+								info.colorComponents[0] = picker.Color.R;
+								info.colorComponents[1] = picker.Color.G;
+								info.colorComponents[2] = picker.Color.B;
+
+								if (info.resultSpace == ColorSpace.ChosenSpace)
+								{
+									info.resultSpace = ColorSpace.RGBSpace;
+								}
+
+								err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
+							}
+							else
+							{
+								err = PSError.userCanceledErr;
+							}
+						} 
+					}
 
 					break;
-				case ColorServicesSelector.plugIncolorServicesConvertColor:
+				case ColorServicesSelector.ConvertColor:
 
 					err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
 
 					break;
-				case ColorServicesSelector.plugIncolorServicesGetSpecialColor:
+				case ColorServicesSelector.GetSpecialColor:
 
 					FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 					switch (info.selectorParameter.specialColorID)
 					{
-						case ColorServicesConstants.plugIncolorServicesBackgroundColor:
+						case SpecialColorID.BackgroundColor:
 
 							for (int i = 0; i < 4; i++)
 							{
 								info.colorComponents[i] = (short)filterRecord->backColor[i];
 							}
 							break;
-						case ColorServicesConstants.plugIncolorServicesForegroundColor:
+						case SpecialColorID.ForegroundColor:
 
 							for (int i = 0; i < 4; i++)
 							{
@@ -3744,7 +3809,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ColorServicesSelector.plugIncolorServicesSamplePoint:
+				case ColorServicesSelector.SamplePoint:
 
 					Point16* point = (Point16*)info.selectorParameter.globalSamplePoint.ToPointer();
 
@@ -5025,6 +5090,9 @@ namespace PSFilterLoad.PSApi
 
 		private byte GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Empty);
+#endif
 			if (descErr != PSError.noErr)
 			{
 				descErrValue = descErr;
@@ -5125,6 +5193,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetIntegerProc(IntPtr descriptor, ref int data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5141,6 +5212,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetFloatProc(IntPtr descriptor, ref double data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5157,6 +5231,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetUnitFloatProc(IntPtr descriptor, ref uint unit, ref double data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5183,6 +5260,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetBooleanProc(IntPtr descriptor, ref byte data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5199,6 +5279,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetTextProc(IntPtr descriptor, ref IntPtr data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5224,6 +5307,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetAliasProc(IntPtr descriptor, ref IntPtr data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5249,6 +5335,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetEnumeratedProc(IntPtr descriptor, ref uint type)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5265,6 +5354,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetClassProc(IntPtr descriptor, ref uint type)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5282,6 +5374,9 @@ namespace PSFilterLoad.PSApi
 
 		private short GetSimpleReferenceProc(IntPtr descriptor, ref PIDescriptorSimpleReference data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			if (aeteDict.ContainsKey(getKey))
 			{
 				data = (PIDescriptorSimpleReference)aeteDict[getKey].Value;
@@ -5397,6 +5492,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetCountProc(IntPtr descriptor, ref uint count)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			if (subClassDict != null)
 			{
 				count = (uint)subClassDict.Count;
@@ -5409,6 +5507,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetStringProc(IntPtr descriptor, IntPtr data)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			AETEValue item = null;
 			if (subClassDict != null)
 			{
@@ -5427,6 +5528,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetPinnedIntegerProc(IntPtr descriptor, int min, int max, ref int intNumber)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			descErr = PSError.noErr;
 
 			AETEValue item = null;
@@ -5457,6 +5561,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetPinnedFloatProc(IntPtr descriptor, ref double min, ref double max, ref double floatNumber)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			descErr = PSError.noErr;
 			AETEValue item = null;
 			if (subClassDict != null)
@@ -5485,6 +5592,9 @@ namespace PSFilterLoad.PSApi
 		}
 		private short GetPinnedUnitFloatProc(IntPtr descriptor, ref double min, ref double max, ref uint units, ref double floatNumber)
 		{
+#if DEBUG
+			Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+#endif
 			descErr = PSError.noErr;
 
 			AETEValue item = null;
@@ -6130,7 +6240,7 @@ namespace PSFilterLoad.PSApi
 
 						if (exif)
 						{
-							sig = new string((sbyte*)p + 2, 0, 6, windows1252Encoding);
+							sig = new string((sbyte*)p + 2, 0, 6, Windows1252Encoding);
 
 							if (sig == "Exif\0\0")
 							{
@@ -6145,7 +6255,7 @@ namespace PSFilterLoad.PSApi
 						}
 						else
 						{
-							sig = new string((sbyte*)p + 2, 0, 29, windows1252Encoding);
+							sig = new string((sbyte*)p + 2, 0, 29, Windows1252Encoding);
 
 							if (sig == "http://ns.adobe.com/xap/1.0/\0")
 							{

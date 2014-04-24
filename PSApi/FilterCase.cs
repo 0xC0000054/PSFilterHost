@@ -20,13 +20,13 @@ namespace PSFilterLoad.PSApi
 {
     static class FilterCase
     {
-        public const short filterCaseUnsupported = -1;
-        public const short filterCaseFlatImageNoSelection = 1;
-        public const short filterCaseFlatImageWithSelection = 2;
-        public const short filterCaseFloatingSelection = 3;
-        public const short filterCaseEditableTransparencyNoSelection = 4;
-        public const short filterCaseEditableTransparencyWithSelection = 5;
-        public const short filterCaseProtectedTransparencyNoSelection = 6;
-        public const short filterCaseProtectedTransparencyWithSelection = 7;
+        public const short Unsupported = -1;
+        public const short FlatImageNoSelection = 1;
+        public const short FlatImageWithSelection = 2;
+        public const short FloatingSelection = 3;
+        public const short EditableTransparencyNoSelection = 4;
+        public const short EditableTransparencyWithSelection = 5;
+        public const short ProtectedTransparencyNoSelection = 6;
+        public const short ProtectedTransparencyWithSelection = 7;
     }
 }

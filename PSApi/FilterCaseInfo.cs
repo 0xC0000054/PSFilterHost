@@ -27,18 +27,18 @@ namespace PSFilterLoad.PSApi
     /// </summary>
     internal enum FilterDataHandling : byte
     {
-        filterDataHandlingCantFilter = 0,
-        filterDataHandlingNone = 1,
-        filterDataHandlingBlackMat = 2,
-        filterDataHandlingGrayMat = 3,
-        filterDataHandlingWhiteMat = 4,
-        filterDataHandlingDefringe = 5,
-        filterDataHandlingBlackZap = 6,
-        filterDataHandlingGrayZap = 7,
-        filterDataHandlingWhiteZap = 8,
-        filterDataHandlingFillMask = 9,
-        filterDataHandlingBackgroundZap = 10,
-        filterDataHandlingForegroundZap = 11,
+        CantFilter = 0,
+        None = 1,
+        BlackMat = 2,
+        GrayMat = 3,
+        WhiteMat = 4,
+        Defringe = 5,
+        BlackZap = 6,
+        GrayZap = 7,
+        WhiteZap = 8,
+        FillMask = 9,
+        BackgroundZap = 10,
+        ForegroundZap = 11,
     }
     /// <summary>
     /// The processing flags for the FilterCaseInfo structure.
@@ -47,10 +47,10 @@ namespace PSFilterLoad.PSApi
     internal enum FilterCaseInfoFlags : byte
     {
         None = 0,
-        PIFilterDontCopyToDestinationBit = (1 << 0),
-        PIFilterWorksWithBlankDataBit = (1 << 1),
-        PIFilterFiltersLayerMaskBit = (1 << 2),
-        PIFilterWritesOutsideSelectionBit = (1 << 3)
+        DontCopyToDestination = (1 << 0),
+        WorksWithBlankData = (1 << 1),
+        FiltersLayerMask = (1 << 2),
+        WritesOutsideSelection = (1 << 3)
     }
 
     [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1), Serializable]

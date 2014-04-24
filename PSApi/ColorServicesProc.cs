@@ -18,6 +18,32 @@
 using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
+    internal enum SpecialColorID : int
+    {
+        ForegroundColor = 0,
+        BackgroundColor = 1
+    }
+
+    internal enum ColorServicesSelector : short
+    {
+        ChooseColor = 0,
+        ConvertColor = 1,
+        SamplePoint = 2,
+        GetSpecialColor = 3
+    }
+
+    internal enum ColorSpace : short
+    {
+        ChosenSpace = -1,
+        RGBSpace = 0,
+        HSBSpace = 1,
+        CMYKSpace = 2,
+        LabSpace = 3,
+        GraySpace = 4,
+        HSLSpace = 5,
+        XYZSpace = 6
+    } 
+
     [StructLayoutAttribute(LayoutKind.Explicit)]
     internal struct SelectorParameters
     {
@@ -26,7 +52,7 @@ namespace PSFilterLoad.PSApi
         [FieldOffsetAttribute(0)]
         public System.IntPtr globalSamplePoint;
         [FieldOffsetAttribute(0)]
-        public int specialColorID;
+        public SpecialColorID specialColorID;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -36,9 +62,9 @@ namespace PSFilterLoad.PSApi
     internal unsafe struct ColorServicesInfo
     {
         public int infoSize;
-        public short selector;
-        public short sourceSpace;
-        public short resultSpace;
+        public ColorServicesSelector selector;
+        public ColorSpace sourceSpace;
+        public ColorSpace resultSpace;
         public byte resultGamutInfoValid;
         public byte resultInGamut;
         public System.IntPtr reservedSourceSpaceInfo;

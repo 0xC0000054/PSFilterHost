@@ -137,13 +137,14 @@ namespace HostTest
 			internal static extern uint SetErrorMode(uint uMode);
 
 			internal const uint SEM_FAILCRITICALERRORS = 1U;
+			internal const uint SEM_NOOPENFILEERRORBOX = 0x8000U;
 		}
 
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
 
-			// Try to Opt-out of DEP on a 32-bit OS as many filters do not support it.
+			// Try to Opt-out of DEP when running as a 32-bit process as many filters do not support it.
 			if (IntPtr.Size == 4)
 			{
 				try
@@ -157,7 +158,8 @@ namespace HostTest
 			}
 
 			// Disable the error dialog that is shown when a filter cannot find a missing dependency.
-			NativeMethods.SetErrorMode(NativeMethods.SEM_FAILCRITICALERRORS);
+			uint oldMode = NativeMethods.SetErrorMode(0U);
+			NativeMethods.SetErrorMode(oldMode | NativeMethods.SEM_FAILCRITICALERRORS | NativeMethods.SEM_NOOPENFILEERRORBOX);
 		}
 
 		protected override void OnShown(EventArgs e)
@@ -263,7 +265,8 @@ namespace HostTest
 			}
 			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
 			try			{				System.Windows.Media.Color primary = GDIPlusToWPFColor(this.primaryColorBtn.RectangleColor);				System.Windows.Media.Color secondary = GDIPlusToWPFColor(this.secondaryColorBtn.RectangleColor);
-				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))				{					host.SetAbortCallback(new AbortFunc(messageFilter.AbortFilter));					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);					if (repeatEffect && paramDict.ContainsKey(pluginData))					{						host.FilterParameters = paramDict[pluginData];					}
+				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))				{					host.SetAbortCallback(new AbortFunc(messageFilter.AbortFilter));
+					host.SetPickColorCallback(new PickColor(PickColor));					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);					if (repeatEffect && paramDict.ContainsKey(pluginData))					{						host.FilterParameters = paramDict[pluginData];					}
 					if ((pseudoResources != null) && pseudoResources.Count > 0)					{						host.PseudoResources = pseudoResources;					}
 					host.HostInfo = this.hostInfo;
 					this.filterName = pluginData.Title.TrimEnd('.');					this.setFilterApplyText = false;					this.messageFilter.Reset();
@@ -576,5 +579,26 @@ namespace HostTest
 
 			this.Cursor = Cursors.Default;
 		}
-	}
+
+		private bool PickColor(string prompt, ref ColorPickerResult color)
+		{
+			bool ok = false;
+
+			using (ColorPickerForm dialog = new ColorPickerForm(prompt))
+			{
+				dialog.SetDefaultColor(color.R, color.G, color.B);
+
+				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					color.R = dialog.UserPrimaryColor.R;
+					color.G = dialog.UserPrimaryColor.G;
+					color.B = dialog.UserPrimaryColor.B;
+
+					ok = true;
+				}
+
+			}
+
+			return ok;
+		}	}
 }

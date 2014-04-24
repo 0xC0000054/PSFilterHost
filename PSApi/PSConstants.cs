@@ -32,7 +32,9 @@ namespace PSFilterLoad.PSApi
         /// <summary>
         /// The filter type code - '8BFM'
         /// </summary>
-        public const uint filterKind = 0x3842464dU; 
+        public const uint filterKind = 0x3842464dU;
+
+        public const int latestPIPLVersion = 0;
 
         public const short kCurrentBufferProcsVersion = 2;
         public const short kCurrentBufferProcsCount = 5; 

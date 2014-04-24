@@ -44,7 +44,7 @@ namespace PSFilterHostDll.BGRASurface
 			imageMode = ImageModes.plugInModeRGBColor;
 			Surface32 surface = new Surface32(width, height);
 
-			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid metadata that causes LockBits to fail.
+			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid meta-data that causes LockBits to fail.
 			{
 				System.Drawing.Imaging.BitmapData data = temp.LockBits(new System.Drawing.Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
@@ -53,7 +53,7 @@ namespace PSFilterHostDll.BGRASurface
 					byte* scan0 = (byte*)data.Scan0.ToPointer();
 					int stride = data.Stride;
 
-					ulong length = (ulong)surface.Width * 4UL;
+					ulong length = (ulong)width * 4UL;
 					for (int y = 0; y < height; y++)
 					{
 						BGRASurfaceMemory.Copy(surface.GetRowAddressUnchecked(y), scan0 + (y * stride), length);
@@ -81,7 +81,7 @@ namespace PSFilterHostDll.BGRASurface
 			int width = bitmap.PixelWidth;
 			int height = bitmap.PixelHeight;
 
-			if (format == PixelFormats.BlackWhite && format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8)
+			if (format == PixelFormats.BlackWhite || format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8)
 			{
 				imageMode = ImageModes.plugInModeGrayScale;
 				Surface8 surface = new Surface8(width, height);

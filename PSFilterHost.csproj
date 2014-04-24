@@ -106,6 +106,7 @@
     <Compile Include="BGRASurface\Surface8.cs" />
     <Compile Include="BGRASurface\SurfaceBase.cs" />
     <Compile Include="BGRASurface\SurfaceFactory.cs" />
+    <Compile Include="ColorPickerResult.cs" />
     <Compile Include="ColorSpace\CIELab.cs" />
     <Compile Include="ColorSpace\CIEXYZ.cs" />
     <Compile Include="ColorSpace\CMYK.cs" />
@@ -119,6 +120,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
+    <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
@@ -142,10 +144,8 @@
     <Compile Include="PSApi\ColorPicker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PSApi\ColorServicesConstants.cs" />
     <Compile Include="PSApi\ColorServicesConvert.cs" />
     <Compile Include="PSApi\ColorServicesProc.cs" />
-    <Compile Include="PSApi\ColorServicesSelector.cs" />
     <Compile Include="PSApi\DebugFlags.cs" />
     <Compile Include="PSApi\DescriptorTypes.cs" />
     <Compile Include="PSApi\DictionaryExtensions.cs" />

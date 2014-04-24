@@ -167,7 +167,22 @@ namespace PSFilterHostDll
         }
 
         internal static IEnumerable<string> EnumerateFiles(string directory, string[] fileExtensions, bool searchSubDirectories)
-        {             
+        {
+            if (directory == null)
+            {
+                throw new ArgumentNullException("directory");
+            }
+
+            if (fileExtensions == null)
+            {
+                throw new ArgumentNullException("fileExtensions");
+            }
+
+            if (fileExtensions.Length == 0)
+            {
+                throw new ArgumentException("fileExtensions array is empty.");
+            }
+
             // Adapted from: http://weblogs.asp.net/podwysocki/archive/2008/10/16/functional-net-fighting-friction-in-the-bcl-with-directory-getfiles.aspx
             string fullPath = Path.GetFullPath(directory);
 
