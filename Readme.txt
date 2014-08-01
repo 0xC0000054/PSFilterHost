@@ -1,4 +1,4 @@
-Adobe(R) Photoshop(R) filter host for .NET
+8bf filter host for .NET
 
 Description
 ------------

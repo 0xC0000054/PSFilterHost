@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////////
 //
-// Adobe(R) Photoshop(R) filter host for .NET
+// 8bf filter host for .NET
 // http://psfilterhost.codeplex.com/
 //
 // This software is provided under the Microsoft Public License:

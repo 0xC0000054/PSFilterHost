@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////////
 //
-// Adobe(R) Photoshop(R) filter host for .NET
+// 8bf filter host for .NET
 // http://psfilterhost.codeplex.com/
 //
 // This software is provided under the Microsoft Public License:
@@ -1270,7 +1270,8 @@ namespace PSFilterLoad.PSApi
 			// If the EditableTransparency cases are not supported use the other modes.
 			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 			{
-				/* use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases 				* or image does not have any transparency */
+				/* use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases 
+				* or image does not have any transparency */
 
 				if (data.FilterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter || !source.HasTransparency())
 				{
@@ -4772,7 +4773,8 @@ namespace PSFilterLoad.PSApi
 		private unsafe short DisplayPixelsProc(ref PSPixelMap source, ref VRect srcRect, int dstRow, int dstCol, IntPtr platformContext)
 		{
 #if DEBUG
-			Ping(DebugFlags.DisplayPixels, string.Format("source: version = {0} bounds = {1}, ImageMode = {2}, colBytes = {3}, rowBytes = {4},planeBytes = {5}, BaseAddress = {6}, mat = {7}, masks = {8}", new object[]{ source.version.ToString(), source.bounds.ToString(), ((ImageModes)source.imageMode).ToString("G"),				source.colBytes.ToString(), source.rowBytes.ToString(), source.planeBytes.ToString(), source.baseAddr.ToString("X8"), source.mat.ToString("X8"), source.masks.ToString("X8")}));
+			Ping(DebugFlags.DisplayPixels, string.Format("source: version = {0} bounds = {1}, ImageMode = {2}, colBytes = {3}, rowBytes = {4},planeBytes = {5}, BaseAddress = {6}, mat = {7}, masks = {8}", new object[]{ source.version.ToString(), source.bounds.ToString(), ((ImageModes)source.imageMode).ToString("G"),
+				source.colBytes.ToString(), source.rowBytes.ToString(), source.planeBytes.ToString(), source.baseAddr.ToString("X8"), source.mat.ToString("X8"), source.masks.ToString("X8")}));
 			Ping(DebugFlags.DisplayPixels, string.Format("srcRect = {0} dstCol (x, width) = {1}, dstRow (y, height) = {2}", srcRect.ToString(), dstCol, dstRow));
 #endif
 
@@ -6348,7 +6350,8 @@ namespace PSFilterLoad.PSApi
 
 			using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
 			{
-#if GDIPLUS				exifBitmap.Save(ms, ImageFormat.Jpeg);
+#if GDIPLUS
+				exifBitmap.Save(ms, ImageFormat.Jpeg);
 #else
 				JpegBitmapEncoder enc = new JpegBitmapEncoder();
 				enc.Frames.Add(BitmapFrame.Create(exifBitmap, null, metaData, null));
