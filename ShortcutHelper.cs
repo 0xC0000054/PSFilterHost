@@ -75,6 +75,8 @@ namespace PSFilterHostDll
             return (os.Platform == PlatformID.Win32NT && (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 1)));
         }
 
+        private static readonly string ProgramFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
+
         /// <summary>
         /// Fixes the Program Files shortcut path when running under the WoW64 subsystem.
         /// </summary>
@@ -85,29 +87,28 @@ namespace PSFilterHostDll
             if (!File.Exists(path) && IsWoW64Process())
             {
                 // WoW64 changes the 64-bit Program Files path to the 32-bit Program Files path, so we change it back. 
-                string programFiles86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
 
-                int index = path.IndexOf(programFiles86, StringComparison.OrdinalIgnoreCase);
-                if (index >= 0 && path.Length > programFiles86.Length)
+                if (path.StartsWith(ProgramFilesX86, StringComparison.OrdinalIgnoreCase) && path.Length > ProgramFilesX86.Length)
                 {
-                    string newPath = path.Remove(index, programFiles86.Length + 1); // remove the trailing slash.
+                    // Remove the trailing slash, otherwise Path.Combine will replace the file path for a network path.
+                    string filePath = path.Remove(0, ProgramFilesX86.Length + 1);
 
                     if (IsWin7OrLater())
                     {                    
-                        return Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), newPath); 
+                        return Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), filePath); 
                     }
                     else
                     {
                         // if we are not running Windows 7 or later remove the (x86) identifier instead.
-                        string x86 = "(x86)";
+                        const string x86 = "(x86)";
 
-                        int index86 = programFiles86.IndexOf(x86, StringComparison.OrdinalIgnoreCase);
+                        int index = ProgramFilesX86.IndexOf(x86, StringComparison.OrdinalIgnoreCase);
 
-                        if (index86 >= 0)
+                        if (index >= 0)
                         {
-                            string programFiles = programFiles86.Remove(index86, x86.Length).Trim();
+                            string programFiles = ProgramFilesX86.Remove(index, x86.Length).Trim();
                             
-                            return Path.Combine(programFiles, newPath);
+                            return Path.Combine(programFiles, filePath);
                         }
                                                 
                     }
