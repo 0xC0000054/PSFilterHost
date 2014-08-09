@@ -19,17 +19,17 @@ namespace PSFilterLoad.PSApi
 {
     internal enum ImageModes : short
     {
-        plugInModeBitmap = 0,
-        plugInModeGrayScale = 1,
-        plugInModeIndexedColor = 2,
-        plugInModeRGBColor = 3,
-        plugInModeCMYKColor = 4,
-        plugInModeHSLColor = 5,
-        plugInModeHSBColor = 6,
-        plugInModeMultichannel = 7,
-        plugInModeDuotone = 8,
-        plugInModeLabColor = 9,
-        plugInModeGray16 = 10,
-        plugInModeRGB48 = 11
+        Bitmap = 0,
+        GrayScale = 1,
+        IndexedColor = 2,
+        RGBColor = 3,
+        CMYKColor = 4,
+        HSLColor = 5,
+        HSBColor = 6,
+        Multichannel = 7,
+        Duotone = 8,
+        LabColor = 9,
+        Gray16 = 10,
+        RGB48 = 11
     }
 }

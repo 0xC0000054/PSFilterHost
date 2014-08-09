@@ -1181,7 +1181,7 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-			if (imageMode == ImageModes.plugInModeGrayScale || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
 				switch (filterCase)
 				{
@@ -1990,13 +1990,13 @@ namespace PSFilterLoad.PSApi
 
 			filterRecord->imageMode = imageMode;
 
-			if (imageMode == ImageModes.plugInModeGrayScale || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
 				filterRecord->inLayerPlanes = 0;
 				filterRecord->inTransparencyMask = 0;
 				filterRecord->inNonLayerPlanes = 1;
 
-				filterRecord->inColumnBytes = imageMode == ImageModes.plugInModeGray16 ? 2 : 1;
+				filterRecord->inColumnBytes = imageMode == ImageModes.Gray16 ? 2 : 1;
 
 				filterRecord->outLayerPlanes = filterRecord->inLayerPlanes;
 				filterRecord->outTransparencyMask = filterRecord->inTransparencyMask;
@@ -2018,7 +2018,7 @@ namespace PSFilterLoad.PSApi
 					filterRecord->inNonLayerPlanes = 0;
 				}
 
-				if (imageMode == ImageModes.plugInModeRGB48)
+				if (imageMode == ImageModes.RGB48)
 				{
 					filterRecord->inColumnBytes = ignoreAlpha ? 6 : 8;
 				}
@@ -2034,7 +2034,7 @@ namespace PSFilterLoad.PSApi
 					filterRecord->outLayerPlanes = 0;
 					filterRecord->outTransparencyMask = 0;
 					filterRecord->outNonLayerPlanes = 3;
-					filterRecord->outColumnBytes = imageMode == ImageModes.plugInModeRGB48 ? 6 : 3;
+					filterRecord->outColumnBytes = imageMode == ImageModes.RGB48 ? 6 : 3;
 
 					CopySourceAlpha();
 				}
@@ -2059,7 +2059,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->absLayerMasks = filterRecord->inLayerMasks;
 			filterRecord->absInvertedLayerMasks = filterRecord->inInvertedLayerMasks;
 
-			if (ignoreAlpha && (imageMode == ImageModes.plugInModeRGBColor || imageMode == ImageModes.plugInModeRGB48))
+			if (ignoreAlpha && (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48))
 			{
 				filterRecord->absNonLayerPlanes = 4;
 			}
@@ -2073,7 +2073,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->outPreDummyPlanes = 0;
 			filterRecord->outPostDummyPlanes = 0;
 
-			if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
 			{
 				filterRecord->inPlaneBytes = 2;
 				filterRecord->outPlaneBytes = 2;
@@ -2131,12 +2131,12 @@ namespace PSFilterLoad.PSApi
 		/// </summary>
 		private unsafe void CopySourceAlpha()
 		{
-			if (!copyToDest && (imageMode == ImageModes.plugInModeRGBColor || imageMode == ImageModes.plugInModeRGB48))
+			if (!copyToDest && (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48))
 			{
 				int width = dest.Width;
 				int height = dest.Height;
 
-				if (imageMode == ImageModes.plugInModeRGB48)
+				if (imageMode == ImageModes.RGB48)
 				{
 					for (int y = 0; y < height; y++)
 					{
@@ -2426,16 +2426,16 @@ namespace PSFilterLoad.PSApi
 			string imageMode = string.Empty;
 			switch (mode)
 			{
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.RGBColor:
 					imageMode = Resources.RGBMode;
 					break;
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGB48:
 					imageMode = Resources.RGB48Mode;
 					break;
-				case ImageModes.plugInModeGrayScale:
+				case ImageModes.GrayScale:
 					imageMode = Resources.GrayScaleMode;
 					break;
-				case ImageModes.plugInModeGray16:
+				case ImageModes.Gray16:
 					imageMode = Resources.Gray16Mode;
 					break;
 				default:
@@ -2662,7 +2662,7 @@ namespace PSFilterLoad.PSApi
 					lastInLoPlane = filterRecord->inLoPlane;
 					filterRecord->inColumnBytes = (filterRecord->inHiPlane - filterRecord->inLoPlane) + 1;
 
-					if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+					if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
 					{
 						filterRecord->inColumnBytes *= 2; // 2 bytes per plane
 					}
@@ -2708,7 +2708,7 @@ namespace PSFilterLoad.PSApi
 					lastOutHiPlane = filterRecord->outHiPlane;
 					filterRecord->outColumnBytes = (filterRecord->outHiPlane - filterRecord->outLoPlane) + 1;
 
-					if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+					if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
 					{
 						filterRecord->outColumnBytes *= 2;
 					}
@@ -2811,7 +2811,7 @@ namespace PSFilterLoad.PSApi
 			int stride = (width * nplanes);
 			int len = stride * height;
 
-			if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
 			{
 				len *= 2; // 2 bytes per plane
 			}
@@ -2859,7 +2859,7 @@ namespace PSFilterLoad.PSApi
 
 
 			short ofs = loplane;
-			if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeRGBColor)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGBColor)
 			{
 				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
@@ -2886,7 +2886,7 @@ namespace PSFilterLoad.PSApi
 
 			switch (imageMode)
 			{
-				case ImageModes.plugInModeGrayScale:
+				case ImageModes.GrayScale:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -2903,7 +2903,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeGray16:
+				case ImageModes.Gray16:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -2922,7 +2922,7 @@ namespace PSFilterLoad.PSApi
 					inRowBytes *= 2;
 
 					break;
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.RGBColor:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -2960,7 +2960,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGB48:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3030,7 +3030,7 @@ namespace PSFilterLoad.PSApi
 			int stride = width * nplanes;
 			int len = stride * height;
 
-			if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
 			{
 				len *= 2;
 			}
@@ -3070,7 +3070,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 			short ofs = loplane;
-			if (imageMode == ImageModes.plugInModeRGB48 || imageMode == ImageModes.plugInModeRGBColor)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGBColor)
 			{
 				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
@@ -3097,7 +3097,7 @@ namespace PSFilterLoad.PSApi
 
 			switch (imageMode)
 			{
-				case ImageModes.plugInModeGrayScale:
+				case ImageModes.GrayScale:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3114,7 +3114,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeGray16:
+				case ImageModes.Gray16:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3133,7 +3133,7 @@ namespace PSFilterLoad.PSApi
 					outRowBytes *= 2;
 
 					break;
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.RGBColor:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3171,7 +3171,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGB48:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3420,7 +3420,7 @@ namespace PSFilterLoad.PSApi
 
 					switch (imageMode)
 					{
-						case ImageModes.plugInModeGrayScale:
+						case ImageModes.GrayScale:
 
 							for (int y = top; y < bottom; y++)
 							{
@@ -3437,7 +3437,7 @@ namespace PSFilterLoad.PSApi
 							}
 
 							break;
-						case ImageModes.plugInModeGray16:
+						case ImageModes.Gray16:
 
 							for (int y = top; y < bottom; y++)
 							{
@@ -3454,7 +3454,7 @@ namespace PSFilterLoad.PSApi
 							}
 
 							break;
-						case ImageModes.plugInModeRGBColor:
+						case ImageModes.RGBColor:
 
 							for (int y = top; y < bottom; y++)
 							{
@@ -3492,7 +3492,7 @@ namespace PSFilterLoad.PSApi
 							}
 
 							break;
-						case ImageModes.plugInModeRGB48:
+						case ImageModes.RGB48:
 
 							for (int y = top; y < bottom; y++)
 							{
@@ -3550,7 +3550,7 @@ namespace PSFilterLoad.PSApi
 				int width = source.Width;
 				int height = source.Height;
 
-				if (imageMode == ImageModes.plugInModeRGB48)
+				if (imageMode == ImageModes.RGB48)
 				{
 					// TODO: Is using 8-bit values for the Zap modes correct for 16-bit images?
 					for (int y = 0; y < height; y++)
@@ -3816,10 +3816,10 @@ namespace PSFilterLoad.PSApi
 
 					if ((point->h >= 0 && point->h < source.Width) && (point->v >= 0 && point->v < source.Height))
 					{
-						if (imageMode == ImageModes.plugInModeGray16 || imageMode == ImageModes.plugInModeRGB48)
+						if (imageMode == ImageModes.Gray16 || imageMode == ImageModes.RGB48)
 						{
 							// As this function only handles 8-bit data return 255 if the source image is 16-bit, same as Adobe(R) Photoshop(R).
-							if (imageMode == ImageModes.plugInModeGray16)
+							if (imageMode == ImageModes.Gray16)
 							{
 								info.colorComponents[0] = 255;
 								info.colorComponents[1] = 0;
@@ -3840,13 +3840,13 @@ namespace PSFilterLoad.PSApi
 
 							switch (imageMode)
 							{
-								case ImageModes.plugInModeGrayScale:
+								case ImageModes.GrayScale:
 									info.colorComponents[0] = pixel[0];
 									info.colorComponents[1] = 0;
 									info.colorComponents[2] = 0;
 									info.colorComponents[3] = 0;
 									break;
-								case ImageModes.plugInModeRGBColor:
+								case ImageModes.RGBColor:
 									info.colorComponents[0] = pixel[2];
 									info.colorComponents[1] = pixel[1];
 									info.colorComponents[2] = pixel[0];
@@ -3884,7 +3884,7 @@ namespace PSFilterLoad.PSApi
 			switch (mode)
 			{
 
-				case ImageModes.plugInModeGrayScale:
+				case ImageModes.GrayScale:
 
 					for (int y = srcRect.top; y < srcRect.bottom; y++)
 					{
@@ -3900,7 +3900,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.RGBColor:
 
 					for (int y = srcRect.top; y < srcRect.bottom; y++)
 					{
@@ -3929,7 +3929,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeGray16:
+				case ImageModes.Gray16:
 
 					for (int y = srcRect.top; y < srcRect.bottom; y++)
 					{
@@ -3945,7 +3945,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGB48:
 
 					for (int y = srcRect.top; y < srcRect.bottom; y++)
 					{
@@ -4104,9 +4104,9 @@ namespace PSFilterLoad.PSApi
 
 						switch (imageMode)
 						{
-							case ImageModes.plugInModeGray16:
+							case ImageModes.Gray16:
 
-								convertedChannelImageMode = ImageModes.plugInModeGrayScale;
+								convertedChannelImageMode = ImageModes.GrayScale;
 								convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
 
 								for (int y = 0; y < height; y++)
@@ -4123,9 +4123,9 @@ namespace PSFilterLoad.PSApi
 								}
 								break;
 
-							case ImageModes.plugInModeRGB48:
+							case ImageModes.RGB48:
 
-								convertedChannelImageMode = ImageModes.plugInModeRGBColor;
+								convertedChannelImageMode = ImageModes.RGBColor;
 								convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
 
 								for (int y = 0; y < height; y++)
@@ -4251,12 +4251,12 @@ namespace PSFilterLoad.PSApi
 
 			switch (imageMode)
 			{
-				case ImageModes.plugInModeGrayScale:
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.GrayScale:
+				case ImageModes.RGBColor:
 					doc->depth = 8;
 					break;
-				case ImageModes.plugInModeGray16:
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.Gray16:
+				case ImageModes.RGB48:
 					doc->depth = 16;
 					break;
 			}
@@ -4268,7 +4268,7 @@ namespace PSFilterLoad.PSApi
 			doc->hResolution = int2fixed((int)(dpiX + 0.5));
 			doc->vResolution = int2fixed((int)(dpiY + 0.5));
 
-			if (imageMode == ImageModes.plugInModeRGBColor || imageMode == ImageModes.plugInModeRGB48)
+			if (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48)
 			{
 				string[] names = new string[3] { Resources.RedChannelName, Resources.GreenChannelName, Resources.BlueChannelName };
 				IntPtr channel = CreateReadChannelDesc(0, names[0], doc->depth, doc->bounds);
@@ -6425,7 +6425,7 @@ namespace PSFilterLoad.PSApi
 
 					string name = string.Empty;
 
-					if (imageMode == ImageModes.plugInModeGrayScale || imageMode == ImageModes.plugInModeGray16)
+					if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 					{
 						switch (index)
 						{
@@ -7045,12 +7045,12 @@ namespace PSFilterLoad.PSApi
 
 			switch (imageMode)
 			{
-				case ImageModes.plugInModeGrayScale:
-				case ImageModes.plugInModeGray16:
+				case ImageModes.GrayScale:
+				case ImageModes.Gray16:
 					filterRecord->planes = 1;
 					break;
-				case ImageModes.plugInModeRGBColor:
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGBColor:
+				case ImageModes.RGB48:
 					filterRecord->planes = ignoreAlpha ? (short)3 : (short)4;
 					break;
 			}
@@ -7352,7 +7352,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->foreground.blue = (ushort)((primaryColor[2] * 65535) / 255);
 
 			// The backColor and foreColor fields are always in the native color space of the image. 
-			if (imageMode == ImageModes.plugInModeGrayScale || imageMode == ImageModes.plugInModeGray16)
+			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
 				const int redLuma = 19595;
 				const int greenLuma = 38470;
@@ -7449,13 +7449,13 @@ namespace PSFilterLoad.PSApi
 #endif
 			switch (imageMode)
 			{
-				case ImageModes.plugInModeGrayScale:
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.GrayScale:
+				case ImageModes.RGBColor:
 					filterRecord->depth = 8;
 					break;
 
-				case ImageModes.plugInModeGray16:
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.Gray16:
+				case ImageModes.RGB48:
 					filterRecord->depth = 16;
 					break;
 			}

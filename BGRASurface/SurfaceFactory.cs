@@ -83,7 +83,7 @@ namespace PSFilterHostDll.BGRASurface
 
 			if (format == PixelFormats.BlackWhite || format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8)
 			{
-				imageMode = ImageModes.plugInModeGrayScale;
+				imageMode = ImageModes.GrayScale;
 				Surface8 surface = new Surface8(width, height);
 
 				if (format != PixelFormats.Gray8)
@@ -100,7 +100,7 @@ namespace PSFilterHostDll.BGRASurface
 			}
 			else if (format == PixelFormats.Gray16 || format == PixelFormats.Gray32Float)
 			{
-				imageMode = ImageModes.plugInModeGray16;
+				imageMode = ImageModes.Gray16;
 				Surface16 surface = new Surface16(width, height);
 
 				if (format == PixelFormats.Gray32Float)
@@ -142,7 +142,7 @@ namespace PSFilterHostDll.BGRASurface
 					bitmap.CopyPixels(pixels, stride * 2, 0);
 				}
 
-				imageMode = ImageModes.plugInModeRGB48;
+				imageMode = ImageModes.RGB48;
 				Surface64 surface = new Surface64(width, height);
 
 				fixed (ushort* ptr = pixels)
@@ -178,7 +178,7 @@ namespace PSFilterHostDll.BGRASurface
 			}
 			else
 			{
-				imageMode = ImageModes.plugInModeRGBColor;
+				imageMode = ImageModes.RGBColor;
 				Surface32 surface = new Surface32(width, height);
 
 				if (format != PixelFormats.Bgra32)
@@ -208,13 +208,13 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			switch (mode)
 			{
-				case ImageModes.plugInModeGrayScale:
+				case ImageModes.GrayScale:
 					return new Surface8(width, height);
-				case ImageModes.plugInModeRGBColor:
+				case ImageModes.RGBColor:
 					return new Surface32(width, height);
-				case ImageModes.plugInModeGray16:
+				case ImageModes.Gray16:
 					return new Surface16(width, height);
-				case ImageModes.plugInModeRGB48:
+				case ImageModes.RGB48:
 					return new Surface64(width, height);
 				default:
 					throw new InvalidEnumArgumentException("mode", (int)mode, typeof(ImageModes));
