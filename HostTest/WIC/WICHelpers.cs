@@ -136,7 +136,10 @@ namespace HostTest
                     }
                     else
                     {
-                        extDict[fileExtName].Add(fileExtension);
+                        if (extDict.ContainsKey(fileExtName))
+                        {
+                            extDict[fileExtName].Add(fileExtension); 
+                        }
                     }
                    
                 }
@@ -220,7 +223,7 @@ namespace HostTest
             return filters.ToString();
         }
 
-        public static string[] GetDecoderFileExtensions()
+        public static System.Collections.ObjectModel.ReadOnlyCollection<string> GetDecoderFileExtensions()
         {
             List<string> extensions = new List<string>();
 
@@ -232,7 +235,7 @@ namespace HostTest
                 extensions.AddRange(exts);
             }
 
-            return extensions.ToArray();
+            return extensions.AsReadOnly();
         }
 
     }
