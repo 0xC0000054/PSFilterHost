@@ -36,25 +36,24 @@
     <SyntaxFilters>Standard</SyntaxFilters>
     <SdkLinkTarget>Blank</SdkLinkTarget>
     <RootNamespaceContainer>False</RootNamespaceContainer>
-    <PresentationStyle>VS2005</PresentationStyle>
+    <PresentationStyle>VS2010</PresentationStyle>
     <Preliminary>False</Preliminary>
     <NamingMethod>Guid</NamingMethod>
     <HelpTitle>8bf filter host for .NET Documentation</HelpTitle>
     <ContentPlacement>AboveNamespaces</ContentPlacement>
     <NamespaceSummaries>
       <NamespaceSummaryItem name="(global)" isDocumented="False" />
-      <NamespaceSummaryItem name="PSFilterHostDll" isDocumented="True">Contains the classes to load and run Adobe® Photoshop® filter plugins.</NamespaceSummaryItem>
-    </NamespaceSummaries>
+<NamespaceSummaryItem name="PSFilterHostDll" isDocumented="True">Contains classes to load and run Adobe® Photoshop®-compatible filter plugins.</NamespaceSummaryItem></NamespaceSummaries>
     <ApiFilter />
     <ComponentConfigurations>
       <ComponentConfig id="IntelliSense Component" enabled="True">
-        <component id="IntelliSense Component" type="Microsoft.Ddue.Tools.IntelliSenseComponent" assembly="{@SandcastlePath}ProductionTools\BuildComponents.dll">
+        <component id="IntelliSense Component">
           <!-- Output options (optional)
-					 Attributes:
-							Include Namespaces (false by default)
-							Namespaces filename ("Namespaces" if not specified or empty)
-							Directory (current folder if not specified or empty) -->
-          <output includeNamespaces="true" namespacesFile="Namespaces" folder="{@OutputFolder}" />
+  Attributes:
+    Include namespaces (false by default)
+    Namespaces comments filename ("Namespaces" if not specified or empty)
+    Output folder (current folder if not specified or empty) -->
+          <output includeNamespaces="false" namespacesFile="Namespaces" folder="{@OutputFolder}" />
         </component>
       </ComponentConfig>
     </ComponentConfigurations>
