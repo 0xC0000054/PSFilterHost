@@ -120,7 +120,7 @@ namespace PSFilterLoad.PSApi
 		private static unsafe string StringFromPString(byte* ptr, out int length)
 		{
 			length = (int)ptr[0] + 1; // skip the first byte
-			
+
 			return new string((sbyte*)ptr, 1, ptr[0], Windows1252Encoding);
 		}
 
@@ -472,7 +472,7 @@ namespace PSFilterLoad.PSApi
 					{
 						if (aeteHandle.IsAllocated)
 						{
-							aeteHandle.Free(); 
+							aeteHandle.Free();
 						}
 					}
 
@@ -696,8 +696,10 @@ namespace PSFilterLoad.PSApi
 		/// </returns>
 		internal static IEnumerable<PluginData> QueryPlugin(string pluginFileName)
 		{
-			if (string.IsNullOrEmpty(pluginFileName))
-				throw new ArgumentException("pluginFileName is null or empty.", "pluginFileName");
+			if (pluginFileName == null)
+			{
+				throw new ArgumentNullException("pluginFileName");
+			}
 
 			if (!PEFile.CheckProcessorArchitecture(pluginFileName))
 			{
@@ -739,7 +741,7 @@ namespace PSFilterLoad.PSApi
 							// If there are no PiPL resources scan for Photoshop 2.5's PiMI resources.
 							queryFilter = (QueryFilter)GCHandle.FromIntPtr(callback).Target;
 
-							pluginData.AddRange(queryFilter.plugins); 
+							pluginData.AddRange(queryFilter.plugins);
 						}
 #if DEBUG
 						else
@@ -753,7 +755,7 @@ namespace PSFilterLoad.PSApi
 					{
 						if (handle.IsAllocated)
 						{
-							handle.Free(); 
+							handle.Free();
 						}
 
 						if (needsRelease)
@@ -895,7 +897,6 @@ namespace PSFilterLoad.PSApi
 		static PutScopedClassProc putScopedClassProc;
 		static PutScopedObjectProc putScopedObjectProc;
 
-#if PICASUITES
 		static SPBasicSuite_AcquireSuite spAcquireSuite;
 		static SPBasicSuite_AllocateBlock spAllocateBlock;
 		static SPBasicSuite_FreeBlock spFreeBlock;
@@ -903,7 +904,6 @@ namespace PSFilterLoad.PSApi
 		static SPBasicSuite_ReallocateBlock spReallocateBlock;
 		static SPBasicSuite_ReleaseSuite spReleaseSuite;
 		static SPBasicSuite_Undefined spUndefined;
-#endif
 		#endregion
 
 		private Dictionary<IntPtr, PSHandle> handles;
@@ -930,9 +930,7 @@ namespace PSFilterLoad.PSApi
 
 		private IntPtr errorStringPtr;
 
-#if PICASUITES
 		private IntPtr basicSuitePtr;
-#endif
 
 		private PluginAETE aete;
 		private Dictionary<uint, AETEValue> aeteDict;
@@ -1022,7 +1020,7 @@ namespace PSFilterLoad.PSApi
 				globalParameters = value.GlobalParameters;
 				if (value.ScriptingData != null)
 				{
-					aeteDict = value.ScriptingData; 
+					aeteDict = value.ScriptingData;
 				}
 			}
 		}
@@ -1140,12 +1138,15 @@ namespace PSFilterLoad.PSApi
 			this.subKeyIndex = 0;
 			this.isSubKey = false;
 
+			this.useChannelPorts = false;
 			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
+			this.usePICASuites = false;
+			this.activePICASuites = new ActivePICASuites();
 			this.hostInfo = new HostInformation();
 
-			lastOutRect.left = lastOutRect.top = lastOutRect.right = lastOutRect.bottom = 0;
-			lastInRect.left = lastInRect.top = lastInRect.right = lastInRect.bottom = 0;
-			lastMaskRect.left = lastMaskRect.right = lastMaskRect.bottom = lastMaskRect.top = 0;
+			this.lastInRect = Rect16.Empty;
+			this.lastOutRect = Rect16.Empty;
+			this.lastMaskRect = Rect16.Empty;
 
 #if GDIPLUS
 			this.source = SurfaceFactory.CreateFromGdipBitmap(sourceImage, out this.imageMode);
@@ -1193,7 +1194,7 @@ namespace PSFilterLoad.PSApi
 						break;
 				}
 			}
-			
+
 
 			unsafe
 			{
@@ -1201,9 +1202,10 @@ namespace PSFilterLoad.PSApi
 				((PlatformData*)platFormDataPtr.ToPointer())->hwnd = owner;
 			}
 
+			this.lastInLoPlane = -1;
 			this.lastOutRowBytes = 0;
 			this.lastOutHiPlane = 0;
-			this.lastOutLoPlane = 0;
+			this.lastOutLoPlane = -1;
 
 			this.primaryColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
 			this.secondaryColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
@@ -1220,9 +1222,7 @@ namespace PSFilterLoad.PSApi
 			dbgFlags |= DebugFlags.MiscCallbacks;
 			dbgFlags |= DebugFlags.PropertySuite;
 			dbgFlags |= DebugFlags.ResourceSuite;
-#if PICASUITES
 			dbgFlags |= DebugFlags.SPBasicSuite;
-#endif
 #endif
 		}
 
@@ -1270,8 +1270,7 @@ namespace PSFilterLoad.PSApi
 			// If the EditableTransparency cases are not supported use the other modes.
 			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 			{
-				/* use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases 
-				* or image does not have any transparency */
+				// Use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases or image does not have any transparency.
 
 				if (data.FilterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter || !source.HasTransparency())
 				{
@@ -1327,9 +1326,8 @@ namespace PSFilterLoad.PSApi
 				return true;
 			}
 
-			result = ((mbi.Protect & NativeConstants.PAGE_READONLY) != 0 || (mbi.Protect & NativeConstants.PAGE_READWRITE) != 0 ||
-			(mbi.Protect & NativeConstants.PAGE_WRITECOPY) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_READ) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_READWRITE) != 0 ||
-			(mbi.Protect & NativeConstants.PAGE_EXECUTE_WRITECOPY) != 0);
+			result = ((mbi.Protect & NativeConstants.PAGE_READONLY) != 0 || (mbi.Protect & NativeConstants.PAGE_READWRITE) != 0 || (mbi.Protect & NativeConstants.PAGE_WRITECOPY) != 0 || 
+				(mbi.Protect & NativeConstants.PAGE_EXECUTE_READ) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_READWRITE) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_WRITECOPY) != 0);
 
 			if ((mbi.Protect & NativeConstants.PAGE_GUARD) != 0 || (mbi.Protect & NativeConstants.PAGE_NOACCESS) != 0)
 			{
@@ -1462,7 +1460,7 @@ namespace PSFilterLoad.PSApi
 					globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 				}
 				else
-				{				
+				{
 					long size = SafeNativeMethods.GlobalSize(filterRecord->parameters).ToInt64();
 
 					if (size > 0L)
@@ -1607,7 +1605,7 @@ namespace PSFilterLoad.PSApi
 					case GlobalParameters.DataStorageMethod.HandleSuite:
 
 						filterRecord->parameters = HandleNewProc(parameterDataBytes.Length);
-						
+
 						if (filterRecord->parameters != IntPtr.Zero)
 						{
 							Marshal.Copy(parameterDataBytes, 0, HandleLockProc(filterRecord->parameters, 0), parameterDataBytes.Length);
@@ -1617,7 +1615,7 @@ namespace PSFilterLoad.PSApi
 					case GlobalParameters.DataStorageMethod.OTOFHandle:
 
 						filterRecord->parameters = Memory.Allocate(OTOFHandleSize, false);
-						
+
 						if (globalParameters.ParameterDataExecutable)
 						{
 							filterParametersHandle = Memory.AllocateExecutable(parameterDataBytes.Length);
@@ -1661,7 +1659,7 @@ namespace PSFilterLoad.PSApi
 					case GlobalParameters.DataStorageMethod.OTOFHandle:
 
 						dataPtr = Memory.Allocate(OTOFHandleSize, false);
-						
+
 						if (globalParameters.PluginDataExecutable)
 						{
 							pluginDataHandle = Memory.AllocateExecutable(pluginDataBytes.Length);
@@ -1740,7 +1738,7 @@ namespace PSFilterLoad.PSApi
 				{
 					if (aboutRecordHandle.IsAllocated)
 					{
-						aboutRecordHandle.Free(); 
+						aboutRecordHandle.Free();
 					}
 				}
 			}
@@ -1748,7 +1746,7 @@ namespace PSFilterLoad.PSApi
 			{
 				if (platformDataHandle.IsAllocated)
 				{
-					platformDataHandle.Free(); 
+					platformDataHandle.Free();
 				}
 			}
 
@@ -2305,7 +2303,21 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-			return true; 
+			return true;
+		}
+
+		private static bool EnablePICASuites(PluginData data)
+		{
+#if !PICASUITEDEBUG
+			if (data.Category == "Nik Collection")
+			{
+				return true;
+			}
+
+			return false;
+#else
+			return true;
+#endif
 		}
 
 		/// <summary>
@@ -2323,16 +2335,17 @@ namespace PSFilterLoad.PSApi
 				return false;
 			}
 
-			useChannelPorts = pdata.Category == "Amico Perry"; // enable the channel ports suite for Luce 2
+			this.useChannelPorts = pdata.Category == "Amico Perry"; // enable the channel ports suite for Luce 2
+			this.usePICASuites = EnablePICASuites(pdata);
 
-			ignoreAlpha = IgnoreAlphaChannel(pdata);
+			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
 
 			if (pdata.FilterInfo != null)
 			{
-				int index = filterCase - 1;
-				copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
-				writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
-				
+				int index = this.filterCase - 1;
+				this.copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
+				this.writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
+
 				bool worksWithBlankData = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
 
 				if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) && !worksWithBlankData)
@@ -2360,7 +2373,7 @@ namespace PSFilterLoad.PSApi
 				DrawCheckerBoardBitmap();
 			}
 
-			aete = pdata.Aete;
+			this.aete = pdata.Aete;
 
 			SetupDelegates();
 			SetupSuites();
@@ -2742,7 +2755,7 @@ namespace PSFilterLoad.PSApi
 		/// <param name="lockRect">The rectangle to clamp the size to.</param>
 		private unsafe void ScaleTempSurface(int inputRate, Rectangle lockRect)
 		{
-			int scaleFactor = fixed2int(inputRate);
+			int scaleFactor = FixedToInt32(inputRate);
 			if (scaleFactor == 0)
 			{
 				scaleFactor = 1;
@@ -2796,8 +2809,7 @@ namespace PSFilterLoad.PSApi
 		private unsafe short FillInputBuffer(ref IntPtr inData, ref int inRowBytes, Rect16 rect, short loplane, short hiplane, int inputRate, short inputPadding)
 		{
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("inRowBytes = {0}, Rect = {1}, loplane = {2}, hiplane = {3}", new object[] { inRowBytes.ToString(), rect.ToString(), loplane.ToString(), hiplane.ToString() }));
-			Ping(DebugFlags.AdvanceState, string.Format("inputRate = {0}", fixed2int(inputRate)));
+			Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { inRowBytes, rect, loplane, hiplane, FixedToInt32(inputRate) }));
 #endif
 
 			int nplanes = hiplane - loplane + 1;
@@ -2809,15 +2821,16 @@ namespace PSFilterLoad.PSApi
 
 
 			int stride = (width * nplanes);
-			int len = stride * height;
-
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
-			{
-				len *= 2; // 2 bytes per plane
-			}
 
 			if (inDataPtr == IntPtr.Zero)
 			{
+				int len = stride * height;
+
+				if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
+				{
+					len *= 2; // 2 bytes per plane
+				}
+
 				try
 				{
 					inDataPtr = Memory.Allocate(len, false);
@@ -3009,7 +3022,7 @@ namespace PSFilterLoad.PSApi
 		{
 
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes = {0}, Rect = {1}, loplane = {2}, hiplane = {3}", new object[] { outRowBytes.ToString(), rect.ToString(), loplane.ToString(), hiplane.ToString() }));
+			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { outRowBytes, rect, loplane, hiplane  }));
 #endif
 
 
@@ -3028,15 +3041,17 @@ namespace PSFilterLoad.PSApi
 
 
 			int stride = width * nplanes;
-			int len = stride * height;
 
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
-			{
-				len *= 2;
-			}
 
 			if (outDataPtr == IntPtr.Zero)
 			{
+				int len = stride * height;
+
+				if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
+				{
+					len *= 2;
+				}
+
 				try
 				{
 					outDataPtr = Memory.Allocate(len, false);
@@ -3220,7 +3235,7 @@ namespace PSFilterLoad.PSApi
 
 		private unsafe void ScaleTempMask(int maskRate, Rectangle lockRect)
 		{
-			int scaleFactor = fixed2int(maskRate);
+			int scaleFactor = FixedToInt32(maskRate);
 
 			if (scaleFactor == 0)
 			{
@@ -3271,8 +3286,7 @@ namespace PSFilterLoad.PSApi
 		private unsafe short FillMaskBuffer(ref IntPtr maskData, ref int maskRowBytes, Rect16 rect, int maskRate, short maskPadding)
 		{
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("maskRowBytes = {0}, Rect = {1}", new object[] { maskRowBytes.ToString(), rect.ToString() }));
-			Ping(DebugFlags.AdvanceState, string.Format("maskRate = {0}", fixed2int(maskRate)));
+			Ping(DebugFlags.AdvanceState, string.Format("maskRowBytes: {0}, Rect: {1}, maskRate: {2}", new object[] { maskRowBytes, rect, FixedToInt32(maskRate) }));
 #endif
 			int width = (rect.right - rect.left);
 			int height = (rect.bottom - rect.top);
@@ -3299,18 +3313,16 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-
 			bool validImageBounds = (rect.left < source.Width && rect.top < source.Height);
 			if (validImageBounds)
 			{
 				ScaleTempMask(maskRate, lockRect);
 			}
 
-
-			int len = width * height;
-
 			if (maskDataPtr == IntPtr.Zero)
 			{
+				int len = width * height;
+
 				try
 				{
 					maskDataPtr = Memory.Allocate(len, false);
@@ -3733,13 +3745,13 @@ namespace PSFilterLoad.PSApi
 
 					if (pickColor != null)
 					{
-						ColorPickerResult result = new ColorPickerResult(info.colorComponents[0], info.colorComponents[1], info.colorComponents[2]);
+						ColorPickerResult color = pickColor(prompt, (byte)info.colorComponents[0], (byte)info.colorComponents[1], (byte)info.colorComponents[2]);
 
-						if (pickColor(prompt, ref result))
+						if (color != null)
 						{
-							info.colorComponents[0] = result.R;
-							info.colorComponents[1] = result.G;
-							info.colorComponents[2] = result.B;
+							info.colorComponents[0] = color.R;
+							info.colorComponents[1] = color.G;
+							info.colorComponents[2] = color.B;
 
 							if (info.resultSpace == ColorSpace.ChosenSpace)
 							{
@@ -3776,7 +3788,7 @@ namespace PSFilterLoad.PSApi
 							{
 								err = PSError.userCanceledErr;
 							}
-						} 
+						}
 					}
 
 					break;
@@ -4265,8 +4277,8 @@ namespace PSFilterLoad.PSApi
 			doc->bounds.left = 0;
 			doc->bounds.right = source.Width;
 			doc->bounds.bottom = source.Height;
-			doc->hResolution = int2fixed((int)(dpiX + 0.5));
-			doc->vResolution = int2fixed((int)(dpiY + 0.5));
+			doc->hResolution = Int32ToFixed((int)(dpiX + 0.5));
+			doc->vResolution = Int32ToFixed((int)(dpiY + 0.5));
 
 			if (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48)
 			{
@@ -4506,7 +4518,7 @@ namespace PSFilterLoad.PSApi
 								row = surface.Width - 1;
 								int rowEnd = width - right;
 								for (int y = 0; y < height; y++)
-								{									
+								{
 									ushort* src = (ushort*)surface.GetPointAddressUnchecked(row, y);
 									ushort* dst = (ushort*)ptr + (y * inRowBytes) + rowEnd;
 
@@ -4700,7 +4712,7 @@ namespace PSFilterLoad.PSApi
 					case PSConstants.Padding.plugInWantsErrorOnBoundsException:
 						return PSError.paramErr;
 					default:
-						
+
 						// Any other padding value is a constant byte.
 						if (inputPadding < 0 || inputPadding > 255)
 						{
@@ -4857,7 +4869,7 @@ namespace PSFilterLoad.PSApi
 					{
 						byte* src = baseAddr + (y * source.rowBytes) + left;
 						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(surfaceY);
-						
+
 						for (int x = 0; x < width; x++)
 						{
 							dst[0] = src[2];
@@ -4890,7 +4902,7 @@ namespace PSFilterLoad.PSApi
 						byte* maskData = (byte*)srcMask->maskData.ToPointer();
 
 						for (int y = 0; y < height; y++)
-						{							
+						{
 							byte* src = maskData + (y * srcMask->rowBytes);
 							byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y);
 
@@ -5458,7 +5470,7 @@ namespace PSFilterLoad.PSApi
 					{
 						return PSError.memFullErr;
 					}
-					
+
 					Marshal.WriteInt32(HandleLockProc(data, 0), (int)item.Value);
 					HandleUnlockProc(data);
 					break;
@@ -5610,7 +5622,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 			UnitFloat unitFloat = (UnitFloat)item.Value;
-	
+
 			if (unitFloat.unit != units)
 			{
 				descErr = PSError.paramErr;
@@ -5628,7 +5640,7 @@ namespace PSFilterLoad.PSApi
 				descErr = PSError.coercedParamErr;
 			}
 			floatNumber = amount;
-		
+
 			return descErr;
 		}
 		// WriteDescriptorProcs
@@ -6332,7 +6344,7 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 				}
-				catch (System.IO.IOException) 
+				catch (System.IO.IOException)
 				{
 					return false; // WINCODEC_ERR_INVALIDQUERYREQUEST
 				}
@@ -6384,7 +6396,7 @@ namespace PSFilterLoad.PSApi
 			{
 				case PSProperties.propBigNudgeH:
 				case PSProperties.propBigNudgeV:
-					simpleProperty = new IntPtr(int2fixed(10));
+					simpleProperty = new IntPtr(Int32ToFixed(10));
 					break;
 				case PSProperties.propCaption:
 					if ((!string.IsNullOrEmpty(hostInfo.Caption)) && hostInfo.Caption.Length < IPTCData.MaxCaptionLength)
@@ -6495,7 +6507,7 @@ namespace PSFilterLoad.PSApi
 					}
 					break;
 				case PSProperties.propGridMajor:
-					simpleProperty = new IntPtr(int2fixed(1));
+					simpleProperty = new IntPtr(Int32ToFixed(1));
 					break;
 				case PSProperties.propGridMinor:
 					simpleProperty = new IntPtr(4);
@@ -6528,7 +6540,7 @@ namespace PSFilterLoad.PSApi
 					break;
 				case PSProperties.propRulerOriginH:
 				case PSProperties.propRulerOriginV:
-					simpleProperty = new IntPtr(int2fixed(0));
+					simpleProperty = new IntPtr(Int32ToFixed(0));
 					break;
 				case PSProperties.propWatermark:
 					simpleProperty = new IntPtr(hostInfo.Watermark ? 1 : 0);
@@ -6796,155 +6808,163 @@ namespace PSFilterLoad.PSApi
 			return IntPtr.Zero;
 		}
 
-#if PICASUITES
-		private Dictionary<string, IntPtr> activePICASuites = new Dictionary<string, IntPtr>();
+		private ActivePICASuites activePICASuites;
+		private bool usePICASuites;
 
 		private unsafe int SPBasicAcquireSuite(IntPtr name, int version, ref IntPtr suite)
 		{
 
 			string suiteName = Marshal.PtrToStringAnsi(name);
 #if DEBUG
-			Ping(DebugFlags.SPBasicSuite, string.Format("name={0}, version={1}", suiteName, version.ToString()));
+			Ping(DebugFlags.SPBasicSuite, string.Format("name: {0}, version: {1}", suiteName, version));
 #endif
 
 			string suiteKey = string.Format(CultureInfo.InvariantCulture, "{0},{1}", suiteName, version.ToString(CultureInfo.InvariantCulture));
-			try
+
+			if (activePICASuites.IsLoaded(suiteKey))
 			{
-				if (suiteName == PSConstants.PICABufferSuite)
+				suite = this.activePICASuites.AddRef(suiteKey);
+			}
+			else
+			{
+				try
 				{
-					if (version > 1)
+					if (suiteName == PSConstants.PICABufferSuite)
 					{
-						return PSError.errPlugInHostInsufficient;
+						if (version > 1)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
+
+						suite = this.activePICASuites.AllocateSuite<PSBufferSuite1>(suiteKey);
+
+						PSBufferSuite1 bufferSuite = PICASuites.CreateBufferSuite1();
+
+						Marshal.StructureToPtr(bufferSuite, suite, false);
 					}
-
-					suite = Memory.Allocate(Marshal.SizeOf(typeof(PSBufferSuite1)), false);
-
-
-					activePICASuites.AddOrUpdate(suiteKey, suite);
-
-					PSBufferSuite1 bufferSuite = PICASuites.CreateBufferSuite1();
-
-					Marshal.StructureToPtr(bufferSuite, suite, false);
-				}
-				else if (suiteName == PSConstants.PICAColorSpaceSuite)
-				{
-					if (version > 1)
+					else if (suiteName == PSConstants.PICAHandleSuite)
 					{
-						return PSError.errPlugInHostInsufficient;
+						if (version > 2)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
+
+						if (version == 1)
+						{
+							suite = this.activePICASuites.AllocateSuite<PSHandleSuite1>(suiteKey);
+
+							PSHandleSuite1 handleSuite = PICASuites.CreateHandleSuite1((HandleProcs*)handleProcsPtr.ToPointer(), handleLockProc, handleUnlockProc);
+
+							Marshal.StructureToPtr(handleSuite, suite, false);
+						}
+						else
+						{
+							suite = this.activePICASuites.AllocateSuite<PSHandleSuite2>(suiteKey);
+
+							PSHandleSuite2 handleSuite = PICASuites.CreateHandleSuite2((HandleProcs*)handleProcsPtr.ToPointer(), handleLockProc, handleUnlockProc);
+
+							Marshal.StructureToPtr(handleSuite, suite, false);
+						}
 					}
-
-
-					suite = Memory.Allocate(Marshal.SizeOf(typeof(PSColorSpaceSuite1)), false);
-
-					activePICASuites.AddOrUpdate(suiteKey, suite);
-
-					PSColorSpaceSuite1 csSuite = PICASuites.CreateColorSpaceSuite1();
-
-					Marshal.StructureToPtr(csSuite, suite, false);
-				}
-				else if (suiteName == PSConstants.PICAHandleSuite)
-				{
-					if (version > 2)
+					else if (suiteName == PSConstants.PICAPropertySuite)
 					{
-						return PSError.errPlugInHostInsufficient;
-					}
+						if (version > PSConstants.kCurrentPropertyProcsVersion)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
 
-					if (version == 1)
+						suite = this.activePICASuites.AllocateSuite<PropertyProcs>(suiteKey);
+
+						PropertyProcs propertySuite = PICASuites.CreatePropertySuite((PropertyProcs*)propertyProcsPtr.ToPointer());
+
+						Marshal.StructureToPtr(propertySuite, suite, false);
+					}
+					else if (suiteName == PSConstants.PICAUIHooksSuite)
 					{
-						suite = Memory.Allocate(Marshal.SizeOf(typeof(PSHandleSuite1)), false);
+						if (version > 1)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
 
-						activePICASuites.AddOrUpdate(suiteKey, suite);
+						suite = this.activePICASuites.AllocateSuite<PSUIHooksSuite1>(suiteKey);
 
-						PSHandleSuite1 handleSuite = PICASuites.CreateHandleSuite1((HandleProcs*)handleProcsPtr.ToPointer());
+						PSUIHooksSuite1 uiHooks = PICASuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
 
-						Marshal.StructureToPtr(handleSuite, suite, false);
+						Marshal.StructureToPtr(uiHooks, suite, false);
 					}
+#if PICASUITEDEBUG
+					else if (suiteName == PSConstants.PICAColorSpaceSuite)
+					{
+						if (version > 1)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
+
+						suite = this.activePICASuites.AllocateSuite<PSColorSpaceSuite1>(suiteKey);
+
+						PSColorSpaceSuite1 csSuite = PICASuites.CreateColorSpaceSuite1();
+
+						Marshal.StructureToPtr(csSuite, suite, false);
+					}
+					else if (suiteName == PSConstants.PICAPluginsSuite)
+					{
+						if (version > 4)
+						{
+							return PSError.kSPSuiteNotFoundError;
+						}
+
+						suite = this.activePICASuites.AllocateSuite<SPPluginsSuite4>(suiteKey);
+
+						SPPluginsSuite4 plugs = PICASuites.CreateSPPlugs4();
+
+						Marshal.StructureToPtr(plugs, suite, false);
+					}
+#endif
 					else
 					{
-						suite = Memory.Allocate(Marshal.SizeOf(typeof(PSHandleSuite2)), false);
-
-						activePICASuites.AddOrUpdate(suiteKey, suite);
-
-						PSHandleSuite2 handleSuite = PICASuites.CreateHandleSuite2((HandleProcs*)handleProcsPtr.ToPointer());
-
-						Marshal.StructureToPtr(handleSuite, suite, false);
+						return PSError.kSPSuiteNotFoundError;
 					}
 				}
-				else if (suiteName == PSConstants.PICAPropertySuite)
+				catch (OutOfMemoryException)
 				{
-					if (version > PSConstants.kCurrentPropertyProcsVersion)
-					{
-						return PSError.errPlugInHostInsufficient;
-					}
-
-					suite = Memory.Allocate(Marshal.SizeOf(typeof(PropertyProcs)), false);
-
-					activePICASuites.Add(suiteKey, suite);
-
-					PropertyProcs propertySuite = PICASuites.CreatePropertySuite((PropertyProcs*)propertyProcsPtr.ToPointer());
-
-					Marshal.StructureToPtr(propertySuite, suite, false);
-				}
-				else if (suiteName == PSConstants.PICAUIHooksSuite)
-				{
-					if (version > 1)
-					{
-						return PSError.errPlugInHostInsufficient;
-					}
-
-					suite = Memory.Allocate(Marshal.SizeOf(typeof(PSUIHooksSuite1)), false);
-					activePICASuites.Add(suiteKey, suite);
-
-					PSUIHooksSuite1 uiHooks = PICASuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
-
-					Marshal.StructureToPtr(uiHooks, suite, false);
-				}
-				else if (suiteName == PSConstants.PICAPluginsSuite)
-				{
-					if (version > 4)
-					{
-						return PSError.errPlugInHostInsufficient;
-					}
-
-					suite = Memory.Allocate(Marshal.SizeOf(typeof(SPPlugs)), false);
-					activePICASuites.Add(suiteKey, suite);
-
-					SPPlugs plugs = PICASuites.CreateSPPlugs4();
-
-					Marshal.StructureToPtr(plugs, suite, false);
-				}
-				else
-				{
-					return PSError.errPlugInHostInsufficient;
+					return PSError.memFullErr;
 				}
 			}
-			catch (OutOfMemoryException)
-			{
-				return PSError.memFullErr;
-			}
 
-			return PSError.noErr;
+			return PSError.kSPNoErr;
 		}
 
 		private int SPBasicReleaseSuite(IntPtr name, int version)
 		{
 			string suiteName = Marshal.PtrToStringAnsi(name);
 
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Format("name: {0}, version: {1}", suiteName, version.ToString()));
+#endif
+
 			string suiteKey = string.Format(CultureInfo.InvariantCulture, "{0},{1}", suiteName, version.ToString(CultureInfo.InvariantCulture));
 
-			if (activePICASuites.ContainsKey(suiteKey))
-			{
-				Memory.Free(activePICASuites[suiteKey]);
-				activePICASuites.Remove(suiteKey);
-			}
+			this.activePICASuites.RemoveRef(suiteKey);
 
-			return PSError.noErr;
+			return PSError.kSPNoErr;
 		}
 
 		private unsafe int SPBasicIsEqual(IntPtr token1, IntPtr token2)
 		{
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Format("token1: {0}, token2: {1}", Marshal.PtrToStringAnsi(token1), Marshal.PtrToStringAnsi(token2)));
+#endif
+			if (token2 == IntPtr.Zero)
+			{
+				if (token1 == IntPtr.Zero)
+				{
+					return 1;
+				}
 
-			// compare two null-terminated strings for equality.
+				return 0;
+			}
+
+			// Compare two null-terminated ASCII strings for equality.
 			byte* src = (byte*)token1.ToPointer();
 			byte* dst = (byte*)token2.ToPointer();
 
@@ -6963,6 +6983,9 @@ namespace PSFilterLoad.PSApi
 
 		private int SPBasicAllocateBlock(int size, ref IntPtr block)
 		{
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Format("size: {0}", size));
+#endif
 			try
 			{
 				block = Memory.Allocate(size, false);
@@ -6972,17 +6995,23 @@ namespace PSFilterLoad.PSApi
 				return PSError.memFullErr;
 			}
 
-			return PSError.noErr;
+			return PSError.kSPNoErr;
 		}
 
 		private int SPBasicFreeBlock(IntPtr block)
 		{
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Format("block: {0:X8}", block.ToInt64()));
+#endif
 			Memory.Free(block);
-			return PSError.noErr;
+			return PSError.kSPNoErr;
 		}
 
 		private int SPBasicReallocateBlock(IntPtr block, int newSize, ref IntPtr newblock)
 		{
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Format("block: {0:X8}, size: {1}", block.ToInt64(), newSize));
+#endif
 			try
 			{
 				newblock = Memory.ReAlloc(block, newSize);
@@ -6992,22 +7021,24 @@ namespace PSFilterLoad.PSApi
 				return PSError.memFullErr;
 			}
 
-			return PSError.noErr;
+			return PSError.kSPNoErr;
 		}
 
 		private int SPBasicUndefined()
 		{
-			return PSError.noErr;
-		}
-
+#if DEBUG
+			Ping(DebugFlags.SPBasicSuite, string.Empty);
 #endif
+
+			return PSError.kSPNoErr;
+		}
 
 		/// <summary>
 		/// Converts an Int32 to a 16.16 fixed point value.
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <returns>The value converted to a 16.16 fixed point number.</returns>
-		private static int int2fixed(int value)
+		private static int Int32ToFixed(int value)
 		{
 			return (value << 16);
 		}
@@ -7017,7 +7048,7 @@ namespace PSFilterLoad.PSApi
 		/// </summary>
 		/// <param name="value">The value to convert.</param>
 		/// <returns>The value converted from a 16.16 fixed point number.</returns>
-		private static int fixed2int(int value)
+		private static int FixedToInt32(int value)
 		{
 			return (value >> 16);
 		}
@@ -7063,8 +7094,8 @@ namespace PSFilterLoad.PSApi
 			filterRecord->filterRect.right = width;
 			filterRecord->filterRect.bottom = height;
 
-			filterRecord->imageHRes = int2fixed((int)(dpiX + 0.5));
-			filterRecord->imageVRes = int2fixed((int)(dpiY + 0.5));
+			filterRecord->imageHRes = Int32ToFixed((int)(dpiX + 0.5));
+			filterRecord->imageVRes = Int32ToFixed((int)(dpiY + 0.5));
 
 			filterRecord->wholeSize.h = width;
 			filterRecord->wholeSize.v = height;
@@ -7157,7 +7188,6 @@ namespace PSFilterLoad.PSApi
 			putTextProc = new PutTextProc(PutTextProc);
 			putUnitFloatProc = new PutUnitFloatProc(PutUnitFloatProc);
 
-#if PICASUITES
 			// SPBasicSuite
 			spAcquireSuite = new SPBasicSuite_AcquireSuite(SPBasicAcquireSuite);
 			spReleaseSuite = new SPBasicSuite_ReleaseSuite(SPBasicReleaseSuite);
@@ -7166,7 +7196,6 @@ namespace PSFilterLoad.PSApi
 			spFreeBlock = new SPBasicSuite_FreeBlock(SPBasicFreeBlock);
 			spReallocateBlock = new SPBasicSuite_ReallocateBlock(SPBasicReallocateBlock);
 			spUndefined = new SPBasicSuite_Undefined(SPBasicUndefined);
-#endif
 		}
 
 		/// <summary>
@@ -7318,17 +7347,22 @@ namespace PSFilterLoad.PSApi
 				descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
 			}
 
-#if PICASUITES
-			basicSuitePtr = Memory.Allocate(Marshal.SizeOf(typeof(SPBasicSuite)), true);
-			SPBasicSuite* basicSuite = (SPBasicSuite*)basicSuitePtr.ToPointer();
-			basicSuite->acquireSuite = Marshal.GetFunctionPointerForDelegate(spAcquireSuite);
-			basicSuite->releaseSuite = Marshal.GetFunctionPointerForDelegate(spReleaseSuite);
-			basicSuite->isEqual = Marshal.GetFunctionPointerForDelegate(spIsEqual);
-			basicSuite->allocateBlock = Marshal.GetFunctionPointerForDelegate(spAllocateBlock);
-			basicSuite->freeBlock = Marshal.GetFunctionPointerForDelegate(spFreeBlock);
-			basicSuite->reallocateBlock = Marshal.GetFunctionPointerForDelegate(spReallocateBlock);
-			basicSuite->undefined = Marshal.GetFunctionPointerForDelegate(spUndefined);
-#endif
+			if (usePICASuites)
+			{
+				basicSuitePtr = Memory.Allocate(Marshal.SizeOf(typeof(SPBasicSuite)), true);
+				SPBasicSuite* basicSuite = (SPBasicSuite*)basicSuitePtr.ToPointer();
+				basicSuite->acquireSuite = Marshal.GetFunctionPointerForDelegate(spAcquireSuite);
+				basicSuite->releaseSuite = Marshal.GetFunctionPointerForDelegate(spReleaseSuite);
+				basicSuite->isEqual = Marshal.GetFunctionPointerForDelegate(spIsEqual);
+				basicSuite->allocateBlock = Marshal.GetFunctionPointerForDelegate(spAllocateBlock);
+				basicSuite->freeBlock = Marshal.GetFunctionPointerForDelegate(spFreeBlock);
+				basicSuite->reallocateBlock = Marshal.GetFunctionPointerForDelegate(spReallocateBlock);
+				basicSuite->undefined = Marshal.GetFunctionPointerForDelegate(spUndefined);
+			}
+			else
+			{
+				basicSuitePtr = IntPtr.Zero;
+			}
 		}
 		/// <summary>
 		/// Setup the filter record for this instance.
@@ -7346,7 +7380,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->background.red = (ushort)((secondaryColor[0] * 65535) / 255);
 			filterRecord->background.green = (ushort)((secondaryColor[1] * 65535) / 255);
 			filterRecord->background.blue = (ushort)((secondaryColor[2] * 65535) / 255);
-			
+
 			filterRecord->foreground.red = (ushort)((primaryColor[0] * 65535) / 255);
 			filterRecord->foreground.green = (ushort)((primaryColor[1] * 65535) / 255);
 			filterRecord->foreground.blue = (ushort)((primaryColor[2] * 65535) / 255);
@@ -7388,7 +7422,7 @@ namespace PSFilterLoad.PSApi
 			// New in 3.0
 			filterRecord->supportsDummyChannels = 0;
 			filterRecord->supportsAlternateLayouts = 0;
-			filterRecord->wantLayout = PSConstants.Layout.piLayoutTraditional;
+			filterRecord->wantLayout = PSConstants.Layout.Traditional;
 			filterRecord->filterCase = filterCase;
 			filterRecord->dummyPlaneValue = -1;
 			filterRecord->premiereHook = IntPtr.Zero;
@@ -7404,8 +7438,8 @@ namespace PSFilterLoad.PSApi
 			filterRecord->maskPadding = PSConstants.Padding.plugInWantsErrorOnBoundsException;
 			filterRecord->samplingSupport = PSConstants.SamplingSupport.hostSupportsIntegralSampling;
 			filterRecord->reservedByte = 0;
-			filterRecord->inputRate = int2fixed(1);
-			filterRecord->maskRate = int2fixed(1);
+			filterRecord->inputRate = Int32ToFixed(1);
+			filterRecord->maskRate = Int32ToFixed(1);
 			filterRecord->colorServices = Marshal.GetFunctionPointerForDelegate(colorProc);
 			// New in 3.0.4
 #if USEIMAGESERVICES
@@ -7440,13 +7474,9 @@ namespace PSFilterLoad.PSApi
 			filterRecord->channelPortProcs = channelPortsPtr;
 			filterRecord->documentInfo = readDocumentPtr;
 			// New in 5.0
-#if PICASUITES
 			filterRecord->sSPBasic = basicSuitePtr;
-			filterRecord->plugInRef = new IntPtr(1);
-#else
-			filterRecord->sSPBasic = IntPtr.Zero;
 			filterRecord->plugInRef = IntPtr.Zero;
-#endif
+
 			switch (imageMode)
 			{
 				case ImageModes.GrayScale:
@@ -7641,7 +7671,6 @@ namespace PSFilterLoad.PSApi
 					errorStringPtr = IntPtr.Zero;
 				}
 
-#if PICASUITES
 				if (basicSuitePtr != IntPtr.Zero)
 				{
 					Memory.Free(basicSuitePtr);
@@ -7651,13 +7680,9 @@ namespace PSFilterLoad.PSApi
 				if (activePICASuites != null)
 				{
 					// free any remaining suites
-					foreach (var item in activePICASuites)
-					{
-						Memory.Free(item.Value);
-					}
+					activePICASuites.Dispose();
 					activePICASuites = null;
 				}
-#endif
 
 				if (filterRecordPtr != IntPtr.Zero)
 				{

@@ -133,7 +133,11 @@
     <Compile Include="HistoryItem.cs" />
     <Compile Include="HistoryItemState.cs" />
     <Compile Include="HistoryStack.cs" />
+    <Compile Include="MenuStripEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="MetaDataHelper.cs" />
+    <Compile Include="NativeConstants.cs" />
     <Compile Include="PaintDotNet\ColorPicker\ColorGradientControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

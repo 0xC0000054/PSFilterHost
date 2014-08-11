@@ -52,11 +52,10 @@ namespace PSFilterLoad.PSApi
         public const short errUnsupportedDepth = -30914;
         public const short errUnsupportedDepthConversion = -30915;
 
-#if PICASUITES
         // PICA suite error codes
         public const int kSPNoErr = 0;
         public const int kSPNotImplmented = 0x21494d50;
-#endif
+        public const int kSPSuiteNotFoundError = 0x53214664;
     }
 
 }

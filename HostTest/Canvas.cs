@@ -825,6 +825,14 @@ namespace HostTest
 			return (this.zoomFactor != 1f);
 		}
 
+		public bool IsActualSize
+		{
+			get
+			{
+				return (this.zoomFactor == 1f);
+			}
+		}
+
 		private void OnZoomChanged()
 		{
 			if (ZoomChanged != null)

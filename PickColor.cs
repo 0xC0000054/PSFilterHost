@@ -13,10 +13,12 @@
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// The callback used when the the filter wants the host application to show it's color picker dialog.
+    /// The callback used when the filter wants the host application to show it's color picker dialog.
     /// </summary>
     /// <param name="prompt">The prompt for the user.</param>
-    /// <param name="color">The color returned by the user.</param>
-    /// <returns>True if the user chose a color; otherwise, false if the user canceled the dialog.</returns>
-    public delegate bool PickColor(string prompt, ref ColorPickerResult color);
+    /// <param name="defaultRed">The red component of the color that the filter wants selected in the host's color dialog.</param>
+    /// <param name="defaultGreen">The green component of the color that the filter wants selected in the host's color dialog..</param>
+    /// <param name="defaultBlue">The blue component of the color that the filter wants selected in the host's color dialog..</param>
+    /// <returns>A <see cref="ColorPickerResult" /> containing the user's chosen color; otherwise, null (Nothing in Visual Basic) if the user canceled the dialog.</returns>
+    public delegate ColorPickerResult PickColor(string prompt, byte defaultRed, byte defaultGreen, byte defaultBlue);
 }

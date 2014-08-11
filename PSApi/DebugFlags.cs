@@ -33,9 +33,7 @@ namespace PSFilterLoad.PSApi
 		PiPL = (1 << 11),
 		PropertySuite = (1 << 12),
 		ResourceSuite = (1 << 13),
-#if PICASUITES
 		SPBasicSuite = (1 << 14)
-#endif   
 	}
 #endif
 }

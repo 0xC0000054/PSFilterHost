@@ -239,7 +239,7 @@ namespace PSFilterHostDll
 			}
 			set
 			{
-				filterParameters = value;
+				this.filterParameters = value;
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace PSFilterHostDll
 			}
 			set
 			{
-				hostInfo = value;
+				this.hostInfo = value;
 			}
 		}
 
@@ -347,7 +347,7 @@ namespace PSFilterHostDll
 		{
 			if (path == null)
 			{
-				throw new ArgumentNullException("path", "path is null");
+				throw new ArgumentNullException("path");
 			}
 
 			var filters = PSFilterHost.EnumerateFilters(path, searchSubdirectories);
@@ -391,7 +391,7 @@ namespace PSFilterHostDll
 		{
 			if (path == null)
 			{
-				throw new ArgumentNullException("path is null.", "path");
+				throw new ArgumentNullException("path");
 			}
 
 			using (ShellLink shortcut = new ShellLink())
@@ -455,7 +455,7 @@ namespace PSFilterHostDll
 		{
 			if (pluginData == null)
 			{
-				throw new ArgumentNullException("pluginData", "pluginData is null.");
+				throw new ArgumentNullException("pluginData");
 			}
 
 			if (disposed)

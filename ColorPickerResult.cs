@@ -15,28 +15,42 @@ namespace PSFilterHostDll
 	/// <summary>
 	/// The class that holds the color selected from the host application.
 	/// </summary>
-	/// <remarks>
-	/// <para>The RGB values are initially populated with the default color that the filter wants selected in the host's color dialog.</para>
-	/// <para>When the user closes the host's color dialog, the host will set the RGB values to the user's selected color.</para>
-	/// </remarks>
 	/// <threadsafety static="true" instance="false" />
 	public sealed class ColorPickerResult
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
 		/// </summary>
-		/// <param name="red">The red component of the initial color.</param>
-		/// <param name="green">The green component of the initial color.</param>
-		/// <param name="blue">The blue component of the initial color.</param>
-		internal ColorPickerResult(short red, short green, short blue)
+		/// <param name="red">The red component of the user's chosen color.</param>
+		/// <param name="green">The green component of the user's chosen color.</param>
+		/// <param name="blue">The blue component of the user's chosen color.</param>
+		public ColorPickerResult(byte red, byte green, byte blue)
 		{
-			this.R = (byte)red;
-			this.G = (byte)green;
-			this.B = (byte)blue;
+			this.R = red;
+			this.G = green;
+			this.B = blue;
 		}
 
 		/// <summary>
-		/// Gets or sets the Red component of the color.
+		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
+		/// </summary>
+		/// <param name="color">The user's chosen color.</param>
+		public ColorPickerResult(System.Drawing.Color color) : this(color.R, color.G, color.B)
+		{
+		}
+
+#if !GDIPLUS
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
+		/// </summary>
+		/// <param name="color">The user's chosen color.</param>
+		public ColorPickerResult(System.Windows.Media.Color color) : this(color.R, color.G, color.B)
+		{
+		}
+#endif
+
+		/// <summary>
+		/// Gets the Red component of the color.
 		/// </summary>
 		/// <value>
 		/// The Red component of the color.
@@ -44,11 +58,11 @@ namespace PSFilterHostDll
 		public byte R
 		{
 			get;
-			set;
+			private set;
 		}
 
 		/// <summary>
-		/// Gets or sets the Green component of the color.
+		/// Gets the Green component of the color.
 		/// </summary>
 		/// <value>
 		/// The Green component of the color.
@@ -56,11 +70,11 @@ namespace PSFilterHostDll
 		public byte G
 		{
 			get;
-			set;
+			private set;
 		}
 
 		/// <summary>
-		/// Gets or sets the Blue component of the color.
+		/// Gets the Blue component of the color.
 		/// </summary>
 		/// <value>
 		/// The Blue component of the color.
@@ -68,7 +82,7 @@ namespace PSFilterHostDll
 		public byte B
 		{
 			get;
-			set;
+			private set;
 		}
 	}
 }

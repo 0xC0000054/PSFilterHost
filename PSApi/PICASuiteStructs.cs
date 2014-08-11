@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-/* Adapted from PIBufferSuite.h, PIColorSpaceSuite.h, PIHandleSuite.h, PIUIHooskSuite.h
+/* Adapted from PIBufferSuite.h, PIColorSpaceSuite.h, PIHandleSuite.h, PIUIHooskSuite.h, SPPlugs.h
 *  Copyright 1986 - 2000 Adobe Systems Incorporated              
 *  All Rights Reserved
 */
@@ -21,8 +21,7 @@ using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
 
-#if PICASUITES
-	#region BufferSuite1Delegates
+	#region BufferSuite1 Delegates
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate IntPtr PSBufferSuiteNew(ref uint requestedSize, uint minimumSize);
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
@@ -41,7 +40,7 @@ namespace PSFilterLoad.PSApi
 	}
 
 
-	#region ColorSpace1Delegates
+#if PICASUITEDEBUG
 	internal struct CS_XYZ
 	{
 		public ushort x; // all clamped to between 0 and 255, why is a ushort used instead of a byte?
@@ -64,6 +63,8 @@ namespace PSFilterLoad.PSApi
 		public ushort c2;
 		public ushort c3;
 	}
+
+	#region ColorSpace1 Delegates
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate short CSMake(IntPtr colorID);
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
@@ -77,7 +78,7 @@ namespace PSFilterLoad.PSApi
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate short CSExtractXYZ(IntPtr colorID, ref CS_XYZ xyz);
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-	internal delegate short CSConvert8(short inputCSpace, short outputCSpace, IntPtr colorArray, short count);
+	internal delegate short CSConvert8(ColorSpace inputCSpace, ColorSpace outputCSpace, IntPtr colorArray, short count);
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate short CSConvert16(short inputCSpace, short outputCSpace, IntPtr colorArray, short count);
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
@@ -107,7 +108,8 @@ namespace PSFilterLoad.PSApi
 		public IntPtr PickColor;
 		public IntPtr Convert8to16;
 		public IntPtr Convert16to8;
-	}
+	} 
+#endif
 
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate void SetPIHandleLockDelegate(IntPtr handle, byte lockHandle, ref IntPtr address, ref byte oldLock);
@@ -131,7 +133,7 @@ namespace PSFilterLoad.PSApi
 		public IntPtr RecoverSpace;
 	}
 
-	#region UIHooks Delagates
+	#region UIHooks Delegates
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
 	internal delegate IntPtr UISuiteMainWindowHandle();
 	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
@@ -151,9 +153,10 @@ namespace PSFilterLoad.PSApi
 		public IntPtr SetCursor;
 		public IntPtr TickCount;
 		public IntPtr GetPluginName;
-	} 
+	}
 
-#region SPPlgin Delegates
+#if PICASUITEDEBUG
+	#region SPPlugin Delegates
 	internal delegate int SPAllocatePluginList(IntPtr strings, ref IntPtr pluginList);
 	internal delegate int SPFreePluginList(ref IntPtr pluginList);
 	internal delegate int SPGetPluginListNeededSuiteAvailable(IntPtr pluginList, ref int available);
@@ -186,9 +189,9 @@ namespace PSFilterLoad.PSApi
 	internal delegate int SPGetNamedPlugin(IntPtr name, ref IntPtr plugin);
 
 	internal delegate int SPSetPluginPropertyList(IntPtr plugin, IntPtr file);
-#endregion
+	#endregion
 
-	internal struct SPPlugs
+	internal struct SPPluginsSuite4
 	{
 		public IntPtr AllocatePluginList;
 		public IntPtr FreePluginList;
@@ -222,8 +225,8 @@ namespace PSFilterLoad.PSApi
 		public IntPtr GetNamedPlugin;
 
 		public IntPtr SetPluginPropertyList;
-	}
-
+	} 
 #endif
+
    
 }

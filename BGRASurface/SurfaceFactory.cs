@@ -41,7 +41,7 @@ namespace PSFilterHostDll.BGRASurface
 			int width = image.Width;
 			int height = image.Height;
 
-			imageMode = ImageModes.plugInModeRGBColor;
+			imageMode = ImageModes.RGBColor;
 			Surface32 surface = new Surface32(width, height);
 
 			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid meta-data that causes LockBits to fail.

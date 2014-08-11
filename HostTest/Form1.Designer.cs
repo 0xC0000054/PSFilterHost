@@ -44,7 +44,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.menuStrip1 = new HostTest.MenuStripEx();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -91,6 +91,7 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ClickThrough = true;
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
@@ -144,8 +145,8 @@
             // 
             this.loadFiltersMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFiltersMenuItem.Image")));
             this.loadFiltersMenuItem.Name = "loadFiltersMenuItem";
-            this.loadFiltersMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
-            | System.Windows.Forms.Keys.O)));
+            this.loadFiltersMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt)
+                        | System.Windows.Forms.Keys.O)));
             this.loadFiltersMenuItem.Size = new System.Drawing.Size(209, 22);
             this.loadFiltersMenuItem.Text = "&Load Filters...";
             this.loadFiltersMenuItem.Click += new System.EventHandler(this.loadFiltersMenuItem_Click);
@@ -468,7 +469,7 @@
 
         #endregion
 
-        private System.Windows.Forms.MenuStrip menuStrip1;
+        private HostTest.MenuStripEx menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem filtersToolStripMenuItem;
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
