@@ -22,6 +22,8 @@ namespace PSFilterLoad.PSApi
         internal const uint MEM_RESERVE = 0x2000;
         internal const uint MEM_RELEASE = 0x8000;
 
+        internal const uint HEAP_ZERO_MEMORY = 8;
+
         internal const int PAGE_NOACCESS = 1;
         internal const int PAGE_READONLY = 2;
         internal const int PAGE_READWRITE = 4;

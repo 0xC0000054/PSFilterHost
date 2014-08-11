@@ -48,7 +48,7 @@ namespace PSFilterLoad.PSApi
 			try
 			{
 				UIntPtr bytes = new UIntPtr((ulong)size);
-				block = SafeNativeMethods.HeapAlloc(hHeap, zeroFill ? 8U : 0U, bytes);
+				block = SafeNativeMethods.HeapAlloc(hHeap, zeroFill ? NativeConstants.HEAP_ZERO_MEMORY : 0U, bytes);
 			}
 			catch (OverflowException ex)
 			{
