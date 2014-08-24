@@ -15,7 +15,9 @@
  * All rights reserved.
 */
 
+using System;
 using System.Runtime.InteropServices;
+
 namespace PSFilterLoad.PSApi
 {
     internal enum SpecialColorID : int
@@ -44,22 +46,22 @@ namespace PSFilterLoad.PSApi
         XYZSpace = 6
     } 
 
-    [StructLayoutAttribute(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit)]
     internal struct SelectorParameters
     {
-        [FieldOffsetAttribute(0)]
-        public System.IntPtr pickerPrompt;
-        [FieldOffsetAttribute(0)]
-        public System.IntPtr globalSamplePoint;
-        [FieldOffsetAttribute(0)]
+        [FieldOffset(0)]
+        public IntPtr pickerPrompt;
+        [FieldOffset(0)]
+        public IntPtr globalSamplePoint;
+        [FieldOffset(0)]
         public SpecialColorID specialColorID;
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short ColorServicesProc(ref ColorServicesInfo info);
 
-    [StructLayoutAttribute(LayoutKind.Sequential)]
-    internal unsafe struct ColorServicesInfo
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ColorServicesInfo
     {
         public int infoSize;
         public ColorServicesSelector selector;
@@ -67,11 +69,11 @@ namespace PSFilterLoad.PSApi
         public ColorSpace resultSpace;
         public byte resultGamutInfoValid;
         public byte resultInGamut;
-        public System.IntPtr reservedSourceSpaceInfo;
-        public System.IntPtr reservedResultSpaceInfo;
+        public IntPtr reservedSourceSpaceInfo;
+        public IntPtr reservedResultSpaceInfo;
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.I2, SizeConst = 4)]
         public short[] colorComponents;
-        public System.IntPtr reserved;
+        public IntPtr reserved;
         public SelectorParameters selectorParameter;
     }
 
