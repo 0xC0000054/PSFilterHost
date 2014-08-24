@@ -21,27 +21,27 @@ using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_AcquireSuite(System.IntPtr name, int version, ref System.IntPtr suite);
+    internal delegate int SPBasicAcquireSuite(IntPtr name, int version, ref IntPtr suite);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_ReleaseSuite(System.IntPtr name, int version);
+    internal delegate int SPBasicReleaseSuite(IntPtr name, int version);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_IsEqual(System.IntPtr token1, System.IntPtr token2);
+    internal delegate int SPBasicIsEqual(IntPtr token1, IntPtr token2);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_AllocateBlock(int size, ref System.IntPtr block);
+    internal delegate int SPBasicAllocateBlock(int size, ref IntPtr block);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_FreeBlock(System.IntPtr block);
+    internal delegate int SPBasicFreeBlock(IntPtr block);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_ReallocateBlock(System.IntPtr block, int newSize, ref System.IntPtr newblock);
+    internal delegate int SPBasicReallocateBlock(IntPtr block, int newSize, ref IntPtr newblock);
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int SPBasicSuite_Undefined();
+    internal delegate int SPBasicUndefined();
 
-    [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential)]
     internal struct SPBasicSuite
     {
         public IntPtr acquireSuite;

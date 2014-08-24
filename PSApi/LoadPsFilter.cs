@@ -38,35 +38,19 @@ using System.Windows.Media.Imaging;
 
 namespace PSFilterLoad.PSApi
 {
-
 	internal sealed class LoadPsFilter : IDisposable
 	{
 		#region EnumRes
 #if DEBUG
-		private static DebugFlags dbgFlags;
-		private static void Ping(DebugFlags dbg, string message)
+		private static DebugFlags debugFlags;
+		private static void Ping(DebugFlags flag, string message)
 		{
-			if ((dbgFlags & dbg) != 0)
+			if ((debugFlags & flag) == flag)
 			{
 				System.Diagnostics.StackFrame sf = new System.Diagnostics.StackFrame(1);
 				string name = sf.GetMethod().Name;
-				System.Diagnostics.Debug.WriteLine(string.Format("Function: {0} {1}\r\n", name, ", " + message));
+				System.Diagnostics.Debug.WriteLine(string.Format("Function: {0}, {1}\r\n", name, message));
 			}
-		}
-
-		private static bool IS_INTRESOURCE(IntPtr value)
-		{
-			if (((uint)value) > ushort.MaxValue)
-			{
-				return false;
-			}
-			return true;
-		}
-		private static string GET_RESOURCE_NAME(IntPtr value)
-		{
-			if (IS_INTRESOURCE(value))
-				return value.ToString();
-			return Marshal.PtrToStringUni(value);
 		}
 
 		private static string PropToString(uint prop)
@@ -74,7 +58,6 @@ namespace PSFilterLoad.PSApi
 			byte[] bytes = BitConverter.GetBytes(prop);
 			return new string(new char[] { (char)bytes[3], (char)bytes[2], (char)bytes[1], (char)bytes[0] });
 		}
-
 #endif
 
 
@@ -129,6 +112,7 @@ namespace PSFilterLoad.PSApi
 			public IntPtr resourceID;
 			public PluginAETE enumAETE;
 		}
+
 		private struct QueryFilter
 		{
 			public string fileName;
@@ -214,7 +198,7 @@ namespace PSFilterLoad.PSApi
 						int idx = 0;
 						while (*propPtr != 0)
 						{
-							if (*propPtr != 0x27) // the ' char
+							if (*propPtr != 0x27) // The ' char, some filters encode the #ImR parameter type as '#'ImR.
 							{
 								bytes[idx] = *propPtr;
 								idx++;
@@ -327,7 +311,7 @@ namespace PSFilterLoad.PSApi
 			if (hRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("FindResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("FindResource failed for PiPL in {0}", query.fileName));
 #endif
 				return true;
 			}
@@ -336,7 +320,7 @@ namespace PSFilterLoad.PSApi
 			if (loadRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("LoadResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("LoadResource failed for PiPL in {0}", query.fileName));
 #endif
 				return true;
 			}
@@ -345,7 +329,7 @@ namespace PSFilterLoad.PSApi
 			if (lockRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("LockResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("LockResource failed for PiPL in {0}", query.fileName));
 #endif
 
 				return true;
@@ -385,7 +369,7 @@ namespace PSFilterLoad.PSApi
 					if (*((uint*)dataPtr) != PSConstants.filterKind)
 					{
 #if DEBUG
-						System.Diagnostics.Debug.WriteLine(string.Format("{0} is not a valid Photoshop Filter.", query.fileName));
+						System.Diagnostics.Debug.WriteLine(string.Format("{0} is not a valid Photoshop filter.", query.fileName));
 #endif
 						return true;
 					}
@@ -541,7 +525,7 @@ namespace PSFilterLoad.PSApi
 			if (hRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("FindResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("FindResource failed for PiMI in {0}", query.fileName));
 #endif
 				return true;
 			}
@@ -550,7 +534,7 @@ namespace PSFilterLoad.PSApi
 			if (loadRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("LoadResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("LoadResource failed for PiMI in {0}", query.fileName));
 #endif
 				return true;
 			}
@@ -559,7 +543,7 @@ namespace PSFilterLoad.PSApi
 			if (lockRes == IntPtr.Zero)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("LockResource failed for {0} in {1}", GET_RESOURCE_NAME(lpszName), query.fileName));
+				System.Diagnostics.Debug.WriteLine(string.Format("LockResource failed for PiMI in {0}", query.fileName));
 #endif
 				return true;
 			}
@@ -709,7 +693,7 @@ namespace PSFilterLoad.PSApi
 			List<PluginData> pluginData = new List<PluginData>();
 
 #if DEBUG
-			dbgFlags |= DebugFlags.PiPL;
+			debugFlags |= DebugFlags.PiPL;
 #endif
 			SafeLibraryHandle dll = UnsafeNativeMethods.LoadLibraryExW(pluginFileName, IntPtr.Zero, NativeConstants.LOAD_LIBRARY_AS_DATAFILE);
 			try
@@ -897,13 +881,13 @@ namespace PSFilterLoad.PSApi
 		static PutScopedClassProc putScopedClassProc;
 		static PutScopedObjectProc putScopedObjectProc;
 
-		static SPBasicSuite_AcquireSuite spAcquireSuite;
-		static SPBasicSuite_AllocateBlock spAllocateBlock;
-		static SPBasicSuite_FreeBlock spFreeBlock;
-		static SPBasicSuite_IsEqual spIsEqual;
-		static SPBasicSuite_ReallocateBlock spReallocateBlock;
-		static SPBasicSuite_ReleaseSuite spReleaseSuite;
-		static SPBasicSuite_Undefined spUndefined;
+		static SPBasicAcquireSuite spAcquireSuite;
+		static SPBasicAllocateBlock spAllocateBlock;
+		static SPBasicFreeBlock spFreeBlock;
+		static SPBasicIsEqual spIsEqual;
+		static SPBasicReallocateBlock spReallocateBlock;
+		static SPBasicReleaseSuite spReleaseSuite;
+		static SPBasicUndefined spUndefined;
 		#endregion
 
 		private Dictionary<IntPtr, PSHandle> handles;
@@ -1211,18 +1195,18 @@ namespace PSFilterLoad.PSApi
 			this.secondaryColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
 #if DEBUG
-			dbgFlags = DebugFlags.AdvanceState;
-			dbgFlags |= DebugFlags.Call;
-			dbgFlags |= DebugFlags.ColorServices;
-			dbgFlags |= DebugFlags.DisplayPixels;
-			dbgFlags |= DebugFlags.DescriptorParameters;
-			dbgFlags |= DebugFlags.Error;
-			dbgFlags |= DebugFlags.HandleSuite;
-			dbgFlags |= DebugFlags.ImageServices;
-			dbgFlags |= DebugFlags.MiscCallbacks;
-			dbgFlags |= DebugFlags.PropertySuite;
-			dbgFlags |= DebugFlags.ResourceSuite;
-			dbgFlags |= DebugFlags.SPBasicSuite;
+			debugFlags = DebugFlags.AdvanceState;
+			debugFlags |= DebugFlags.Call;
+			debugFlags |= DebugFlags.ColorServices;
+			debugFlags |= DebugFlags.DisplayPixels;
+			debugFlags |= DebugFlags.DescriptorParameters;
+			debugFlags |= DebugFlags.Error;
+			debugFlags |= DebugFlags.HandleSuite;
+			debugFlags |= DebugFlags.ImageServices;
+			debugFlags |= DebugFlags.MiscCallbacks;
+			debugFlags |= DebugFlags.PropertySuite;
+			debugFlags |= DebugFlags.ResourceSuite;
+			debugFlags |= DebugFlags.SPBasicSuite;
 #endif
 		}
 
@@ -5917,6 +5901,7 @@ namespace PSFilterLoad.PSApi
 
 			return PSError.noErr;
 		}
+
 		private short PutScopedObjectProc(IntPtr descriptor, uint key, uint type, IntPtr handle)
 		{
 #if DEBUG
@@ -5939,7 +5924,6 @@ namespace PSFilterLoad.PSApi
 
 			return PSError.noErr;
 		}
-
 		#endregion
 
 		/// <summary>
@@ -6154,6 +6138,7 @@ namespace PSFilterLoad.PSApi
 
 			return PSError.noErr;
 		}
+
 		private void HandleUnlockProc(IntPtr h)
 		{
 #if DEBUG
@@ -7189,13 +7174,13 @@ namespace PSFilterLoad.PSApi
 			putUnitFloatProc = new PutUnitFloatProc(PutUnitFloatProc);
 
 			// SPBasicSuite
-			spAcquireSuite = new SPBasicSuite_AcquireSuite(SPBasicAcquireSuite);
-			spReleaseSuite = new SPBasicSuite_ReleaseSuite(SPBasicReleaseSuite);
-			spIsEqual = new SPBasicSuite_IsEqual(SPBasicIsEqual);
-			spAllocateBlock = new SPBasicSuite_AllocateBlock(SPBasicAllocateBlock);
-			spFreeBlock = new SPBasicSuite_FreeBlock(SPBasicFreeBlock);
-			spReallocateBlock = new SPBasicSuite_ReallocateBlock(SPBasicReallocateBlock);
-			spUndefined = new SPBasicSuite_Undefined(SPBasicUndefined);
+			spAcquireSuite = new SPBasicAcquireSuite(SPBasicAcquireSuite);
+			spReleaseSuite = new SPBasicReleaseSuite(SPBasicReleaseSuite);
+			spIsEqual = new SPBasicIsEqual(SPBasicIsEqual);
+			spAllocateBlock = new SPBasicAllocateBlock(SPBasicAllocateBlock);
+			spFreeBlock = new SPBasicFreeBlock(SPBasicFreeBlock);
+			spReallocateBlock = new SPBasicReallocateBlock(SPBasicReallocateBlock);
+			spUndefined = new SPBasicUndefined(SPBasicUndefined);
 		}
 
 		/// <summary>
