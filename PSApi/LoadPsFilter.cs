@@ -670,7 +670,6 @@ namespace PSFilterLoad.PSApi
 
 		#endregion
 
-
 		/// <summary>
 		/// Queries an 8bf plug-in
 		/// </summary>
@@ -794,110 +793,113 @@ namespace PSFilterLoad.PSApi
 
 		private static readonly int OTOFHandleSize = IntPtr.Size + 4;
 		private const int OTOFSignature = 0x464f544f;
-		struct PSHandle
+		private struct PSHandle
 		{
 			public IntPtr pointer;
 			public int size;
 		}
 
-		#region CallbackDelegates
-
-		// AdvanceState
-		static AdvanceStateProc advanceProc;
-		// BufferProcs
-		static AllocateBufferProc allocProc;
-		static FreeBufferProc freeProc;
-		static LockBufferProc lockProc;
-		static UnlockBufferProc unlockProc;
-		static BufferSpaceProc spaceProc;
-		// MiscCallbacks
-		static ColorServicesProc colorProc;
-		static DisplayPixelsProc displayPixelsProc;
-		static HostProcs hostProc;
-		static ProcessEventProc processEventProc;
-		static ProgressProc progressProc;
-		static TestAbortProc abortProc;
-		// HandleProcs 
-		static NewPIHandleProc handleNewProc;
-		static DisposePIHandleProc handleDisposeProc;
-		static GetPIHandleSizeProc handleGetSizeProc;
-		static SetPIHandleSizeProc handleSetSizeProc;
-		static LockPIHandleProc handleLockProc;
-		static UnlockPIHandleProc handleUnlockProc;
-		static RecoverSpaceProc handleRecoverSpaceProc;
-		static DisposeRegularPIHandleProc handleDisposeRegularProc;
-		// ImageServicesProc
-#if USEIMAGESERVICES
-		static PIResampleProc resample1DProc;
-		static PIResampleProc resample2DProc;
-#endif
-		// ChannelPorts
-		static ReadPixelsProc readPixelsProc;
-		static WriteBasePixelsProc writeBasePixelsProc;
-		static ReadPortForWritePortProc readPortForWritePortProc;
-		// PropertyProcs
-		static GetPropertyProc getPropertyProc;
-		static SetPropertyProc setPropertyProc;
-		// ResourceProcs
-		static CountPIResourcesProc countResourceProc;
-		static GetPIResourceProc getResourceProc;
-		static DeletePIResourceProc deleteResourceProc;
-		static AddPIResourceProc addResourceProc;
-
-		// ReadDescriptorProcs
-		static OpenReadDescriptorProc openReadDescriptorProc;
-		static CloseReadDescriptorProc closeReadDescriptorProc;
-		static GetKeyProc getKeyProc;
-		static GetIntegerProc getIntegerProc;
-		static GetFloatProc getFloatProc;
-		static GetUnitFloatProc getUnitFloatProc;
-		static GetBooleanProc getBooleanProc;
-		static GetTextProc getTextProc;
-		static GetAliasProc getAliasProc;
-		static GetEnumeratedProc getEnumeratedProc;
-		static GetClassProc getClassProc;
-		static GetSimpleReferenceProc getSimpleReferenceProc;
-		static GetObjectProc getObjectProc;
-		static GetCountProc getCountProc;
-		static GetStringProc getStringProc;
-		static GetPinnedIntegerProc getPinnedIntegerProc;
-		static GetPinnedFloatProc getPinnedFloatProc;
-		static GetPinnedUnitFloatProc getPinnedUnitFloatProc;
-		// WriteDescriptorProcs
-		static OpenWriteDescriptorProc openWriteDescriptorProc;
-		static CloseWriteDescriptorProc closeWriteDescriptorProc;
-		static PutIntegerProc putIntegerProc;
-		static PutFloatProc putFloatProc;
-		static PutUnitFloatProc putUnitFloatProc;
-		static PutBooleanProc putBooleanProc;
-		static PutTextProc putTextProc;
-		static PutAliasProc putAliasProc;
-		static PutEnumeratedProc putEnumeratedProc;
-		static PutClassProc putClassProc;
-		static PutSimpleReferenceProc putSimpleReferenceProc;
-		static PutObjectProc putObjectProc;
-		static PutCountProc putCountProc;
-		static PutStringProc putStringProc;
-		static PutScopedClassProc putScopedClassProc;
-		static PutScopedObjectProc putScopedObjectProc;
-
-		static SPBasicAcquireSuite spAcquireSuite;
-		static SPBasicAllocateBlock spAllocateBlock;
-		static SPBasicFreeBlock spFreeBlock;
-		static SPBasicIsEqual spIsEqual;
-		static SPBasicReallocateBlock spReallocateBlock;
-		static SPBasicReleaseSuite spReleaseSuite;
-		static SPBasicUndefined spUndefined;
-		#endregion
-
 		private Dictionary<IntPtr, PSHandle> handles;
 
+		private struct ChannelDescPtrs
+		{
+			public IntPtr address;
+			public IntPtr name;
+		}
+
+		private List<ChannelDescPtrs> channelReadDescPtrs;
+
+		#region CallbackDelegates
+		private static AdvanceStateProc advanceProc;
+		// BufferProcs
+		private static AllocateBufferProc allocProc;
+		private static FreeBufferProc freeProc;
+		private static LockBufferProc lockProc;
+		private static UnlockBufferProc unlockProc;
+		private static BufferSpaceProc spaceProc;
+		// MiscCallbacks
+		private static ColorServicesProc colorProc;
+		private static DisplayPixelsProc displayPixelsProc;
+		private static HostProcs hostProc;
+		private static ProcessEventProc processEventProc;
+		private static ProgressProc progressProc;
+		private static TestAbortProc abortProc;
+		// HandleProcs 
+		private static NewPIHandleProc handleNewProc;
+		private static DisposePIHandleProc handleDisposeProc;
+		private static GetPIHandleSizeProc handleGetSizeProc;
+		private static SetPIHandleSizeProc handleSetSizeProc;
+		private static LockPIHandleProc handleLockProc;
+		private static UnlockPIHandleProc handleUnlockProc;
+		private static RecoverSpaceProc handleRecoverSpaceProc;
+		private static DisposeRegularPIHandleProc handleDisposeRegularProc;
+		// ImageServicesProc
+#if USEIMAGESERVICES
+		private static PIResampleProc resample1DProc;
+		private static PIResampleProc resample2DProc;
+#endif
+		// ChannelPorts
+		private static ReadPixelsProc readPixelsProc;
+		private static WriteBasePixelsProc writeBasePixelsProc;
+		private static ReadPortForWritePortProc readPortForWritePortProc;
+		// PropertyProcs
+		private static GetPropertyProc getPropertyProc;
+		private static SetPropertyProc setPropertyProc;
+		// ResourceProcs
+		private static CountPIResourcesProc countResourceProc;
+		private static GetPIResourceProc getResourceProc;
+		private static DeletePIResourceProc deleteResourceProc;
+		private static AddPIResourceProc addResourceProc;
+
+		// ReadDescriptorProcs
+		private static OpenReadDescriptorProc openReadDescriptorProc;
+		private static CloseReadDescriptorProc closeReadDescriptorProc;
+		private static GetKeyProc getKeyProc;
+		private static GetIntegerProc getIntegerProc;
+		private static GetFloatProc getFloatProc;
+		private static GetUnitFloatProc getUnitFloatProc;
+		private static GetBooleanProc getBooleanProc;
+		private static GetTextProc getTextProc;
+		private static GetAliasProc getAliasProc;
+		private static GetEnumeratedProc getEnumeratedProc;
+		private static GetClassProc getClassProc;
+		private static GetSimpleReferenceProc getSimpleReferenceProc;
+		private static GetObjectProc getObjectProc;
+		private static GetCountProc getCountProc;
+		private static GetStringProc getStringProc;
+		private static GetPinnedIntegerProc getPinnedIntegerProc;
+		private static GetPinnedFloatProc getPinnedFloatProc;
+		private static GetPinnedUnitFloatProc getPinnedUnitFloatProc;
+		// WriteDescriptorProcs
+		private static OpenWriteDescriptorProc openWriteDescriptorProc;
+		private static CloseWriteDescriptorProc closeWriteDescriptorProc;
+		private static PutIntegerProc putIntegerProc;
+		private static PutFloatProc putFloatProc;
+		private static PutUnitFloatProc putUnitFloatProc;
+		private static PutBooleanProc putBooleanProc;
+		private static PutTextProc putTextProc;
+		private static PutAliasProc putAliasProc;
+		private static PutEnumeratedProc putEnumeratedProc;
+		private static PutClassProc putClassProc;
+		private static PutSimpleReferenceProc putSimpleReferenceProc;
+		private static PutObjectProc putObjectProc;
+		private static PutCountProc putCountProc;
+		private static PutStringProc putStringProc;
+		private static PutScopedClassProc putScopedClassProc;
+		private static PutScopedObjectProc putScopedObjectProc;
+		// SPBasic
+		private static SPBasicAcquireSuite spAcquireSuite;
+		private static SPBasicAllocateBlock spAllocateBlock;
+		private static SPBasicFreeBlock spFreeBlock;
+		private static SPBasicIsEqual spIsEqual;
+		private static SPBasicReallocateBlock spReallocateBlock;
+		private static SPBasicReleaseSuite spReleaseSuite;
+		private static SPBasicUndefined spUndefined;
+		#endregion
+
 		private IntPtr filterRecordPtr;
-
 		private IntPtr platFormDataPtr;
-
 		private IntPtr bufferProcsPtr;
-
 		private IntPtr handleProcsPtr;
 #if USEIMAGESERVICES
 		private IntPtr imageServicesProcsPtr;
@@ -911,20 +913,93 @@ namespace PSFilterLoad.PSApi
 		private IntPtr descriptorParametersPtr;
 		private IntPtr readDescriptorPtr;
 		private IntPtr writeDescriptorPtr;
-
 		private IntPtr errorStringPtr;
 
 		private IntPtr basicSuitePtr;
 
 		private PluginAETE aete;
 		private Dictionary<uint, AETEValue> aeteDict;
+		private GlobalParameters globalParameters;
+		private bool isRepeatEffect;
 
+		private static AbortFunc abortFunc;
+		private static ProgressProc progressFunc;
+		private static PickColor pickColor;
+
+		private SurfaceBase source;
+		private SurfaceBase dest;
+		private Surface8 mask;
+		private Surface32 tempDisplaySurface;
+		private Surface8 tempMask;
+		private SurfaceBase tempSurface;
+
+		private PluginPhase phase;
+
+		private IntPtr dataPtr;
+		private short result;
+		private string errorMessage;
+		private List<PSResource> pseudoResources;
+		private HostInformation hostInfo;
+
+		private short filterCase;
+		private double dpiX;
+		private double dpiY;
+		private Region selectedRegion;
+#if GDIPLUS
+		private Bitmap exifBitmap;
+#else
+		private BitmapSource exifBitmap;
+#endif
+		private ImageModes imageMode;
+		private byte[] backgroundColor;
+		private byte[] foregroundColor;
+
+		private bool ignoreAlpha;
+		private FilterDataHandling inputHandling;
+		private FilterDataHandling outputHandling;
+		private IntPtr filterParametersHandle;
+		private IntPtr pluginDataHandle;
+
+		private Rect16 lastOutRect;
+		private int lastOutRowBytes;
+		private int lastOutLoPlane;
+		private int lastOutHiPlane;
+		private Rect16 lastInRect;
+		private int lastInLoPlane;
+		private Rect16 lastMaskRect;
+
+		private IntPtr maskDataPtr;
+		private IntPtr inDataPtr;
+		private IntPtr outDataPtr;
+
+		private SurfaceBase scaledChannelSurface;
+		private SurfaceBase convertedChannelSurface;
+		private Surface8 scaledSelectionMask;
+		private ImageModes convertedChannelImageMode;
+
+		private short descErr;
+		private short descErrValue;
+		private uint getKey;
+		private int getKeyIndex;
+		private List<uint> keys;
+		private List<uint> subKeys;
+		private bool isSubKey;
+		private int subKeyIndex;
+		private int subClassIndex;
+		private Dictionary<uint, AETEValue> subClassDict;
+
+		private bool disposed;
+		private bool sizesSetup;
+		private bool frValuesSetup;
+		private bool useChannelPorts;
+		private bool usePICASuites;
+		private ActivePICASuites activePICASuites;
 
 		public SurfaceBase Dest
 		{
 			get
 			{
-				return dest;
+				return this.dest;
 			}
 		}
 
@@ -964,35 +1039,21 @@ namespace PSFilterLoad.PSApi
 			pickColor = value;
 		}
 
-		static AbortFunc abortFunc;
-		static ProgressProc progressFunc;
-		static PickColor pickColor;
-
-		private SurfaceBase source;
-		private SurfaceBase dest;
-		private PluginPhase phase;
-
-		private IntPtr dataPtr;
-		private short result;
-
-		private string errorMessage;
 
 		public string ErrorMessage
 		{
 			get
 			{
-				return errorMessage;
+				return this.errorMessage;
 			}
 		}
 
-		private GlobalParameters globalParameters;
-		private bool isRepeatEffect;
 
 		internal ParameterData ParameterData
 		{
 			get
 			{
-				return new ParameterData(globalParameters, aeteDict);
+				return new ParameterData(this.globalParameters, this.aeteDict);
 			}
 			set
 			{
@@ -1001,10 +1062,10 @@ namespace PSFilterLoad.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				globalParameters = value.GlobalParameters;
+				this.globalParameters = value.GlobalParameters;
 				if (value.ScriptingData != null)
 				{
-					aeteDict = value.ScriptingData;
+					this.aeteDict = value.ScriptingData;
 				}
 			}
 		}
@@ -1015,17 +1076,15 @@ namespace PSFilterLoad.PSApi
 		{
 			set
 			{
-				isRepeatEffect = value;
+				this.isRepeatEffect = value;
 			}
 		}
-
-		private List<PSResource> pseudoResources;
 
 		internal List<PSResource> PseudoResources
 		{
 			get
 			{
-				return pseudoResources;
+				return this.pseudoResources;
 			}
 			set
 			{
@@ -1034,17 +1093,15 @@ namespace PSFilterLoad.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				pseudoResources = value;
+				this.pseudoResources = value;
 			}
 		}
-
-		private HostInformation hostInfo;
 
 		internal HostInformation HostInformation
 		{
 			get
 			{
-				return hostInfo;
+				return this.hostInfo;
 			}
 			set
 			{
@@ -1053,23 +1110,9 @@ namespace PSFilterLoad.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				hostInfo = value;
+				this.hostInfo = value;
 			}
 		}
-
-		private short filterCase;
-
-		private double dpiX;
-		private double dpiY;
-
-		private Region selectedRegion;
-
-#if GDIPLUS
-		private Bitmap exifBitmap;
-#else
-		private BitmapSource exifBitmap;
-#endif
-		private ImageModes imageMode;
 
 		/// <summary>
 		/// Loads and runs Adobe(R) Photoshop(R) filters
@@ -1131,6 +1174,10 @@ namespace PSFilterLoad.PSApi
 			this.lastInRect = Rect16.Empty;
 			this.lastOutRect = Rect16.Empty;
 			this.lastMaskRect = Rect16.Empty;
+			this.lastInLoPlane = -1;
+			this.lastOutRowBytes = 0;
+			this.lastOutHiPlane = 0;
+			this.lastOutLoPlane = -1;
 
 #if GDIPLUS
 			this.source = SurfaceFactory.CreateFromGdipBitmap(sourceImage, out this.imageMode);
@@ -1179,20 +1226,15 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-
 			unsafe
 			{
 				this.platFormDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
 				((PlatformData*)platFormDataPtr.ToPointer())->hwnd = owner;
 			}
 
-			this.lastInLoPlane = -1;
-			this.lastOutRowBytes = 0;
-			this.lastOutHiPlane = 0;
-			this.lastOutLoPlane = -1;
 
-			this.primaryColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
-			this.secondaryColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
+			this.foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
+			this.backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
 #if DEBUG
 			debugFlags = DebugFlags.AdvanceState;
@@ -1210,20 +1252,6 @@ namespace PSFilterLoad.PSApi
 #endif
 		}
 
-
-		/// <summary>
-		/// The secondary (background) color in the host
-		/// </summary>
-		private byte[] secondaryColor;
-		/// <summary>
-		/// The primary (foreground) color in the host
-		/// </summary>
-		private byte[] primaryColor;
-
-		private bool ignoreAlpha;
-		private FilterDataHandling inputHandling;
-		private FilterDataHandling outputHandling;
-
 		private bool IgnoreAlphaChannel(PluginData data)
 		{
 			if (filterCase < FilterCase.EditableTransparencyNoSelection)
@@ -1239,17 +1267,17 @@ namespace PSFilterLoad.PSApi
 				switch (filterCase)
 				{
 					case FilterCase.EditableTransparencyNoSelection:
-						filterCase = FilterCase.FlatImageNoSelection;
+						this.filterCase = FilterCase.FlatImageNoSelection;
 						break;
 					case FilterCase.EditableTransparencyWithSelection:
-						filterCase = FilterCase.FlatImageWithSelection;
+						this.filterCase = FilterCase.FlatImageWithSelection;
 						break;
 				}
 
 				return true;
 			}
 
-			int filterCaseIndex = filterCase - 1;
+			int filterCaseIndex = this.filterCase - 1;
 
 			// If the EditableTransparency cases are not supported use the other modes.
 			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
@@ -1261,10 +1289,10 @@ namespace PSFilterLoad.PSApi
 					switch (filterCase)
 					{
 						case FilterCase.EditableTransparencyNoSelection:
-							filterCase = FilterCase.FlatImageNoSelection;
+							this.filterCase = FilterCase.FlatImageNoSelection;
 							break;
 						case FilterCase.EditableTransparencyWithSelection:
-							filterCase = FilterCase.FlatImageWithSelection;
+							this.filterCase = FilterCase.FlatImageWithSelection;
 							break;
 					}
 					return true;
@@ -1274,10 +1302,10 @@ namespace PSFilterLoad.PSApi
 					switch (filterCase)
 					{
 						case FilterCase.EditableTransparencyNoSelection:
-							filterCase = FilterCase.ProtectedTransparencyNoSelection;
+							this.filterCase = FilterCase.ProtectedTransparencyNoSelection;
 							break;
 						case FilterCase.EditableTransparencyWithSelection:
-							filterCase = FilterCase.ProtectedTransparencyWithSelection;
+							this.filterCase = FilterCase.ProtectedTransparencyWithSelection;
 							break;
 					}
 
@@ -1285,9 +1313,9 @@ namespace PSFilterLoad.PSApi
 
 			}
 
-			FilterCaseInfo info = data.FilterInfo[filterCase - 1];
-			inputHandling = info.inputHandling;
-			outputHandling = info.outputHandling;
+			FilterCaseInfo info = data.FilterInfo[this.filterCase - 1];
+			this.inputHandling = info.inputHandling;
+			this.outputHandling = info.outputHandling;
 
 			return false;
 		}
@@ -1310,7 +1338,7 @@ namespace PSFilterLoad.PSApi
 				return true;
 			}
 
-			result = ((mbi.Protect & NativeConstants.PAGE_READONLY) != 0 || (mbi.Protect & NativeConstants.PAGE_READWRITE) != 0 || (mbi.Protect & NativeConstants.PAGE_WRITECOPY) != 0 || 
+			result = ((mbi.Protect & NativeConstants.PAGE_READONLY) != 0 || (mbi.Protect & NativeConstants.PAGE_READWRITE) != 0 || (mbi.Protect & NativeConstants.PAGE_WRITECOPY) != 0 ||
 				(mbi.Protect & NativeConstants.PAGE_EXECUTE_READ) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_READWRITE) != 0 || (mbi.Protect & NativeConstants.PAGE_EXECUTE_WRITECOPY) != 0);
 
 			if ((mbi.Protect & NativeConstants.PAGE_GUARD) != 0 || (mbi.Protect & NativeConstants.PAGE_NOACCESS) != 0)
@@ -1440,8 +1468,8 @@ namespace PSFilterLoad.PSApi
 					Marshal.Copy(HandleLockProc(filterRecord->parameters, 0), buf, 0, buf.Length);
 					HandleUnlockProc(filterRecord->parameters);
 
-					globalParameters.SetParameterDataBytes(buf);
-					globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+					this.globalParameters.SetParameterDataBytes(buf);
+					this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 				}
 				else
 				{
@@ -1462,10 +1490,10 @@ namespace PSFilterLoad.PSApi
 								{
 									byte[] buf = new byte[ps];
 									Marshal.Copy(hPtr, buf, 0, (int)ps);
-									globalParameters.SetParameterDataBytes(buf);
-									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
+									this.globalParameters.SetParameterDataBytes(buf);
+									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
 									// Some filters may store executable code in the parameter block.
-									globalParameters.ParameterDataExecutable = IsMemoryExecutable(hPtr);
+									this.globalParameters.ParameterDataExecutable = IsMemoryExecutable(hPtr);
 								}
 
 							}
@@ -1482,16 +1510,16 @@ namespace PSFilterLoad.PSApi
 									byte[] buf = new byte[ps];
 
 									Marshal.Copy(hPtr, buf, 0, ps);
-									globalParameters.SetParameterDataBytes(buf);
-									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+									this.globalParameters.SetParameterDataBytes(buf);
+									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 								}
 								else
 								{
 									byte[] buf = new byte[(int)size];
 
 									Marshal.Copy(parameters, buf, 0, (int)size);
-									globalParameters.SetParameterDataBytes(buf);
-									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
+									this.globalParameters.SetParameterDataBytes(buf);
+									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 								}
 
 							}
@@ -1534,8 +1562,8 @@ namespace PSFilterLoad.PSApi
 						Marshal.Copy(HandleLockProc(pluginData, 0), dataBuf, 0, ps);
 						HandleUnlockProc(pluginData);
 
-						globalParameters.SetPluginDataBytes(dataBuf);
-						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+						this.globalParameters.SetPluginDataBytes(dataBuf);
+						this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 					}
 					else if (pluginDataSize == OTOFHandleSize && Marshal.ReadInt32(pluginData, IntPtr.Size) == OTOFSignature)
 					{
@@ -1545,9 +1573,9 @@ namespace PSFilterLoad.PSApi
 						{
 							byte[] dataBuf = new byte[ps];
 							Marshal.Copy(hPtr, dataBuf, 0, (int)ps);
-							globalParameters.SetPluginDataBytes(dataBuf);
-							globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
-							globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
+							this.globalParameters.SetPluginDataBytes(dataBuf);
+							this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
+							this.globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
 						}
 
 					}
@@ -1555,8 +1583,8 @@ namespace PSFilterLoad.PSApi
 					{
 						byte[] dataBuf = new byte[pluginDataSize];
 						Marshal.Copy(pluginData, dataBuf, 0, (int)pluginDataSize);
-						globalParameters.SetPluginDataBytes(dataBuf);
-						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
+						this.globalParameters.SetPluginDataBytes(dataBuf);
+						this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 					}
 
 				}
@@ -1567,8 +1595,7 @@ namespace PSFilterLoad.PSApi
 
 			}
 		}
-		private IntPtr pluginDataHandle;
-		private IntPtr filterParametersHandle;
+
 		/// <summary>
 		/// Restore the filter parameters for repeat runs.
 		/// </summary>
@@ -1933,7 +1960,6 @@ namespace PSFilterLoad.PSApi
 			return true;
 		}
 
-		private bool frValuesSetup;
 		private unsafe void SetFilterRecordValues()
 		{
 			if (frValuesSetup)
@@ -2454,7 +2480,7 @@ namespace PSFilterLoad.PSApi
 			}
 			else if (err == PSError.errReportString)
 			{
-				error = StringFromPString(errorStringPtr);
+				error = StringFromPString(this.errorStringPtr);
 			}
 			else
 			{
@@ -2538,18 +2564,6 @@ namespace PSFilterLoad.PSApi
 
 			return false;
 		}
-
-		private Rect16 lastOutRect;
-		private int lastOutRowBytes;
-		private int lastOutLoPlane;
-		private int lastOutHiPlane;
-		private Rect16 lastInRect;
-		private int lastInLoPlane;
-		private Rect16 lastMaskRect;
-
-		private IntPtr maskDataPtr;
-		private IntPtr inDataPtr;
-		private IntPtr outDataPtr;
 
 		/// <summary>
 		/// Determines whether the filter uses planar order processing.
@@ -2731,7 +2745,6 @@ namespace PSFilterLoad.PSApi
 			return PSError.noErr;
 		}
 
-		private SurfaceBase tempSurface;
 		/// <summary>
 		/// Scales the temp surface.
 		/// </summary>
@@ -3006,7 +3019,7 @@ namespace PSFilterLoad.PSApi
 		{
 
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { outRowBytes, rect, loplane, hiplane  }));
+			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { outRowBytes, rect, loplane, hiplane }));
 #endif
 
 
@@ -3214,8 +3227,6 @@ namespace PSFilterLoad.PSApi
 
 			return PSError.noErr;
 		}
-
-		private Surface8 tempMask;
 
 		private unsafe void ScaleTempMask(int maskRate, Rectangle lockRect)
 		{
@@ -3577,14 +3588,14 @@ namespace PSFilterLoad.PSApi
 										ptr[0] = ptr[1] = ptr[2] = 255;
 										break;
 									case FilterDataHandling.BackgroundZap:
-										ptr[2] = secondaryColor[0];
-										ptr[1] = secondaryColor[1];
-										ptr[0] = secondaryColor[2];
+										ptr[2] = backgroundColor[0];
+										ptr[1] = backgroundColor[1];
+										ptr[0] = backgroundColor[2];
 										break;
 									case FilterDataHandling.ForegroundZap:
-										ptr[2] = primaryColor[0];
-										ptr[1] = primaryColor[1];
-										ptr[0] = primaryColor[2];
+										ptr[2] = foregroundColor[0];
+										ptr[1] = foregroundColor[1];
+										ptr[0] = foregroundColor[2];
 										break;
 									default:
 										break;
@@ -3625,14 +3636,14 @@ namespace PSFilterLoad.PSApi
 										ptr[0] = ptr[1] = ptr[2] = 255;
 										break;
 									case FilterDataHandling.BackgroundZap:
-										ptr[2] = secondaryColor[0];
-										ptr[1] = secondaryColor[1];
-										ptr[0] = secondaryColor[2];
+										ptr[2] = backgroundColor[0];
+										ptr[1] = backgroundColor[1];
+										ptr[0] = backgroundColor[2];
 										break;
 									case FilterDataHandling.ForegroundZap:
-										ptr[2] = primaryColor[0];
-										ptr[1] = primaryColor[1];
-										ptr[0] = primaryColor[2];
+										ptr[2] = foregroundColor[0];
+										ptr[1] = foregroundColor[1];
+										ptr[0] = foregroundColor[2];
 										break;
 									default:
 										break;
@@ -3865,11 +3876,6 @@ namespace PSFilterLoad.PSApi
 			return err;
 		}
 
-		private SurfaceBase scaledChannelSurface;
-		private SurfaceBase convertedChannelSurface;
-		private Surface8 scaledSelectionMask;
-		private ImageModes convertedChannelImageMode;
-
 		private static unsafe void FillChannelData(int channel, PixelMemoryDesc destiniation, SurfaceBase source, VRect srcRect, ImageModes mode)
 		{
 			byte* dstPtr = (byte*)destiniation.data.ToPointer();
@@ -3995,7 +4001,6 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
-		private bool useChannelPorts;
 		private unsafe short ReadPixelsProc(IntPtr port, ref PSScaling scaling, ref VRect writeRect, ref PixelMemoryDesc destination, ref VRect wroteRect)
 		{
 #if DEBUG
@@ -4228,14 +4233,6 @@ namespace PSFilterLoad.PSApi
 #endif
 			return PSError.memFullErr;
 		}
-
-		struct ChannelDescPtrs
-		{
-			public IntPtr address;
-			public IntPtr name;
-		}
-
-		private List<ChannelDescPtrs> channelReadDescPtrs;
 
 		private unsafe void CreateReadImageDocument()
 		{
@@ -4713,7 +4710,6 @@ namespace PSFilterLoad.PSApi
 			return PSError.noErr;
 		}
 
-		private Surface32 tempDisplaySurface;
 		private void SetupTempDisplaySurface(int width, int height, bool haveMask)
 		{
 			if ((tempDisplaySurface == null) || width != tempDisplaySurface.Width || height != tempDisplaySurface.Height)
@@ -4946,10 +4942,6 @@ namespace PSFilterLoad.PSApi
 
 		}
 
-		/// <summary>
-		/// The selection mask for the image
-		/// </summary>
-		private Surface8 mask;
 		private unsafe void DrawMask()
 		{
 			mask = new Surface8(source.Width, source.Height);
@@ -4975,17 +4967,6 @@ namespace PSFilterLoad.PSApi
 		}
 
 		#region DescriptorParameters
-
-		private short descErr;
-		private short descErrValue;
-		private uint getKey;
-		private int getKeyIndex;
-		private List<uint> keys;
-		private List<uint> subKeys;
-		private bool isSubKey;
-		private int subKeyIndex;
-		private int subClassIndex;
-		private Dictionary<uint, AETEValue> subClassDict;
 
 		private unsafe IntPtr OpenReadDescriptorProc(IntPtr descriptor, IntPtr keyArray)
 		{
@@ -6793,9 +6774,6 @@ namespace PSFilterLoad.PSApi
 			return IntPtr.Zero;
 		}
 
-		private ActivePICASuites activePICASuites;
-		private bool usePICASuites;
-
 		private unsafe int SPBasicAcquireSuite(IntPtr name, int version, ref IntPtr suite)
 		{
 
@@ -7038,7 +7016,6 @@ namespace PSFilterLoad.PSApi
 			return (value >> 16);
 		}
 
-		private bool sizesSetup;
 		/// <summary>
 		/// Setup the FilterRecord image size data.
 		/// </summary>
@@ -7362,13 +7339,13 @@ namespace PSFilterLoad.PSApi
 			filterRecord->progressProc = Marshal.GetFunctionPointerForDelegate(progressProc);
 			filterRecord->parameters = IntPtr.Zero;
 
-			filterRecord->background.red = (ushort)((secondaryColor[0] * 65535) / 255);
-			filterRecord->background.green = (ushort)((secondaryColor[1] * 65535) / 255);
-			filterRecord->background.blue = (ushort)((secondaryColor[2] * 65535) / 255);
+			filterRecord->background.red = (ushort)((backgroundColor[0] * 65535) / 255);
+			filterRecord->background.green = (ushort)((backgroundColor[1] * 65535) / 255);
+			filterRecord->background.blue = (ushort)((backgroundColor[2] * 65535) / 255);
 
-			filterRecord->foreground.red = (ushort)((primaryColor[0] * 65535) / 255);
-			filterRecord->foreground.green = (ushort)((primaryColor[1] * 65535) / 255);
-			filterRecord->foreground.blue = (ushort)((primaryColor[2] * 65535) / 255);
+			filterRecord->foreground.red = (ushort)((foregroundColor[0] * 65535) / 255);
+			filterRecord->foreground.green = (ushort)((foregroundColor[1] * 65535) / 255);
+			filterRecord->foreground.blue = (ushort)((foregroundColor[2] * 65535) / 255);
 
 			// The backColor and foreColor fields are always in the native color space of the image. 
 			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
@@ -7377,19 +7354,19 @@ namespace PSFilterLoad.PSApi
 				const int greenLuma = 38470;
 				const int blueLuma = 7471;
 
-				filterRecord->backColor[0] = (byte)((secondaryColor[0] * redLuma + secondaryColor[1] * greenLuma + secondaryColor[2] * blueLuma) >> 16);
-				filterRecord->foreColor[0] = (byte)((primaryColor[0] * redLuma + primaryColor[1] * greenLuma + primaryColor[2] * blueLuma) >> 16);
+				filterRecord->backColor[0] = (byte)((backgroundColor[0] * redLuma + backgroundColor[1] * greenLuma + backgroundColor[2] * blueLuma) >> 16);
+				filterRecord->foreColor[0] = (byte)((foregroundColor[0] * redLuma + foregroundColor[1] * greenLuma + foregroundColor[2] * blueLuma) >> 16);
 			}
 			else
 			{
 				for (int i = 0; i < 4; i++)
 				{
-					filterRecord->backColor[i] = secondaryColor[i];
+					filterRecord->backColor[i] = backgroundColor[i];
 				}
 
 				for (int i = 0; i < 4; i++)
 				{
-					filterRecord->foreColor[i] = primaryColor[i];
+					filterRecord->foreColor[i] = foregroundColor[i];
 				}
 			}
 
@@ -7453,8 +7430,9 @@ namespace PSFilterLoad.PSApi
 			// New in 4.0
 			filterRecord->descriptorParameters = descriptorParametersPtr;
 
-			errorStringPtr = Memory.Allocate(256L, true);
-			filterRecord->errorString = errorStringPtr; // some filters trash the filterRecord->errorString pointer so the errorStringPtr value is used instead. 
+			// The errorStringPtr value is used so the filters cannot corrupt the pointer that we release when the class is disposed. 
+			this.errorStringPtr = Memory.Allocate(256L, true);
+			filterRecord->errorString = this.errorStringPtr; 
 
 			filterRecord->channelPortProcs = channelPortsPtr;
 			filterRecord->documentInfo = readDocumentPtr;
@@ -7496,7 +7474,6 @@ namespace PSFilterLoad.PSApi
 			Dispose(false);
 		}
 
-		private bool disposed;
 		private unsafe void Dispose(bool disposing)
 		{
 			if (!disposed)
