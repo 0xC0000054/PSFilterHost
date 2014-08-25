@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle(".NET host library for 3rd party Adobe\u00AE Photoshop\u00AE filters")]
+[assembly: AssemblyTitle(".NET host library for 3rd party Adobe\u00AE Photoshop\u00AE-compatible filters")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PSFilterHost Team")]
