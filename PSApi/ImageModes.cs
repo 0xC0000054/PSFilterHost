@@ -21,14 +21,14 @@ namespace PSFilterLoad.PSApi
     {
         Bitmap = 0,
         GrayScale = 1,
-        IndexedColor = 2,
-        RGBColor = 3,
-        CMYKColor = 4,
-        HSLColor = 5,
-        HSBColor = 6,
+        Indexed = 2,
+        RGB = 3,
+        CMYK = 4,
+        HSL = 5,
+        HSB = 6,
         Multichannel = 7,
         Duotone = 8,
-        LabColor = 9,
+        Lab = 9,
         Gray16 = 10,
         RGB48 = 11
     }

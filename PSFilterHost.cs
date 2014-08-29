@@ -30,7 +30,7 @@ using System.Security.Permissions;
 namespace PSFilterHostDll
 {
 	/// <summary>
-	/// The class that enumerates and runs the Adobe® Photoshop® filters.
+	/// The class that enumerates and runs the Photoshop-compatible filters.
 	/// </summary>
 	/// <threadsafety static="true" instance="false" />
 	public sealed class PSFilterHost : IDisposable

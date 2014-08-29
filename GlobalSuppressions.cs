@@ -186,3 +186,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "VirtualFree", Scope = "member", Target = "PSFilterLoad.PSApi.Memory.#FreeExecutable(System.IntPtr,System.Int64)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "VirtualAlloc", Scope = "member", Target = "PSFilterLoad.PSApi.Memory.#AllocateExecutable(System.Int64)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Scope = "member", Target = "PSFilterLoad.PSApi.Memory.#AllocateExecutable(System.Int64)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Scope = "member", Target = "PSFilterLoad.PSApi.LoadPsFilter.#SetPickColor(PSFilterHostDll.PickColor)")]

@@ -23,7 +23,7 @@ namespace PSFilterHostDll
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate void pluginEntryPoint(FilterSelector selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
     /// <summary>
-    /// The class that encapsulates an Adobe® Photoshop® filter plug-in.
+    /// The class that encapsulates a Photoshop-compatible filter plug-in.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
     [Serializable]

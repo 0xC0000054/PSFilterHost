@@ -932,6 +932,7 @@ namespace PSFilterLoad.PSApi
 		private Surface32 tempDisplaySurface;
 		private Surface8 tempMask;
 		private SurfaceBase tempSurface;
+		private Bitmap checkerBoardBitmap;
 
 		private PluginPhase phase;
 
@@ -991,6 +992,8 @@ namespace PSFilterLoad.PSApi
 		private bool disposed;
 		private bool sizesSetup;
 		private bool frValuesSetup;
+		private bool copyToDest;
+		private bool writesOutsideSelection;
 		private bool useChannelPorts;
 		private bool usePICASuites;
 		private ActivePICASuites activePICASuites;
@@ -1218,23 +1221,22 @@ namespace PSFilterLoad.PSApi
 				switch (filterCase)
 				{
 					case FilterCase.EditableTransparencyNoSelection:
-						filterCase = FilterCase.FlatImageNoSelection;
+						this.filterCase = FilterCase.FlatImageNoSelection;
 						break;
 					case FilterCase.EditableTransparencyWithSelection:
-						filterCase = FilterCase.FlatImageWithSelection;
+						this.filterCase = FilterCase.FlatImageWithSelection;
 						break;
 				}
 			}
+			
+			this.foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
+			this.backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
 			unsafe
 			{
 				this.platFormDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
 				((PlatformData*)platFormDataPtr.ToPointer())->hwnd = owner;
 			}
-
-
-			this.foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
-			this.backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
 #if DEBUG
 			debugFlags = DebugFlags.AdvanceState;
@@ -1260,9 +1262,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
-			if ((data.FilterInfo == null) || data.Category == "L'amico Perry" || data.Category == "Imagenomic" ||
-				data.Category.Contains("Vizros") && data.Title.Contains("Lake") || data.Category == "PictureCode" ||
-				data.Category == "PictoColor" || data.Category == "Axion")
+			if ((data.FilterInfo == null) || data.Category == "Axion")
 			{
 				switch (filterCase)
 				{
@@ -2067,7 +2067,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->absLayerMasks = filterRecord->inLayerMasks;
 			filterRecord->absInvertedLayerMasks = filterRecord->inInvertedLayerMasks;
 
-			if (ignoreAlpha && (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48))
+			if (ignoreAlpha && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
 			{
 				filterRecord->absNonLayerPlanes = 4;
 			}
@@ -2131,15 +2131,11 @@ namespace PSFilterLoad.PSApi
 		}
 
 		/// <summary>
-		/// True if the source image is copied to the dest image, otherwise false.
-		/// </summary>
-		private bool copyToDest;
-		/// <summary>
 		/// Sets the dest alpha to the source alpha when the filter ignores the alpha channel.
 		/// </summary>
 		private unsafe void CopySourceAlpha()
 		{
-			if (!copyToDest && (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48))
+			if (!copyToDest && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
 			{
 				int width = dest.Width;
 				int height = dest.Height;
@@ -2186,7 +2182,6 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
-		private bool writesOutsideSelection;
 		/// <summary>
 		/// Clips the output image to the selection.
 		/// </summary>
@@ -2449,7 +2444,7 @@ namespace PSFilterLoad.PSApi
 			string imageMode = string.Empty;
 			switch (mode)
 			{
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 					imageMode = Resources.RGBMode;
 					break;
 				case ImageModes.RGB48:
@@ -2869,7 +2864,7 @@ namespace PSFilterLoad.PSApi
 
 
 			short ofs = loplane;
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGBColor)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGB)
 			{
 				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
@@ -2932,7 +2927,7 @@ namespace PSFilterLoad.PSApi
 					inRowBytes *= 2;
 
 					break;
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3082,7 +3077,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 			short ofs = loplane;
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGBColor)
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGB)
 			{
 				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
@@ -3145,7 +3140,7 @@ namespace PSFilterLoad.PSApi
 					outRowBytes *= 2;
 
 					break;
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 
 					for (int y = top; y < bottom; y++)
 					{
@@ -3461,7 +3456,7 @@ namespace PSFilterLoad.PSApi
 							}
 
 							break;
-						case ImageModes.RGBColor:
+						case ImageModes.RGB:
 
 							for (int y = top; y < bottom; y++)
 							{
@@ -3853,7 +3848,7 @@ namespace PSFilterLoad.PSApi
 									info.colorComponents[2] = 0;
 									info.colorComponents[3] = 0;
 									break;
-								case ImageModes.RGBColor:
+								case ImageModes.RGB:
 									info.colorComponents[0] = pixel[2];
 									info.colorComponents[1] = pixel[1];
 									info.colorComponents[2] = pixel[0];
@@ -3902,7 +3897,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 
 					for (int y = srcRect.top; y < srcRect.bottom; y++)
 					{
@@ -4126,7 +4121,7 @@ namespace PSFilterLoad.PSApi
 
 							case ImageModes.RGB48:
 
-								convertedChannelImageMode = ImageModes.RGBColor;
+								convertedChannelImageMode = ImageModes.RGB;
 								convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
 
 								for (int y = 0; y < height; y++)
@@ -4245,7 +4240,7 @@ namespace PSFilterLoad.PSApi
 			switch (imageMode)
 			{
 				case ImageModes.GrayScale:
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 					doc->depth = 8;
 					break;
 				case ImageModes.Gray16:
@@ -4261,7 +4256,7 @@ namespace PSFilterLoad.PSApi
 			doc->hResolution = Int32ToFixed((int)(dpiX + 0.5));
 			doc->vResolution = Int32ToFixed((int)(dpiY + 0.5));
 
-			if (imageMode == ImageModes.RGBColor || imageMode == ImageModes.RGB48)
+			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
 				string[] names = new string[3] { Resources.RedChannelName, Resources.GreenChannelName, Resources.BlueChannelName };
 				IntPtr channel = CreateReadChannelDesc(0, names[0], doc->depth, doc->bounds);
@@ -4780,7 +4775,15 @@ namespace PSFilterLoad.PSApi
 			int height = srcRect.bottom - srcRect.top;
 			int nplanes = ((FilterRecord*)filterRecordPtr.ToPointer())->planes;
 
-			SetupTempDisplaySurface(width, height, (source.version >= 1 && source.masks != IntPtr.Zero));
+			bool hasTransparencyMask = source.version >= 1 && source.masks != IntPtr.Zero;
+
+			// Ignore the alpha plane if the PSPixelMap does not have a transparency mask.  
+			if (!hasTransparencyMask && nplanes == 4)
+			{
+				nplanes = 3;
+			}
+
+			SetupTempDisplaySurface(width, height, hasTransparencyMask);
 
 			byte* baseAddr = (byte*)source.baseAddr.ToPointer();
 
@@ -4870,13 +4873,14 @@ namespace PSFilterLoad.PSApi
 
 			using (Graphics gr = Graphics.FromHdc(platformContext))
 			{
-				if (source.colBytes == 4)
+				if (source.colBytes == 4 || nplanes == 4 && source.colBytes == 1)
 				{
 					Display32BitBitmap(gr, dstCol, dstRow);
 				}
 				else
 				{
-					if ((source.version >= 1) && source.masks != IntPtr.Zero) // use the mask for the Protected Transparency cases 
+					// Apply the transparency mask for the Protected Transparency cases.
+					if (hasTransparencyMask && (this.filterCase == FilterCase.ProtectedTransparencyNoSelection || this.filterCase == FilterCase.ProtectedTransparencyWithSelection)) 
 					{
 						PSPixelMask* srcMask = (PSPixelMask*)source.masks.ToPointer();
 						byte* maskData = (byte*)srcMask->maskData.ToPointer();
@@ -4911,7 +4915,6 @@ namespace PSFilterLoad.PSApi
 			return PSError.noErr;
 		}
 
-		private Bitmap checkerBoardBitmap;
 		private unsafe void DrawCheckerBoardBitmap()
 		{
 			checkerBoardBitmap = new Bitmap(source.Width, source.Height, PixelFormat.Format32bppArgb);
@@ -7042,7 +7045,7 @@ namespace PSFilterLoad.PSApi
 				case ImageModes.Gray16:
 					filterRecord->planes = 1;
 					break;
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 				case ImageModes.RGB48:
 					filterRecord->planes = ignoreAlpha ? (short)3 : (short)4;
 					break;
@@ -7432,7 +7435,7 @@ namespace PSFilterLoad.PSApi
 
 			// The errorStringPtr value is used so the filters cannot corrupt the pointer that we release when the class is disposed. 
 			this.errorStringPtr = Memory.Allocate(256L, true);
-			filterRecord->errorString = this.errorStringPtr; 
+			filterRecord->errorString = this.errorStringPtr;
 
 			filterRecord->channelPortProcs = channelPortsPtr;
 			filterRecord->documentInfo = readDocumentPtr;
@@ -7443,7 +7446,7 @@ namespace PSFilterLoad.PSApi
 			switch (imageMode)
 			{
 				case ImageModes.GrayScale:
-				case ImageModes.RGBColor:
+				case ImageModes.RGB:
 					filterRecord->depth = 8;
 					break;
 
