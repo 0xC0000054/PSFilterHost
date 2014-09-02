@@ -4338,11 +4338,349 @@ namespace PSFilterLoad.PSApi
 			return addressPtr;
 		}
 
+		private static unsafe void SetFilterEdgePadding8(IntPtr inData, int inRowBytes, Rect16 rect, int nplanes, short ofs, Rectangle lockRect, SurfaceBase surface)
+		{
+			int top = rect.top < 0 ? -rect.top : 0;
+			int left = rect.left < 0 ? -rect.left : 0;
+
+			int right = lockRect.Right - surface.Width;
+			int bottom = lockRect.Bottom - surface.Height;
+
+			int height = rect.bottom - rect.top;
+			int width = rect.right - rect.left;
+
+			int row, col;
+
+			byte* ptr = (byte*)inData.ToPointer();
+
+			int srcChannelCount = surface.ChannelCount;
+
+
+			if (top > 0)
+			{
+				for (int y = 0; y < top; y++)
+				{
+					byte* src = surface.GetRowAddressUnchecked(0);
+					byte* dst = ptr + (y * inRowBytes);
+
+					for (int x = 0; x < width; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+
+						src += srcChannelCount;
+						dst += nplanes;
+					}
+				}
+			}
+
+
+			if (left > 0)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					byte* src = surface.GetPointAddressUnchecked(0, y);
+					byte* dst = ptr + (y * inRowBytes);
+
+					for (int x = 0; x < left; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+						dst += nplanes;
+					}
+				}
+			}
+
+
+			if (bottom > 0)
+			{
+				col = surface.Height - 1;
+				int lockBottom = height - 1;
+				for (int y = 0; y < bottom; y++)
+				{
+					byte* src = surface.GetRowAddressUnchecked(col);
+					byte* dst = ptr + ((lockBottom - y) * inRowBytes);
+
+					for (int x = 0; x < width; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+
+						src += srcChannelCount;
+						dst += nplanes;
+					}
+
+				}
+			}
+
+			if (right > 0)
+			{
+				row = surface.Width - 1;
+				int rowEnd = width - right;
+				for (int y = 0; y < height; y++)
+				{
+					byte* src = surface.GetPointAddressUnchecked(row, y);
+					byte* dst = ptr + (y * inRowBytes) + rowEnd;
+
+					for (int x = 0; x < right; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+						dst += nplanes;
+					}
+				}
+			}
+		}
+
+		private static unsafe void SetFilterEdgePadding16(IntPtr inData, int inRowBytes, Rect16 rect, int nplanes, short ofs, Rectangle lockRect, SurfaceBase surface)
+		{
+			int top = rect.top < 0 ? -rect.top : 0;
+			int left = rect.left < 0 ? -rect.left : 0;
+
+			int right = lockRect.Right - surface.Width;
+			int bottom = lockRect.Bottom - surface.Height;
+
+			int height = rect.bottom - rect.top;
+			int width = rect.right - rect.left;
+
+			int row, col;
+
+			byte* ptr = (byte*)inData.ToPointer();
+
+			int srcChannelCount = surface.ChannelCount;
+
+			if (top > 0)
+			{
+				for (int y = 0; y < top; y++)
+				{
+					ushort* src = (ushort*)surface.GetRowAddressUnchecked(0);
+					ushort* dst = (ushort*)ptr + (y * inRowBytes);
+
+					for (int x = 0; x < width; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+
+						src += srcChannelCount;
+						dst += nplanes;
+					}
+				}
+			}
+
+			if (left > 0)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					ushort* src = (ushort*)surface.GetPointAddressUnchecked(0, y);
+					ushort* dst = (ushort*)ptr + (y * inRowBytes);
+
+					for (int x = 0; x < left; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+						dst += nplanes;
+					}
+				}
+			}
+
+
+			if (bottom > 0)
+			{
+				col = surface.Height - 1;
+				int lockBottom = height - 1;
+				for (int y = 0; y < bottom; y++)
+				{
+					ushort* src = (ushort*)surface.GetRowAddressUnchecked(col);
+					ushort* dst = (ushort*)ptr + ((lockBottom - y) * inRowBytes);
+
+					for (int x = 0; x < width; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+
+						src += srcChannelCount;
+						dst += nplanes;
+					}
+
+				}
+			}
+
+			if (right > 0)
+			{
+				row = surface.Width - 1;
+				int rowEnd = width - right;
+				for (int y = 0; y < height; y++)
+				{
+					ushort* src = (ushort*)surface.GetPointAddressUnchecked(row, y);
+					ushort* dst = (ushort*)ptr + (y * inRowBytes) + rowEnd;
+
+					for (int x = 0; x < right; x++)
+					{
+						switch (nplanes)
+						{
+							case 1:
+								*dst = src[ofs];
+								break;
+							case 2:
+								dst[0] = src[ofs];
+								dst[1] = src[ofs + 1];
+								break;
+							case 3:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								break;
+							case 4:
+								dst[0] = src[2];
+								dst[1] = src[1];
+								dst[2] = src[0];
+								dst[3] = src[3];
+								break;
+						}
+						dst += nplanes;
+					}
+				}
+			}
+		}
+
 		/// <summary>
 		/// Sets the filter padding.
 		/// </summary>
 		/// <param name="inData">The input data.</param>
-		/// <param name="inRowBytes">The input row bytes (stride).</param>
+		/// <param name="inRowBytes">The input stride.</param>
 		/// <param name="rect">The input rect.</param>
 		/// <param name="nplanes">The number of channels in the image.</param>
 		/// <param name="ofs">The single channel offset to map to BGRA color space.</param>
@@ -4357,330 +4695,17 @@ namespace PSFilterLoad.PSApi
 				{
 					case PSConstants.Padding.plugInWantsEdgeReplication:
 
-						int top = rect.top < 0 ? -rect.top : 0;
-						int left = rect.left < 0 ? -rect.left : 0;
-
-						int right = lockRect.Right - surface.Width;
-						int bottom = lockRect.Bottom - surface.Height;
-
-						int height = rect.bottom - rect.top;
-						int width = rect.right - rect.left;
-
-						int row, col;
-
-						byte* ptr = (byte*)inData.ToPointer();
-
-						int srcChannelCount = surface.ChannelCount;
-
-						#region Padding code
-
-						if (surface.BitsPerChannel == 16)
+						switch (surface.BitsPerChannel)
 						{
-							if (top > 0)
-							{
-								for (int y = 0; y < top; y++)
-								{
-									ushort* src = (ushort*)surface.GetRowAddressUnchecked(0);
-									ushort* dst = (ushort*)ptr + (y * inRowBytes);
-
-									for (int x = 0; x < width; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-
-										src += srcChannelCount;
-										dst += nplanes;
-									}
-								}
-							}
-
-							if (left > 0)
-							{
-								for (int y = 0; y < height; y++)
-								{
-									ushort* src = (ushort*)surface.GetPointAddressUnchecked(0, y);
-									ushort* dst = (ushort*)ptr + (y * inRowBytes);
-
-									for (int x = 0; x < left; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-										dst += nplanes;
-									}
-								}
-							}
-
-
-							if (bottom > 0)
-							{
-								col = surface.Height - 1;
-								int lockBottom = height - 1;
-								for (int y = 0; y < bottom; y++)
-								{
-									ushort* src = (ushort*)surface.GetRowAddressUnchecked(col);
-									ushort* dst = (ushort*)ptr + ((lockBottom - y) * inRowBytes);
-
-									for (int x = 0; x < width; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-
-										src += srcChannelCount;
-										dst += nplanes;
-									}
-
-								}
-							}
-
-							if (right > 0)
-							{
-								row = surface.Width - 1;
-								int rowEnd = width - right;
-								for (int y = 0; y < height; y++)
-								{
-									ushort* src = (ushort*)surface.GetPointAddressUnchecked(row, y);
-									ushort* dst = (ushort*)ptr + (y * inRowBytes) + rowEnd;
-
-									for (int x = 0; x < right; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-										dst += nplanes;
-									}
-								}
-							}
+							case 16:
+								SetFilterEdgePadding16(inData, inRowBytes, rect, nplanes, ofs, lockRect, surface);
+								break;
+							case 8:
+								SetFilterEdgePadding8(inData, inRowBytes, rect, nplanes, ofs, lockRect, surface);
+								break;
+							default:
+								break;
 						}
-						else
-						{
-							if (top > 0)
-							{
-								for (int y = 0; y < top; y++)
-								{
-									byte* src = surface.GetRowAddressUnchecked(0);
-									byte* dst = ptr + (y * inRowBytes);
-
-									for (int x = 0; x < width; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-
-										src += srcChannelCount;
-										dst += nplanes;
-									}
-								}
-							}
-
-
-							if (left > 0)
-							{
-								for (int y = 0; y < height; y++)
-								{
-									byte* src = surface.GetPointAddressUnchecked(0, y);
-									byte* dst = ptr + (y * inRowBytes);
-
-									for (int x = 0; x < left; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-										dst += nplanes;
-									}
-								}
-							}
-
-
-							if (bottom > 0)
-							{
-								col = surface.Height - 1;
-								int lockBottom = height - 1;
-								for (int y = 0; y < bottom; y++)
-								{
-									byte* src = surface.GetRowAddressUnchecked(col);
-									byte* dst = ptr + ((lockBottom - y) * inRowBytes);
-
-									for (int x = 0; x < width; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-
-										src += srcChannelCount;
-										dst += nplanes;
-									}
-
-								}
-							}
-
-							if (right > 0)
-							{
-								row = surface.Width - 1;
-								int rowEnd = width - right;
-								for (int y = 0; y < height; y++)
-								{
-									byte* src = surface.GetPointAddressUnchecked(row, y);
-									byte* dst = ptr + (y * inRowBytes) + rowEnd;
-
-									for (int x = 0; x < right; x++)
-									{
-										switch (nplanes)
-										{
-											case 1:
-												*dst = src[ofs];
-												break;
-											case 2:
-												dst[0] = src[ofs];
-												dst[1] = src[ofs + 1];
-												break;
-											case 3:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												break;
-											case 4:
-												dst[0] = src[2];
-												dst[1] = src[1];
-												dst[2] = src[0];
-												dst[3] = src[3];
-												break;
-										}
-										dst += nplanes;
-									}
-								}
-							}
-						}
-
-						#endregion
 
 						break;
 					case PSConstants.Padding.plugInDoesNotWantPadding:
