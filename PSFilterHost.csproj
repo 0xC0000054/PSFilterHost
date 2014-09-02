@@ -131,6 +131,7 @@
     <Compile Include="ColorSpace\RGB.cs" />
     <Compile Include="EnableInfoParser.cs" />
     <Compile Include="Enumerable.cs" />
+    <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostInformation.cs" />

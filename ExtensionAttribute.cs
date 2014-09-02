@@ -11,22 +11,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 
-namespace PSFilterLoad.PSApi
+#if !NET_35_OR_GREATER
+namespace System.Runtime.CompilerServices
 {
-    internal static class DictionaryExtensions
-    {
-        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                dict.Add(key, value);
-            }
-            else
-            {
-                dict[key] = value;
-            }
-        }
-    }
+    [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
+    internal sealed class ExtensionAttribute : Attribute { }
 }
+#endif
