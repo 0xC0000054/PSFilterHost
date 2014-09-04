@@ -2563,19 +2563,14 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// Determines whether the filter uses planar order processing.
 		/// </summary>
-		/// <param name="fr">The FilterRecord to check.</param>
-		/// <param name="outData">if set to <c>true</c> check the output data.</param>
+		/// <param name="loPlane">The lo plane.</param>
+		/// <param name="hiPlane">The hi plane.</param>
 		/// <returns>
 		///   <c>true</c> if a single plane of data is requested; otherwise, <c>false</c>.
 		/// </returns>
-		private static unsafe bool IsSinglePlane(FilterRecord* fr, bool outData)
+		private static unsafe bool IsSinglePlane(short loPlane, short hiPlane)
 		{
-			if (outData)
-			{
-				return (((fr->outHiPlane - fr->outLoPlane) + 1) == 1);
-			}
-
-			return (((fr->inHiPlane - fr->inLoPlane) + 1) == 1);
+			return (((hiPlane - loPlane) + 1) == 1);
 		}
 
 		/// <summary>
@@ -2649,7 +2644,7 @@ namespace PSFilterLoad.PSApi
 
 			if (RectNonEmpty(filterRecord->inRect))
 			{
-				if (!lastInRect.Equals(filterRecord->inRect) || (IsSinglePlane(filterRecord, false) && lastInLoPlane != filterRecord->inLoPlane))
+				if (!lastInRect.Equals(filterRecord->inRect) || (IsSinglePlane(filterRecord->inLoPlane, filterRecord->inHiPlane) && lastInLoPlane != filterRecord->inLoPlane))
 				{
 					if (inDataPtr != IntPtr.Zero && ResizeBuffer(inDataPtr, filterRecord->inRect, filterRecord->inLoPlane, filterRecord->inHiPlane))
 					{
@@ -2689,7 +2684,7 @@ namespace PSFilterLoad.PSApi
 
 			if (RectNonEmpty(filterRecord->outRect))
 			{
-				if (!lastOutRect.Equals(filterRecord->outRect) || (IsSinglePlane(filterRecord, true) && lastOutLoPlane != filterRecord->outLoPlane))
+				if (!lastOutRect.Equals(filterRecord->outRect) || (IsSinglePlane(filterRecord->outLoPlane, filterRecord->outHiPlane) && lastOutLoPlane != filterRecord->outLoPlane))
 				{
 					if (outDataPtr != IntPtr.Zero && ResizeBuffer(outDataPtr, filterRecord->outRect, filterRecord->outLoPlane, filterRecord->outHiPlane))
 					{
