@@ -36,7 +36,6 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			if (hHeap == IntPtr.Zero)
 			{
-				SafeNativeMethods.HeapSetInformation(IntPtr.Zero, 1, null, new UIntPtr(0U)); // HeapEnableTerminationOnCorruption
 				hHeap = SafeNativeMethods.HeapCreate(0, UIntPtr.Zero, UIntPtr.Zero);
 				uint info = 2; // low fragmentation heap
 
