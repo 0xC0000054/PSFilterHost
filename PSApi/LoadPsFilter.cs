@@ -6940,13 +6940,17 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 			Ping(DebugFlags.SPBasicSuite, string.Format("token1: {0}, token2: {1}", Marshal.PtrToStringAnsi(token1), Marshal.PtrToStringAnsi(token2)));
 #endif
-			if (token2 == IntPtr.Zero)
+			if (token1 == IntPtr.Zero)
 			{
-				if (token1 == IntPtr.Zero)
+				if (token2 == IntPtr.Zero)
 				{
 					return 1;
 				}
 
+				return 0;
+			}
+			else if (token2 == IntPtr.Zero)
+			{
 				return 0;
 			}
 
