@@ -145,8 +145,8 @@
             // 
             this.loadFiltersMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("loadFiltersMenuItem.Image")));
             this.loadFiltersMenuItem.Name = "loadFiltersMenuItem";
-            this.loadFiltersMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt)
-                        | System.Windows.Forms.Keys.O)));
+            this.loadFiltersMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Alt) 
+            | System.Windows.Forms.Keys.O)));
             this.loadFiltersMenuItem.Size = new System.Drawing.Size(209, 22);
             this.loadFiltersMenuItem.Text = "&Load Filters...";
             this.loadFiltersMenuItem.Click += new System.EventHandler(this.loadFiltersMenuItem_Click);
@@ -205,6 +205,7 @@
             this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
             this.filtersToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
             this.filtersToolStripMenuItem.Text = "F&ilters";
+            this.filtersToolStripMenuItem.DropDownOpening += new System.EventHandler(this.filtersToolStripMenuItem_DropDownOpening);
             // 
             // helpToolStripMenuItem
             // 
@@ -219,9 +220,10 @@
             // aboutPluginsMenuItem
             // 
             this.aboutPluginsMenuItem.Name = "aboutPluginsMenuItem";
-            this.aboutPluginsMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.aboutPluginsMenuItem.Size = new System.Drawing.Size(152, 22);
             this.aboutPluginsMenuItem.Text = "About &Plugins";
             this.aboutPluginsMenuItem.Visible = false;
+            this.aboutPluginsMenuItem.DropDownOpening += new System.EventHandler(this.aboutPluginsMenuItem_DropDownOpening);
             // 
             // aboutMenuToolStripSeparator
             // 

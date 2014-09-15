@@ -46,6 +46,7 @@ namespace HostTest
 		private string currentPluginDirectory;
 		private HostInformation hostInfo;
 		private BitmapMetadata srcMetaData;
+		private readonly bool highDPIMode;
 	 
 		private static readonly System.Collections.ObjectModel.ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
 		
@@ -81,9 +82,42 @@ namespace HostTest
 			this.openFileDialog1.Filter = WICHelpers.GetOpenDialogFilterString();
 
 			PaintDotNet.SystemLayer.UI.InitScaling(this);
-			
-			ScaleToolStripImageSize(this.menuStrip1);
-			ScaleToolStripImageSize(this.toolStrip1);
+			this.highDPIMode = PaintDotNet.SystemLayer.UI.GetXScaleFactor() > 1f;
+			InitializeDPIScaling();
+		}
+
+		private static bool CheckForDotNet452()
+		{
+			// The .NET 4.5 detection code is adapted from http://msdn.microsoft.com/en-us/library/hh925568.aspx.
+			const int Net452ReleaseKey = 379893;
+
+			bool result = false;
+
+			using (Microsoft.Win32.RegistryKey ndpKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\", false))
+			{
+				if (ndpKey != null)
+				{
+					int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
+					if (releaseKey >= Net452ReleaseKey)
+					{
+						result = true;
+					}
+				}
+			}
+
+			return result;
+		}
+
+		private void InitializeDPIScaling()
+		{
+			// DPI scaling for the ToolStrip and MenuStrip classes was added in .NET 4.5.2, as .NET 4.5 is an in-place upgrade this will also be available to .NET 4.0 applications.
+			// The scroll buttons in the ToolStripDropDownMenu have not been updated with high DPI support, so we will scale them when the menu is first opened.
+			if (!CheckForDotNet452())
+			{
+				ScaleToolStripImageSize(this.menuStrip1);
+				ScaleToolStripImageSize(this.toolStrip1);
+				ToolStripManager.Renderer = new DPIAwareToolStripRenderer();
+			}
 		}
 
 		/// <summary>
@@ -1223,6 +1257,24 @@ namespace HostTest
 			}
 
 			return color;
+		}
+
+		private void filtersToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
+		{
+			if (this.highDPIMode)
+			{
+				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
+				DPIAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
+			}
+		}
+
+		private void aboutPluginsMenuItem_DropDownOpening(object sender, EventArgs e)
+		{
+			if (this.highDPIMode)
+			{
+				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
+				DPIAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
+			}
 		}
 	}
 }
