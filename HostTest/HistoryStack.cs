@@ -24,6 +24,8 @@ namespace HostTest
 		private int index;
 		private List<HistoryItem> historyList;
 
+		public event EventHandler HistoryChanged;
+
 		public HistoryStack()
 		{
 			historyList = new List<HistoryItem>();
@@ -45,6 +47,8 @@ namespace HostTest
 
 			this.historyList.Add(new HistoryItem(historyState, image));
 			this.index = this.historyList.Count - 1;
+
+			OnHistoryChanged();
 		}
 
 		public int Count
@@ -68,6 +72,9 @@ namespace HostTest
 			}
 
 			this.historyList.Clear();
+			this.index = -1;
+
+			OnHistoryChanged();
 		}
 
 		/// <summary>
@@ -77,7 +84,7 @@ namespace HostTest
 		/// <param name="image">The destination image for the current item.</param>
 		public void StepBackward(Canvas surface, ref BitmapSource image)
 		{
-			if (this.index > 0)
+			if (this.CanUndo)
 			{
 				this.index--;
 
@@ -97,7 +104,7 @@ namespace HostTest
 		/// <param name="surface">The canvas to step forward.</param>
 		public void StepForward(Canvas surface, ref BitmapSource image)
 		{
-			if (this.index < (this.historyList.Count - 1))
+			if (this.CanRedo)
 			{
 				this.index++;
 
@@ -111,6 +118,33 @@ namespace HostTest
 				surface.IsDirty = true;
 			}
 		}
+
+		public bool CanUndo
+		{
+			get
+			{
+				return (this.index > 0);
+			}
+		}
+
+		public bool CanRedo
+		{
+			get
+			{
+				return (this.index < (this.historyList.Count - 1));
+			}
+		}
+
+		private void OnHistoryChanged()
+		{
+			EventHandler historyChanged = this.HistoryChanged;
+
+			if (historyChanged != null)
+			{
+				historyChanged.Invoke(this, EventArgs.Empty);
+			}
+		}
+
 
 		#region IDisposible Members
 		private bool disposed;

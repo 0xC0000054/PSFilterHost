@@ -31,7 +31,7 @@ namespace HostTest
 		private BitmapSource srcImage;
 		private BitmapSource dstImage;
 		private PseudoResourceCollection pseudoResources;
-		private Dictionary<PluginData, ParameterData> paramDict;
+		private Dictionary<PluginData, ParameterData> filterParameters;
 		private HistoryStack historyStack;   
 		private Thread filterThread;
 		private bool setRepeatEffect;
@@ -56,8 +56,9 @@ namespace HostTest
 			this.srcImage = null;
 			this.dstImage = null;
 			this.pseudoResources = null;
-			this.paramDict = new Dictionary<PluginData, ParameterData>();
-			this.historyStack = new HistoryStack();            
+			this.filterParameters = new Dictionary<PluginData, ParameterData>();
+			this.historyStack = new HistoryStack();
+			this.historyStack.HistoryChanged += new EventHandler(historyStack_HistoryChanged);
 			this.setRepeatEffect = false;          
 			this.setFilterApplyText = false;
 			this.filterName = string.Empty;
@@ -460,9 +461,9 @@ namespace HostTest
 					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilter));
 					host.SetPickColorCallback(new PickColor(PickColor));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
-					if (repeatEffect && paramDict.ContainsKey(pluginData))
+					if (repeatEffect && filterParameters.ContainsKey(pluginData))
 					{
-						host.FilterParameters = paramDict[pluginData];
+						host.FilterParameters = filterParameters[pluginData];
 					}
 
 					if ((pseudoResources != null) && pseudoResources.Count > 0)
@@ -509,13 +510,13 @@ namespace HostTest
 
 						if (!repeatEffect)
 						{
-							if (paramDict.ContainsKey(pluginData))
+							if (filterParameters.ContainsKey(pluginData))
 							{
-								paramDict[pluginData] = host.FilterParameters;
+								filterParameters[pluginData] = host.FilterParameters;
 							}
 							else
 							{
-								paramDict.Add(pluginData, host.FilterParameters);
+								filterParameters.Add(pluginData, host.FilterParameters);
 							}
 
 							this.pseudoResources = host.PseudoResources;
@@ -955,13 +956,35 @@ namespace HostTest
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			this.historyStack.StepBackward(this.canvas, ref this.dstImage);
+			EnableUndoButtons();
 		}
 
 		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			this.historyStack.StepForward(this.canvas, ref this.dstImage);
+			EnableUndoButtons();
 		}
 
+		private void EnableUndoButtons()
+		{
+			this.undoToolStripMenuItem.Enabled = this.historyStack.CanUndo;
+			this.redoToolStripMenuItem.Enabled = this.historyStack.CanRedo;
+		}
+
+		private void historyStack_HistoryChanged(object sender, EventArgs e)
+		{
+			if (base.InvokeRequired)
+			{
+				base.Invoke(new Action(delegate()
+				{
+					EnableUndoButtons();
+				}));
+			}
+			else
+			{
+				EnableUndoButtons();
+			}
+		}
 		private void primaryColorBtn_Click(object sender, EventArgs e)
 		{
 			this.colorDialog1.Color = this.primaryColorBtn.RectangleColor;
