@@ -51,23 +51,38 @@ namespace PSFilterHostDll
         /// </summary>
         public string FileName
         {
-            get { return fileName; }
+            get 
+            {
+                return this.fileName; 
+            }
         }
         /// <summary>
         /// Gets the entry point of the filter.
         /// </summary>
         public string EntryPoint
         {
-            get { return entryPoint; }
-            internal set { entryPoint = value; }
+            get 
+            {
+                return this.entryPoint; 
+            }
+            internal set 
+            {
+                this.entryPoint = value;
+            }
         }
         /// <summary>
         /// Gets the category of the filter.
         /// </summary>
         public string Category
         {
-            get { return category; }
-            internal set { category = value; }
+            get 
+            {
+                return this.category;
+            }
+            internal set 
+            {
+                this.category = value;
+            }
         }
 
         /// <summary>
@@ -75,20 +90,38 @@ namespace PSFilterHostDll
         /// </summary>
         public string Title
         {
-            get { return title; }
-            internal set { title = value; }
+            get 
+            {
+                return this.title;
+            }
+            internal set 
+            {
+                this.title = value; 
+            }
         }
  
         internal FilterCaseInfo[] FilterInfo
         {
-            get { return filterInfo; }
-            set { filterInfo = value; }
+            get 
+            {
+                return this.filterInfo; 
+            }
+            set 
+            {
+                this.filterInfo = value;
+            }
         }
 
         internal PluginAETE Aete
         {
-            get { return aete; }
-            set { aete = value; }
+            get 
+            {
+                return this.aete; 
+            }
+            set 
+            {
+                this.aete = value; 
+            }
         }
         
         /// <summary>
@@ -99,8 +132,14 @@ namespace PSFilterHostDll
         /// </value>
         public bool HasAboutBox
         {
-            get { return hasAboutBox; }
-            internal set { hasAboutBox = value; }
+            get 
+            { 
+                return this.hasAboutBox; 
+            }
+            internal set 
+            {
+                this.hasAboutBox = value; 
+            }
         }
 
 #if !GDIPLUS
@@ -111,14 +150,14 @@ namespace PSFilterHostDll
         /// <returns><c>true</c> if the filter can process the image; otherwise <c>false</c>.</returns>
         public bool SupportsImageMode(PixelFormat mode)
         {
-            if (!supportedModes.HasValue)
+            if (!this.supportedModes.HasValue)
             {
                 DetectSupportedModes();
             }
 
             if (mode == PixelFormats.BlackWhite || mode == PixelFormats.Gray2 || mode == PixelFormats.Gray4 || mode == PixelFormats.Gray8)
             {
-                return ((this.supportedModes & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
+                return ((this.supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
             }
             else if (mode == PixelFormats.Gray16 || mode == PixelFormats.Gray32Float)
             {
@@ -131,7 +170,7 @@ namespace PSFilterHostDll
             }
             else
             {
-                return ((this.supportedModes & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor);
+                return ((this.supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor);
             }
         }
 
@@ -172,10 +211,10 @@ namespace PSFilterHostDll
 
             if (grayScale)
             {
-                return ((this.supportedModes & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16);
+                return ((this.supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16);
             }
 
-            return ((this.supportedModes & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48);
+            return ((this.supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48);
         }
 #endif
         /// <summary>
@@ -205,7 +244,7 @@ namespace PSFilterHostDll
         /// </returns>
         internal bool IsValid()
         {
-            return (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(entryPoint));
+            return (!string.IsNullOrEmpty(this.category) && !string.IsNullOrEmpty(this.title) && !string.IsNullOrEmpty(this.entryPoint));
         }
 
         /// <summary>
@@ -243,7 +282,7 @@ namespace PSFilterHostDll
         /// </summary>
         /// <param name="other">An object to compare with this object.</param>
         /// <returns>
-        /// true if the current object is equal to the <paramref name="other"/> parameter; otherwise, false.
+        /// <c>true</c> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <c>false</c>.
         /// </returns>
         public bool Equals(PluginData other)
         {
