@@ -50,10 +50,9 @@ namespace HostTest
         {
             this.backingFile = Path.GetTempFileName();
             this.state = HistoryItemState.Memory;
-
             this.chunk = new HistoryChunk(historyCanvas, currentImage);
 
-            this.ToDisk();
+            ToDisk();
         }
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace HostTest
         /// </summary>
         public void ToDisk()
         {
-            if (state == HistoryItemState.Memory)
+            if (this.state == HistoryItemState.Memory)
             {
                 using (FileStream fs = new FileStream(this.backingFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
                 {
@@ -78,7 +77,7 @@ namespace HostTest
         /// </summary>
         public void ToMemory()
         {
-            if (state == HistoryItemState.Disk)
+            if (this.state == HistoryItemState.Disk)
             {
                 using (FileStream fs = new FileStream(this.backingFile, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
@@ -98,6 +97,7 @@ namespace HostTest
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         private void Dispose(bool disposing)
         {
@@ -117,11 +117,13 @@ namespace HostTest
         {
             internal CanvasHistoryState canvas;
             internal BitmapSource image;
+            private bool disposed;
 
             public HistoryChunk(CanvasHistoryState canvasHistory, BitmapSource source)
             {
                 this.canvas = canvasHistory;
                 this.image = source;
+                this.disposed = false;
             }
 
             private HistoryChunk(SerializationInfo info, StreamingContext context)
@@ -164,7 +166,6 @@ namespace HostTest
 
             }
 
-            private bool disposed;
             /// <summary>
             /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
             /// </summary>

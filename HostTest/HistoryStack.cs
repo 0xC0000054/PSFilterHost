@@ -20,17 +20,18 @@ namespace HostTest
 	/// This class stores the undo / redo history.
 	/// </summary>
 	internal sealed class HistoryStack : IDisposable
-	{
-		private int index;
+	{		
 		private List<HistoryItem> historyList;
+		private int index;
+		private bool disposed;
 
 		public event EventHandler HistoryChanged;
 
 		public HistoryStack()
 		{
-			historyList = new List<HistoryItem>();
-			index = -1;
-			disposed = false;
+			this.historyList = new List<HistoryItem>();
+			this.index = -1;
+			this.disposed = false;
 		}
 
 		/// <summary>
@@ -42,7 +43,7 @@ namespace HostTest
 		{
 			if (this.index < (this.historyList.Count - 1))
 			{
-				historyList.RemoveRange(this.index + 1, (this.historyList.Count - 1) - this.index);
+				this.historyList.RemoveRange(this.index + 1, (this.historyList.Count - 1) - this.index);
 			}
 
 			this.historyList.Add(new HistoryItem(historyState, image));
@@ -98,6 +99,7 @@ namespace HostTest
 				surface.IsDirty = this.index > 0;
 			}
 		}
+
 		/// <summary>
 		/// Steps the <see cref="HostTest.Canvas"/> forward to the next state.
 		/// </summary>
@@ -147,13 +149,13 @@ namespace HostTest
 
 
 		#region IDisposible Members
-		private bool disposed;
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
 		{
 			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 		private void Dispose(bool disposing)
 		{
