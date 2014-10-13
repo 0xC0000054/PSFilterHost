@@ -109,13 +109,33 @@ namespace PSFilterLoad.PSApi
         }
 
         /// <summary>
-        /// The InterpolationMethod constants used by PSProperties.propInterpolationMethod 
+        /// The constants used by the Property suite.
         /// </summary>
-        internal static class InterpolationMethod
+        internal static class Properties
         {
-            public const int NearestNeghbor = 1;
-            public const int Bilinear = 2;
-            public const int Bicubic = 3;
+            /// <summary>
+            /// The default big nudge distance, 10 pixels.
+            /// </summary>
+            public const int BigNudgeDistance = 10;
+            /// <summary>
+            /// The default major grid size.
+            /// </summary>
+            public const int GridMajor = 1;
+            /// <summary>
+            /// The default minor grid size.
+            /// </summary>
+            public const int GridMinor = 4;
+            /// <summary>
+            /// The index that is used when a document does not contain any paths.
+            /// </summary>
+            public const int NoPathIndex = -1;
+
+            internal static class InterpolationMethod
+            {
+                public const int NearestNeghbor = 1;
+                public const int Bilinear = 2;
+                public const int Bicubic = 3;
+            }
         }
 
         /// <summary>
