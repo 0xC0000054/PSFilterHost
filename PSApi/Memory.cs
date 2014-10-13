@@ -21,6 +21,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace PSFilterLoad.PSApi
 {
@@ -29,7 +30,22 @@ namespace PSFilterLoad.PSApi
 	/// </summary>
 	internal static class Memory 
 	{
-		private static IntPtr hHeap = SafeNativeMethods.GetProcessHeap();
+		private static IntPtr hHeap;
+
+		/// <summary>
+		/// Initializes the heap.
+		/// </summary>
+		/// <exception cref="System.ComponentModel.Win32Exception">GetProcessHeap returned NULL.</exception>
+		private static void InitializeHeap()
+		{
+			hHeap = SafeNativeMethods.GetProcessHeap();
+
+			if (hHeap == IntPtr.Zero)
+			{
+				int error = Marshal.GetLastWin32Error();
+				throw new System.ComponentModel.Win32Exception(error, string.Format(CultureInfo.InvariantCulture, "GetProcessHeap returned NULL, LastError = {0}", error));
+			}
+		}
 
 		/// <summary>
 		/// Allocates a block of memory from the default process heap.
@@ -41,7 +57,7 @@ namespace PSFilterLoad.PSApi
 		{
 			if (hHeap == IntPtr.Zero)
 			{
-				throw new InvalidOperationException("heap has already been destroyed");
+				InitializeHeap();
 			}
 
 			IntPtr block = IntPtr.Zero;
@@ -52,11 +68,11 @@ namespace PSFilterLoad.PSApi
 			}
 			catch (OverflowException ex)
 			{
-				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", size), ex);
+				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", size), ex);
 			}
 			if (block == IntPtr.Zero)
 			{
-				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", size));
+				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", size));
 			}
 
 			if (size > 0L)
@@ -102,7 +118,7 @@ namespace PSFilterLoad.PSApi
 				{
 					int error = Marshal.GetLastWin32Error();
 
-					throw new InvalidOperationException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapFree returned an error 0x{0:X8}", error));
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "HeapFree returned an error 0x{0:X8}", error));
 				}
 
 				if (size > 0L)
@@ -123,7 +139,7 @@ namespace PSFilterLoad.PSApi
 			if (!SafeNativeMethods.VirtualFree(hMem, UIntPtr.Zero, NativeConstants.MEM_RELEASE))
 			{
 				int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-				throw new InvalidOperationException("VirtualFree returned an error: " + error.ToString(System.Globalization.CultureInfo.InvariantCulture));
+				throw new InvalidOperationException("VirtualFree returned an error: " + error.ToString(CultureInfo.InvariantCulture));
 			}
 
 			if (size > 0L)
@@ -142,7 +158,7 @@ namespace PSFilterLoad.PSApi
 		{
 			if (hHeap == IntPtr.Zero)
 			{
-				throw new InvalidOperationException("heap has already been destroyed");
+				InitializeHeap();
 			}
 			IntPtr block = IntPtr.Zero;
 
@@ -155,11 +171,11 @@ namespace PSFilterLoad.PSApi
 			}
 			catch (OverflowException ex)
 			{
-				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", newSize), ex);
+				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", newSize), ex);
 			}
 			if (block == IntPtr.Zero)
 			{
-				throw new OutOfMemoryException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", newSize));
+				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", newSize));
 			}
 
 			if (oldSize > 0L)
