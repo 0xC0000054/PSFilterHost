@@ -37,6 +37,13 @@ namespace PSFilterHostDll.BGRASurface
 			if (hHeap == IntPtr.Zero)
 			{
 				hHeap = SafeNativeMethods.HeapCreate(0, UIntPtr.Zero, UIntPtr.Zero);
+
+				if (hHeap == IntPtr.Zero)
+				{
+					int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+					throw new System.ComponentModel.Win32Exception(error, string.Format(CultureInfo.InvariantCulture, "HeapCreate returned NULL, LastError = {0}", error));
+				}
+
 				uint info = 2; // low fragmentation heap
 
 				SafeNativeMethods.HeapSetInformation(hHeap, 0, (void*)&info, new UIntPtr(4U));
