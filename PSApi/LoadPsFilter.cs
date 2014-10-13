@@ -6383,11 +6383,11 @@ namespace PSFilterLoad.PSApi
 
 			switch (key)
 			{
-				case PSProperties.propBigNudgeH:
-				case PSProperties.propBigNudgeV:
-					simpleProperty = new IntPtr(Int32ToFixed(10));
+				case PSProperties.BigNudgeH:
+				case PSProperties.BigNudgeV:
+					simpleProperty = new IntPtr(Int32ToFixed(PSConstants.Properties.BigNudgeDistance));
 					break;
-				case PSProperties.propCaption:
+				case PSProperties.Caption:
 					if ((!string.IsNullOrEmpty(hostInfo.Caption)) && hostInfo.Caption.Length < IPTCData.MaxCaptionLength)
 					{
 						bytes = Encoding.ASCII.GetBytes(hostInfo.Caption);
@@ -6420,9 +6420,11 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 					break;
-				case PSProperties.propChannelName:
+				case PSProperties.ChannelName:
 					if (index < 0 || index > (filterRecord->planes - 1))
+					{
 						return PSError.errPlugInPropertyUndefined;
+					}
 
 					string name = string.Empty;
 
@@ -6467,13 +6469,13 @@ namespace PSFilterLoad.PSApi
 						err = PSError.memFullErr;
 					}
 					break;
-				case PSProperties.propCopyright:
-				case PSProperties.propCopyright2:
+				case PSProperties.Copyright:
+				case PSProperties.Copyright2:
 					simpleProperty = new IntPtr(hostInfo.Copyright ? 1 : 0);
 					break;
-				case PSProperties.propEXIFData:
-				case PSProperties.propXMPData:
-					if (ExtractMetadata(out bytes, key == PSProperties.propEXIFData))
+				case PSProperties.EXIFData:
+				case PSProperties.XMPData:
+					if (ExtractMetadata(out bytes, key == PSProperties.EXIFData))
 					{
 						complexProperty = HandleNewProc(bytes.Length);
 						if (complexProperty != IntPtr.Zero)
@@ -6495,46 +6497,46 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 					break;
-				case PSProperties.propGridMajor:
-					simpleProperty = new IntPtr(Int32ToFixed(1));
+				case PSProperties.GridMajor:
+					simpleProperty = new IntPtr(Int32ToFixed(PSConstants.Properties.GridMajor));
 					break;
-				case PSProperties.propGridMinor:
-					simpleProperty = new IntPtr(4);
+				case PSProperties.GridMinor:
+					simpleProperty = new IntPtr(PSConstants.Properties.GridMinor);
 					break;
-				case PSProperties.propImageMode:
+				case PSProperties.ImageMode:
 					simpleProperty = new IntPtr((int)filterRecord->imageMode);
 					break;
-				case PSProperties.propInterpolationMethod:
-					simpleProperty = new IntPtr(PSConstants.InterpolationMethod.NearestNeghbor);
+				case PSProperties.InterpolationMethod:
+					simpleProperty = new IntPtr(PSConstants.Properties.InterpolationMethod.NearestNeghbor);
 					break;
-				case PSProperties.propNumberOfChannels:
+				case PSProperties.NumberOfChannels:
 					simpleProperty = new IntPtr(filterRecord->planes);
 					break;
-				case PSProperties.propNumberOfPaths:
+				case PSProperties.NumberOfPaths:
 					simpleProperty = new IntPtr(0);
 					break;
-				case PSProperties.propPathName:
+				case PSProperties.PathName:
 					if (complexProperty != IntPtr.Zero)
 					{
 						complexProperty = HandleNewProc(0);
 					}
 					break;
-				case PSProperties.propWorkPathIndex:
-				case PSProperties.propClippingPathIndex:
-				case PSProperties.propTargetPathIndex:
-					simpleProperty = new IntPtr(-1);
+				case PSProperties.WorkPathIndex:
+				case PSProperties.ClippingPathIndex:
+				case PSProperties.TargetPathIndex:
+					simpleProperty = new IntPtr(PSConstants.Properties.NoPathIndex);
 					break;
-				case PSProperties.propRulerUnits:
+				case PSProperties.RulerUnits:
 					simpleProperty = new IntPtr((int)hostInfo.RulerUnit);
 					break;
-				case PSProperties.propRulerOriginH:
-				case PSProperties.propRulerOriginV:
+				case PSProperties.RulerOriginH:
+				case PSProperties.RulerOriginV:
 					simpleProperty = new IntPtr(Int32ToFixed(0));
 					break;
-				case PSProperties.propWatermark:
+				case PSProperties.Watermark:
 					simpleProperty = new IntPtr(hostInfo.Watermark ? 1 : 0);
 					break;
-				case PSProperties.propSerialString:
+				case PSProperties.SerialString:
 					bytes = Encoding.ASCII.GetBytes(filterRecord->serial.ToString(CultureInfo.InvariantCulture));
 					complexProperty = HandleNewProc(bytes.Length);
 
@@ -6548,7 +6550,7 @@ namespace PSFilterLoad.PSApi
 						err = PSError.memFullErr;
 					}
 					break;
-				case PSProperties.propURL:
+				case PSProperties.URL:
 					if ((hostInfo.Url != null) && !string.IsNullOrEmpty(hostInfo.Url.OriginalString))
 					{
 						bytes = Encoding.ASCII.GetBytes(hostInfo.Url.ToString());
@@ -6572,7 +6574,7 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 					break;
-				case PSProperties.propTitle:
+				case PSProperties.Title:
 					string title;
 					if (!string.IsNullOrEmpty(hostInfo.Title))
 					{
@@ -6597,16 +6599,16 @@ namespace PSFilterLoad.PSApi
 					}
 
 					break;
-				case PSProperties.propWatchSuspension:
+				case PSProperties.WatchSuspension:
 					simpleProperty = new IntPtr(0);
 					break;
-				case PSProperties.propDocumentWidth:
+				case PSProperties.DocumentWidth:
 					simpleProperty = new IntPtr(source.Width);
 					break;
-				case PSProperties.propDocumentHeight:
+				case PSProperties.DocumentHeight:
 					simpleProperty = new IntPtr(source.Height);
 					break;
-				case PSProperties.propToolTips:
+				case PSProperties.ToolTips:
 					simpleProperty = new IntPtr(1);
 					break;
 
@@ -6634,11 +6636,11 @@ namespace PSFilterLoad.PSApi
 
 			switch (key)
 			{
-				case PSProperties.propBigNudgeH:
+				case PSProperties.BigNudgeH:
 					break;
-				case PSProperties.propBigNudgeV:
+				case PSProperties.BigNudgeV:
 					break;
-				case PSProperties.propCaption:
+				case PSProperties.Caption:
 					size = HandleGetSizeProc(complexProperty);
 					if (size > 0)
 					{
@@ -6655,35 +6657,39 @@ namespace PSFilterLoad.PSApi
 						HandleUnlockProc(complexProperty);
 					}
 					break;
-				case PSProperties.propCopyright:
-				case PSProperties.propCopyright2:
+				case PSProperties.Copyright:
+				case PSProperties.Copyright2:
 					hostInfo.Copyright = simple != 0;
 					break;
-				case PSProperties.propEXIFData:
-				case PSProperties.propXMPData:
+				case PSProperties.EXIFData:
+				case PSProperties.XMPData:
 					break;
-				case PSProperties.propGridMajor:
+				case PSProperties.GridMajor:
 					break;
-				case PSProperties.propGridMinor:
+				case PSProperties.GridMinor:
 					break;
-				case PSProperties.propRulerOriginH:
+				case PSProperties.RulerOriginH:
 					break;
-				case PSProperties.propRulerOriginV:
+				case PSProperties.RulerOriginV:
 					break;
-				case PSProperties.propURL:
+				case PSProperties.URL:
 					size = HandleGetSizeProc(complexProperty);
 					if (size > 0)
 					{
 						bytes = new byte[size];
 						Marshal.Copy(HandleLockProc(complexProperty, 0), bytes, 0, size);
 						HandleUnlockProc(complexProperty);
-
-						hostInfo.Url = new Uri(Encoding.ASCII.GetString(bytes, 0, size));
+						
+						Uri temp;
+						if (Uri.TryCreate(Encoding.ASCII.GetString(bytes, 0, size), UriKind.Absolute, out temp))
+						{
+							hostInfo.Url = temp; 
+						}
 					}
 					break;
-				case PSProperties.propWatchSuspension:
+				case PSProperties.WatchSuspension:
 					break;
-				case PSProperties.propWatermark:
+				case PSProperties.Watermark:
 					hostInfo.Watermark = simple != 0;
 					break;
 				default:
