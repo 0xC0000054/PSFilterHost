@@ -138,6 +138,7 @@
     <Compile Include="HostRulerUnit.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
+    <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
