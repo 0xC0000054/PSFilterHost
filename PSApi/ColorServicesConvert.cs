@@ -31,15 +31,16 @@ namespace PSFilterLoad.PSApi
 			// TODO: CMYK, LAB and XYZ conversions are different than Photoshop
 			if (sourceSpace != resultSpace)
 			{
-#if DEBUG
-				System.Diagnostics.Debug.Assert(sourceSpace != ColorSpace.ChosenSpace);
-#endif
 				if (resultSpace == ColorSpace.ChosenSpace)
 				{
 					resultSpace = sourceSpace;
 					return PSError.noErr;
 				}
-
+				
+				if (resultSpace < ColorSpace.RGBSpace || resultSpace > ColorSpace.XYZSpace)
+				{
+					return PSError.paramErr;
+				}
 
 				switch (sourceSpace)
 				{
