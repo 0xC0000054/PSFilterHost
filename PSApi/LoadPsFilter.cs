@@ -799,15 +799,15 @@ namespace PSFilterLoad.PSApi
 			public int size;
 		}
 
-		private Dictionary<IntPtr, PSHandle> handles;
-
 		private struct ChannelDescPtrs
 		{
 			public IntPtr address;
 			public IntPtr name;
 		}
-
+		
+		private Dictionary<IntPtr, PSHandle> handles;
 		private List<ChannelDescPtrs> channelReadDescPtrs;
+		private List<IntPtr> bufferIDs;
 
 		#region CallbackDelegates
 		private static AdvanceStateProc advanceProc;
@@ -1939,7 +1939,7 @@ namespace PSFilterLoad.PSApi
 			{
 				FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 
-				Ping(DebugFlags.Call, string.Format("data = {0:X8},  parameters = {1:X8}", dataPtr.ToInt64(), filterRecord->parameters.ToInt64()));
+				Ping(DebugFlags.Call, string.Format("data: 0x{0},  parameters: 0x{1}", dataPtr.ToHexString(), filterRecord->parameters.ToHexString()));
 			}
 
 			Ping(DebugFlags.Call, "After filterSelectorParameters");
@@ -3667,12 +3667,10 @@ namespace PSFilterLoad.PSApi
 			}
 		}
 
-		private List<IntPtr> bufferIDs;
-
 		private short AllocateBufferProc(int size, ref IntPtr bufferID)
 		{
 #if DEBUG
-			Ping(DebugFlags.BufferSuite, string.Format("Size = {0}", size));
+			Ping(DebugFlags.BufferSuite, string.Format("Size: {0}", size));
 #endif
 			short err = PSError.noErr;
 			try
@@ -3688,29 +3686,33 @@ namespace PSFilterLoad.PSApi
 
 			return err;
 		}
+
 		private void BufferFreeProc(IntPtr bufferID)
 		{
 #if DEBUG
-			Ping(DebugFlags.BufferSuite, string.Format("Buffer address = {0:X8}, Size = {1}", bufferID.ToInt64(), Memory.Size(bufferID)));
+			Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}, Size: {1}", bufferID.ToHexString(), Memory.Size(bufferID)));
 #endif
 			Memory.Free(bufferID);
 
 			this.bufferIDs.Remove(bufferID);
 		}
+
 		private IntPtr BufferLockProc(IntPtr bufferID, byte moveHigh)
 		{
 #if DEBUG
-			Ping(DebugFlags.BufferSuite, string.Format("Buffer address = {0:X8}", bufferID.ToInt64()));
+			Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}", bufferID.ToHexString()));
 #endif
 
 			return bufferID;
 		}
+
 		private void BufferUnlockProc(IntPtr bufferID)
 		{
 #if DEBUG
-			Ping(DebugFlags.BufferSuite, string.Format("Buffer address = {0:X8}", bufferID.ToInt64()));
+			Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}", bufferID.ToHexString()));
 #endif
 		}
+
 		private int BufferSpaceProc()
 		{
 			return 1000000000;
@@ -5956,7 +5958,7 @@ namespace PSFilterLoad.PSApi
 
 				handles.Add(handle, *hand);
 #if DEBUG
-				Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}, pointer: {1:X8}, size: {1}", handle.ToInt64(), hand->pointer.ToInt64(), size));
+				Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}, pointer: 0x{1}, size: {2}", handle.ToHexString(), hand->pointer.ToHexString(), size));
 #endif
 			}
 			catch (OutOfMemoryException)
@@ -5978,7 +5980,7 @@ namespace PSFilterLoad.PSApi
 			if (h != IntPtr.Zero && !IsBadReadPtr(h))
 			{
 #if DEBUG
-				Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}", h.ToInt64()));
+				Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 				if (!IsHandleValid(h))
 				{
@@ -6009,7 +6011,7 @@ namespace PSFilterLoad.PSApi
 		private unsafe void HandleDisposeRegularProc(IntPtr h)
 		{
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}", h.ToInt64()));
+			Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 			// What is this supposed to do?
 			if (!IsHandleValid(h))
@@ -6031,7 +6033,7 @@ namespace PSFilterLoad.PSApi
 		private IntPtr HandleLockProc(IntPtr h, byte moveHigh)
 		{
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}, moveHigh: {1}", h.ToInt64(), moveHigh));
+			Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}, moveHigh: {1}", h.ToHexString(), moveHigh));
 #endif
 			if (!IsHandleValid(h))
 			{
@@ -6054,7 +6056,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, String.Format("Handle Pointer Address = 0x{0:X}", handles[h].pointer.ToInt64()));
+			Ping(DebugFlags.HandleSuite, String.Format("Handle Pointer Address = 0x{0}", handles[h].pointer.ToHexString()));
 #endif
 			return handles[h].pointer;
 		}
@@ -6062,7 +6064,7 @@ namespace PSFilterLoad.PSApi
 		private int HandleGetSizeProc(IntPtr h)
 		{
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}", h.ToInt64()));
+			Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 			if (!IsHandleValid(h))
 			{
@@ -6095,7 +6097,7 @@ namespace PSFilterLoad.PSApi
 		private unsafe short HandleSetSizeProc(IntPtr h, int newSize)
 		{
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, string.Format("Handle: {0:X8}", h.ToInt64()));
+			Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 			if (!IsHandleValid(h))
 			{
@@ -6146,7 +6148,7 @@ namespace PSFilterLoad.PSApi
 		private void HandleUnlockProc(IntPtr h)
 		{
 #if DEBUG
-			Ping(DebugFlags.HandleSuite, string.Format("Handle address = {0:X8}", h.ToInt64()));
+			Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 			if (!IsHandleValid(h))
 			{
@@ -6997,7 +6999,7 @@ namespace PSFilterLoad.PSApi
 		private int SPBasicFreeBlock(IntPtr block)
 		{
 #if DEBUG
-			Ping(DebugFlags.SPBasicSuite, string.Format("block: {0:X8}", block.ToInt64()));
+			Ping(DebugFlags.SPBasicSuite, string.Format("block: 0x{0}", block.ToHexString()));
 #endif
 			Memory.Free(block);
 			return PSError.kSPNoErr;
@@ -7006,7 +7008,7 @@ namespace PSFilterLoad.PSApi
 		private int SPBasicReallocateBlock(IntPtr block, int newSize, ref IntPtr newblock)
 		{
 #if DEBUG
-			Ping(DebugFlags.SPBasicSuite, string.Format("block: {0:X8}, size: {1}", block.ToInt64(), newSize));
+			Ping(DebugFlags.SPBasicSuite, string.Format("block: 0x{0}, size: {1}", block.ToHexString(), newSize));
 #endif
 			try
 			{
