@@ -18,14 +18,14 @@ namespace PSFilterLoad.PSApi
     [System.Security.SuppressUnmanagedCodeSecurity]
     internal static class SafeNativeMethods
     {
-        [DllImport("kernel32.dll", SetLastError = false, ExactSpelling = true)]
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         internal static extern IntPtr HeapCreate([In()] uint flOptions, [In()] UIntPtr dwInitialsize, [In()] UIntPtr dwMaximumSize);
 
         [DllImport("kernel32.dll", SetLastError = false, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool HeapDestroy([In()] IntPtr hHeap);
 
-        [DllImport("kernel32.dll", SetLastError = false, ExactSpelling = true)]
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         internal static extern IntPtr GetProcessHeap();
 
         [DllImport("kernel32.dll", SetLastError = false, ExactSpelling = true)]
