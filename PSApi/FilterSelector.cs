@@ -19,7 +19,7 @@
 
 namespace PSFilterLoad.PSApi
 {
-    enum FilterSelector : short
+    internal enum FilterSelector : short
     {
         About = 0,
         Parameters = 1,

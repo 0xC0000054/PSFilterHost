@@ -16,7 +16,7 @@ using PSFilterHostDll;
 
 namespace PSFilterLoad.PSApi
 {
-	static class PICASuites
+	internal static class PICASuites
 	{
 		#region BufferSuite1
 		private static PSBufferSuiteNew bufferSuiteNew = new PSBufferSuiteNew(PSBufferNew);

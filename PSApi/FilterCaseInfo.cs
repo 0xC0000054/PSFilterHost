@@ -54,7 +54,7 @@ namespace PSFilterLoad.PSApi
     }
 
     [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1), Serializable]
-    struct FilterCaseInfo
+    internal struct FilterCaseInfo
     {
         public FilterDataHandling inputHandling;
         public FilterDataHandling outputHandling;

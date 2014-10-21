@@ -15,7 +15,7 @@ using Devcorp.Controls.Design;
 
 namespace PSFilterLoad.PSApi
 {
-	static class ColorServicesConvert
+	internal static class ColorServicesConvert
 	{
 		/// <summary>
 		/// Converts between the specified color spaces.

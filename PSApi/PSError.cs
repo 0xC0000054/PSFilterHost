@@ -17,7 +17,7 @@
 
 namespace PSFilterLoad.PSApi
 {
-    static class PSError
+    internal static class PSError
     {
         // Mac system error codes
         public const short noErr = 0;

@@ -20,24 +20,23 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterLoad.PSApi
 {
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
-    internal delegate short AllocateBufferProc(int size, ref System.IntPtr bufferID);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate short AllocateBufferProc(int size, ref IntPtr bufferID);
     
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr LockBufferProc(IntPtr bufferID, byte moveHigh);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void UnlockBufferProc(IntPtr bufferID);
 
-   
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void FreeBufferProc(IntPtr bufferID);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate int BufferSpaceProc();
 
     [StructLayout(LayoutKind.Sequential)]
-    struct BufferProcs
+    internal struct BufferProcs
     {
         public short bufferProcsVersion;
         public short numBufferProcs;
