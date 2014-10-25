@@ -797,6 +797,8 @@ namespace PSFilterLoad.PSApi
 		{
 			public IntPtr pointer;
 			public int size;
+
+			public static readonly int SizeOf = Marshal.SizeOf(typeof(PSHandle));
 		}
 
 		private struct ChannelDescPtrs
@@ -5949,7 +5951,7 @@ namespace PSFilterLoad.PSApi
 			IntPtr handle = IntPtr.Zero;
 			try
 			{
-				handle = Memory.Allocate(Marshal.SizeOf(typeof(PSHandle)), true);
+				handle = Memory.Allocate(PSHandle.SizeOf, true);
 
 				PSHandle* hand = (PSHandle*)handle.ToPointer();
 
