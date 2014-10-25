@@ -2606,7 +2606,7 @@ namespace PSFilterLoad.PSApi
 			}
 
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("Inrect = {0}, Outrect = {1}, maskRect = {2}", filterRecord->inRect.ToString(), filterRecord->outRect.ToString(), filterRecord->maskRect.ToString()));
+			Ping(DebugFlags.AdvanceState, string.Format("inRect: {0}, outRect: {1}, maskRect: {2}", filterRecord->inRect, filterRecord->outRect, filterRecord->maskRect));
 #endif
 			short error;
 
@@ -2621,7 +2621,7 @@ namespace PSFilterLoad.PSApi
 						filterRecord->maskData = IntPtr.Zero;
 					}
 
-					error = FillMaskBuffer(ref filterRecord->maskData, ref filterRecord->maskRowBytes, filterRecord->maskRect, filterRecord->maskRate, filterRecord->maskPadding);
+					error = FillMaskBuffer(filterRecord);
 
 					if (error != PSError.noErr)
 					{
@@ -2640,7 +2640,7 @@ namespace PSFilterLoad.PSApi
 					filterRecord->maskData = IntPtr.Zero;
 				}
 				filterRecord->maskRowBytes = 0;
-				lastMaskRect.left = lastMaskRect.right = lastMaskRect.bottom = lastMaskRect.top = 0;
+				lastMaskRect = Rect16.Empty;
 			}
 
 
@@ -2655,7 +2655,7 @@ namespace PSFilterLoad.PSApi
 						filterRecord->inData = IntPtr.Zero;
 					}
 
-					error = FillInputBuffer(ref filterRecord->inData, ref filterRecord->inRowBytes, filterRecord->inRect, filterRecord->inLoPlane, filterRecord->inHiPlane, filterRecord->inputRate, filterRecord->inputPadding);
+					error = FillInputBuffer(filterRecord);
 					if (error != PSError.noErr)
 					{
 						return error;
@@ -2663,12 +2663,6 @@ namespace PSFilterLoad.PSApi
 
 					lastInRect = filterRecord->inRect;
 					lastInLoPlane = filterRecord->inLoPlane;
-					filterRecord->inColumnBytes = (filterRecord->inHiPlane - filterRecord->inLoPlane) + 1;
-
-					if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
-					{
-						filterRecord->inColumnBytes *= 2; // 2 bytes per plane
-					}
 				}
 			}
 			else
@@ -2680,7 +2674,7 @@ namespace PSFilterLoad.PSApi
 					filterRecord->inData = IntPtr.Zero;
 				}
 				filterRecord->inRowBytes = 0;
-				lastInRect.left = lastInRect.top = lastInRect.right = lastInRect.bottom = 0;
+				lastInRect = Rect16.Empty;
 				lastInLoPlane = -1;
 			}
 
@@ -2695,26 +2689,17 @@ namespace PSFilterLoad.PSApi
 						filterRecord->outData = IntPtr.Zero;
 					}
 
-					error = FillOutputBuffer(ref filterRecord->outData, ref filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane, filterRecord->outHiPlane, filterRecord->outputPadding);
+					error = FillOutputBuffer(filterRecord);
 					if (error != PSError.noErr)
 					{
 						return error;
 					}
 
-#if DEBUG
-					System.Diagnostics.Debug.WriteLine(string.Format("outRowBytes = {0}", filterRecord->outRowBytes));
-#endif
 					// store previous values
 					lastOutRowBytes = filterRecord->outRowBytes;
 					lastOutRect = filterRecord->outRect;
 					lastOutLoPlane = filterRecord->outLoPlane;
 					lastOutHiPlane = filterRecord->outHiPlane;
-					filterRecord->outColumnBytes = (filterRecord->outHiPlane - filterRecord->outLoPlane) + 1;
-
-					if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
-					{
-						filterRecord->outColumnBytes *= 2;
-					}
 				}
 
 			}
@@ -2728,10 +2713,9 @@ namespace PSFilterLoad.PSApi
 				}
 				filterRecord->outRowBytes = 0;
 				lastOutRowBytes = 0;
-				lastOutRect.left = lastOutRect.top = lastOutRect.right = lastOutRect.bottom = 0;
+				lastOutRect = Rect16.Empty;
 				lastOutLoPlane = -1;
 				lastOutHiPlane = 0;
-
 			}
 
 			return PSError.noErr;
@@ -2788,26 +2772,20 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// Fills the input buffer with data from the source image.
 		/// </summary>
-		/// <param name="inData">The input buffer to fill.</param>
-		/// <param name="inRowBytes">The stride of the input buffer.</param>
-		/// <param name="rect">The rectangle of interest within the image.</param>
-		/// <param name="loplane">The input loPlane.</param>
-		/// <param name="hiplane">The input hiPlane.</param>
-		/// <param name="inputRate">The FilterRecord.inputRate to use to scale the image.</param>
-		/// <param name="inputPadding">The mode to use if the image needs padding.</param>
-		private unsafe short FillInputBuffer(ref IntPtr inData, ref int inRowBytes, Rect16 rect, short loplane, short hiplane, int inputRate, short inputPadding)
+		/// <param name="filterRecord">The filter record.</param>
+		private unsafe short FillInputBuffer(FilterRecord* filterRecord)
 		{
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { inRowBytes, rect, loplane, hiplane, FixedToInt32(inputRate) }));
+			Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { filterRecord->inRowBytes, filterRecord->inRect, 
+			filterRecord->inLoPlane, filterRecord->inHiPlane, FixedToInt32(filterRecord->inputRate) }));
 #endif
+			Rect16 rect = filterRecord->inRect;
 
-			int nplanes = hiplane - loplane + 1;
+			int nplanes = filterRecord->inHiPlane - filterRecord->inLoPlane + 1;
 			int width = (rect.right - rect.left);
 			int height = (rect.bottom - rect.top);
 
-
 			Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
-
 
 			int stride = (width * nplanes);
 
@@ -2829,8 +2807,9 @@ namespace PSFilterLoad.PSApi
 					return PSError.memFullErr;
 				}
 			}
-			inData = inDataPtr;
-			inRowBytes = stride;
+			filterRecord->inData = inDataPtr;
+			filterRecord->inRowBytes = stride;
+			filterRecord->inColumnBytes = nplanes;
 
 			if (lockRect.Left < 0 || lockRect.Top < 0)
 			{
@@ -2856,30 +2835,30 @@ namespace PSFilterLoad.PSApi
 
 			if (validImageBounds)
 			{
-				ScaleTempSurface(inputRate, lockRect);
+				ScaleTempSurface(filterRecord->inputRate, lockRect);
 			}
 
 
-			short ofs = loplane;
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGB)
+			short channelOffset = filterRecord->inLoPlane;
+			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
-				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
+				switch (filterRecord->inLoPlane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
 					case 0:
-						ofs = 2;
+						channelOffset = 2;
 						break;
 					case 2:
-						ofs = 0;
+						channelOffset = 0;
 						break;
 				}
 			}
 
-			short padErr = SetFilterPadding(inData, inRowBytes, rect, nplanes, ofs, inputPadding, lockRect, tempSurface);
+			short padErr = SetFilterPadding(inDataPtr, stride, rect, nplanes, channelOffset, filterRecord->inputPadding, lockRect, tempSurface);
 			if (padErr != PSError.noErr || !validImageBounds)
 			{
 				return padErr;
 			}
-			void* ptr = inData.ToPointer();
+			void* ptr = inDataPtr.ToPointer();
 			int top = lockRect.Top;
 			int left = lockRect.Left;
 			int bottom = Math.Min(lockRect.Bottom, tempSurface.Height);
@@ -2921,8 +2900,6 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 
-					inRowBytes *= 2;
-
 					break;
 				case ImageModes.RGB:
 
@@ -2936,11 +2913,11 @@ namespace PSFilterLoad.PSApi
 							switch (nplanes)
 							{
 								case 1:
-									*dst = src[ofs];
+									*dst = src[channelOffset];
 									break;
 								case 2:
-									dst[0] = src[ofs];
-									dst[1] = src[ofs + 1];
+									dst[0] = src[channelOffset];
+									dst[1] = src[channelOffset + 1];
 									break;
 								case 3:
 									dst[0] = src[2];
@@ -2974,11 +2951,11 @@ namespace PSFilterLoad.PSApi
 							switch (nplanes)
 							{
 								case 1:
-									*dst = src[ofs];
+									*dst = src[channelOffset];
 									break;
 								case 2:
-									dst[0] = src[ofs];
-									dst[1] = src[ofs + 1];
+									dst[0] = src[channelOffset];
+									dst[1] = src[channelOffset + 1];
 									break;
 								case 3:
 									dst[0] = src[2];
@@ -2999,38 +2976,40 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 
-					inRowBytes *= 2;
-
 					break;
+			}
+
+			if (imageMode == ImageModes.Gray16 || imageMode == ImageModes.RGB48)
+			{
+				filterRecord->inRowBytes *= 2;
+				filterRecord->inColumnBytes *= 2;
 			}
 
 			return PSError.noErr;
 		}
 
-		private unsafe short FillOutputBuffer(ref IntPtr outData, ref int outRowBytes, Rect16 rect, short loplane, short hiplane, short outputPadding)
+		/// <summary>
+		/// Fills the output buffer with data from the destination image.
+		/// </summary>
+		/// <param name="filterRecord">The filter record.</param>
+		private unsafe short FillOutputBuffer(FilterRecord* filterRecord)
 		{
-
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { outRowBytes, rect, loplane, hiplane }));
-#endif
+			Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane, 
+				filterRecord->outHiPlane }));
 
-
-#if DEBUG
 			using (Bitmap dst = dest.CreateAliasedBitmap())
 			{
-
 			}
 #endif
-
-			int nplanes = hiplane - loplane + 1;
+			Rect16 rect = filterRecord->outRect;
+			int nplanes = filterRecord->outHiPlane - filterRecord->outLoPlane + 1;
 			int width = (rect.right - rect.left);
 			int height = (rect.bottom - rect.top);
 
 			Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
 
-
 			int stride = width * nplanes;
-
 
 			if (outDataPtr == IntPtr.Zero)
 			{
@@ -3050,8 +3029,9 @@ namespace PSFilterLoad.PSApi
 					return PSError.memFullErr;
 				}
 			}
-			outData = outDataPtr;
-			outRowBytes = stride;
+			filterRecord->outData = outDataPtr;
+			filterRecord->outRowBytes = stride;
+			filterRecord->outColumnBytes = nplanes;
 
 			if (lockRect.Left < 0 || lockRect.Top < 0)
 			{
@@ -3073,31 +3053,30 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-			short ofs = loplane;
-			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.RGB)
+			short channelOffset = filterRecord->outLoPlane;
+			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
-				switch (loplane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
+				switch (filterRecord->outLoPlane) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
 				{
 					case 0:
-						ofs = 2;
+						channelOffset = 2;
 						break;
 					case 2:
-						ofs = 0;
+						channelOffset = 0;
 						break;
 				}
 			}
 
-			short padErr = SetFilterPadding(outData, outRowBytes, rect, nplanes, ofs, outputPadding, lockRect, dest);
+			short padErr = SetFilterPadding(outDataPtr, stride, rect, nplanes, channelOffset, filterRecord->outputPadding, lockRect, dest);
 			if (padErr != PSError.noErr || (rect.left >= dest.Width || rect.top >= dest.Height))
 			{
 				return padErr;
 			}
-			void* ptr = outData.ToPointer();
+			void* ptr = outDataPtr.ToPointer();
 			int top = lockRect.Top;
 			int left = lockRect.Left;
 			int bottom = Math.Min(lockRect.Bottom, dest.Height);
 			int right = Math.Min(lockRect.Right, dest.Width);
-
 
 			switch (imageMode)
 			{
@@ -3134,8 +3113,6 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 
-					outRowBytes *= 2;
-
 					break;
 				case ImageModes.RGB:
 
@@ -3149,11 +3126,11 @@ namespace PSFilterLoad.PSApi
 							switch (nplanes)
 							{
 								case 1:
-									*dst = src[ofs];
+									*dst = src[channelOffset];
 									break;
 								case 2:
-									dst[0] = src[ofs];
-									dst[1] = src[ofs + 1];
+									dst[0] = src[channelOffset];
+									dst[1] = src[channelOffset + 1];
 									break;
 								case 3:
 									dst[0] = src[2];
@@ -3187,11 +3164,11 @@ namespace PSFilterLoad.PSApi
 							switch (nplanes)
 							{
 								case 1:
-									*dst = src[ofs];
+									*dst = src[channelOffset];
 									break;
 								case 2:
-									dst[0] = src[ofs];
-									dst[1] = src[ofs + 1];
+									dst[0] = src[channelOffset];
+									dst[1] = src[channelOffset + 1];
 									break;
 								case 3:
 									dst[0] = src[2];
@@ -3212,9 +3189,13 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 
-					outRowBytes *= 2;
-
 					break;
+			}
+
+			if (imageMode == ImageModes.RGB48 || imageMode == ImageModes.Gray16)
+			{
+				filterRecord->outRowBytes *= 2;
+				filterRecord->outColumnBytes *= 2;
 			}
 
 			return PSError.noErr;
@@ -3265,16 +3246,13 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// Fills the mask buffer with data from the mask image.
 		/// </summary>
-		/// <param name="maskData">The input buffer to fill.</param>
-		/// <param name="maskRowBytes">The stride of the input buffer.</param>
-		/// <param name="rect">The rectangle of interest within the image.</param>
-		/// <param name="maskRate">The FilterRecord.maskRate to use to scale the image.</param>
-		/// <param name="maskPadding">The mode to use if the image needs padding.</param>
-		private unsafe short FillMaskBuffer(ref IntPtr maskData, ref int maskRowBytes, Rect16 rect, int maskRate, short maskPadding)
+		/// <param name="filterRecord">The filter record.</param>
+		private unsafe short FillMaskBuffer(FilterRecord* filterRecord)
 		{
 #if DEBUG
-			Ping(DebugFlags.AdvanceState, string.Format("maskRowBytes: {0}, Rect: {1}, maskRate: {2}", new object[] { maskRowBytes, rect, FixedToInt32(maskRate) }));
+			Ping(DebugFlags.AdvanceState, string.Format("maskRowBytes: {0}, Rect: {1}, maskRate: {2}", new object[] { filterRecord->maskRowBytes, filterRecord->maskRect, FixedToInt32(filterRecord->maskRate) }));
 #endif
+			Rect16 rect = filterRecord->maskRect;
 			int width = (rect.right - rect.left);
 			int height = (rect.bottom - rect.top);
 
@@ -3303,7 +3281,7 @@ namespace PSFilterLoad.PSApi
 			bool validImageBounds = (rect.left < source.Width && rect.top < source.Height);
 			if (validImageBounds)
 			{
-				ScaleTempMask(maskRate, lockRect);
+				ScaleTempMask(filterRecord->maskRate, lockRect);
 			}
 
 			if (maskDataPtr == IntPtr.Zero)
@@ -3319,16 +3297,16 @@ namespace PSFilterLoad.PSApi
 					return PSError.memFullErr;
 				}
 			}
-			maskData = maskDataPtr;
-			maskRowBytes = width;
+			filterRecord->maskData = maskDataPtr;
+			filterRecord->maskRowBytes = width;
 
-			short err = SetFilterPadding(maskDataPtr, width, rect, 1, 0, maskPadding, lockRect, mask);
+			short err = SetFilterPadding(maskDataPtr, width, rect, 1, 0, filterRecord->maskPadding, lockRect, mask);
 			if (err != PSError.noErr || !validImageBounds)
 			{
 				return err;
 			}
 
-			byte* ptr = (byte*)maskData.ToPointer();
+			byte* ptr = (byte*)maskDataPtr.ToPointer();
 
 			int top = lockRect.Top;
 			int left = lockRect.Left;
@@ -3654,8 +3632,7 @@ namespace PSFilterLoad.PSApi
 		/// </summary>
 		private unsafe void PostProcessOutputData()
 		{
-			if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) &&
-				outputHandling == FilterDataHandling.FillMask)
+			if (outputHandling == FilterDataHandling.FillMask && (filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection))
 			{
 				if ((selectedRegion != null) && !writesOutsideSelection)
 				{
@@ -4784,9 +4761,9 @@ namespace PSFilterLoad.PSApi
 		private unsafe short DisplayPixelsProc(ref PSPixelMap source, ref VRect srcRect, int dstRow, int dstCol, IntPtr platformContext)
 		{
 #if DEBUG
-			Ping(DebugFlags.DisplayPixels, string.Format("source: version = {0} bounds = {1}, ImageMode = {2}, colBytes = {3}, rowBytes = {4},planeBytes = {5}, BaseAddress = {6}, mat = {7}, masks = {8}", new object[]{ source.version.ToString(), source.bounds.ToString(), ((ImageModes)source.imageMode).ToString("G"),
-				source.colBytes.ToString(), source.rowBytes.ToString(), source.planeBytes.ToString(), source.baseAddr.ToString("X8"), source.mat.ToString("X8"), source.masks.ToString("X8")}));
-			Ping(DebugFlags.DisplayPixels, string.Format("srcRect = {0} dstCol (x, width) = {1}, dstRow (y, height) = {2}", srcRect.ToString(), dstCol, dstRow));
+			Ping(DebugFlags.DisplayPixels, string.Format("source: version = {0} bounds = {1}, ImageMode = {2}, colBytes = {3}, rowBytes = {4},planeBytes = {5}, BaseAddress = 0x{6}, mat = 0x{7}, masks = 0x{8}", new object[]{ source.version, source.bounds, ((ImageModes)source.imageMode).ToString("G"),
+				source.colBytes, source.rowBytes, source.planeBytes, source.baseAddr.ToHexString(), source.mat.ToHexString(), source.masks.ToHexString()}));
+			Ping(DebugFlags.DisplayPixels, string.Format("srcRect = {0} dstCol (x, width) = {1}, dstRow (y, height) = {2}", srcRect, dstCol, dstRow));
 #endif
 
 			if (platformContext == IntPtr.Zero || source.rowBytes == 0 || source.baseAddr == IntPtr.Zero ||
