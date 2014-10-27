@@ -18,12 +18,18 @@ namespace HostTest.Tools
     internal sealed class SelectionPathChangedEventArgs : EventArgs, IDisposable
     {
         private GraphicsPath selectedPath;
+        private bool disposed;
 
         public SelectionPathChangedEventArgs(GraphicsPath path)
         {
+            this.disposed = false;
             if (path != null)
             {
-                selectedPath = (GraphicsPath)path.Clone();
+                this.selectedPath = (GraphicsPath)path.Clone();
+            }
+            else
+            {
+                this.selectedPath = null;
             }
         }
 
@@ -31,20 +37,22 @@ namespace HostTest.Tools
         {
             get
             {
-                return selectedPath;
+                return this.selectedPath;
             }
         }
 
-        private bool disposed;
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         private void Dispose(bool disposing)
         {
-            if (!disposed)
-            {
+            if (!this.disposed)
+            {                    
+                this.disposed = true;
+
                 if (disposing)
                 {
                     if (this.selectedPath != null)
@@ -52,7 +60,6 @@ namespace HostTest.Tools
                         this.selectedPath.Dispose();
                         this.selectedPath = null;
                     }
-                    disposed = true;
                 }
             }
         }
