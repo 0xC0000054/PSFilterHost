@@ -142,18 +142,30 @@ namespace HostTest.Tools
                 List<Point> trimPoints = this.TrimShapePath(this.selectPoints);
                 List<PointF> shapePoints = this.CreateShape(trimPoints);
 
-                if (this.SelectedPathChanged != null)
-                {
-                    if (shapePoints.Count >= 2)
+                EventHandler<SelectionPathChangedEventArgs> handler = SelectedPathChanged;
+                if (handler != null)
+                { 
+                    GraphicsPath path = null;
+
+                    try
                     {
-                        GraphicsPath path = this.RenderShape(shapePoints);
-                        this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(path));
-                        path.Dispose();
+                        if (shapePoints.Count >= 2)
+                        {
+                            path = RenderShape(shapePoints);
+                        }
+
+                        using (SelectionPathChangedEventArgs args = new SelectionPathChangedEventArgs(path))
+                        {
+                            handler(this, args);
+                        }
                     }
-                    else
+                    finally
                     {
-                        this.SelectedPathChanged(this, new SelectionPathChangedEventArgs(null));
-                    }
+                        if (path != null)
+                        {
+                            path.Dispose();
+                        }
+                    } 
                 } 
             }
 
