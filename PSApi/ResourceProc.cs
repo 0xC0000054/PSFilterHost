@@ -20,16 +20,16 @@ using System.Runtime.InteropServices;
 namespace PSFilterLoad.PSApi
 {
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short CountPIResourcesProc(uint type);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr GetPIResourceProc(uint type, short index);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DeletePIResourceProc(uint type, short index);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short AddPIResourceProc(uint type, IntPtr data);
 
     [StructLayout(LayoutKind.Sequential)]

@@ -22,13 +22,13 @@ namespace PSFilterLoad.PSApi
 {
 
 	#region BufferSuite1 Delegates
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate IntPtr PSBufferSuiteNew(ref uint requestedSize, uint minimumSize);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate void PSBufferSuiteDispose(ref IntPtr buffer);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate uint PSBufferSuiteGetSize(IntPtr buffer);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate uint PSBufferSuiteGetSpace();
 	#endregion
 	internal struct PSBufferSuite1
@@ -65,31 +65,31 @@ namespace PSFilterLoad.PSApi
 	}
 
 	#region ColorSpace1 Delegates
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSMake(IntPtr colorID);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSDelete(IntPtr colorID);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSStuffComponents(IntPtr colorID, short colorSpace, ref byte c0, ref byte c1, ref byte c2, ref byte c3);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSExtractComponents(IntPtr colorID, short colorSpace, ref byte c0, ref byte c1, ref byte c2, ref byte c3, ref byte gamutFlag);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSStuffXYZ(IntPtr colorID, CS_XYZ xyz);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSExtractXYZ(IntPtr colorID, ref CS_XYZ xyz);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSConvert8(ColorSpace inputCSpace, ColorSpace outputCSpace, IntPtr colorArray, short count);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSConvert16(short inputCSpace, short outputCSpace, IntPtr colorArray, short count);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSGetNativeSpace(IntPtr colorID, ref short nativeSpace);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSIsBookColor(IntPtr colorID, ref byte isBookColor);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSExtractColorName(IntPtr colorID, ref IntPtr colorName);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSPickColor(IntPtr colorID, IntPtr promptString);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short CSConvert(IntPtr inputData, IntPtr outputData, short count);
 	#endregion
 	internal struct PSColorSpaceSuite1
@@ -111,8 +111,9 @@ namespace PSFilterLoad.PSApi
 	} 
 #endif
 
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate void SetPIHandleLockDelegate(IntPtr handle, byte lockHandle, ref IntPtr address, ref byte oldLock);
+	
 	internal struct PSHandleSuite1
 	{
 		public IntPtr New;
@@ -122,6 +123,7 @@ namespace PSFilterLoad.PSApi
 		public IntPtr SetSize;
 		public IntPtr RecoverSpace;
 	}
+	
 	internal struct PSHandleSuite2
 	{
 		public IntPtr New;
@@ -134,13 +136,13 @@ namespace PSFilterLoad.PSApi
 	}
 
 	#region UIHooks Delegates
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate IntPtr UISuiteMainWindowHandle();
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short UISuiteHostSetCursor(IntPtr cursor);
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate uint UISuiteHostTickCount();
-	[UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	internal delegate short UISuiteGetPluginName(IntPtr plugInRef, ref IntPtr plugInName);
 	#endregion
 	internal struct PSUIHooksSuite1

@@ -20,28 +20,28 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterLoad.PSApi
 {
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void RecoverSpaceProc(int size);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr NewPIHandleProc(int size);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate void DisposePIHandleProc(System.IntPtr h);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void DisposePIHandleProc(IntPtr h);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate int GetPIHandleSizeProc(System.IntPtr h);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate int GetPIHandleSizeProc(IntPtr h);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short SetPIHandleSizeProc(System.IntPtr h, int newSize);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate short SetPIHandleSizeProc(IntPtr h, int newSize);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate IntPtr LockPIHandleProc(System.IntPtr h, byte moveHigh);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate IntPtr LockPIHandleProc(IntPtr h, byte moveHigh);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate void UnlockPIHandleProc(System.IntPtr h);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void UnlockPIHandleProc(IntPtr h);
 
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate void DisposeRegularPIHandleProc(IntPtr h);
 
     [StructLayoutAttribute(LayoutKind.Sequential)]
