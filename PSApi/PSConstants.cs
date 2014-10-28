@@ -97,6 +97,33 @@ namespace PSFilterLoad.PSApi
         public const string PICAZStringDictonarySuite = "AS ZString Dictionary Suite";
         public const string PICAPluginsSuite = "SP Plug-ins Suite";
 #endif
+        internal static class ChannelPorts
+        {
+            /// <summary>
+            /// The index of the gray channel.
+            /// </summary>
+            public const int Gray = 0;
+            /// <summary>
+            /// The index of the red channel.
+            /// </summary>
+            public const int Red = 1;
+            /// <summary>
+            /// The index of the green channel.
+            /// </summary>
+            public const int Green = 2;
+            /// <summary>
+            /// The index of the blue channel.
+            /// </summary>
+            public const int Blue = 3;
+            /// <summary>
+            /// The index of the alpha channel.
+            /// </summary>
+            public const int Alpha = 4;
+            /// <summary>
+            /// The index of the selection mask.
+            /// </summary>
+            public const int SelectionMask = 5;
+        }
 
         /// <summary>
         /// The host sampling support constants 
