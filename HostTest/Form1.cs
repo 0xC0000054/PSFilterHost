@@ -34,7 +34,7 @@ namespace HostTest
 		private Dictionary<PluginData, ParameterData> filterParameters;
 		private HistoryStack historyStack;   
 		private Thread filterThread;
-		private bool setRepeatEffect;
+		private ToolStripItem currentFilterMenuItem;
 		private bool setFilterApplyText;
 		private string filterName;
 		private string titleString;
@@ -59,7 +59,7 @@ namespace HostTest
 			this.filterParameters = new Dictionary<PluginData, ParameterData>();
 			this.historyStack = new HistoryStack();
 			this.historyStack.HistoryChanged += new EventHandler(historyStack_HistoryChanged);
-			this.setRepeatEffect = false;          
+			this.currentFilterMenuItem = null;          
 			this.setFilterApplyText = false;
 			this.filterName = string.Empty;
 			this.imageFileName = string.Empty;
@@ -311,14 +311,9 @@ namespace HostTest
 		{
 			ToolStripItem item = (ToolStripItem)sender;
 			PluginData pluginData = (PluginData)item.Tag;
-			this.setRepeatEffect = false;
+			this.currentFilterMenuItem = item;
+			
 			RunPhotoshopFilterThread(pluginData, false);
-
-			if (setRepeatEffect)
-			{
-				SetRepeatEffectMenuItem(item);
-				this.setRepeatEffect = false;
-			}
 		}
 
 		private void ShowFilterAboutDialog(object sender, EventArgs e)
@@ -349,20 +344,19 @@ namespace HostTest
 				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, repeatEffect)) { IsBackground = true, Priority = ThreadPriority.AboveNormal };
 				this.filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
 				this.filterThread.Start();
-
-				while (filterThread.IsAlive)
-				{
-					Application.DoEvents();
-				}
-
-				this.filterThread.Join();
-				this.filterThread = null;
-					
-				this.Cursor = Cursors.Default;
-				this.toolStripProgressBar1.Value = 0;
-				this.toolStripProgressBar1.Visible = false;
-				this.toolStripStatusLabel1.Text = string.Empty;
 			}
+		}
+
+		private void FilterCompleted()
+		{
+			this.filterThread.Join();
+			this.filterThread = null;
+
+			this.currentFilterMenuItem = null;
+			this.Cursor = Cursors.Default;
+			this.toolStripProgressBar1.Value = 0;
+			this.toolStripProgressBar1.Visible = false;
+			this.toolStripStatusLabel1.Text = string.Empty;
 		}
 
 		private void SaveImageOnUIThread()
@@ -459,7 +453,7 @@ namespace HostTest
 				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))
 				{
 					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilter));
-					host.SetPickColorCallback(new PickColor(PickColor));
+					host.SetPickColorCallback(new PickColor(PickColorCallback));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
 					if (repeatEffect && filterParameters.ContainsKey(pluginData))
 					{
@@ -521,7 +515,7 @@ namespace HostTest
 
 							this.pseudoResources = host.PseudoResources;
 							this.hostInfo = host.HostInfo;
-							this.setRepeatEffect = true;
+							base.BeginInvoke(new Action(SetRepeatEffectMenuItem));
 						}
 
 					}
@@ -554,29 +548,33 @@ namespace HostTest
 					selection.Dispose();
 					selection = null;
 				}
+				base.BeginInvoke(new Action(FilterCompleted));
 			}
 
 		}
 
-		private void SetRepeatEffectMenuItem(ToolStripItem item)
+		private void SetRepeatEffectMenuItem()
 		{
-			if (!filtersToolStripMenuItem.DropDownItems.ContainsKey("repeatEffect"))
+			if (this.currentFilterMenuItem != null)
 			{
-				ToolStripMenuItem repeatItem = new ToolStripMenuItem(Resources.RepeatEffectMenuText + item.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
+				if (!filtersToolStripMenuItem.DropDownItems.ContainsKey("repeatEffect"))
 				{
-					Name = "repeatEffect",
-					Tag = item.Tag,
-					ShowShortcutKeys = true,
-					ShortcutKeys = Keys.Control | Keys.F
-				};
+					ToolStripMenuItem repeatItem = new ToolStripMenuItem(Resources.RepeatEffectMenuText + this.currentFilterMenuItem.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
+					{
+						Name = "repeatEffect",
+						Tag = this.currentFilterMenuItem.Tag,
+						ShowShortcutKeys = true,
+						ShortcutKeys = Keys.Control | Keys.F
+					};
 
-				filtersToolStripMenuItem.DropDownItems.Insert(0, repeatItem);
-			}
-			else
-			{
-				ToolStripMenuItem repeatItem = (ToolStripMenuItem)filtersToolStripMenuItem.DropDownItems[0];
-				repeatItem.Text = Resources.RepeatEffectMenuText + item.Text.TrimEnd('.');
-				repeatItem.Tag = item.Tag;
+					filtersToolStripMenuItem.DropDownItems.Insert(0, repeatItem);
+				}
+				else
+				{
+					ToolStripMenuItem repeatItem = (ToolStripMenuItem)filtersToolStripMenuItem.DropDownItems[0];
+					repeatItem.Text = Resources.RepeatEffectMenuText + this.currentFilterMenuItem.Text.TrimEnd('.');
+					repeatItem.Tag = this.currentFilterMenuItem.Tag;
+				} 
 			}
 		}
 
@@ -985,6 +983,7 @@ namespace HostTest
 				EnableUndoButtons();
 			}
 		}
+
 		private void primaryColorBtn_Click(object sender, EventArgs e)
 		{
 			this.colorDialog1.Color = this.primaryColorBtn.RectangleColor;
@@ -1264,7 +1263,7 @@ namespace HostTest
 			this.Cursor = Cursors.Default;
 		}
 
-		private ColorPickerResult PickColor(string prompt, byte defaultRed, byte defaultGreen, byte defaultBlue)
+		private ColorPickerResult PickColorCallback(string prompt, byte defaultRed, byte defaultGreen, byte defaultBlue)
 		{
 			ColorPickerResult color = null;
 
