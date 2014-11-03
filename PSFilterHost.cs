@@ -46,7 +46,7 @@ namespace PSFilterHostDll
 		private System.Windows.Media.Color primaryColor;
 		private System.Windows.Media.Color secondaryColor;
 #endif
-
+		private bool disposed;
 		private ParameterData filterParameters;      
 		private Region selectedRegion;
 		private IntPtr owner;
@@ -169,7 +169,7 @@ namespace PSFilterHostDll
 #else
 			this.source = sourceImage.Clone();
 #endif
-
+			this.disposed = false;
 			this.dest = null;
 			this.filterParameters = null;
 			this.primaryColor = primary;
@@ -203,7 +203,7 @@ namespace PSFilterHostDll
 					throw new ObjectDisposedException("PSFilterHost");
 				}
 
-				return dest;
+				return this.dest;
 			}
 		} 
 #else
@@ -220,7 +220,7 @@ namespace PSFilterHostDll
 					throw new ObjectDisposedException("PSFilterHost");
 				}
 
-				return dest;
+				return this.dest;
 			}
 		} 
 #endif
@@ -235,7 +235,7 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return filterParameters;
+				return this.filterParameters;
 			}
 			set
 			{
@@ -253,7 +253,7 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return hostInfo;
+				return this.hostInfo;
 			}
 			set
 			{
@@ -271,7 +271,7 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return new PseudoResourceCollection(pseudoResources);
+				return new PseudoResourceCollection(this.pseudoResources);
 			}
 			set
 			{
@@ -428,7 +428,7 @@ namespace PSFilterHostDll
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
 		/// <returns>
-		/// True if successful; false if the user canceled the dialog.
+		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
 		/// </returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
@@ -442,7 +442,7 @@ namespace PSFilterHostDll
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
 		/// <returns>
-		/// True if successful; false if the user canceled the dialog.
+		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
 		/// </returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="System.IO.FileNotFoundException">The filter cannot be found.</exception>
@@ -516,29 +516,13 @@ namespace PSFilterHostDll
 					throw new FilterRunException(ex.Message, ex);
 				}
 
-				if (result && string.IsNullOrEmpty(lps.ErrorMessage))
+				if (result)
 				{
-
 #if GDIPLUS
 					this.dest = new Bitmap(lps.Dest.CreateAliasedBitmap());
 #else
 					this.dest = lps.Dest.CreateAliasedBitmapSource().Clone();
 					this.dest.Freeze();
-#endif
-					
-
-
-#if DEBUG
-					using (FileStream fs = new FileStream(Path.Combine(Path.GetDirectoryName(typeof(PSFilterHost).Assembly.Location), "dest.png"), FileMode.Create, FileAccess.Write))
-					{
-#if GDIPLUS
-						this.dest.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
-#else
-						PngBitmapEncoder enc = new PngBitmapEncoder();
-						enc.Frames.Add(BitmapFrame.Create(this.dest));
-						enc.Save(fs); 
-#endif
-					} 
 #endif
 
 					this.filterParameters = lps.ParameterData;
@@ -630,7 +614,6 @@ namespace PSFilterHostDll
 			Dispose(false);
 		}
 
-		private bool disposed;
 		private void Dispose(bool disposing)
 		{
 			if (!disposed)
