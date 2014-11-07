@@ -53,13 +53,15 @@ namespace PSFilterLoad.PSApi
         WritesOutsideSelection = (1 << 3)
     }
 
-    [StructLayoutAttribute(LayoutKind.Sequential, Pack = 1), Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1), Serializable]
     internal struct FilterCaseInfo
     {
         public FilterDataHandling inputHandling;
         public FilterDataHandling outputHandling;
         public FilterCaseInfoFlags flags1;
-        public byte flags2; 
+        public byte flags2;
+
+        public const int SizeOf = 4;
     }
 
 }
