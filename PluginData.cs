@@ -12,6 +12,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using PSFilterLoad.PSApi;
 
 #if !GDIPLUS
@@ -20,8 +21,8 @@ using System.Windows.Media;
 
 namespace PSFilterHostDll
 {
-    [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate void pluginEntryPoint(FilterSelector selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
+    internal delegate void PluginEntryPoint(FilterSelector selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
     /// <summary>
     /// The class that encapsulates a Photoshop-compatible filter plug-in.
     /// </summary>
@@ -38,6 +39,7 @@ namespace PSFilterHostDll
         internal string enableInfo;
         internal ushort? supportedModes;
         internal string[] moduleEntryPoints;
+        [OptionalField(VersionAdded = 2)]
         private bool hasAboutBox;
 
         /// <summary>
@@ -236,6 +238,12 @@ namespace PSFilterHostDll
             this.hasAboutBox = true;
         }
 
+        [OnDeserializing]
+        private void SetOptionalFieldDefaults(StreamingContext context)
+        {
+            this.hasAboutBox = true;
+        }
+
         /// <summary>
         /// Determines whether this instance is valid.
         /// </summary>
@@ -304,7 +312,6 @@ namespace PSFilterHostDll
         /// <summary>
         /// The entrypoint for the FilterParmBlock and AboutRecord
         /// </summary>
-        public pluginEntryPoint entryPoint;
+        public PluginEntryPoint entryPoint;
     }
-
 }
