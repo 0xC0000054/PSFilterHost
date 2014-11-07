@@ -15,7 +15,7 @@ using System;
 namespace PSFilterLoad.PSApi
 {
     [Serializable]
-    internal struct AETEParameter
+    internal sealed class AETEParameter
     {
         public string name;
         public uint key;
@@ -25,7 +25,7 @@ namespace PSFilterLoad.PSApi
     }
 
     [Serializable]
-    internal struct AETEEnums
+    internal sealed class AETEEnums
     {
         public uint type;
         public short count;
@@ -33,7 +33,7 @@ namespace PSFilterLoad.PSApi
     }
 
     [Serializable]
-    internal struct AETEEnum
+    internal sealed class AETEEnum
     {
         public string name;
         public uint type;
