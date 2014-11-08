@@ -15,10 +15,11 @@ using System.Windows.Forms;
 
 namespace HostTest
 {
-    internal class AbortMessageFilter : IMessageFilter
+    internal sealed class AbortMessageFilter : IMessageFilter
     {
-        private bool escapePressed = false;
-        private static readonly IntPtr escapeKey = new IntPtr(0x1b);
+        private bool escapePressed;
+        private static readonly IntPtr EscapeKey = new IntPtr(VK_ESCAPE);
+        private const int VK_ESCAPE = 0x1b;
         private const int WM_CHAR = 0x102;
         private const int WM_SYSKEYCHAR = 0x106;
         private const int WM_IME_CHAR = 0x286;
@@ -27,10 +28,15 @@ namespace HostTest
         {
             if (m.Msg == WM_CHAR || m.Msg == WM_SYSKEYCHAR || m.Msg == WM_IME_CHAR)
             {
-                this.escapePressed = (m.WParam == escapeKey);
+                this.escapePressed = (m.WParam == EscapeKey);
             }
 
             return false;
+        }
+
+        public AbortMessageFilter()
+        {
+            this.escapePressed = false;
         }
 
         public void Reset()
@@ -38,7 +44,7 @@ namespace HostTest
             this.escapePressed = false;
         }
 
-        public bool AbortFilter()
+        public bool AbortFilterCallback()
         {
             return escapePressed;
         }
