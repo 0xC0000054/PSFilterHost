@@ -60,12 +60,12 @@ namespace PSFilterLoad.PSApi
 		}
 #endif
 
-
 		/// <summary>
 		/// The Windows-1252 Western European encoding
 		/// </summary>
 		private static readonly Encoding Windows1252Encoding = Encoding.GetEncoding(1252);
 		private static readonly char[] TrimChars = new char[] { ' ', '\0' };
+		
 		/// <summary>
 		/// Reads a Pascal String into a string.
 		/// </summary>
@@ -81,6 +81,7 @@ namespace PSFilterLoad.PSApi
 
 			return StringFromPString(ptr);
 		}
+
 		/// <summary>
 		/// Reads a Pascal String into a string.
 		/// </summary>
@@ -92,7 +93,6 @@ namespace PSFilterLoad.PSApi
 
 			return new string((sbyte*)ptr, 1, length, Windows1252Encoding).Trim(TrimChars);
 		}
-
 
 		/// <summary>
 		/// Reads a Pascal String into a string.
@@ -107,16 +107,28 @@ namespace PSFilterLoad.PSApi
 			return new string((sbyte*)ptr, 1, ptr[0], Windows1252Encoding);
 		}
 
-		private struct QueryAETE
+		private sealed class QueryAETE
 		{
-			public IntPtr resourceID;
+			public readonly IntPtr resourceID;
 			public PluginAETE enumAETE;
+
+			public QueryAETE(int terminologyID)
+			{
+				this.resourceID = new IntPtr(terminologyID);
+				this.enumAETE = null;
+			}
 		}
 
-		private struct QueryFilter
+		private sealed class QueryFilter
 		{
-			public string fileName;
+			public readonly string fileName;
 			public List<PluginData> plugins;
+
+			public QueryFilter(string fileName)
+			{
+				this.fileName = fileName;
+				this.plugins = new List<PluginData>();
+			}
 		}
 
 		private static unsafe bool EnumAETE(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, IntPtr lParam)
@@ -128,9 +140,6 @@ namespace PSFilterLoad.PSApi
 				IntPtr hRes = UnsafeNativeMethods.FindResourceW(hModule, lpszName, lpszType);
 				if (hRes == IntPtr.Zero)
 				{
-#if DEBUG
-					System.Diagnostics.Debug.WriteLine(Marshal.GetLastWin32Error().ToString());
-#endif
 					return true;
 				}
 
@@ -298,7 +307,6 @@ namespace PSFilterLoad.PSApi
 				return false;
 			}
 
-
 			return true;
 		}
 
@@ -425,7 +433,7 @@ namespace PSFilterLoad.PSApi
 					for (int j = 0; j < 7; j++)
 					{
 						filterInfo[j] = *(FilterCaseInfo*)dataPtr;
-						dataPtr += 4;
+						dataPtr += FilterCaseInfo.SizeOf;
 					}
 					enumData.FilterInfo = filterInfo;
 				}
@@ -435,11 +443,7 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 					string aeteName = Marshal.PtrToStringAnsi(new IntPtr(dataPtr + PITerminology.SizeOf)).TrimEnd('\0');
 #endif
-					QueryAETE queryAETE = new QueryAETE()
-					{
-						resourceID = new IntPtr(term->terminologyID),
-						enumAETE = null
-					};
+					QueryAETE queryAETE = new QueryAETE(term->terminologyID);
 
 					GCHandle aeteHandle = GCHandle.Alloc(queryAETE, GCHandleType.Normal);
 					try
@@ -699,11 +703,7 @@ namespace PSFilterLoad.PSApi
 			{
 				if (!dll.IsInvalid)
 				{
-					QueryFilter queryFilter = new QueryFilter()
-					{
-						fileName = pluginFileName,
-						plugins = new List<PluginData>()
-					};
+					QueryFilter queryFilter = new QueryFilter(pluginFileName);
 
 					GCHandle handle = GCHandle.Alloc(queryFilter, GCHandleType.Normal);
 					bool needsRelease = false;
@@ -1425,7 +1425,7 @@ namespace PSFilterLoad.PSApi
 
 					if (entryPoint != IntPtr.Zero)
 					{
-						pdata.module.entryPoint = (pluginEntryPoint)Marshal.GetDelegateForFunctionPointer(entryPoint, typeof(pluginEntryPoint));
+						pdata.module.entryPoint = (PluginEntryPoint)Marshal.GetDelegateForFunctionPointer(entryPoint, typeof(PluginEntryPoint));
 						loaded = true;
 					}
 				}
@@ -1733,18 +1733,17 @@ namespace PSFilterLoad.PSApi
 					}
 					else
 					{
-						// otherwise call about on all the entry points in the module, per the SDK docs only one of the entry points will display the about box.
+						// Otherwise call about on all the entry points in the module, per the SDK docs only one of the entry points will display the about box.
 						foreach (var entryPoint in pdata.moduleEntryPoints)
 						{
 							IntPtr ptr = UnsafeNativeMethods.GetProcAddress(pdata.module.dll, entryPoint);
 
-							pluginEntryPoint ep = (pluginEntryPoint)Marshal.GetDelegateForFunctionPointer(ptr, typeof(pluginEntryPoint));
+							PluginEntryPoint ep = (PluginEntryPoint)Marshal.GetDelegateForFunctionPointer(ptr, typeof(PluginEntryPoint));
 
 							ep(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
 
 							GC.KeepAlive(ep);
 						}
-
 					}
 				}
 				finally
@@ -1878,7 +1877,8 @@ namespace PSFilterLoad.PSApi
 					return false;
 				}
 
-				if (AbortProc()) // Per the SDK the host can call filterSelectorFinish in between filterSelectorContinue calls if it detects a cancel request.
+				// Per the SDK the host can call filterSelectorFinish in between filterSelectorContinue calls if it detects a cancel request.
+				if (AbortProc()) 
 				{
 					result = PSError.noErr;
 					pdata.module.entryPoint(FilterSelector.Finish, filterRecordPtr, ref dataPtr, ref result);
@@ -1916,7 +1916,7 @@ namespace PSFilterLoad.PSApi
 
 			filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 
-			if (filterRecord->autoMask == 1)
+			if (filterRecord->autoMask != 0)
 			{
 				ClipToSelection(); // Clip the rendered image to the selection if the filter does not do it for us.
 			}
@@ -2570,7 +2570,7 @@ namespace PSFilterLoad.PSApi
 		/// <returns>
 		///   <c>true</c> if a single plane of data is requested; otherwise, <c>false</c>.
 		/// </returns>
-		private static unsafe bool IsSinglePlane(short loPlane, short hiPlane)
+		private static bool IsSinglePlane(short loPlane, short hiPlane)
 		{
 			return (((hiPlane - loPlane) + 1) == 1);
 		}
@@ -2578,17 +2578,19 @@ namespace PSFilterLoad.PSApi
 		/// <summary>
 		/// Determines whether the data buffer needs to be resized.
 		/// </summary>
-		/// <param name="inData">The buffer to check.</param>
-		/// <param name="inRect">The new source rectangle.</param>
+		/// <param name="data">The buffer to check.</param>
+		/// <param name="rect">The new source rectangle.</param>
 		/// <param name="loplane">The loplane.</param>
 		/// <param name="hiplane">The hiplane.</param>
-		/// <returns> <c>true</c> if a the buffer needs to be resized; otherwise, <c>false</c></returns>
-		private static bool ResizeBuffer(IntPtr inData, Rect16 inRect, int loplane, int hiplane)
+		/// <returns>
+		///   <c>true</c> if a the buffer needs to be resized; otherwise, <c>false</c>.
+		/// </returns>
+		private static bool ResizeBuffer(IntPtr data, Rect16 rect, int loplane, int hiplane)
 		{
-			long size = Memory.Size(inData);
+			long size = Memory.Size(data);
 
-			int width = inRect.right - inRect.left;
-			int height = inRect.bottom - inRect.top;
+			int width = rect.right - rect.left;
+			int height = rect.bottom - rect.top;
 			int nplanes = hiplane - loplane + 1;
 
 			long bufferSize = ((width * nplanes) * height);
@@ -2779,15 +2781,15 @@ namespace PSFilterLoad.PSApi
 			Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { filterRecord->inRowBytes, filterRecord->inRect, 
 			filterRecord->inLoPlane, filterRecord->inHiPlane, FixedToInt32(filterRecord->inputRate) }));
 #endif
-			Rect16 rect = filterRecord->inRect;
+			Rect16 inRect = filterRecord->inRect;
 
 			int nplanes = filterRecord->inHiPlane - filterRecord->inLoPlane + 1;
-			int width = (rect.right - rect.left);
-			int height = (rect.bottom - rect.top);
+			int width = inRect.right - inRect.left;
+			int height = inRect.bottom - inRect.top;
 
-			Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+			Rectangle lockRect = Rectangle.FromLTRB(inRect.left, inRect.top, inRect.right, inRect.bottom);
 
-			int stride = (width * nplanes);
+			int stride = width * nplanes;
 
 			if (inDataPtr == IntPtr.Zero)
 			{
@@ -2813,25 +2815,20 @@ namespace PSFilterLoad.PSApi
 
 			if (lockRect.Left < 0 || lockRect.Top < 0)
 			{
-				if (lockRect.Left < 0 && lockRect.Top < 0)
-				{
-					lockRect.X = lockRect.Y = 0;
-					lockRect.Width -= -rect.left;
-					lockRect.Height -= -rect.top;
-				}
-				else if (lockRect.Left < 0)
+				if (lockRect.Left < 0)
 				{
 					lockRect.X = 0;
-					lockRect.Width -= -rect.left;
+					lockRect.Width -= -inRect.left;
 				}
-				else
+				
+				if (lockRect.Top < 0)
 				{
 					lockRect.Y = 0;
-					lockRect.Height -= -rect.top;
+					lockRect.Height -= -inRect.top;
 				}
 			}
 
-			bool validImageBounds = (rect.left < source.Width && rect.top < source.Height);
+			bool validImageBounds = (inRect.left < source.Width && inRect.top < source.Height);
 
 			if (validImageBounds)
 			{
@@ -2853,7 +2850,7 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-			short padErr = SetFilterPadding(inDataPtr, stride, rect, nplanes, channelOffset, filterRecord->inputPadding, lockRect, tempSurface);
+			short padErr = SetFilterPadding(inDataPtr, stride, inRect, nplanes, channelOffset, filterRecord->inputPadding, lockRect, tempSurface);
 			if (padErr != PSError.noErr || !validImageBounds)
 			{
 				return padErr;
@@ -3002,12 +2999,12 @@ namespace PSFilterLoad.PSApi
 			{
 			}
 #endif
-			Rect16 rect = filterRecord->outRect;
+			Rect16 outRect = filterRecord->outRect;
 			int nplanes = filterRecord->outHiPlane - filterRecord->outLoPlane + 1;
-			int width = (rect.right - rect.left);
-			int height = (rect.bottom - rect.top);
+			int width = outRect.right - outRect.left;
+			int height = outRect.bottom - outRect.top;
 
-			Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+			Rectangle lockRect = Rectangle.FromLTRB(outRect.left, outRect.top, outRect.right, outRect.bottom);
 
 			int stride = width * nplanes;
 
@@ -3035,21 +3032,16 @@ namespace PSFilterLoad.PSApi
 
 			if (lockRect.Left < 0 || lockRect.Top < 0)
 			{
-				if (lockRect.Left < 0 && lockRect.Top < 0)
-				{
-					lockRect.X = lockRect.Y = 0;
-					lockRect.Width -= -rect.left;
-					lockRect.Height -= -rect.top;
-				}
-				else if (lockRect.Left < 0)
+				if (lockRect.Left < 0)
 				{
 					lockRect.X = 0;
-					lockRect.Width -= -rect.left;
+					lockRect.Width -= -outRect.left;
 				}
-				else
+
+				if (lockRect.Top < 0)
 				{
 					lockRect.Y = 0;
-					lockRect.Height -= -rect.top;
+					lockRect.Height -= -outRect.top;
 				}
 			}
 
@@ -3067,8 +3059,8 @@ namespace PSFilterLoad.PSApi
 				}
 			}
 
-			short padErr = SetFilterPadding(outDataPtr, stride, rect, nplanes, channelOffset, filterRecord->outputPadding, lockRect, dest);
-			if (padErr != PSError.noErr || (rect.left >= dest.Width || rect.top >= dest.Height))
+			short padErr = SetFilterPadding(outDataPtr, stride, outRect, nplanes, channelOffset, filterRecord->outputPadding, lockRect, dest);
+			if (padErr != PSError.noErr || (outRect.left >= dest.Width || outRect.top >= dest.Height))
 			{
 				return padErr;
 			}
@@ -3252,33 +3244,28 @@ namespace PSFilterLoad.PSApi
 #if DEBUG
 			Ping(DebugFlags.AdvanceState, string.Format("maskRowBytes: {0}, Rect: {1}, maskRate: {2}", new object[] { filterRecord->maskRowBytes, filterRecord->maskRect, FixedToInt32(filterRecord->maskRate) }));
 #endif
-			Rect16 rect = filterRecord->maskRect;
-			int width = (rect.right - rect.left);
-			int height = (rect.bottom - rect.top);
+			Rect16 maskRect = filterRecord->maskRect;
+			int width = maskRect.right - maskRect.left;
+			int height = maskRect.bottom - maskRect.top;
 
-			Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+			Rectangle lockRect = Rectangle.FromLTRB(maskRect.left, maskRect.top, maskRect.right, maskRect.bottom);
 
 			if (lockRect.Left < 0 || lockRect.Top < 0)
 			{
-				if (lockRect.Left < 0 && lockRect.Top < 0)
-				{
-					lockRect.X = lockRect.Y = 0;
-					lockRect.Width -= -rect.left;
-					lockRect.Height -= -rect.top;
-				}
-				else if (lockRect.Left < 0)
+				if (lockRect.Left < 0)
 				{
 					lockRect.X = 0;
-					lockRect.Width -= -rect.left;
+					lockRect.Width -= -maskRect.left;
 				}
-				else
+				
+				if (lockRect.Top < 0)
 				{
 					lockRect.Y = 0;
-					lockRect.Height -= -rect.top;
+					lockRect.Height -= -maskRect.top;
 				}
 			}
 
-			bool validImageBounds = (rect.left < source.Width && rect.top < source.Height);
+			bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
 			if (validImageBounds)
 			{
 				ScaleTempMask(filterRecord->maskRate, lockRect);
@@ -3300,7 +3287,7 @@ namespace PSFilterLoad.PSApi
 			filterRecord->maskData = maskDataPtr;
 			filterRecord->maskRowBytes = width;
 
-			short err = SetFilterPadding(maskDataPtr, width, rect, 1, 0, filterRecord->maskPadding, lockRect, mask);
+			short err = SetFilterPadding(maskDataPtr, width, maskRect, 1, 0, filterRecord->maskPadding, lockRect, mask);
 			if (err != PSError.noErr || !validImageBounds)
 			{
 				return err;
@@ -3347,173 +3334,175 @@ namespace PSFilterLoad.PSApi
 				return;
 			}
 
-			int nplanes = hiplane - loplane + 1;
-
 			if (RectNonEmpty(rect))
 			{
-				if (rect.left < source.Width && rect.top < source.Height)
+				if (rect.left >= source.Width || rect.top >= source.Height)
 				{
-					int ofs = loplane;
-					switch (loplane)
+					return;
+				}
+			
+				int nplanes = hiplane - loplane + 1;
+
+				int ofs = loplane;
+				switch (loplane)
+				{
+					case 0:
+						ofs = 2;
+						break;
+					case 2:
+						ofs = 0;
+						break;
+				}
+				Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
+
+				if (lockRect.Left < 0 || lockRect.Top < 0)
+				{
+					if (lockRect.Left < 0 && lockRect.Top < 0)
 					{
-						case 0:
-							ofs = 2;
-							break;
-						case 2:
-							ofs = 0;
-							break;
+						lockRect.X = lockRect.Y = 0;
+						lockRect.Width -= -rect.left;
+						lockRect.Height -= -rect.top;
 					}
-					Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
-
-					if (lockRect.Left < 0 || lockRect.Top < 0)
+					else if (lockRect.Left < 0)
 					{
-						if (lockRect.Left < 0 && lockRect.Top < 0)
-						{
-							lockRect.X = lockRect.Y = 0;
-							lockRect.Width -= -rect.left;
-							lockRect.Height -= -rect.top;
-						}
-						else if (lockRect.Left < 0)
-						{
-							lockRect.X = 0;
-							lockRect.Width -= -rect.left;
-						}
-						else if (lockRect.Top < 0)
-						{
-							lockRect.Y = 0;
-							lockRect.Height -= -rect.top;
-						}
+						lockRect.X = 0;
+						lockRect.Width -= -rect.left;
 					}
-
-
-					void* ptr = outData.ToPointer();
-
-					int top = lockRect.Top;
-					int left = lockRect.Left;
-					int bottom = Math.Min(lockRect.Bottom, dest.Height);
-					int right = Math.Min(lockRect.Right, dest.Width);
-
-					int stride16 = outRowBytes / 2;
-
-					switch (imageMode)
+					else if (lockRect.Top < 0)
 					{
-						case ImageModes.GrayScale:
-
-							for (int y = top; y < bottom; y++)
-							{
-								byte* src = (byte*)ptr + ((y - top) * outRowBytes);
-								byte* dst = dest.GetPointAddressUnchecked(left, y);
-
-								for (int x = left; x < right; x++)
-								{
-									*dst = *src;
-
-									src++;
-									dst++;
-								}
-							}
-
-							break;
-						case ImageModes.Gray16:
-
-							for (int y = top; y < bottom; y++)
-							{
-								ushort* src = (ushort*)ptr + ((y - top) * stride16);
-								ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
-
-								for (int x = left; x < right; x++)
-								{
-									*dst = *src;
-
-									src++;
-									dst++;
-								}
-							}
-
-							break;
-						case ImageModes.RGB:
-
-							for (int y = top; y < bottom; y++)
-							{
-								byte* src = (byte*)ptr + ((y - top) * outRowBytes);
-								byte* dst = dest.GetPointAddressUnchecked(left, y);
-
-								for (int x = left; x < right; x++)
-								{
-									switch (nplanes)
-									{
-										case 1:
-											dst[ofs] = *src;
-											break;
-										case 2:
-											dst[ofs] = src[0];
-											dst[ofs + 1] = src[1];
-											break;
-										case 3:
-											dst[0] = src[2];
-											dst[1] = src[1];
-											dst[2] = src[0];
-											break;
-										case 4:
-											dst[0] = src[2];
-											dst[1] = src[1];
-											dst[2] = src[0];
-											dst[3] = src[3];
-											break;
-
-									}
-
-									src += nplanes;
-									dst += 4;
-								}
-							}
-
-							break;
-						case ImageModes.RGB48:
-
-							for (int y = top; y < bottom; y++)
-							{
-								ushort* src = (ushort*)ptr + ((y - top) * stride16);
-								ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
-
-								for (int x = left; x < right; x++)
-								{
-									switch (nplanes)
-									{
-										case 1:
-											dst[ofs] = src[0];
-											break;
-										case 2:
-											dst[ofs] = src[0];
-											dst[ofs + 1] = src[1];
-											break;
-										case 3:
-											dst[0] = src[2];
-											dst[1] = src[1];
-											dst[2] = src[0];
-											break;
-										case 4:
-											dst[0] = src[2];
-											dst[1] = src[1];
-											dst[2] = src[0];
-											dst[3] = src[3];
-											break;
-									}
-
-									src += nplanes;
-									dst += 4;
-								}
-							}
-
-							break;
+						lockRect.Y = 0;
+						lockRect.Height -= -rect.top;
 					}
+				}
+
+
+				void* ptr = outData.ToPointer();
+
+				int top = lockRect.Top;
+				int left = lockRect.Left;
+				int bottom = Math.Min(lockRect.Bottom, dest.Height);
+				int right = Math.Min(lockRect.Right, dest.Width);
+
+				int stride16 = outRowBytes / 2;
+
+				switch (imageMode)
+				{
+					case ImageModes.GrayScale:
+
+						for (int y = top; y < bottom; y++)
+						{
+							byte* src = (byte*)ptr + ((y - top) * outRowBytes);
+							byte* dst = dest.GetPointAddressUnchecked(left, y);
+
+							for (int x = left; x < right; x++)
+							{
+								*dst = *src;
+
+								src++;
+								dst++;
+							}
+						}
+
+						break;
+					case ImageModes.Gray16:
+
+						for (int y = top; y < bottom; y++)
+						{
+							ushort* src = (ushort*)ptr + ((y - top) * stride16);
+							ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
+
+							for (int x = left; x < right; x++)
+							{
+								*dst = *src;
+
+								src++;
+								dst++;
+							}
+						}
+
+						break;
+					case ImageModes.RGB:
+
+						for (int y = top; y < bottom; y++)
+						{
+							byte* src = (byte*)ptr + ((y - top) * outRowBytes);
+							byte* dst = dest.GetPointAddressUnchecked(left, y);
+
+							for (int x = left; x < right; x++)
+							{
+								switch (nplanes)
+								{
+									case 1:
+										dst[ofs] = *src;
+										break;
+									case 2:
+										dst[ofs] = src[0];
+										dst[ofs + 1] = src[1];
+										break;
+									case 3:
+										dst[0] = src[2];
+										dst[1] = src[1];
+										dst[2] = src[0];
+										break;
+									case 4:
+										dst[0] = src[2];
+										dst[1] = src[1];
+										dst[2] = src[0];
+										dst[3] = src[3];
+										break;
+
+								}
+
+								src += nplanes;
+								dst += 4;
+							}
+						}
+
+						break;
+					case ImageModes.RGB48:
+
+						for (int y = top; y < bottom; y++)
+						{
+							ushort* src = (ushort*)ptr + ((y - top) * stride16);
+							ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
+
+							for (int x = left; x < right; x++)
+							{
+								switch (nplanes)
+								{
+									case 1:
+										dst[ofs] = src[0];
+										break;
+									case 2:
+										dst[ofs] = src[0];
+										dst[ofs + 1] = src[1];
+										break;
+									case 3:
+										dst[0] = src[2];
+										dst[1] = src[1];
+										dst[2] = src[0];
+										break;
+									case 4:
+										dst[0] = src[2];
+										dst[1] = src[1];
+										dst[2] = src[0];
+										dst[3] = src[3];
+										break;
+								}
+
+								src += nplanes;
+								dst += 4;
+							}
+						}
+
+						break;
+				}
 
 #if DEBUG
-					using (Bitmap bmp = dest.CreateAliasedBitmap())
-					{
-					}
-#endif
+				using (Bitmap bmp = dest.CreateAliasedBitmap())
+				{
 				}
+#endif
 			}
 		}
 
@@ -3709,6 +3698,16 @@ namespace PSFilterLoad.PSApi
 
 					string prompt = StringFromPString(info.selectorParameter.pickerPrompt);
 
+					if (info.sourceSpace != ColorSpace.RGBSpace)
+					{
+						err = ColorServicesConvert.Convert(info.sourceSpace, ColorSpace.RGBSpace, ref info.colorComponents);
+
+						if (err != PSError.noErr)
+						{
+							return err;
+						}
+					}
+
 					if (pickColor != null)
 					{
 						ColorPickerResult color = pickColor(prompt, (byte)info.colorComponents[0], (byte)info.colorComponents[1], (byte)info.colorComponents[2]);
@@ -3724,7 +3723,7 @@ namespace PSFilterLoad.PSApi
 								info.resultSpace = ColorSpace.RGBSpace;
 							}
 
-							err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
+							err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
 						}
 						else
 						{
@@ -3748,7 +3747,7 @@ namespace PSFilterLoad.PSApi
 									info.resultSpace = ColorSpace.RGBSpace;
 								}
 
-								err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
+								err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
 							}
 							else
 							{
@@ -3772,19 +3771,24 @@ namespace PSFilterLoad.PSApi
 
 							for (int i = 0; i < 4; i++)
 							{
-								info.colorComponents[i] = (short)filterRecord->backColor[i];
+								info.colorComponents[i] = (short)backgroundColor[i];
 							}
 							break;
 						case SpecialColorID.ForegroundColor:
 
 							for (int i = 0; i < 4; i++)
 							{
-								info.colorComponents[i] = (short)filterRecord->foreColor[i];
+								info.colorComponents[i] = (short)foregroundColor[i];
 							}
 							break;
 						default:
 							err = PSError.paramErr;
 							break;
+					}
+
+					if (err == PSError.noErr)
+					{
+						err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
 					}
 
 					break;
@@ -3834,7 +3838,14 @@ namespace PSFilterLoad.PSApi
 
 						}
 
-						err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
+						ColorSpace sourceSpace = ColorSpace.RGBSpace;
+
+						if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
+						{
+							sourceSpace = ColorSpace.GraySpace;
+						}
+
+						err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 					}
 					else
 					{
@@ -3883,16 +3894,16 @@ namespace PSFilterLoad.PSApi
 						{
 							switch (channel)
 							{
-								case 0:
+								case PSConstants.ChannelPorts.Red:
 									*dst = src[2];
 									break;
-								case 1:
+								case PSConstants.ChannelPorts.Green:
 									*dst = src[1];
 									break;
-								case 2:
+								case PSConstants.ChannelPorts.Blue:
 									*dst = src[0];
 									break;
-								case 3:
+								case PSConstants.ChannelPorts.Alpha:
 									*dst = src[3];
 									break;
 							}
@@ -3928,16 +3939,16 @@ namespace PSFilterLoad.PSApi
 						{
 							switch (channel)
 							{
-								case 0:
+								case PSConstants.ChannelPorts.Red:
 									*dst = src[2];
 									break;
-								case 1:
+								case PSConstants.ChannelPorts.Green:
 									*dst = src[1];
 									break;
-								case 2:
+								case PSConstants.ChannelPorts.Blue:
 									*dst = src[0];
 									break;
-								case 3:
+								case PSConstants.ChannelPorts.Alpha:
 									*dst = src[3];
 									break;
 							}
@@ -4001,7 +4012,7 @@ namespace PSFilterLoad.PSApi
 
 			int channel = port.ToInt32();
 
-			if (channel < 0 || channel > 4)
+			if (channel < PSConstants.ChannelPorts.Gray || channel > PSConstants.ChannelPorts.SelectionMask)
 			{
 				return PSError.errUnknownPort;
 			}
@@ -4013,7 +4024,7 @@ namespace PSFilterLoad.PSApi
 			int srcHeight = srcRect.bottom - srcRect.top;
 			int dstWidth = dstRect.right - dstRect.left;
 			int dstHeight = dstRect.bottom - dstRect.top;
-			bool isSelection = channel == 4;
+			bool isSelection = channel == PSConstants.ChannelPorts.SelectionMask;
 
 			if ((source.BitsPerChannel == 8 || isSelection) && destination.depth == 16)
 			{
@@ -4028,7 +4039,6 @@ namespace PSFilterLoad.PSApi
 				}
 				else if (dstWidth < srcWidth || dstHeight < srcHeight) // scale down
 				{
-
 					if ((scaledSelectionMask == null) || scaledSelectionMask.Width != dstWidth || scaledSelectionMask.Height != dstHeight)
 					{
 						if (scaledSelectionMask != null)
@@ -4045,7 +4055,6 @@ namespace PSFilterLoad.PSApi
 				}
 				else if (dstWidth > srcWidth || dstHeight > srcHeight) // scale up
 				{
-
 					if ((scaledSelectionMask == null) || scaledSelectionMask.Width != dstWidth || scaledSelectionMask.Height != dstHeight)
 					{
 						if (scaledSelectionMask != null)
@@ -4142,7 +4151,6 @@ namespace PSFilterLoad.PSApi
 				}
 				else if (dstWidth < srcWidth || dstHeight < srcHeight) // scale down
 				{
-
 					if ((scaledChannelSurface == null) || scaledChannelSurface.Width != dstWidth || scaledChannelSurface.Height != dstHeight)
 					{
 						if (scaledChannelSurface != null)
@@ -4166,7 +4174,6 @@ namespace PSFilterLoad.PSApi
 				}
 				else if (dstWidth > srcWidth || dstHeight > srcHeight) // scale up
 				{
-
 					if ((scaledChannelSurface == null) || scaledChannelSurface.Width != dstWidth || scaledChannelSurface.Height != dstHeight)
 					{
 						if (scaledChannelSurface != null)
@@ -4235,11 +4242,11 @@ namespace PSFilterLoad.PSApi
 			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
 				string[] names = new string[3] { Resources.RedChannelName, Resources.GreenChannelName, Resources.BlueChannelName };
-				IntPtr channel = CreateReadChannelDesc(0, names[0], doc->depth, doc->bounds);
+				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Red, names[0], doc->depth, doc->bounds);
 
 				ReadChannelDesc* ch = (ReadChannelDesc*)channel.ToPointer();
 
-				for (int i = 1; i < 3; i++)
+				for (int i = PSConstants.ChannelPorts.Green; i <= PSConstants.ChannelPorts.Blue; i++)
 				{
 					IntPtr ptr = CreateReadChannelDesc(i, names[i], doc->depth, doc->bounds);
 
@@ -4252,19 +4259,19 @@ namespace PSFilterLoad.PSApi
 
 				if (!ignoreAlpha)
 				{
-					IntPtr alphaPtr = CreateReadChannelDesc(3, Resources.AlphaChannelName, doc->depth, doc->bounds);
+					IntPtr alphaPtr = CreateReadChannelDesc(PSConstants.ChannelPorts.Alpha, Resources.AlphaChannelName, doc->depth, doc->bounds);
 					doc->targetTransparency = doc->mergedTransparency = alphaPtr;
 				}
 			}
 			else
 			{
-				IntPtr channel = CreateReadChannelDesc(0, Resources.GrayChannelName, doc->depth, doc->bounds);
+				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Gray, Resources.GrayChannelName, doc->depth, doc->bounds);
 				doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
 			}
 
 			if (selectedRegion != null)
 			{
-				IntPtr selectionPtr = CreateReadChannelDesc(4, Resources.MaskChannelName, doc->depth, doc->bounds);
+				IntPtr selectionPtr = CreateReadChannelDesc(PSConstants.ChannelPorts.SelectionMask, Resources.MaskChannelName, doc->depth, doc->bounds);
 				doc->selection = selectionPtr;
 			}
 		}
@@ -4289,20 +4296,23 @@ namespace PSFilterLoad.PSApi
 			desc->port = new IntPtr(channel);
 			switch (channel)
 			{
-				case 0:
-					desc->channelType = name != Resources.GrayChannelName ? ChannelTypes.ctRed : ChannelTypes.ctBlack;
+				case PSConstants.ChannelPorts.Gray:
+					desc->channelType = ChannelTypes.Black;
 					break;
-				case 1:
-					desc->channelType = ChannelTypes.ctGreen;
+				case PSConstants.ChannelPorts.Red:
+					desc->channelType = ChannelTypes.Red;
 					break;
-				case 2:
-					desc->channelType = ChannelTypes.ctBlue;
+				case PSConstants.ChannelPorts.Green:
+					desc->channelType = ChannelTypes.Green;
 					break;
-				case 3:
-					desc->channelType = ChannelTypes.ctTransparency;
+				case PSConstants.ChannelPorts.Blue:
+					desc->channelType = ChannelTypes.Blue;
 					break;
-				case 4:
-					desc->channelType = ChannelTypes.ctSelectionMask;
+				case PSConstants.ChannelPorts.Alpha:
+					desc->channelType = ChannelTypes.Transparency;
+					break;
+				case PSConstants.ChannelPorts.SelectionMask:
+					desc->channelType = ChannelTypes.SelectionMask;
 					break;
 			}
 			IntPtr namePtr = Marshal.StringToHGlobalAnsi(name);
@@ -7340,6 +7350,7 @@ namespace PSFilterLoad.PSApi
 				basicSuitePtr = IntPtr.Zero;
 			}
 		}
+		
 		/// <summary>
 		/// Setup the filter record for this instance.
 		/// </summary>
@@ -7376,16 +7387,12 @@ namespace PSFilterLoad.PSApi
 				for (int i = 0; i < 4; i++)
 				{
 					filterRecord->backColor[i] = backgroundColor[i];
-				}
-
-				for (int i = 0; i < 4; i++)
-				{
 					filterRecord->foreColor[i] = foregroundColor[i];
 				}
 			}
 
 			filterRecord->bufferSpace = BufferSpaceProc();
-			filterRecord->maxSpace = 1000000000;
+			filterRecord->maxSpace = filterRecord->bufferSpace;
 
 			filterRecord->hostSig = BitConverter.ToUInt32(Encoding.ASCII.GetBytes(".NET"), 0);
 			filterRecord->hostProcs = Marshal.GetFunctionPointerForDelegate(hostProc);
@@ -7492,6 +7499,8 @@ namespace PSFilterLoad.PSApi
 		{
 			if (!disposed)
 			{
+				disposed = true;
+
 				if (disposing)
 				{
 					if (source != null)
@@ -7499,16 +7508,19 @@ namespace PSFilterLoad.PSApi
 						source.Dispose();
 						source = null;
 					}
+					
 					if (dest != null)
 					{
 						dest.Dispose();
 						dest = null;
 					}
+					
 					if (checkerBoardBitmap != null)
 					{
 						checkerBoardBitmap.Dispose();
 						checkerBoardBitmap = null;
 					}
+					
 					if (tempSurface != null)
 					{
 						tempSurface.Dispose();
@@ -7558,6 +7570,7 @@ namespace PSFilterLoad.PSApi
 					}
 
 				}
+				
 				if (platFormDataPtr != IntPtr.Zero)
 				{
 					Memory.Free(platFormDataPtr);
@@ -7569,6 +7582,7 @@ namespace PSFilterLoad.PSApi
 					Memory.Free(bufferProcsPtr);
 					bufferProcsPtr = IntPtr.Zero;
 				}
+				
 				if (handleProcsPtr != IntPtr.Zero)
 				{
 					Memory.Free(handleProcsPtr);
@@ -7630,11 +7644,13 @@ namespace PSFilterLoad.PSApi
 					Memory.Free(descriptorParametersPtr);
 					descriptorParametersPtr = IntPtr.Zero;
 				}
+				
 				if (readDescriptorPtr != IntPtr.Zero)
 				{
 					Memory.Free(readDescriptorPtr);
 					readDescriptorPtr = IntPtr.Zero;
 				}
+				
 				if (writeDescriptorPtr != IntPtr.Zero)
 				{
 					Memory.Free(writeDescriptorPtr);
@@ -7769,9 +7785,6 @@ namespace PSFilterLoad.PSApi
 					}
 					handles = null;
 				}
-
-				disposed = true;
-
 			}
 		}
 
