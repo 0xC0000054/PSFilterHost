@@ -40,6 +40,7 @@ namespace HostTest
 		private string titleString;
 		private string imageFileName;
 		private string imageType;
+		private string dropImageFileName;
 		private Size panelClientSize;
 		private AbortMessageFilter messageFilter;  
 		private string srcImageTempFileName;
@@ -64,6 +65,7 @@ namespace HostTest
 			this.filterName = string.Empty;
 			this.imageFileName = string.Empty;
 			this.imageType = string.Empty;
+			this.dropImageFileName = string.Empty;
 			this.panelClientSize = Size.Empty;
 			this.srcImageTempFileName = string.Empty;
 			this.currentPluginDirectory = string.Empty;
@@ -341,7 +343,9 @@ namespace HostTest
 			{
 				this.Cursor = Cursors.WaitCursor;
 
-				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, repeatEffect)) { IsBackground = true, Priority = ThreadPriority.AboveNormal };
+				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, repeatEffect));
+				this.filterThread.IsBackground = true;
+				this.filterThread.Priority = ThreadPriority.AboveNormal;
 				this.filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
 				this.filterThread.Start();
 			}
@@ -452,7 +456,7 @@ namespace HostTest
 
 				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))
 				{
-					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilter));
+					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilterCallback));
 					host.SetPickColorCallback(new PickColor(PickColorCallback));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
 					if (repeatEffect && filterParameters.ContainsKey(pluginData))
@@ -1004,15 +1008,11 @@ namespace HostTest
 
 		protected override void OnFormClosing(FormClosingEventArgs e)
 		{
-			base.OnFormClosing(e);
-
 			if (filterThread != null)
 			{
 				e.Cancel = true;
-				return;
 			}
-
-			if (canvas.IsDirty)
+			else if (canvas.IsDirty)
 			{
 				TaskButton save = new TaskButton(Resources.saveHS, Resources.SaveChangesText, Resources.SaveChangesDescription);
 				TaskButton discard = new TaskButton(Resources.FileClose, Resources.DontSaveChangesText, Resources.DontSaveChangesDescription);
@@ -1036,6 +1036,8 @@ namespace HostTest
 					}
 				}
 			}
+
+			base.OnFormClosing(e);
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1067,11 +1069,8 @@ namespace HostTest
 			this.saveToolStripMenuItem.Enabled = e.Dirty; 
 		}
 
-		private string dropImageFileName;
 		protected override void OnDragEnter(DragEventArgs drgevent)
 		{
-			base.OnDragEnter(drgevent);
-
 			this.dropImageFileName = string.Empty;
 			if (drgevent.Data.GetDataPresent(DataFormats.FileDrop, false))
 			{
@@ -1083,17 +1082,17 @@ namespace HostTest
 					this.dropImageFileName = files[0];
 				}
 			}
+			
+			base.OnDragEnter(drgevent);
 		}
 
 		protected override void OnDragDrop(DragEventArgs drgevent)
 		{
-			base.OnDragDrop(drgevent);
-
-			if (!string.IsNullOrEmpty(dropImageFileName))
+			if (!string.IsNullOrEmpty(this.dropImageFileName))
 			{
 				try
 				{
-					this.OpenFile(dropImageFileName);
+					OpenFile(this.dropImageFileName);
 				}
 				catch (FileNotFoundException ex)
 				{
@@ -1107,7 +1106,9 @@ namespace HostTest
 				{
 					ShowErrorMessage(ex.Message);
 				}
-			}
+			}			
+			
+			base.OnDragDrop(drgevent);
 		}
 
 		private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
