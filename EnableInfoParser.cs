@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace PSFilterHostDll
@@ -45,8 +45,8 @@ namespace PSFilterHostDll
 			}
 		}
 
-		private List<string> keywords;
-		private List<string> constants;
+		private ReadOnlyCollection<string> keywords;
+		private ReadOnlyCollection<string> constants;
 
 		private string imageMode;
 		private char[] chars;
@@ -64,17 +64,21 @@ namespace PSFilterHostDll
 
 		public EnableInfoParser()
 		{
-			keywords = new List<string>(new[] { psImageMode, psImageDepth });
-			constants = new List<string>(new[] { "true", "false", GrayScaleMode, RGBMode, Gray16Mode, RGB48Mode });
-
-			index = 0;
+			Init();
 		}
 
-		public EnableInfoParser(bool grayScale) : this()
+		public EnableInfoParser(bool grayScale)
 		{
-			imageMode = grayScale ? Gray16Mode : RGB48Mode;
+			Init();
+			this.imageMode = grayScale ? Gray16Mode : RGB48Mode;
 		}
 
+		private void Init()
+		{
+			this.keywords = new ReadOnlyCollection<string>(new[] { psImageMode, psImageDepth });
+			this.constants = new ReadOnlyCollection<string>(new[] { "true", "false", GrayScaleMode, RGBMode, Gray16Mode, RGB48Mode });
+			this.index = 0;
+		}
 
 		public bool Parse(string info)
 		{
