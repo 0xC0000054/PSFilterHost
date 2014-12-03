@@ -273,10 +273,10 @@ namespace HostTest
 					if (menu != null)
 					{
 						var nodes = menu.SubMenuItems;
-						int nCount = nodes.Count;
-						List<bool> catEnabled = new List<bool>(nCount);
+						int count = nodes.Count;
+						List<bool> catEnabled = new List<bool>(count);
 
-						for (int j = 0; j < nCount; j++)
+						for (int j = 0; j < count; j++)
 						{
 							PluginData data = (PluginData)nodes[j].Tag;
 

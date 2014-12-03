@@ -155,14 +155,14 @@ namespace PSFilterLoad.PSApi
 					return true;
 				}
 
-				query.enumAETE = new PluginAETE();
+				PluginAETE enumAETE = new PluginAETE();
 
 				byte* ptr = (byte*)lockRes.ToPointer() + 2;
 				short version = *(short*)ptr;
 				ptr += 2;
 
-				query.enumAETE.major = (version & 0xff);
-				query.enumAETE.minor = ((version >> 8) & 0xff);
+				enumAETE.major = (version & 0xff);
+				enumAETE.minor = ((version >> 8) & 0xff);
 
 				short lang = *(short*)ptr;
 				ptr += 2;
@@ -182,9 +182,9 @@ namespace PSFilterLoad.PSApi
 					propPtr += stringLength;
 					uint suiteID = *(uint*)propPtr;
 					propPtr += 4;
-					query.enumAETE.suiteLevel = *(short*)propPtr;
+					enumAETE.suiteLevel = *(short*)propPtr;
 					propPtr += 2;
-					query.enumAETE.suiteVersion = *(short*)propPtr;
+					enumAETE.suiteVersion = *(short*)propPtr;
 					propPtr += 2;
 					short eventCount = *(short*)propPtr;
 					propPtr += 2;
@@ -239,6 +239,7 @@ namespace PSFilterLoad.PSApi
 							AETEParameter[] parameters = new AETEParameter[paramCount];
 							for (int p = 0; p < paramCount; p++)
 							{
+								parameters[p] = new AETEParameter();
 								parameters[p].name = StringFromPString(propPtr, out stringLength);
 								propPtr += stringLength;
 
@@ -279,6 +280,7 @@ namespace PSFilterLoad.PSApi
 
 									for (int e = 0; e < en.count; e++)
 									{
+										en.enums[e] = new AETEEnum();
 										en.enums[e].name = StringFromPString(propPtr, out stringLength);
 										propPtr += stringLength;
 										en.enums[e].type = *(uint*)propPtr;
@@ -292,14 +294,14 @@ namespace PSFilterLoad.PSApi
 								evnt.enums = enums;
 							}
 						}
-						query.enumAETE.scriptEvent = evnt;
-
+						enumAETE.scriptEvent = evnt;
 					}
 
 				}
 
-				if ((query.enumAETE.scriptEvent != null) && query.enumAETE.scriptEvent.parameters != null)
+				if ((enumAETE.scriptEvent != null) && enumAETE.scriptEvent.parameters != null)
 				{
+					query.enumAETE = enumAETE;
 					handle.Target = query;
 					lParam = GCHandle.ToIntPtr(handle);
 				}
@@ -4241,14 +4243,24 @@ namespace PSFilterLoad.PSApi
 
 			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
-				string[] names = new string[3] { Resources.RedChannelName, Resources.GreenChannelName, Resources.BlueChannelName };
-				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Red, names[0], doc->depth, doc->bounds);
+				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Red, Resources.RedChannelName, doc->depth, doc->bounds);
 
 				ReadChannelDesc* ch = (ReadChannelDesc*)channel.ToPointer();
 
 				for (int i = PSConstants.ChannelPorts.Green; i <= PSConstants.ChannelPorts.Blue; i++)
 				{
-					IntPtr ptr = CreateReadChannelDesc(i, names[i], doc->depth, doc->bounds);
+					string name = null;
+					switch (i)
+					{ 
+						case PSConstants.ChannelPorts.Green:
+							name = Resources.GreenChannelName;
+							break;
+						case PSConstants.ChannelPorts.Blue:
+							name = Resources.BlueChannelName;
+							break;
+					}
+
+					IntPtr ptr = CreateReadChannelDesc(i, name, doc->depth, doc->bounds);
 
 					ch->next = ptr;
 
