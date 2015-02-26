@@ -30,7 +30,7 @@ namespace PSFilterHostDll
     [Serializable]
     public sealed class PluginData : IEquatable<PluginData>
     {
-        private string fileName;
+        private readonly string fileName;
         private string entryPoint;
         private string category;
         private string title;
@@ -239,9 +239,15 @@ namespace PSFilterHostDll
         }
 
         [OnDeserializing]
-        private void SetOptionalFieldDefaults(StreamingContext context)
+        private void OnDeserializing(StreamingContext context)
         {
             this.hasAboutBox = true;
+        }
+
+        [OnDeserializedAttribute]
+        private void OnDeserialized(StreamingContext context)
+        {
+            this.module = new PIEntrypoint();
         }
 
         /// <summary>
