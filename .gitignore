@@ -5,6 +5,7 @@
 *.psess
 *.suo
 *.Cache
+*.GhostDoc.xml
 /obj
 /bin
 /Doc/Help
