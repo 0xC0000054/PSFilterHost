@@ -201,4 +201,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "GetProcessHeap", Scope = "member", Target = "PSFilterLoad.PSApi.Memory.#InitializeHeap()")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "LastError", Scope = "member", Target = "PSFilterHostDll.BGRASurface.BGRASurfaceMemory.#CreateHeap()")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA2204:Literals should be spelled correctly", MessageId = "HeapCreate", Scope = "member", Target = "PSFilterHostDll.BGRASurface.BGRASurfaceMemory.#CreateHeap()")]
-
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2103:ReviewImperativeSecurity", Scope = "member", Target = "PSFilterLoad.PSApi.LoadPsFilter.#LoadFilter(PSFilterHostDll.PluginData&)")]
