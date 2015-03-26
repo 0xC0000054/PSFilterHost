@@ -3688,6 +3688,42 @@ namespace PSFilterLoad.PSApi
 			return 1000000000;
 		}
 
+		private static bool ShowColorPickerDialog(string prompt, ref short[] rgb)
+		{
+			bool result = false;
+
+			if (pickColor != null)
+			{
+				ColorPickerResult color = pickColor(prompt, (byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
+
+				if (color != null)
+				{
+					rgb[0] = color.R;
+					rgb[1] = color.G;
+					rgb[2] = color.B;
+					result = true;
+				}
+			}
+			else
+			{
+				using (ColorPicker picker = new ColorPicker(prompt))
+				{
+					picker.Color = Color.FromArgb(rgb[0], rgb[1], rgb[2]);
+
+					if (picker.ShowDialog() == DialogResult.OK)
+					{
+						Color color = picker.Color;
+						rgb[0] = color.R;
+						rgb[1] = color.G;
+						rgb[2] = color.B;
+						result = true;
+					}
+				}
+			}
+
+			return result;
+		}
+
 		private unsafe short ColorServicesProc(ref ColorServicesInfo info)
 		{
 #if DEBUG
@@ -3710,52 +3746,18 @@ namespace PSFilterLoad.PSApi
 						}
 					}
 
-					if (pickColor != null)
+					if (ShowColorPickerDialog(prompt, ref info.colorComponents))
 					{
-						ColorPickerResult color = pickColor(prompt, (byte)info.colorComponents[0], (byte)info.colorComponents[1], (byte)info.colorComponents[2]);
-
-						if (color != null)
+						if (info.resultSpace == ColorSpace.ChosenSpace)
 						{
-							info.colorComponents[0] = color.R;
-							info.colorComponents[1] = color.G;
-							info.colorComponents[2] = color.B;
-
-							if (info.resultSpace == ColorSpace.ChosenSpace)
-							{
-								info.resultSpace = ColorSpace.RGBSpace;
-							}
-
-							err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
+							info.resultSpace = ColorSpace.RGBSpace;
 						}
-						else
-						{
-							err = PSError.userCanceledErr;
-						}
+
+						err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
 					}
 					else
 					{
-						using (ColorPicker picker = new ColorPicker(prompt))
-						{
-							picker.Color = Color.FromArgb(info.colorComponents[0], info.colorComponents[1], info.colorComponents[2]);
-
-							if (picker.ShowDialog() == DialogResult.OK)
-							{
-								info.colorComponents[0] = picker.Color.R;
-								info.colorComponents[1] = picker.Color.G;
-								info.colorComponents[2] = picker.Color.B;
-
-								if (info.resultSpace == ColorSpace.ChosenSpace)
-								{
-									info.resultSpace = ColorSpace.RGBSpace;
-								}
-
-								err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
-							}
-							else
-							{
-								err = PSError.userCanceledErr;
-							}
-						}
+						err = PSError.userCanceledErr;
 					}
 
 					break;
@@ -3822,6 +3824,8 @@ namespace PSFilterLoad.PSApi
 						{
 							byte* pixel = source.GetPointAddressUnchecked(point->h, point->v);
 
+							ColorSpace sourceSpace = ColorSpace.RGBSpace;
+
 							switch (imageMode)
 							{
 								case ImageModes.GrayScale:
@@ -3829,6 +3833,7 @@ namespace PSFilterLoad.PSApi
 									info.colorComponents[1] = 0;
 									info.colorComponents[2] = 0;
 									info.colorComponents[3] = 0;
+									sourceSpace = ColorSpace.GraySpace;
 									break;
 								case ImageModes.RGB:
 									info.colorComponents[0] = pixel[2];
@@ -3837,17 +3842,9 @@ namespace PSFilterLoad.PSApi
 									info.colorComponents[3] = 0;
 									break;
 							}
-
+							
+							err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 						}
-
-						ColorSpace sourceSpace = ColorSpace.RGBSpace;
-
-						if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
-						{
-							sourceSpace = ColorSpace.GraySpace;
-						}
-
-						err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 					}
 					else
 					{
