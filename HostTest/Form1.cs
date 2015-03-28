@@ -378,20 +378,18 @@ namespace HostTest
 				catch (NotSupportedException)
 				{
 				}
-
+					
+				this.srcMetaData = null;
 				if (metaData != null)
 				{
-					BitmapMetadata convertedMetaData = MetaDataHelper.ConvertMetaDataToTIFF(metaData); // As WIC does not automatically convert between meta-data formats we have to do it manually.
+					// As WIC does not automatically convert between meta-data formats we have to do it manually.
+					BitmapMetadata convertedMetaData = MetaDataHelper.ConvertMetaDataToTIFF(metaData);
 					if (convertedMetaData != null)
 					{
 						this.srcMetaData = convertedMetaData.Clone();
 						this.srcMetaData.Freeze();
 					}
 					metaData = convertedMetaData;
-				}
-				else
-				{
-					this.srcMetaData = null;
 				}
 					
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Create, FileAccess.Write))
