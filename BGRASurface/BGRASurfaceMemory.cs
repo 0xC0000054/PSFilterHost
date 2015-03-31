@@ -25,29 +25,28 @@ using System.Security.Permissions;
 using PSFilterLoad.PSApi;
 
 namespace PSFilterHostDll.BGRASurface
-{    
+{
 	internal static class BGRASurfaceMemory
 	{
 		private static IntPtr hHeap;
+
 		/// <summary>
-		/// Creates the heap.
+		/// Creates the private heap used by Allocate().
 		/// </summary>
-		public static unsafe void CreateHeap()
+		/// <exception cref="System.ComponentModel.Win32Exception">Thrown if HeapCreate could not create the private heap.</exception>
+		private static unsafe void CreateHeap()
 		{
+			hHeap = SafeNativeMethods.HeapCreate(0, UIntPtr.Zero, UIntPtr.Zero);
+
 			if (hHeap == IntPtr.Zero)
 			{
-				hHeap = SafeNativeMethods.HeapCreate(0, UIntPtr.Zero, UIntPtr.Zero);
-
-				if (hHeap == IntPtr.Zero)
-				{
-					int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-					throw new System.ComponentModel.Win32Exception(error, string.Format(CultureInfo.InvariantCulture, "HeapCreate returned NULL, LastError = {0}", error));
-				}
-
-				uint info = 2; // low fragmentation heap
-
-				SafeNativeMethods.HeapSetInformation(hHeap, 0, (void*)&info, new UIntPtr(4U));
+				int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
+				throw new System.ComponentModel.Win32Exception(error, string.Format(CultureInfo.InvariantCulture, "HeapCreate returned NULL, LastError = {0}", error));
 			}
+
+			uint info = 2; // low fragmentation heap
+
+			SafeNativeMethods.HeapSetInformation(hHeap, 0, (void*)&info, new UIntPtr(4U));
 		}
 
 		/// <summary>
@@ -55,29 +54,27 @@ namespace PSFilterHostDll.BGRASurface
 		/// </summary>
 		/// <param name="bytes">The number of bytes you want to allocate.</param>
 		/// <returns>A pointer to a block of memory at least as large as <b>bytes</b>.</returns>
-		/// <exception cref="OutOfMemoryException">Thrown if the memory manager could not fulfill the request for a memory block at least as large as <b>bytes</b>.</exception>
+		/// <exception cref="System.OutOfMemoryException">Thrown if the memory manager could not fulfill the request for a memory block at least as large as <b>bytes</b>.</exception>
 		public static IntPtr Allocate(ulong bytes)
 		{
 			if (hHeap == IntPtr.Zero)
 			{
-				throw new InvalidOperationException("heap has already been destroyed");
+				CreateHeap();
 			}
-			else
+
+			IntPtr block = SafeNativeMethods.HeapAlloc(hHeap, 0, new UIntPtr(bytes));
+
+			if (block == IntPtr.Zero)
 			{
-				IntPtr block = SafeNativeMethods.HeapAlloc(hHeap, 0, new UIntPtr(bytes));
-
-				if (block == IntPtr.Zero)
-				{
-					throw new OutOfMemoryException("HeapAlloc returned a null pointer");
-				}
-
-				if (bytes > 0)
-				{
-					GC.AddMemoryPressure((long)bytes);
-				}
-
-				return block;
+				throw new OutOfMemoryException("HeapAlloc returned a null pointer");
 			}
+
+			if (bytes > 0)
+			{
+				GC.AddMemoryPressure((long)bytes);
+			}
+
+			return block;
 		}
 
 		/// <summary>
@@ -173,16 +170,17 @@ namespace PSFilterHostDll.BGRASurface
 		}
 
 		/// <summary>
-		/// Destroys the heap.
+		/// Destroys the private heap used by Allocate().
 		/// </summary>
 		public static void DestroyHeap()
 		{
 			if (hHeap != IntPtr.Zero)
 			{
-				SafeNativeMethods.HeapDestroy(hHeap);
+				IntPtr hHeap2 = hHeap;
 				hHeap = IntPtr.Zero;
+				SafeNativeMethods.HeapDestroy(hHeap2);
 			}
 		}
-	   
+
 	}
 }
