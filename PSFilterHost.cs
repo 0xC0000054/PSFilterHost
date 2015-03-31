@@ -186,7 +186,6 @@ namespace PSFilterHostDll
 			this.pseudoResources = new List<PSResource>();
 			this.abortFunc = null;
 			this.hostInfo = null;
-			PSFilterHostDll.BGRASurface.BGRASurfaceMemory.CreateHeap();
 		}
 
 #if GDIPLUS
