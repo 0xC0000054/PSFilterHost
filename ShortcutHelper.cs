@@ -68,13 +68,6 @@ namespace PSFilterHostDll
             return false;
         }
 
-        private static bool IsWin7OrLater()
-        {
-            OperatingSystem os = Environment.OSVersion;
-
-            return (os.Platform == PlatformID.Win32NT && (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 1)));
-        }
-
         private static readonly string ProgramFilesX86 = Environment.ExpandEnvironmentVariables("%ProgramFiles(x86)%");
 
         /// <summary>
@@ -93,7 +86,7 @@ namespace PSFilterHostDll
                     // Remove the trailing slash, otherwise Path.Combine will replace the file path for a network path.
                     string filePath = path.Remove(0, ProgramFilesX86.Length + 1);
 
-                    if (IsWin7OrLater())
+                    if (OS.IsWindows7OrLater)
                     {                    
                         return Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), filePath); 
                     }
