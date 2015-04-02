@@ -155,14 +155,12 @@ namespace PSFilterLoad.PSApi
 					return true;
 				}
 
-				PluginAETE enumAETE = new PluginAETE();
-
 				byte* ptr = (byte*)lockRes.ToPointer() + 2;
 				short version = *(short*)ptr;
 				ptr += 2;
 
-				enumAETE.major = (version & 0xff);
-				enumAETE.minor = ((version >> 8) & 0xff);
+				int major = (version & 0xff);
+				int minor = ((version >> 8) & 0xff);
 
 				short lang = *(short*)ptr;
 				ptr += 2;
@@ -182,9 +180,9 @@ namespace PSFilterLoad.PSApi
 					propPtr += stringLength;
 					uint suiteID = *(uint*)propPtr;
 					propPtr += 4;
-					enumAETE.suiteLevel = *(short*)propPtr;
+					short suiteLevel = *(short*)propPtr;
 					propPtr += 2;
-					enumAETE.suiteVersion = *(short*)propPtr;
+					short suiteVersion = *(short*)propPtr;
 					propPtr += 2;
 					short eventCount = *(short*)propPtr;
 					propPtr += 2;
@@ -294,16 +292,18 @@ namespace PSFilterLoad.PSApi
 								evnt.enums = enums;
 							}
 						}
-						enumAETE.scriptEvent = evnt;
+
+						if (evnt.parameters != null &&
+							major == PSConstants.AETEMajorVersion &&
+							minor == PSConstants.AETEMinorVersion &&
+							suiteLevel == PSConstants.AETESuiteLevel &&
+							suiteVersion == PSConstants.AETESuiteVersion)
+						{
+							query.enumAETE = new PluginAETE(major, minor, suiteLevel, suiteVersion, evnt);
+							handle.Target = query;
+							lParam = GCHandle.ToIntPtr(handle);
+						}
 					}
-
-				}
-
-				if ((enumAETE.scriptEvent != null) && enumAETE.scriptEvent.parameters != null)
-				{
-					query.enumAETE = enumAETE;
-					handle.Target = query;
-					lParam = GCHandle.ToIntPtr(handle);
 				}
 
 				return false;
@@ -468,10 +468,7 @@ namespace PSFilterLoad.PSApi
 
 					if (queryAETE.enumAETE != null)
 					{
-						if (queryAETE.enumAETE.IsValid())
-						{
-							enumData.Aete = queryAETE.enumAETE;
-						}
+						enumData.Aete = queryAETE.enumAETE;
 					}
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
