@@ -136,6 +136,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
+    <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
