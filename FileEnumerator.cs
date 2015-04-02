@@ -116,13 +116,6 @@ namespace PSFilterHostDll
             public uint dwHighDateTime;
         }
 
-        private static bool IsWin7OrLater()
-        {
-            OperatingSystem os = Environment.OSVersion;
-
-            return (os.Platform == PlatformID.Win32NT && (os.Version.Major > 6 || (os.Version.Major == 6 && os.Version.Minor >= 1)));
-        }
-
         private static string GetPermissionPath(string path, bool searchSubDirectories)
         {
             char end = path[path.Length - 1];
@@ -190,22 +183,21 @@ namespace PSFilterHostDll
 
             new FileIOPermission(FileIOPermissionAccess.PathDiscovery, GetPermissionPath(fullPath, searchSubDirectories)).Demand();
 
-            Queue<string> directories = new Queue<string>();
-            directories.Enqueue(fullPath);
-            
             var findData = new WIN32_FIND_DATAW();
 
             FindExInfoLevel infoLevel = FindExInfoLevel.Standard;
             FindExAdditionalFlags flags = FindExAdditionalFlags.None;
 
-            if (IsWin7OrLater())
+            if (OS.IsWindows7OrLater)
             {
                 // Suppress the querying of short filenames and use a larger buffer on Windows 7 and later.
                 infoLevel = FindExInfoLevel.Basic;
                 flags = FindExAdditionalFlags.LargeFetch;
             }
+            Queue<string> directories = new Queue<string>();
+            directories.Enqueue(fullPath);
 
-            while (directories.Count > 0)
+            do
             {
                 string path = directories.Dequeue();
 
@@ -234,14 +226,14 @@ namespace PSFilterHostDll
                                     if (findData.cFileName.EndsWith(fileExtensions[i], StringComparison.OrdinalIgnoreCase))
                                     {
                                         yield return Path.Combine(path, findData.cFileName);
-                                    } 
+                                    }
                                 }
                             }
 
                         } while (UnsafeNativeMethods.FindNextFileW(findHandle, out findData));
                     }
-                } 
-            }  
+                }
+            } while (directories.Count > 0);
             
         }
 
