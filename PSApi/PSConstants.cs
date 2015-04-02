@@ -97,6 +97,12 @@ namespace PSFilterLoad.PSApi
         public const string PICAZStringDictonarySuite = "AS ZString Dictionary Suite";
         public const string PICAPluginsSuite = "SP Plug-ins Suite";
 #endif
+
+        public const int AETEMajorVersion = 1;
+        public const int AETEMinorVersion = 0;
+        public const short AETESuiteLevel = 1;
+        public const short AETESuiteVersion = 1;
+
         internal static class ChannelPorts
         {
             /// <summary>
