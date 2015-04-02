@@ -63,9 +63,13 @@ namespace PSFilterLoad.PSApi
         public short suiteVersion;
         public AETEEvent scriptEvent;
 
-        public bool IsValid()
+        public PluginAETE(int major, int minor, short suiteLevel, short suiteVersion, AETEEvent scriptEvent)
         {
-            return (this.major == 1 && this.minor == 0 && this.suiteLevel == 1 && this.suiteVersion == 1);
+            this.major = major;
+            this.minor = minor;
+            this.suiteLevel = suiteLevel;
+            this.suiteVersion = suiteVersion;
+            this.scriptEvent = scriptEvent;
         }
     } 
 }
