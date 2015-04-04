@@ -23,8 +23,10 @@ namespace PSFilterHostDll
     {
         private ShellLinkCoClass shellLinkCoClass;
         private NativeInterfaces.IShellLinkW shellLink;
+        private bool disposed;
 
         private const int STGM_READ = 0;
+        private const int S_OK = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellLink"/> class.
@@ -40,9 +42,9 @@ namespace PSFilterHostDll
         /// Loads a shortcut from a file.
         /// </summary>
         /// <param name="linkPath">The shortcut to load.</param>
-        public void Load(string linkPath)
+        public bool Load(string linkPath)
         {
-            ((NativeInterfaces.IPersistFile)shellLink).Load(linkPath, STGM_READ);
+            return (((NativeInterfaces.IPersistFile)shellLink).Load(linkPath, STGM_READ) == S_OK);
         }
 
         /// <summary>
@@ -54,8 +56,11 @@ namespace PSFilterHostDll
             {
                 StringBuilder sb = new StringBuilder(260);
 
-                shellLink.GetPath(sb, sb.MaxCapacity, IntPtr.Zero, 0U);
-
+                if (shellLink.GetPath(sb, sb.MaxCapacity, IntPtr.Zero, 0U) != S_OK)
+                {    
+                    return string.Empty;
+                }
+                
                 return sb.ToString();
             }
         }
@@ -77,7 +82,7 @@ namespace PSFilterHostDll
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        private bool disposed;
+
         private void Dispose(bool disposing)
         {
             if (!disposed)
