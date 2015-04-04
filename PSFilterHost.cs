@@ -399,15 +399,17 @@ namespace PSFilterHostDll
 				{
 					if (file.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
 					{
-						shortcut.Load(file);
-						string linkPath = shortcut.Path;
-
-						if (linkPath.EndsWith(".8bf", StringComparison.OrdinalIgnoreCase))
+						if (shortcut.Load(file))
 						{
-							foreach (var item in LoadPsFilter.QueryPlugin(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
+							string linkPath = shortcut.Path;
+
+							if (linkPath.EndsWith(".8bf", StringComparison.OrdinalIgnoreCase))
 							{
-								yield return item;
-							}
+								foreach (var item in LoadPsFilter.QueryPlugin(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
+								{
+									yield return item;
+								}
+							} 
 						}
 					}
 					else
