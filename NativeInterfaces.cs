@@ -19,76 +19,92 @@ namespace PSFilterHostDll
     static class NativeInterfaces
     {
         /// <summary>The IShellLink interface allows Shell links to be created, modified, and resolved</summary>
-        [ComImport(), InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("000214F9-0000-0000-C000-000000000046")]
+        [ComImport(), Guid("000214F9-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IShellLinkW
         {
             /// <summary>Retrieves the path and file name of a Shell link object</summary>
-            void GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, IntPtr pfd, uint fFlags);
+            [PreserveSig]
+            int GetPath([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile, int cchMaxPath, IntPtr pfd, uint fFlags);
             /// <summary>Retrieves the list of item identifiers for a Shell link object</summary>
-            void GetIDList(out IntPtr ppidl);
+            [PreserveSig]
+            int GetIDList(out IntPtr ppidl);
             /// <summary>Sets the pointer to an item identifier list (PIDL) for a Shell link object.</summary>
-            void SetIDList(IntPtr pidl);
+            [PreserveSig]
+            int SetIDList(IntPtr pidl);
             /// <summary>Retrieves the description string for a Shell link object</summary>
-            void GetDescription([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
+            [PreserveSig]
+            int GetDescription([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszName, int cchMaxName);
             /// <summary>Sets the description for a Shell link object. The description can be any application-defined string</summary>
-            void SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
+            [PreserveSig]
+            int SetDescription([MarshalAs(UnmanagedType.LPWStr)] string pszName);
             /// <summary>Retrieves the name of the working directory for a Shell link object</summary>
-            void GetWorkingDirectory([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
+            [PreserveSig]
+            int GetWorkingDirectory([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszDir, int cchMaxPath);
             /// <summary>Sets the name of the working directory for a Shell link object</summary>
-            void SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
+            [PreserveSig]
+            int SetWorkingDirectory([MarshalAs(UnmanagedType.LPWStr)] string pszDir);
             /// <summary>Retrieves the command-line arguments associated with a Shell link object</summary>
-            void GetArguments([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
+            [PreserveSig]
+            int GetArguments([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszArgs, int cchMaxPath);
             /// <summary>Sets the command-line arguments for a Shell link object</summary>
-            void SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
+            [PreserveSig]
+            int SetArguments([MarshalAs(UnmanagedType.LPWStr)] string pszArgs);
             /// <summary>Retrieves the hot key for a Shell link object</summary>
-            void GetHotkey(out short pwHotkey);
+            [PreserveSig]
+            int GetHotkey(out short pwHotkey);
             /// <summary>Sets a hot key for a Shell link object</summary>
-            void SetHotkey(short wHotkey);
+            [PreserveSig]
+            int SetHotkey(short wHotkey);
             /// <summary>Retrieves the show command for a Shell link object</summary>
-            void GetShowCmd(out int piShowCmd);
+            [PreserveSig]
+            int GetShowCmd(out int piShowCmd);
             /// <summary>Sets the show command for a Shell link object. The show command sets the initial show state of the window.</summary>
-            void SetShowCmd(int iShowCmd);
+            [PreserveSig]
+            int SetShowCmd(int iShowCmd);
             /// <summary>Retrieves the location (path and index) of the icon for a Shell link object</summary>
-            void GetIconLocation([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
+            [PreserveSig]
+            int GetIconLocation([Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszIconPath, int cchIconPath, out int piIcon);
             /// <summary>Sets the location (path and index) of the icon for a Shell link object</summary>
-            void SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
+            [PreserveSig]
+            int SetIconLocation([MarshalAs(UnmanagedType.LPWStr)] string pszIconPath, int iIcon);
             /// <summary>Sets the relative path to the Shell link object</summary>
-            void SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
+            [PreserveSig]
+            int SetRelativePath([MarshalAs(UnmanagedType.LPWStr)] string pszPathRel, int dwReserved);
             /// <summary>Attempts to find the target of a Shell link, even if it has been moved or renamed</summary>
-            void Resolve(IntPtr hwnd, uint fFlags);
+            [PreserveSig]
+            int Resolve(IntPtr hwnd, uint fFlags);
             /// <summary>Sets the path and file name of a Shell link object</summary>
-            void SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
+            [PreserveSig]
+            int SetPath([MarshalAs(UnmanagedType.LPWStr)] string pszFile);
         }
 
-        [ComImport, Guid("0000010c-0000-0000-c000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [ComImport(), Guid("0000010c-0000-0000-c000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IPersist
         {
             [PreserveSig]
-            void GetClassID(out Guid pClassID);
+            int GetClassID(out Guid pClassID);
         }
 
-
-        [ComImport, Guid("0000010b-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [ComImport(), Guid("0000010b-0000-0000-C000-000000000046"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         internal interface IPersistFile : IPersist
         {
-            new void GetClassID(out Guid pClassID);
+            [PreserveSig]
+            new int GetClassID(out Guid pClassID);
+            
             [PreserveSig]
             int IsDirty();
 
             [PreserveSig]
-            void Load([In, MarshalAs(UnmanagedType.LPWStr)]
-             string pszFileName, uint dwMode);
+            int Load([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, uint dwMode);
 
             [PreserveSig]
-            void Save([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, [In, MarshalAs(UnmanagedType.Bool)] bool fRemember);
+            int Save([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName, [In, MarshalAs(UnmanagedType.Bool)] bool fRemember);
 
             [PreserveSig]
-            void SaveCompleted([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
+            int SaveCompleted([In, MarshalAs(UnmanagedType.LPWStr)] string pszFileName);
 
             [PreserveSig]
-            void GetCurFile([In, MarshalAs(UnmanagedType.LPWStr)] string ppszFileName);
+            int GetCurFile([In, MarshalAs(UnmanagedType.LPWStr)] string ppszFileName);
         }
-
-        
     }
 }
