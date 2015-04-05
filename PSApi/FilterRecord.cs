@@ -20,7 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [return: MarshalAs(UnmanagedType.U1)]
     internal delegate bool TestAbortProc();

@@ -18,7 +18,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 #if USEIMAGESERVICES
     [StructLayout(LayoutKind.Sequential)]

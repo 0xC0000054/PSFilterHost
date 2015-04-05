@@ -23,7 +23,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Globalization;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 	/// <summary>
 	/// Contains methods for allocating and freeing memory from the default process heap.

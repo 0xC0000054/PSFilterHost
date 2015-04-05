@@ -17,7 +17,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 #pragma warning disable 0659
     internal struct Rect16 : System.IEquatable<Rect16>

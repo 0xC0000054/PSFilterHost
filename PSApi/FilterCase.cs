@@ -16,7 +16,7 @@
  * All rights reserved.
 */
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     internal static class FilterCase
     {

@@ -11,7 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System.ComponentModel;
-using PSFilterLoad.PSApi;
+using PSFilterHostDll.PSApi;
 
 #if GDIPLUS
 using System.Drawing;

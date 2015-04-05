@@ -22,7 +22,7 @@
 using System;
 using System.Globalization;
 using System.Security.Permissions;
-using PSFilterLoad.PSApi;
+using PSFilterHostDll.PSApi;
 
 namespace PSFilterHostDll.BGRASurface
 {

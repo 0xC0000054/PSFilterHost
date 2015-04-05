@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [System.Security.SuppressUnmanagedCodeSecurity]
     internal static class SafeNativeMethods

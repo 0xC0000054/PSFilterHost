@@ -14,7 +14,7 @@ using System;
 using System.Runtime.InteropServices;
 using PSFilterHostDll;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 	internal static class PICASuites
 	{

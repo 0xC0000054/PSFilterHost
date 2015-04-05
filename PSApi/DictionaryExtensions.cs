@@ -13,7 +13,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     internal static class DictionaryExtensions
     {

@@ -20,7 +20,7 @@ using System.Security.Permissions;
  * http://blogs.msdn.com/b/jmstall/archive/2007/01/06/typesafe-getprocaddress.aspx
  */
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {  
 #if NET_40_OR_GREATER
 	[System.Security.SecurityCritical()]

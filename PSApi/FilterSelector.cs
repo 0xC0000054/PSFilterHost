@@ -17,7 +17,7 @@
 */
 
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     internal enum FilterSelector : short
     {

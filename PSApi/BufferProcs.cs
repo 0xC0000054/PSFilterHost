@@ -18,7 +18,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short AllocateBufferProc(int size, ref IntPtr bufferID);

@@ -17,7 +17,7 @@
 
 using System;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 // Disable CS0649, Field 'field' is never assigned to, and will always have its default value 'value'
 #pragma warning disable 0649 

@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using PSFilterLoad.PSApi;
+using PSFilterHostDll.PSApi;
 using PSFilterHostDll.Properties;
 
 #if !GDIPLUS

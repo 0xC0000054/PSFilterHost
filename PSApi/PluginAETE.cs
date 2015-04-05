@@ -12,7 +12,7 @@
 
 using System;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [Serializable]
     internal sealed class AETEParameter

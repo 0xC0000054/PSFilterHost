@@ -14,7 +14,7 @@ using System;
 using System.IO;
 using System.Security;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     internal static class PEFile
     {

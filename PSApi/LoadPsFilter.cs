@@ -36,7 +36,7 @@ using PSFilterHostDll.Properties;
 using System.Windows.Media.Imaging;
 #endif
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 	internal sealed class LoadPsFilter : IDisposable
 	{

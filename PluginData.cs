@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using PSFilterLoad.PSApi;
+using PSFilterHostDll.PSApi;
 
 #if !GDIPLUS
 using System.Windows.Media;

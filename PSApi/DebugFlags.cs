@@ -12,7 +12,7 @@
 
 using System;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 #if DEBUG
 	[Flags]

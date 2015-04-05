@@ -17,7 +17,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl)]
     internal delegate short AdvanceStateProc();

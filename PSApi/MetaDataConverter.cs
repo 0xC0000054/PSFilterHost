@@ -19,7 +19,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 #endif
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 #if !GDIPLUS
     internal static class MetaDataConverter

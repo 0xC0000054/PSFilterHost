@@ -17,7 +17,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     [StructLayout(LayoutKind.Sequential)]
     internal struct Point16

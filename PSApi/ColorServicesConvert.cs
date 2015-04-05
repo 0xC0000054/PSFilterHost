@@ -13,7 +13,7 @@
 using System;
 using Devcorp.Controls.Design;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 	internal static class ColorServicesConvert
 	{

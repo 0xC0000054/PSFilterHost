@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     /// <summary>
     /// The callback that reports the render progress to the host.

@@ -13,7 +13,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     internal sealed class ColorPicker : ColorDialog
     {

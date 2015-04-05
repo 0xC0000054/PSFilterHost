@@ -20,7 +20,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
     /// <summary>
     /// The inputHandling and outputHandling constants for the FilterCaseInfo structure

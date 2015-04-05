@@ -143,22 +143,22 @@ namespace PSFilterHostDll
 
 			if (SupportsMode(RGBMode))
 			{
-				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsRGBColor;
+				modes |= PSFilterHostDll.PSApi.PSConstants.flagSupportsRGBColor;
 			}
 
 			if (SupportsMode(GrayScaleMode))
 			{
-				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsGrayScale;
+				modes |= PSFilterHostDll.PSApi.PSConstants.flagSupportsGrayScale;
 			}
 
 			if (SupportsMode(RGB48Mode))
 			{
-				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsRGB48;
+				modes |= PSFilterHostDll.PSApi.PSConstants.flagSupportsRGB48;
 			}
 
 			if (SupportsMode(Gray16Mode))
 			{
-				modes |= PSFilterLoad.PSApi.PSConstants.flagSupportsGray16;
+				modes |= PSFilterHostDll.PSApi.PSConstants.flagSupportsGray16;
 			}
 
 			return modes;

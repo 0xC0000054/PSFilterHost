@@ -15,7 +15,7 @@
  * All rights reserved.
 */
 
-namespace PSFilterLoad.PSApi
+namespace PSFilterHostDll.PSApi
 {
 #pragma warning disable 0649
     internal struct PlugInInfo
