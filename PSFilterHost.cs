@@ -497,13 +497,17 @@ namespace PSFilterHostDll
 				if (hostInfo != null)
 				{
 					lps.HostInformation = hostInfo;
-				}  
+				}
 
 				try
 				{
 					result = lps.RunPlugin(pluginData);
 				}
 				catch (FileNotFoundException)
+				{
+					throw;
+				}
+				catch (SecurityException)
 				{
 					throw;
 				}
@@ -573,7 +577,30 @@ namespace PSFilterHostDll
 			{
 				string errorMessage = string.Empty;
 
-				bool result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
+				bool result;
+
+				try
+				{
+					result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
+				}
+				catch (FileNotFoundException)
+				{
+					throw;
+				}
+				catch (SecurityException)
+				{
+					throw;
+				}
+				catch (Exception ex)
+				{
+					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is System.Threading.ThreadAbortException)
+					{
+						throw;
+					}
+
+					throw new FilterRunException(ex.Message, ex);
+				}
+
 				if (!result && !string.IsNullOrEmpty(errorMessage))
 				{
 					throw new FilterRunException(errorMessage);
