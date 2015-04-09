@@ -226,4 +226,7 @@
   <data name="PathAccessDenied" xml:space="preserve">
     <value>Access to the path is denied</value>
   </data>
+  <data name="PluginEntryPointNotFound" xml:space="preserve">
+    <value>Unable to find an entry point named '{0}' in  '{1}'</value>
+  </data>
 </root>

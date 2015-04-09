@@ -277,6 +277,15 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to find an entry point named &apos;{0}&apos; in  &apos;{1}&apos;.
+        /// </summary>
+        internal static string PluginEntryPointNotFound {
+            get {
+                return ResourceManager.GetString("PluginEntryPointNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Requires services not provided by this host..
         /// </summary>
         internal static string PlugInHostInsufficient {
