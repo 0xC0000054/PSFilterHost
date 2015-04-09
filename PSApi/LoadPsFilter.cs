@@ -1406,36 +1406,35 @@ namespace PSFilterHostDll.PSApi
 		/// Loads a filter from the PluginData.
 		/// </summary>
 		/// <param name="pdata">The PluginData of the filter to load.</param>
-		/// <returns>True if successful, otherwise false.</returns>
-		/// <exception cref="System.IO.FileNotFoundException">The file in the PluginData.FileName cannot be found.</exception>
-		private static bool LoadFilter(ref PluginData pdata)
+		/// <exception cref="System.EntryPointNotFoundException">The entry point specified by the PluginData.EntryPoint property was not found in PluginData.FileName.</exception>
+		/// <exception cref="System.IO.FileNotFoundException">The file specified by the PluginData.FileName property cannot be found.</exception>
+		private static void LoadFilter(ref PluginData pdata)
 		{
-			bool loaded = false;
+			new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, pdata.FileName).Demand();
 
-			if (!string.IsNullOrEmpty(pdata.EntryPoint))
+			pdata.module.dll = UnsafeNativeMethods.LoadLibraryExW(pdata.FileName, IntPtr.Zero, 0U);
+
+			if (!pdata.module.dll.IsInvalid)
 			{
-				new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, pdata.FileName).Demand();
+				IntPtr entryPoint = UnsafeNativeMethods.GetProcAddress(pdata.module.dll, pdata.EntryPoint);
 
-				pdata.module.dll = UnsafeNativeMethods.LoadLibraryExW(pdata.FileName, IntPtr.Zero, 0U);
-
-				if (!pdata.module.dll.IsInvalid)
+				if (entryPoint != IntPtr.Zero)
 				{
-					IntPtr entryPoint = UnsafeNativeMethods.GetProcAddress(pdata.module.dll, pdata.EntryPoint);
-
-					if (entryPoint != IntPtr.Zero)
-					{
-						pdata.module.entryPoint = (PluginEntryPoint)Marshal.GetDelegateForFunctionPointer(entryPoint, typeof(PluginEntryPoint));
-						loaded = true;
-					}
+					pdata.module.entryPoint = (PluginEntryPoint)Marshal.GetDelegateForFunctionPointer(entryPoint, typeof(PluginEntryPoint));
 				}
 				else
 				{
-					int hr = Marshal.GetHRForLastWin32Error();
-					Marshal.ThrowExceptionForHR(hr);
+					pdata.module.dll.Dispose();
+					pdata.module.dll = null;
+
+					throw new EntryPointNotFoundException(string.Format(Resources.PluginEntryPointNotFound, pdata.EntryPoint, pdata.FileName));
 				}
 			}
-
-			return loaded;
+			else
+			{
+				int hr = Marshal.GetHRForLastWin32Error();
+				Marshal.ThrowExceptionForHR(hr);
+			}
 		}
 
 		/// <summary>
@@ -2333,13 +2332,7 @@ namespace PSFilterHostDll.PSApi
 		/// <returns>True if successful otherwise false</returns>
 		internal bool RunPlugin(PluginData pdata)
 		{
-			if (!LoadFilter(ref pdata))
-			{
-#if DEBUG
-				System.Diagnostics.Debug.WriteLine("LoadFilter failed");
-#endif
-				return false;
-			}
+			LoadFilter(ref pdata);
 
 			this.useChannelPorts = pdata.Category == "Amico Perry"; // enable the channel ports suite for Luce 2
 			this.usePICASuites = EnablePICASuites(pdata);
@@ -2423,19 +2416,11 @@ namespace PSFilterHostDll.PSApi
 		{
 			errorMessage = string.Empty;
 
-			if (!LoadFilter(ref pdata))
-			{
-#if DEBUG
-				System.Diagnostics.Debug.WriteLine("LoadFilter failed");
-#endif
-				return false;
-			}
+			LoadFilter(ref pdata);
 
 			bool retVal = PluginAbout(pdata, owner, out errorMessage);
 
-
 			FreeLibrary(ref pdata);
-
 
 			return retVal;
 		}
