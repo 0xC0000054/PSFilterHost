@@ -2816,7 +2816,14 @@ namespace PSFilterHostDll.PSApi
 
 			if (validImageBounds)
 			{
-				ScaleTempSurface(filterRecord->inputRate, lockRect);
+				try
+				{
+					ScaleTempSurface(filterRecord->inputRate, lockRect);
+				}
+				catch (OutOfMemoryException)
+				{
+					return PSError.memFullErr;
+				}
 			}
 
 
@@ -3252,7 +3259,14 @@ namespace PSFilterHostDll.PSApi
 			bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
 			if (validImageBounds)
 			{
-				ScaleTempMask(filterRecord->maskRate, lockRect);
+				try
+				{
+					ScaleTempMask(filterRecord->maskRate, lockRect);
+				}
+				catch (OutOfMemoryException)
+				{
+					return PSError.memFullErr;
+				}
 			}
 
 			if (maskDataPtr == IntPtr.Zero)
@@ -4028,8 +4042,15 @@ namespace PSFilterHostDll.PSApi
 							scaledSelectionMask = null;
 						}
 
-						scaledSelectionMask = new Surface8(dstWidth, dstHeight);
-						scaledSelectionMask.SuperSampleFitSurface(mask);
+						try
+						{
+							scaledSelectionMask = new Surface8(dstWidth, dstHeight);
+							scaledSelectionMask.SuperSampleFitSurface(mask);
+						}
+						catch (OutOfMemoryException)
+						{
+							return PSError.memFullErr;
+						}
 					}
 
 					FillSelectionMask(destination, scaledSelectionMask, dstRect);
@@ -4044,8 +4065,15 @@ namespace PSFilterHostDll.PSApi
 							scaledSelectionMask = null;
 						}
 
-						scaledSelectionMask = new Surface8(dstWidth, dstHeight);
-						scaledSelectionMask.BicubicFitSurface(mask);
+						try
+						{
+							scaledSelectionMask = new Surface8(dstWidth, dstHeight);
+							scaledSelectionMask.BicubicFitSurface(mask);
+						}
+						catch (OutOfMemoryException)
+						{
+							return PSError.memFullErr;
+						}
 					}
 
 					FillSelectionMask(destination, scaledSelectionMask, dstRect);
@@ -4064,49 +4092,56 @@ namespace PSFilterHostDll.PSApi
 						int width = source.Width;
 						int height = source.Height;
 
-						switch (imageMode)
+						try
 						{
-							case ImageModes.Gray16:
+							switch (imageMode)
+							{
+								case ImageModes.Gray16:
 
-								convertedChannelImageMode = ImageModes.GrayScale;
-								convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+									convertedChannelImageMode = ImageModes.GrayScale;
+									convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
 
-								for (int y = 0; y < height; y++)
-								{
-									ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-									byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
-									for (int x = 0; x < width; x++)
+									for (int y = 0; y < height; y++)
 									{
-										*dst = (byte)((*src * 10) / 1285);
+										ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+										byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+										for (int x = 0; x < width; x++)
+										{
+											*dst = (byte)((*src * 10) / 1285);
 
-										src++;
-										dst++;
+											src++;
+											dst++;
+										}
 									}
-								}
-								break;
+									break;
 
-							case ImageModes.RGB48:
+								case ImageModes.RGB48:
 
-								convertedChannelImageMode = ImageModes.RGB;
-								convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+									convertedChannelImageMode = ImageModes.RGB;
+									convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
 
-								for (int y = 0; y < height; y++)
-								{
-									ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-									byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
-									for (int x = 0; x < width; x++)
+									for (int y = 0; y < height; y++)
 									{
-										dst[0] = (byte)((src[0] * 10) / 1285);
-										dst[1] = (byte)((src[1] * 10) / 1285);
-										dst[2] = (byte)((src[2] * 10) / 1285);
-										dst[3] = (byte)((src[3] * 10) / 1285);
+										ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+										byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+										for (int x = 0; x < width; x++)
+										{
+											dst[0] = (byte)((src[0] * 10) / 1285);
+											dst[1] = (byte)((src[1] * 10) / 1285);
+											dst[2] = (byte)((src[2] * 10) / 1285);
+											dst[3] = (byte)((src[3] * 10) / 1285);
 
-										src += 4;
-										dst += 4;
+											src += 4;
+											dst += 4;
+										}
 									}
-								}
 
-								break;
+									break;
+							}
+						}
+						catch (OutOfMemoryException)
+						{
+							return PSError.memFullErr;
 						}
 
 
@@ -4140,8 +4175,15 @@ namespace PSFilterHostDll.PSApi
 							scaledChannelSurface = null;
 						}
 
-						scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
-						scaledChannelSurface.SuperSampleFitSurface(temp);
+						try
+						{
+							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
+							scaledChannelSurface.SuperSampleFitSurface(temp);
+						}
+						catch (OutOfMemoryException)
+						{
+							return PSError.memFullErr;
+						}
 
 #if DEBUG
 						using (Bitmap bmp = scaledChannelSurface.CreateAliasedBitmap())
@@ -4163,8 +4205,15 @@ namespace PSFilterHostDll.PSApi
 							scaledChannelSurface = null;
 						}
 
-						scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
-						scaledChannelSurface.BicubicFitSurface(temp);
+						try
+						{
+							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
+							scaledChannelSurface.BicubicFitSurface(temp);
+						}
+						catch (OutOfMemoryException)
+						{
+							return PSError.memFullErr;
+						}
 					}
 
 					FillChannelData(channel, destination, scaledChannelSurface, dstRect, tempMode);
@@ -7562,6 +7611,11 @@ namespace PSFilterHostDll.PSApi
 						scaledSelectionMask = null;
 					}
 
+					if (activePICASuites != null)
+					{
+						activePICASuites.Dispose();
+						activePICASuites = null;
+					}
 				}
 				
 				if (platFormDataPtr != IntPtr.Zero)
@@ -7660,13 +7714,6 @@ namespace PSFilterHostDll.PSApi
 				{
 					Memory.Free(basicSuitePtr);
 					basicSuitePtr = IntPtr.Zero;
-				}
-
-				if (activePICASuites != null)
-				{
-					// free any remaining suites
-					activePICASuites.Dispose();
-					activePICASuites = null;
 				}
 
 				if (filterRecordPtr != IntPtr.Zero)
