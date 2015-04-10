@@ -18,9 +18,9 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class ActivePICASuites : IDisposable
     {
-        private struct PICASuite
+        private sealed class PICASuite
         {
-            public IntPtr suitePointer;
+            public readonly IntPtr suitePointer;
             public int refCount;
 
             public PICASuite(IntPtr suite)
@@ -114,11 +114,20 @@ namespace PSFilterHostDll.PSApi
             GC.SuppressFinalize(this);
         }
 
+        ~ActivePICASuites()
+        {
+            Dispose(false);
+        }
+
         private void Dispose(bool disposing)
         {
-            if (!disposed && disposing)
+            if (!disposed)
             {
                 disposed = true;
+
+                if (disposing)
+                {
+                }
 
                 foreach (PICASuite item in this.activeSuites.Values)
                 {
