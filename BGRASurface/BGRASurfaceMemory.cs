@@ -87,9 +87,9 @@ namespace PSFilterHostDll.BGRASurface
 		/// granularity is the page size of the system (usually 4K). Blocks allocated with this method may also
 		/// be protected using the ProtectBlock method.
 		/// </remarks>
-		public static IntPtr AllocateLarge(long bytes)
+		public static IntPtr AllocateLarge(ulong bytes)
 		{
-			IntPtr block = SafeNativeMethods.VirtualAlloc(IntPtr.Zero, new UIntPtr((ulong)bytes),
+			IntPtr block = SafeNativeMethods.VirtualAlloc(IntPtr.Zero, new UIntPtr(bytes),
 				NativeConstants.MEM_COMMIT, NativeConstants.PAGE_READWRITE);
 
 			if (block == IntPtr.Zero)

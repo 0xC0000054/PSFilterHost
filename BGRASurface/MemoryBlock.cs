@@ -148,7 +148,7 @@ namespace PSFilterHostDll.BGRASurface
             {
                 if (bytes >= largeBlockThreshold)
                 {
-                    block = BGRASurfaceMemory.AllocateLarge(bytes);
+                    block = BGRASurfaceMemory.AllocateLarge((ulong)bytes);
                 }
                 else
                 {
