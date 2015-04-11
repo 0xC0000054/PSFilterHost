@@ -143,6 +143,7 @@
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
+    <Compile Include="PSApi\PluginModule.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterProgressEventArgs.cs" />
