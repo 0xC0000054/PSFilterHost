@@ -21,8 +21,6 @@ using System.Windows.Media;
 
 namespace PSFilterHostDll
 {
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate void PluginEntryPoint(FilterSelector selector, IntPtr pluginParamBlock, ref IntPtr pluginData, ref short result);
     /// <summary>
     /// The class that encapsulates a Photoshop-compatible filter plug-in.
     /// </summary>
@@ -41,12 +39,6 @@ namespace PSFilterHostDll
         internal string[] moduleEntryPoints;
         [OptionalField(VersionAdded = 2)]
         private bool hasAboutBox;
-
-        /// <summary>
-        /// The structure containing the dll entrypoint
-        /// </summary>
-        [NonSerialized]
-        internal PIEntrypoint module;
 
         /// <summary>
         /// Gets the filename of the filter.
@@ -233,7 +225,6 @@ namespace PSFilterHostDll
             this.aete = null;
             this.enableInfo = string.Empty;
             this.supportedModes = null;
-            this.module = new PIEntrypoint();
             this.moduleEntryPoints = null;
             this.hasAboutBox = true;
         }
@@ -247,7 +238,6 @@ namespace PSFilterHostDll
         [OnDeserializedAttribute]
         private void OnDeserialized(StreamingContext context)
         {
-            this.module = new PIEntrypoint();
         }
 
         /// <summary>
@@ -307,17 +297,5 @@ namespace PSFilterHostDll
 
             return (this.fileName == other.fileName && this.category == other.category && this.entryPoint == other.entryPoint && this.title == other.title);
         }
-    }
-
-    internal struct PIEntrypoint
-    {
-        /// <summary>
-        /// The dll module handle
-        /// </summary>
-        public SafeLibraryHandle dll;
-        /// <summary>
-        /// The entrypoint for the FilterParmBlock and AboutRecord
-        /// </summary>
-        public PluginEntryPoint entryPoint;
     }
 }
