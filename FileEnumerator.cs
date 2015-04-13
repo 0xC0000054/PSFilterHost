@@ -254,7 +254,7 @@ namespace PSFilterHostDll
                                 {
                                     if (searchSubDirectories)
                                     {
-                                        if (findData.cFileName != "." && findData.cFileName != ".." && (findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+                                        if (findData.cFileName != "." && findData.cFileName != "..")
                                         {
                                             var subdirectory = Path.Combine(path, findData.cFileName);
 
