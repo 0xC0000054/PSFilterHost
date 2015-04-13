@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Security;
 using System.IO;
 using PSFilterHostDll.PSApi;
 using PSFilterHostDll.Properties;
@@ -21,9 +22,7 @@ using PSFilterHostDll.Properties;
 using System.Windows.Media.Imaging;
 #endif
 
-#if NET_40_OR_GREATER
-using System.Security;
-#else
+#if !NET_40_OR_GREATER
 using System.Security.Permissions;
 #endif
 
@@ -321,6 +320,7 @@ namespace PSFilterHostDll
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
@@ -336,6 +336,7 @@ namespace PSFilterHostDll
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
@@ -365,6 +366,7 @@ namespace PSFilterHostDll
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
@@ -380,6 +382,7 @@ namespace PSFilterHostDll
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
 		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
@@ -422,6 +425,57 @@ namespace PSFilterHostDll
 				}
 			}
 		}
+
+#if NET_40_OR_GREATER
+		/// <summary>
+		/// Enumerates the directory for filters to load.
+		/// </summary>
+		/// <param name="path">The directory to search.</param>
+		/// <param name="searchOption">One of the <see cref="System.IO.SearchOption"/> values that specifies whether the search operation should include all subdirectories or only the current directory.</param>
+		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="System.IO.SearchOption"/> value.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
+		/// <permission cref="System.Security.SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+		[SecurityCritical()]
+#else
+		/// <summary>
+		/// Enumerates the directory for filters to load.
+		/// </summary>
+		/// <param name="path">The directory to search.</param>
+		/// <param name="searchOption">One of the <see cref="System.IO.SearchOption"/> values that specifies whether the search operation should include all subdirectories or only the current directory.</param>
+		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
+		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+		/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="System.IO.SearchOption"/> value.</exception>
+		/// <exception cref="System.IO.DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+		/// <exception cref="System.IO.IOException"><paramref name="path"/> is a file name.</exception>
+		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters, and file names must be less than 260 characters.</exception>
+		/// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+		/// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
+		public static IEnumerable<PluginData> EnumerateFilters(string path, SearchOption searchOption)
+		{
+			if (path == null)
+			{
+				throw new ArgumentNullException("path");
+			}
+
+			if (searchOption < SearchOption.TopDirectoryOnly || searchOption > SearchOption.AllDirectories)
+			{
+				throw new ArgumentOutOfRangeException("searchOption");
+			}
+
+			return EnumerateFilters(path, searchOption == SearchOption.AllDirectories);
+		}
+
 
 #if NET_40_OR_GREATER
 		/// <summary>

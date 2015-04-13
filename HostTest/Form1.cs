@@ -1158,7 +1158,7 @@ namespace HostTest
 			Dictionary<string, ToolStripMenuItemEx> filterList = new Dictionary<string, ToolStripMenuItemEx>();
 			List<ToolStripItem> aboutList = new List<ToolStripItem>();
 
-			foreach (var plug in PSFilterHost.EnumerateFilters(args.Path, true))
+			foreach (var plug in PSFilterHost.EnumerateFilters(args.Path, SearchOption.AllDirectories))
 			{
 				ToolStripMenuItem child = new ToolStripMenuItem(plug.Title, null, new EventHandler(RunPhotoshopFilter_Click)) { Name = plug.Title, Tag = plug };
 				ToolStripMenuItem aboutItem = new ToolStripMenuItem(plug.Title, null, new EventHandler(ShowFilterAboutDialog)) { Tag = plug };
