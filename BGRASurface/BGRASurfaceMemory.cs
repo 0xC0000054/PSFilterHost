@@ -33,15 +33,14 @@ namespace PSFilterHostDll.BGRASurface
 		/// <summary>
 		/// Creates the private heap used by Allocate().
 		/// </summary>
-		/// <exception cref="System.ComponentModel.Win32Exception">Thrown if HeapCreate could not create the private heap.</exception>
+		/// <exception cref="System.OutOfMemoryException">Thrown if HeapCreate could not create the private heap.</exception>
 		private static unsafe void CreateHeap()
 		{
 			hHeap = SafeNativeMethods.HeapCreate(0, UIntPtr.Zero, UIntPtr.Zero);
 
 			if (hHeap == IntPtr.Zero)
 			{
-				int error = System.Runtime.InteropServices.Marshal.GetLastWin32Error();
-				throw new System.ComponentModel.Win32Exception(error, string.Format(CultureInfo.InvariantCulture, "HeapCreate returned NULL, LastError = {0}", error));
+				throw new OutOfMemoryException("HeapCreate returned NULL");
 			}
 
 			uint info = 2; // low fragmentation heap
