@@ -139,6 +139,7 @@
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
+    <Compile Include="PSApi\ImageMetaData.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
