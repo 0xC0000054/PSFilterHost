@@ -28,7 +28,6 @@ using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
-using PSFilterHostDll;
 using PSFilterHostDll.BGRASurface;
 using PSFilterHostDll.Properties;
 
@@ -811,91 +810,91 @@ namespace PSFilterHostDll.PSApi
 		private List<IntPtr> bufferIDs;
 
 		#region CallbackDelegates
-		private static AdvanceStateProc advanceProc;
+		private AdvanceStateProc advanceProc;
 		// BufferProcs
-		private static AllocateBufferProc allocProc;
-		private static FreeBufferProc freeProc;
-		private static LockBufferProc lockProc;
-		private static UnlockBufferProc unlockProc;
-		private static BufferSpaceProc spaceProc;
+		private AllocateBufferProc allocProc;
+		private FreeBufferProc freeProc;
+		private LockBufferProc lockProc;
+		private UnlockBufferProc unlockProc;
+		private BufferSpaceProc spaceProc;
 		// MiscCallbacks
-		private static ColorServicesProc colorProc;
-		private static DisplayPixelsProc displayPixelsProc;
-		private static HostProcs hostProc;
-		private static ProcessEventProc processEventProc;
-		private static ProgressProc progressProc;
-		private static TestAbortProc abortProc;
+		private ColorServicesProc colorProc;
+		private DisplayPixelsProc displayPixelsProc;
+		private HostProcs hostProc;
+		private ProcessEventProc processEventProc;
+		private ProgressProc progressProc;
+		private TestAbortProc abortProc;
 		// HandleProcs 
-		private static NewPIHandleProc handleNewProc;
-		private static DisposePIHandleProc handleDisposeProc;
-		private static GetPIHandleSizeProc handleGetSizeProc;
-		private static SetPIHandleSizeProc handleSetSizeProc;
-		private static LockPIHandleProc handleLockProc;
-		private static UnlockPIHandleProc handleUnlockProc;
-		private static RecoverSpaceProc handleRecoverSpaceProc;
-		private static DisposeRegularPIHandleProc handleDisposeRegularProc;
+		private NewPIHandleProc handleNewProc;
+		private DisposePIHandleProc handleDisposeProc;
+		private GetPIHandleSizeProc handleGetSizeProc;
+		private SetPIHandleSizeProc handleSetSizeProc;
+		private LockPIHandleProc handleLockProc;
+		private UnlockPIHandleProc handleUnlockProc;
+		private RecoverSpaceProc handleRecoverSpaceProc;
+		private DisposeRegularPIHandleProc handleDisposeRegularProc;
 		// ImageServicesProc
 #if USEIMAGESERVICES
 		private static PIResampleProc resample1DProc;
 		private static PIResampleProc resample2DProc;
 #endif
 		// ChannelPorts
-		private static ReadPixelsProc readPixelsProc;
-		private static WriteBasePixelsProc writeBasePixelsProc;
-		private static ReadPortForWritePortProc readPortForWritePortProc;
+		private ReadPixelsProc readPixelsProc;
+		private WriteBasePixelsProc writeBasePixelsProc;
+		private ReadPortForWritePortProc readPortForWritePortProc;
 		// PropertyProcs
-		private static GetPropertyProc getPropertyProc;
-		private static SetPropertyProc setPropertyProc;
+		private GetPropertyProc getPropertyProc;
+		private SetPropertyProc setPropertyProc;
 		// ResourceProcs
-		private static CountPIResourcesProc countResourceProc;
-		private static GetPIResourceProc getResourceProc;
-		private static DeletePIResourceProc deleteResourceProc;
-		private static AddPIResourceProc addResourceProc;
+		private CountPIResourcesProc countResourceProc;
+		private GetPIResourceProc getResourceProc;
+		private DeletePIResourceProc deleteResourceProc;
+		private AddPIResourceProc addResourceProc;
 
 		// ReadDescriptorProcs
-		private static OpenReadDescriptorProc openReadDescriptorProc;
-		private static CloseReadDescriptorProc closeReadDescriptorProc;
-		private static GetKeyProc getKeyProc;
-		private static GetIntegerProc getIntegerProc;
-		private static GetFloatProc getFloatProc;
-		private static GetUnitFloatProc getUnitFloatProc;
-		private static GetBooleanProc getBooleanProc;
-		private static GetTextProc getTextProc;
-		private static GetAliasProc getAliasProc;
-		private static GetEnumeratedProc getEnumeratedProc;
-		private static GetClassProc getClassProc;
-		private static GetSimpleReferenceProc getSimpleReferenceProc;
-		private static GetObjectProc getObjectProc;
-		private static GetCountProc getCountProc;
-		private static GetStringProc getStringProc;
-		private static GetPinnedIntegerProc getPinnedIntegerProc;
-		private static GetPinnedFloatProc getPinnedFloatProc;
-		private static GetPinnedUnitFloatProc getPinnedUnitFloatProc;
+		private OpenReadDescriptorProc openReadDescriptorProc;
+		private CloseReadDescriptorProc closeReadDescriptorProc;
+		private GetKeyProc getKeyProc;
+		private GetIntegerProc getIntegerProc;
+		private GetFloatProc getFloatProc;
+		private GetUnitFloatProc getUnitFloatProc;
+		private GetBooleanProc getBooleanProc;
+		private GetTextProc getTextProc;
+		private GetAliasProc getAliasProc;
+		private GetEnumeratedProc getEnumeratedProc;
+		private GetClassProc getClassProc;
+		private GetSimpleReferenceProc getSimpleReferenceProc;
+		private GetObjectProc getObjectProc;
+		private GetCountProc getCountProc;
+		private GetStringProc getStringProc;
+		private GetPinnedIntegerProc getPinnedIntegerProc;
+		private GetPinnedFloatProc getPinnedFloatProc;
+		private GetPinnedUnitFloatProc getPinnedUnitFloatProc;
 		// WriteDescriptorProcs
-		private static OpenWriteDescriptorProc openWriteDescriptorProc;
-		private static CloseWriteDescriptorProc closeWriteDescriptorProc;
-		private static PutIntegerProc putIntegerProc;
-		private static PutFloatProc putFloatProc;
-		private static PutUnitFloatProc putUnitFloatProc;
-		private static PutBooleanProc putBooleanProc;
-		private static PutTextProc putTextProc;
-		private static PutAliasProc putAliasProc;
-		private static PutEnumeratedProc putEnumeratedProc;
-		private static PutClassProc putClassProc;
-		private static PutSimpleReferenceProc putSimpleReferenceProc;
-		private static PutObjectProc putObjectProc;
-		private static PutCountProc putCountProc;
-		private static PutStringProc putStringProc;
-		private static PutScopedClassProc putScopedClassProc;
-		private static PutScopedObjectProc putScopedObjectProc;
+		private OpenWriteDescriptorProc openWriteDescriptorProc;
+		private CloseWriteDescriptorProc closeWriteDescriptorProc;
+		private PutIntegerProc putIntegerProc;
+		private PutFloatProc putFloatProc;
+		private PutUnitFloatProc putUnitFloatProc;
+		private PutBooleanProc putBooleanProc;
+		private PutTextProc putTextProc;
+		private PutAliasProc putAliasProc;
+		private PutEnumeratedProc putEnumeratedProc;
+		private PutClassProc putClassProc;
+		private PutSimpleReferenceProc putSimpleReferenceProc;
+		private PutObjectProc putObjectProc;
+		private PutCountProc putCountProc;
+		private PutStringProc putStringProc;
+		private PutScopedClassProc putScopedClassProc;
+		private PutScopedObjectProc putScopedObjectProc;
 		// SPBasic
-		private static SPBasicAcquireSuite spAcquireSuite;
-		private static SPBasicAllocateBlock spAllocateBlock;
-		private static SPBasicFreeBlock spFreeBlock;
-		private static SPBasicIsEqual spIsEqual;
-		private static SPBasicReallocateBlock spReallocateBlock;
-		private static SPBasicReleaseSuite spReleaseSuite;
-		private static SPBasicUndefined spUndefined;
+		private SPBasicAcquireSuite spAcquireSuite;
+		private SPBasicAllocateBlock spAllocateBlock;
+		private SPBasicFreeBlock spFreeBlock;
+		private SPBasicIsEqual spIsEqual;
+		private SPBasicReallocateBlock spReallocateBlock;
+		private SPBasicReleaseSuite spReleaseSuite;
+		private SPBasicUndefined spUndefined;
 		#endregion
 
 		private IntPtr filterRecordPtr;
@@ -923,9 +922,9 @@ namespace PSFilterHostDll.PSApi
 		private GlobalParameters globalParameters;
 		private bool isRepeatEffect;
 
-		private static AbortFunc abortFunc;
-		private static ProgressProc progressFunc;
-		private static PickColor pickColor;
+		private AbortFunc abortFunc;
+		private ProgressProc progressFunc;
+		private PickColor pickColor;
 
 		private SurfaceBase source;
 		private SurfaceBase dest;
@@ -948,11 +947,8 @@ namespace PSFilterHostDll.PSApi
 		private double dpiX;
 		private double dpiY;
 		private Region selectedRegion;
-#if GDIPLUS
-		private Bitmap exifBitmap;
-#else
-		private BitmapSource exifBitmap;
-#endif
+		private ImageMetaData imageMetaData;
+
 		private ImageModes imageMode;
 		private byte[] backgroundColor;
 		private byte[] foregroundColor;
@@ -999,6 +995,11 @@ namespace PSFilterHostDll.PSApi
 		private bool useChannelPorts;
 		private bool usePICASuites;
 		private ActivePICASuites activePICASuites;
+
+		/// <summary>
+		/// The host signature of this library - '.NET'
+		/// </summary>
+		private const uint HostSignature = 0x2e4e4554;
 
 		public SurfaceBase Dest
 		{
@@ -1194,13 +1195,11 @@ namespace PSFilterHostDll.PSApi
 #if GDIPLUS
 			this.dpiX = sourceImage.HorizontalResolution;
 			this.dpiY = sourceImage.VerticalResolution;
-			   
-			this.exifBitmap = (Bitmap)sourceImage.Clone();
+			this.imageMetaData = new ImageMetaData((Bitmap)sourceImage.Clone());
 #else
 			this.dpiX = sourceImage.DpiX;
 			this.dpiY = sourceImage.DpiY;
-
-			this.exifBitmap = sourceImage.Clone();
+			this.imageMetaData = new ImageMetaData(sourceImage.Clone());
 #endif
 
 			this.selectedRegion = null;
@@ -3635,7 +3634,7 @@ namespace PSFilterHostDll.PSApi
 			return 1000000000;
 		}
 
-		private static bool ShowColorPickerDialog(string prompt, ref short[] rgb)
+		private bool ShowColorPickerDialog(string prompt, ref short[] rgb)
 		{
 			bool result = false;
 
@@ -6195,160 +6194,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		/// <summary>
-		/// Reads the JPEG APP1 section to extract EXIF or XMP meta data.
-		/// </summary>
-		/// <param name="jpegData">The JPEG image byte array.</param>
-		/// <param name="exif">if set to <c>true</c> extract the EXIF meta data; otherwise extract the XMP meta data.</param>
-		/// <returns>The extracted data or null.</returns>
-		private static unsafe byte[] ReadJpegAPP1(byte[] jpegData, bool exif)
-		{
-			byte[] bytes = null;
-			fixed (byte* ptr = jpegData)
-			{
-				byte* p = ptr;
-				if (p[0] != 0xff && p[1] != 0xd8) // JPEG file signature
-				{
-					return null;
-				}
-				p += 2;
-
-				ushort sectionLength = 0;
-				while ((p[0] == 0xff && (p[1] >= 0xe0 && p[1] <= 0xef)) && bytes == null) // APP sections
-				{
-
-					sectionLength = (ushort)((p[2] << 8) | p[3]); // JPEG uses big-endian   
-
-					if (p[0] == 0xff && p[1] == 0xe1) // APP1
-					{
-						p += 2; // skip the header bytes
-
-						string sig;
-
-						if (exif)
-						{
-							sig = new string((sbyte*)p + 2, 0, 6, Windows1252Encoding);
-
-							if (sig == "Exif\0\0")
-							{
-								int exifLength = sectionLength - 8; // subtract the signature and section length size to get the data length. 
-								bytes = new byte[exifLength];
-
-								Marshal.Copy(new IntPtr(p + 8), bytes, 0, exifLength);
-							}
-
-							p += sectionLength;
-
-						}
-						else
-						{
-							sig = new string((sbyte*)p + 2, 0, 29, Windows1252Encoding);
-
-							if (sig == "http://ns.adobe.com/xap/1.0/\0")
-							{
-								// TODO: The XMP extension packets are not supported, so the XMP data must be less that 65502 bytes in size.
-								int xmpLength = sectionLength - 31;
-								bytes = new byte[xmpLength];
-
-								Marshal.Copy(new IntPtr(p + 31), bytes, 0, xmpLength);
-							}
-
-							p += sectionLength;
-						}
-
-					}
-					else
-					{
-						p += sectionLength + 2;
-					}
-
-				}
-			}
-
-			return bytes;
-		}
-
-		/// <summary>
-		/// Extracts the meta data from the image.
-		/// </summary>
-		/// <param name="bytes">The output bytes.</param>
-		/// <param name="exif">set to <c>true</c> if the EXIF data is requested.</param>
-		/// <returns><c>true</c> if the meta data was extracted otherwise <c>false</c></returns>
-		private bool ExtractMetadata(out byte[] bytes, bool exif)
-		{
-			bytes = null;
-			if (exifBitmap == null)
-			{
-				return false;
-			}
-
-#if !GDIPLUS
-			BitmapMetadata metaData = null;
-
-			try
-			{
-				metaData = exifBitmap.Metadata as BitmapMetadata;
-			}
-			catch (NotSupportedException)
-			{
-			}
-
-			if (metaData == null)
-			{
-				return false;
-			}
-
-			if (MetaDataConverter.IsJPEGMetaData(metaData))
-			{
-				try
-				{
-					if (exif)
-					{
-						if (metaData.GetQuery("/app1/ifd/exif") == null)
-						{
-							return false;
-						}
-					}
-					else
-					{
-						if (metaData.GetQuery("/xmp") == null)
-						{
-							return false;
-						}
-					}
-				}
-				catch (System.IO.IOException)
-				{
-					return false; // WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-			}
-			else
-			{
-				metaData = MetaDataConverter.ConvertMetaDataToJPEG(metaData, exif);
-
-				if (metaData == null)
-				{
-					return false;
-				}
-			}
-#endif
-
-			using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
-			{
-#if GDIPLUS
-				exifBitmap.Save(ms, ImageFormat.Jpeg);
-#else
-				JpegBitmapEncoder enc = new JpegBitmapEncoder();
-				enc.Frames.Add(BitmapFrame.Create(exifBitmap, null, metaData, null));
-				enc.Save(ms);
-#endif
-
-				bytes = ReadJpegAPP1(ms.GetBuffer(), exif);
-			}
-
-			return (bytes != null);
-		}
-
 		private unsafe short PropertyGetProc(uint signature, uint key, int index, ref IntPtr simpleProperty, ref IntPtr complexProperty)
 		{
 #if DEBUG
@@ -6459,7 +6304,7 @@ namespace PSFilterHostDll.PSApi
 					break;
 				case PSProperties.EXIFData:
 				case PSProperties.XMPData:
-					if (ExtractMetadata(out bytes, key == PSProperties.EXIFData))
+					if (imageMetaData.Extract(out bytes, key == PSProperties.EXIFData))
 					{
 						complexProperty = HandleNewProc(bytes.Length);
 						if (complexProperty != IntPtr.Zero)
@@ -6559,6 +6404,7 @@ namespace PSFilterHostDll.PSApi
 					}
 					break;
 				case PSProperties.Title:
+				case PSProperties.UnicodeTitle:
 					string title;
 					if (!string.IsNullOrEmpty(hostInfo.Title))
 					{
@@ -6569,7 +6415,14 @@ namespace PSFilterHostDll.PSApi
 						title = "temp.png";
 					}
 
-					bytes = Encoding.ASCII.GetBytes(title);
+					if (key == PSProperties.UnicodeTitle)
+					{
+						bytes = Encoding.Unicode.GetBytes(title);
+					}
+					else
+					{
+						bytes = Encoding.ASCII.GetBytes(title); 
+					}
 					complexProperty = HandleNewProc(bytes.Length);
 
 					if (complexProperty != IntPtr.Zero)
@@ -7387,7 +7240,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->bufferSpace = BufferSpaceProc();
 			filterRecord->maxSpace = filterRecord->bufferSpace;
 
-			filterRecord->hostSig = BitConverter.ToUInt32(Encoding.ASCII.GetBytes(".NET"), 0);
+			filterRecord->hostSig = HostSignature;
 			filterRecord->hostProcs = Marshal.GetFunctionPointerForDelegate(hostProc);
 			filterRecord->platformData = platFormDataPtr;
 			filterRecord->bufferProcs = bufferProcsPtr;
@@ -7572,6 +7425,12 @@ namespace PSFilterHostDll.PSApi
 					{
 						activePICASuites.Dispose();
 						activePICASuites = null;
+					}
+
+					if (imageMetaData != null)
+					{
+						imageMetaData.Dispose();
+						imageMetaData = null;
 					}
 				}
 				
