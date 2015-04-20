@@ -51,7 +51,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (image == null)
 			{
-				throw new ArgumentNullException("bitmap");
+				throw new ArgumentNullException("image");
 			}
 
 			this.image = image;
