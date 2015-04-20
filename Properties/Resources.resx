@@ -127,7 +127,7 @@
     <value>Blue</value>
   </data>
   <data name="DiskFullError" xml:space="preserve">
-    <value>Disk full.</value>
+    <value>There is not enough space on the disk.</value>
   </data>
   <data name="HostDoesNotSupportColStep" xml:space="preserve">
     <value>This host does not support colBytes other than 1.</value>
@@ -139,16 +139,7 @@
     <value>A requested property could not be found.</value>
   </data>
   <data name="FileIOError" xml:space="preserve">
-    <value>File I/O error.</value>
-  </data>
-  <data name="FileOpenError" xml:space="preserve">
-    <value>File open error.</value>
-  </data>
-  <data name="FileReadError" xml:space="preserve">
-    <value>File read error.</value>
-  </data>
-  <data name="FileWriteError" xml:space="preserve">
-    <value>File write error.</value>
+    <value>A file I/O error occurred.</value>
   </data>
   <data name="GreenChannelName" xml:space="preserve">
     <value>Green</value>
@@ -163,13 +154,10 @@
     <value>Image width must be less than or equal to 32000 pixels.</value>
   </data>
   <data name="InvalidSamplePoint" xml:space="preserve">
-    <value>Invalid sample point.</value>
-  </data>
-  <data name="NullHandleError" xml:space="preserve">
-    <value>Null handle error.</value>
+    <value>The image sample point is not valid.</value>
   </data>
   <data name="OutOfMemoryError" xml:space="preserve">
-    <value>Out of memory.</value>
+    <value>Insufficient memory to continue the execution of the plugin.</value>
   </data>
   <data name="PiMIDefaultCategoryName" xml:space="preserve">
     <value>Other</value>
@@ -178,32 +166,11 @@
   <data name="RedChannelName" xml:space="preserve">
     <value>Red</value>
   </data>
-  <data name="UnknownErrorCodeFormat" xml:space="preserve">
-    <value>error code: {0}</value>
-  </data>
   <data name="FilterBadModeFormat" xml:space="preserve">
     <value>The filter does not support {0} images.</value>
   </data>
   <data name="MaskChannelName" xml:space="preserve">
     <value>Selection Mask</value>
-  </data>
-  <data name="UnknownChannelPort" xml:space="preserve">
-    <value>Unknown channel port.</value>
-  </data>
-  <data name="UnsupportedChannelBitOffset" xml:space="preserve">
-    <value>Unsupported channel bit offset.</value>
-  </data>
-  <data name="UnsupportedChannelColumnBits" xml:space="preserve">
-    <value>Unsupported channel column bits.</value>
-  </data>
-  <data name="UnsupportedChannelDepth" xml:space="preserve">
-    <value>Unsupported channel depth.</value>
-  </data>
-  <data name="UnsupportedChannelDepthConversion" xml:space="preserve">
-    <value>Unsupported channel depth conversion.</value>
-  </data>
-  <data name="UnsupportedChannelRowBits" xml:space="preserve">
-    <value>Unsupported channel row bits.</value>
   </data>
   <data name="GrayChannelName" xml:space="preserve">
     <value>Gray</value>
@@ -228,5 +195,17 @@
   </data>
   <data name="PluginEntryPointNotFound" xml:space="preserve">
     <value>Unable to find an entry point named '{0}' in  '{1}'</value>
+  </data>
+  <data name="FileLockedError" xml:space="preserve">
+    <value>The file is in use or locked by another process.</value>
+  </data>
+  <data name="VolumeLockedError" xml:space="preserve">
+    <value>The disk is in use or locked by another process.</value>
+  </data>
+  <data name="EndOfFileError" xml:space="preserve">
+    <value>Reached the end of the file.</value>
+  </data>
+  <data name="FileNotFoundError" xml:space="preserve">
+    <value>The system cannot find the file specified.</value>
   </data>
 </root>

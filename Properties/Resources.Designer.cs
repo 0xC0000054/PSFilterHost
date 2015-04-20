@@ -88,7 +88,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Disk full..
+        ///   Looks up a localized string similar to There is not enough space on the disk..
         /// </summary>
         internal static string DiskFullError {
             get {
@@ -97,7 +97,16 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File I/O error..
+        ///   Looks up a localized string similar to Reached the end of the file..
+        /// </summary>
+        internal static string EndOfFileError {
+            get {
+                return ResourceManager.GetString("EndOfFileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A file I/O error occurred..
         /// </summary>
         internal static string FileIOError {
             get {
@@ -106,29 +115,20 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File open error..
+        ///   Looks up a localized string similar to The file is in use or locked by another process..
         /// </summary>
-        internal static string FileOpenError {
+        internal static string FileLockedError {
             get {
-                return ResourceManager.GetString("FileOpenError", resourceCulture);
+                return ResourceManager.GetString("FileLockedError", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File read error..
+        ///   Looks up a localized string similar to The system cannot find the file specified..
         /// </summary>
-        internal static string FileReadError {
+        internal static string FileNotFoundError {
             get {
-                return ResourceManager.GetString("FileReadError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File write error..
-        /// </summary>
-        internal static string FileWriteError {
-            get {
-                return ResourceManager.GetString("FileWriteError", resourceCulture);
+                return ResourceManager.GetString("FileNotFoundError", resourceCulture);
             }
         }
         
@@ -223,7 +223,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid sample point..
+        ///   Looks up a localized string similar to The image sample point is not valid..
         /// </summary>
         internal static string InvalidSamplePoint {
             get {
@@ -241,16 +241,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Null handle error..
-        /// </summary>
-        internal static string NullHandleError {
-            get {
-                return ResourceManager.GetString("NullHandleError", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Out of memory..
+        ///   Looks up a localized string similar to Insufficient memory to continue the execution of the plugin..
         /// </summary>
         internal static string OutOfMemoryError {
             get {
@@ -331,65 +322,11 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unknown channel port..
+        ///   Looks up a localized string similar to The disk is in use or locked by another process..
         /// </summary>
-        internal static string UnknownChannelPort {
+        internal static string VolumeLockedError {
             get {
-                return ResourceManager.GetString("UnknownChannelPort", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to error code: {0}.
-        /// </summary>
-        internal static string UnknownErrorCodeFormat {
-            get {
-                return ResourceManager.GetString("UnknownErrorCodeFormat", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported channel bit offset..
-        /// </summary>
-        internal static string UnsupportedChannelBitOffset {
-            get {
-                return ResourceManager.GetString("UnsupportedChannelBitOffset", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported channel column bits..
-        /// </summary>
-        internal static string UnsupportedChannelColumnBits {
-            get {
-                return ResourceManager.GetString("UnsupportedChannelColumnBits", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported channel depth..
-        /// </summary>
-        internal static string UnsupportedChannelDepth {
-            get {
-                return ResourceManager.GetString("UnsupportedChannelDepth", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported channel depth conversion..
-        /// </summary>
-        internal static string UnsupportedChannelDepthConversion {
-            get {
-                return ResourceManager.GetString("UnsupportedChannelDepthConversion", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unsupported channel row bits..
-        /// </summary>
-        internal static string UnsupportedChannelRowBits {
-            get {
-                return ResourceManager.GetString("UnsupportedChannelRowBits", resourceCulture);
+                return ResourceManager.GetString("VolumeLockedError", resourceCulture);
             }
         }
     }
