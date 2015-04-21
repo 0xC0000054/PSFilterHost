@@ -22,9 +22,6 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
-    [return: MarshalAs(UnmanagedType.U1)]
-    internal delegate bool TestAbortProc();
-
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal unsafe struct FilterRecord
     {
