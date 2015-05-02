@@ -1704,6 +1704,11 @@ namespace PSFilterHostDll.PSApi
 
 								ep(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
 
+								if (result != PSError.noErr)
+								{
+									break;
+								}
+
 								GC.KeepAlive(ep);
 							}
 						}
@@ -1732,29 +1737,11 @@ namespace PSFilterHostDll.PSApi
 				{
 					switch (result)
 					{
-						case PSError.readErr:
-							error = Resources.FileReadError;
-							break;
-						case PSError.writErr:
-							error = Resources.FileWriteError;
-							break;
-						case PSError.openErr:
-							error = Resources.FileOpenError;
-							break;
-						case PSError.dskFulErr:
-							error = Resources.DiskFullError;
-							break;
-						case PSError.ioErr:
-							error = Resources.FileIOError;
-							break;
-						case PSError.memFullErr:
-							error = Resources.OutOfMemoryError;
-							break;
-						case PSError.nilHandleErr:
-							error = Resources.NullHandleError;
+						case PSError.errPlugInHostInsufficient:
+							error = Resources.PlugInHostInsufficient;
 							break;
 						default:
-							error = string.Format(CultureInfo.CurrentCulture, Resources.UnknownErrorCodeFormat, result);
+							error = GetMacOSErrorMessage(result);
 							break;
 					}
 				}
@@ -2400,87 +2387,90 @@ namespace PSFilterHostDll.PSApi
 			return imageMode;
 		}
 
-		private string GetErrorMessage(short err)
+		private static string GetMacOSErrorMessage(short error)
 		{
-			string error = string.Empty;
+			string message;
+
+			switch (error)
+			{
+				case PSError.readErr:
+				case PSError.writErr:
+				case PSError.openErr:
+				case PSError.ioErr:
+					message = Resources.FileIOError;
+					break;
+				case PSError.eofErr:
+					message = Resources.EndOfFileError;
+					break;
+				case PSError.dskFulErr:
+					message = Resources.DiskFullError;
+					break;
+				case PSError.fLckdErr:
+					message = Resources.FileLockedError;
+					break;
+				case PSError.vLckdErr:
+					message = Resources.VolumeLockedError;
+					break;
+				case PSError.fnfErr:
+					message = Resources.FileNotFoundError;
+					break;
+				case PSError.memFullErr:
+				case PSError.nilHandleErr:
+				case PSError.memWZErr:
+					message = Resources.OutOfMemoryError;
+					break;
+				case PSError.paramErr:
+				default:
+					message = Resources.FilterBadParameters;
+					break;
+			}
+
+			return message;
+		}
+
+		private string GetErrorMessage(short error)
+		{
+			string message = string.Empty;
 
 			// Any positive integer is a plug-in handled error message.
-			if (err == PSError.userCanceledErr || err >= 1)
+			if (error < 0 && error != PSError.userCanceledErr)
 			{
-				return string.Empty;
-			}
-			else if (err == PSError.errReportString)
-			{
-				error = StringFromPString(this.errorStringPtr);
-			}
-			else
-			{
-				switch (err)
+				switch (error)
 				{
-					case PSError.readErr:
-						error = Resources.FileReadError;
-						break;
-					case PSError.writErr:
-						error = Resources.FileWriteError;
-						break;
-					case PSError.openErr:
-						error = Resources.FileOpenError;
-						break;
-					case PSError.dskFulErr:
-						error = Resources.DiskFullError;
-						break;
-					case PSError.ioErr:
-						error = Resources.FileIOError;
-						break;
-					case PSError.memFullErr:
-						error = Resources.OutOfMemoryError;
-						break;
-					case PSError.nilHandleErr:
-						error = Resources.NullHandleError;
-						break;
-					case PSError.filterBadParameters:
-						error = Resources.FilterBadParameters;
-						break;
 					case PSError.filterBadMode:
-						error = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
-						break;
-					case PSError.errPlugInHostInsufficient:
-						error = Resources.PlugInHostInsufficient;
+						message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
+						break;					
+					case PSError.filterBadParameters:
+						message = Resources.FilterBadParameters;
 						break;
 					case PSError.errPlugInPropertyUndefined:
-						error = Resources.PlugInPropertyUndefined;
+						message = Resources.PlugInPropertyUndefined;
 						break;
 					case PSError.errHostDoesNotSupportColStep:
-						error = Resources.HostDoesNotSupportColStep;
+						message = Resources.HostDoesNotSupportColStep;
 						break;
 					case PSError.errInvalidSamplePoint:
-						error = Resources.InvalidSamplePoint;
+						message = Resources.InvalidSamplePoint;
 						break;
+					case PSError.errPlugInHostInsufficient:
 					case PSError.errUnknownPort:
-						error = Resources.UnknownChannelPort;
-						break;
 					case PSError.errUnsupportedBitOffset:
-						error = Resources.UnsupportedChannelBitOffset;
-						break;
 					case PSError.errUnsupportedColBits:
-						error = Resources.UnsupportedChannelColumnBits;
-						break;
 					case PSError.errUnsupportedDepth:
-						error = Resources.UnsupportedChannelDepth;
-						break;
 					case PSError.errUnsupportedDepthConversion:
-						error = Resources.UnsupportedChannelDepthConversion;
-						break;
 					case PSError.errUnsupportedRowBits:
-						error = Resources.UnsupportedChannelRowBits;
+						message = Resources.PlugInHostInsufficient;
 						break;
-
+					case PSError.errReportString:
+						message = StringFromPString(this.errorStringPtr);
+						break;
 					default:
-						error = string.Format(CultureInfo.CurrentCulture, Resources.UnknownErrorCodeFormat, err);
+						message = GetMacOSErrorMessage(error);
 						break;
 				}
 			}
-			return error;
+
+			return message;
 		}
 
 		private bool AbortProc()
@@ -3636,7 +3626,7 @@ namespace PSFilterHostDll.PSApi
 
 		private bool ShowColorPickerDialog(string prompt, ref short[] rgb)
 		{
-			bool result = false;
+			bool colorPicked = false;
 
 			if (pickColor != null)
 			{
@@ -3647,7 +3637,7 @@ namespace PSFilterHostDll.PSApi
 					rgb[0] = color.R;
 					rgb[1] = color.G;
 					rgb[2] = color.B;
-					result = true;
+					colorPicked = true;
 				}
 			}
 			else
@@ -3662,12 +3652,12 @@ namespace PSFilterHostDll.PSApi
 						rgb[0] = color.R;
 						rgb[1] = color.G;
 						rgb[2] = color.B;
-						result = true;
+						colorPicked = true;
 					}
 				}
 			}
 
-			return result;
+			return colorPicked;
 		}
 
 		private unsafe short ColorServicesProc(ref ColorServicesInfo info)
