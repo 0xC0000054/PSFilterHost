@@ -5223,13 +5223,13 @@ namespace PSFilterHostDll.PSApi
 
 			try
 			{
-				unit = unitFloat.unit;
+				unit = unitFloat.Unit;
 			}
 			catch (NullReferenceException)
 			{
 			}
 
-			data = unitFloat.value;
+			data = unitFloat.Value;
 
 			return PSError.noErr;
 		}
@@ -5448,7 +5448,7 @@ namespace PSFilterHostDll.PSApi
 					if (type == DescriptorTypes.typeUintFloat)
 					{
 						UnitFloat unitFloat = (UnitFloat)item.Value;
-						value = unitFloat.value;
+						value = unitFloat.Value;
 					}
 					else
 					{
@@ -5584,12 +5584,12 @@ namespace PSFilterHostDll.PSApi
 
 			UnitFloat unitFloat = (UnitFloat)item.Value;
 
-			if (unitFloat.unit != units)
+			if (unitFloat.Unit != units)
 			{
 				descErr = PSError.paramErr;
 			}
 
-			double amount = unitFloat.value;
+			double amount = unitFloat.Value;
 			if (amount < min)
 			{
 				amount = min;
@@ -5668,7 +5668,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			UnitFloat item = new UnitFloat() { unit = unit, value = data };
+			UnitFloat item = new UnitFloat(unit, data);
 
 			aeteDict.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeUintFloat, GetAETEParamFlags(key), 0, item));
 			return PSError.noErr;
