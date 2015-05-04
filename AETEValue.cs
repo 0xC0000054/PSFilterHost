@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Runtime.Serialization;
 
 namespace PSFilterHostDll
 {
@@ -80,10 +81,49 @@ namespace PSFilterHostDll
 	}
 
 	[Serializable]
-	internal struct UnitFloat
+	internal sealed class UnitFloat : ISerializable
 	{
-		public uint unit;
-		public double value;
+		private readonly uint unit;
+		private readonly double value;
+
+		public uint Unit
+		{
+			get
+			{
+				return unit;
+			}
+		}
+
+		public double Value
+		{
+			get
+			{
+				return value;
+			}
+		}
+
+		public UnitFloat(uint unit, double value)
+		{
+			this.unit = unit;
+			this.value = value;
+		}
+
+		private UnitFloat(SerializationInfo info, StreamingContext context)
+		{
+			if (info == null)
+			{
+				throw new System.ArgumentNullException("info");
+			}
+
+			this.unit = info.GetUInt32("unit");
+			this.value = info.GetDouble("value");
+		}
+
+		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+		{
+			info.AddValue("unit", this.unit);
+			info.AddValue("value", this.value);
+		}
 	}
   
 }
