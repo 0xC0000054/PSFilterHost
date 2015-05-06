@@ -74,25 +74,32 @@ namespace PSFilterHostDll
         /// Fixes the Program Files shortcut path when running under the WoW64 subsystem.
         /// </summary>
         /// <param name="path">The path to fix.</param>
-        /// <returns>The fixed path.</returns>
-        internal static string FixWoW64ShortcutPath(string path)
+        /// <param name="fixedPath">The fixed path.</param>
+        /// <returns><c>true</c> if the path was fixed; otherwise, <c>false</c>.</returns>
+        internal static bool FixWoW64ShortcutPath(string path, out string fixedPath)
         {
-            if (!File.Exists(path) && IsWoW64Process())
-            {
-                // WoW64 changes the 64-bit Program Files path to the 32-bit Program Files path, so we change it back. 
+            fixedPath = null;
 
-                if (path.StartsWith(ProgramFilesX86, StringComparison.OrdinalIgnoreCase) && path.Length > ProgramFilesX86.Length)
+            if (IsWoW64Process())
+            {
+                // WoW64 changes the 64-bit Program Files path to the 32-bit Program Files path. 
+                if (path.StartsWith(ProgramFilesX86, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Remove the trailing slash, otherwise Path.Combine will replace the file path for a network path.
-                    string filePath = path.Remove(0, ProgramFilesX86.Length + 1);
+                    string filePath = string.Empty;
+                    if (path.Length > ProgramFilesX86.Length)
+                    {
+                        // Remove the trailing slash, otherwise Path.Combine will mistake the file path for a network path.
+                        filePath = path.Remove(0, ProgramFilesX86.Length + 1);
+                    }
 
                     if (OS.IsWindows7OrLater)
-                    {                    
-                        return Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), filePath); 
+                    {
+                        fixedPath = Path.Combine(Environment.ExpandEnvironmentVariables("%ProgramW6432%"), filePath);
+                        return true;
                     }
                     else
                     {
-                        // if we are not running Windows 7 or later remove the (x86) identifier instead.
+                        // If we are not running Windows 7 or later remove the (x86) identifier instead.
                         const string x86 = "(x86)";
 
                         int index = ProgramFilesX86.IndexOf(x86, StringComparison.OrdinalIgnoreCase);
@@ -100,15 +107,14 @@ namespace PSFilterHostDll
                         if (index >= 0)
                         {
                             string programFiles = ProgramFilesX86.Remove(index, x86.Length).Trim();
-                            
-                            return Path.Combine(programFiles, filePath);
+                            fixedPath = Path.Combine(programFiles, filePath);
+                            return true;
                         }
-                                                
                     }
                 }
             }
 
-            return path;
+            return false;
         }
 
     }
