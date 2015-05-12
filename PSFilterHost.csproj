@@ -142,6 +142,7 @@
     <Compile Include="PSApi\ImageMetaData.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
+    <Compile Include="PSApi\LoadPsFilter.QueryPlugin.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
