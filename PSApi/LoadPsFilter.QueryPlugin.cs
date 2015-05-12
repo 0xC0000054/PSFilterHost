@@ -320,7 +320,7 @@ namespace PSFilterHostDll.PSApi
 						(filterVersion[1] == PSConstants.latestFilterVersion && filterVersion[0] > PSConstants.latestFilterSubVersion))
 					{
 #if DEBUG
-						System.Diagnostics.Debug.WriteLine(string.Format("{0} requires newer filter interface version {1}.{2} and only version {3}.{4} is supported", 
+						System.Diagnostics.Debug.WriteLine(string.Format("{0} requires newer filter interface version {1}.{2} and only version {3}.{4} is supported",
 							new object[] { query.fileName, filterVersion[1], filterVersion[0], PSConstants.latestFilterVersion, PSConstants.latestFilterSubVersion }));
 #endif
 						return true;
@@ -368,33 +368,34 @@ namespace PSFilterHostDll.PSApi
 				else if (propKey == PIPropertyID.PIHasTerminologyProperty)
 				{
 					PITerminology* term = (PITerminology*)dataPtr;
+					if (term->version == PSConstants.LatestTerminologyVersion)
+					{
 #if DEBUG
-					string aeteName = Marshal.PtrToStringAnsi(new IntPtr(dataPtr + PITerminology.SizeOf)).TrimEnd('\0');
+						string aeteName = Marshal.PtrToStringAnsi(new IntPtr(dataPtr + PITerminology.SizeOf)).TrimEnd('\0');
 #endif
-					QueryAETE queryAETE = new QueryAETE(term->terminologyID);
+						QueryAETE queryAETE = new QueryAETE(term->terminologyID);
 
-					GCHandle aeteHandle = GCHandle.Alloc(queryAETE, GCHandleType.Normal);
-					try
-					{
-						IntPtr callback = GCHandle.ToIntPtr(aeteHandle);
-						while (UnsafeNativeMethods.EnumResourceNamesW(hModule, "AETE", new UnsafeNativeMethods.EnumResNameDelegate(EnumAETE), callback))
+						GCHandle aeteHandle = GCHandle.Alloc(queryAETE, GCHandleType.Normal);
+						try
 						{
-							// do nothing
+							IntPtr callback = GCHandle.ToIntPtr(aeteHandle);
+							if (!UnsafeNativeMethods.EnumResourceNamesW(hModule, "AETE", new UnsafeNativeMethods.EnumResNameDelegate(EnumAETE), callback))
+							{
+								queryAETE = (QueryAETE)GCHandle.FromIntPtr(callback).Target;
+							}
 						}
-						queryAETE = (QueryAETE)GCHandle.FromIntPtr(callback).Target;
-
-					}
-					finally
-					{
-						if (aeteHandle.IsAllocated)
+						finally
 						{
-							aeteHandle.Free();
+							if (aeteHandle.IsAllocated)
+							{
+								aeteHandle.Free();
+							}
 						}
-					}
 
-					if (queryAETE.enumAETE != null)
-					{
-						enumData.Aete = queryAETE.enumAETE;
+						if (queryAETE.enumAETE != null)
+						{
+							enumData.Aete = queryAETE.enumAETE;
+						}
 					}
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
@@ -546,7 +547,7 @@ namespace PSFilterHostDll.PSApi
 			try
 			{
 				// Load the _8BFM resource to get the filter title.
-				filterRes = UnsafeNativeMethods.FindResourceW(hModule, lpszName, type); 
+				filterRes = UnsafeNativeMethods.FindResourceW(hModule, lpszName, type);
 			}
 			finally
 			{
