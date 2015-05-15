@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Test.Tools.WicCop.InteropServices.ComTypes;
@@ -83,68 +84,70 @@ namespace HostTest
             }
         }
 
-
-        private static List<string> GetFilterStrings(List<string[]> extList)
+        private static IEnumerable<string> GetFilterStrings(IList<string> extensions)
         {
-            List<string> filters = new List<string>();
             Dictionary<string, List<string>> extDict = new Dictionary<string, List<string>>();
-            foreach (var list in extList)
-            {                    
-                string fileExtName = string.Empty;
 
-                for (int i = 0; i < list.Length; i++)
+            for (int i = 0; i < extensions.Count; i++)
+            {
+                string fileExtension = extensions[i];
+
+                string friendlyName = null;
+                string progid = null;
+
+                using (RegistryKey rk = Registry.ClassesRoot.OpenSubKey(fileExtension))
                 {
-                    string fileExtension = list[i];
-                    string progid = null;
+                    if (rk != null)
+                    {
+                        progid = rk.GetValue(null, null) as string;
+                    }
+                }
 
-                    using (RegistryKey rk = Registry.ClassesRoot.OpenSubKey(fileExtension))
+                if (!string.IsNullOrEmpty(progid))
+                {
+                    using (RegistryKey rk = Registry.ClassesRoot.OpenSubKey(progid))
                     {
                         if (rk != null)
                         {
-                            progid = rk.GetValue(null, null) as string;
+                            friendlyName = rk.GetValue(null, null) as string;
                         }
                     }
-                    
-                    if (!string.IsNullOrEmpty(progid))
+                }
+
+                if (string.IsNullOrEmpty(friendlyName))
+                {
+                    // Set the names for the built-in formats if Windows does not.
+                    switch (fileExtension)
                     {
-                        using (RegistryKey rk = Registry.ClassesRoot.OpenSubKey(progid))
-                        {
-                            if (rk != null)
-                            {
-                                fileExtName = rk.GetValue(null, null) as string;
-                                if (!string.IsNullOrEmpty(fileExtName))
-                                {
-                                    if (!extDict.ContainsKey(fileExtName))
-                                    {
-                                        List<string> exts = new List<string>();
-                                        exts.Add(fileExtension);
-                                        extDict.Add(fileExtName, exts);
-                                    }
-                                    else
-                                    {
-                                        extDict[fileExtName].Add(fileExtension);
-                                    }
-                                }
-#if DEBUG
-                                else
-                                {
-                                    System.Diagnostics.Debug.WriteLine(fileExtension);
-                                } 
-#endif
-                            }
-                        }
+                        case ".exif":
+                            friendlyName = "JPEG Image";
+                            break;
+                        case ".icon":
+                            friendlyName = "Icon";
+                            break;
+                        case ".tif":
+                        case ".tiff":
+                            friendlyName = "TIFF Image";
+                            break;
+                        default:
+                            friendlyName = fileExtension.TrimStart('.').ToUpperInvariant() + " File";
+                            break;
                     }
-                    else
-                    {
-                        if (extDict.ContainsKey(fileExtName))
-                        {
-                            extDict[fileExtName].Add(fileExtension); 
-                        }
-                    }
-                   
+                }
+
+                if (extDict.ContainsKey(friendlyName))
+                {
+                    extDict[friendlyName].Add(fileExtension);
+                }
+                else
+                {
+                    List<string> exts = new List<string>();
+                    exts.Add(fileExtension);
+                    extDict.Add(friendlyName, exts);
                 }
             }
 
+            List<string> filters = new List<string>();
 
             foreach (var item in extDict)
             {
@@ -175,50 +178,51 @@ namespace HostTest
                 string filter = desc.ToString() + "|" + formats.ToString();
                 filters.Add(filter);
             }
+            // Sort the filters by name in ascending order.
+            filters.Sort(StringComparer.Ordinal);
 
             return filters;
         }
 
         public static string GetOpenDialogFilterString()
         {
-            StringBuilder formats = new StringBuilder();
-            StringBuilder formatDesc = new StringBuilder("Images (");
-            List<string[]> extList = new List<string[]>();
+            List<string> fileExtensions = new List<string>();
 
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
-                string extString = GetString(info.GetFileExtensions);
+                string extString = GetString(info.GetFileExtensions).ToLowerInvariant();
 
-                string[] exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
-
-                extList.Add(exts);
-
-                foreach (var item in exts)
-                {
-                    formats.Append("*");
-                    formatDesc.Append("*");
-
-                    formats.Append(item);
-                    formatDesc.Append(item);
-
-                    formats.Append(";");
-                    formatDesc.Append(", ");
-                } 
-
+                // Remove any duplicate extensions.
+                var exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries).Except(fileExtensions, StringComparer.Ordinal);
+                fileExtensions.AddRange(exts);
             }
 
-            formatDesc.Remove(formatDesc.Length - 2, 2); // remove the final comma
-            formatDesc.Append(")");
+            StringBuilder formats = new StringBuilder();
+            StringBuilder description = new StringBuilder("Images (");
 
-            StringBuilder filters = new StringBuilder(formatDesc.ToString() + "|" + formats.ToString());
-            List<string> data = GetFilterStrings(extList);
+            foreach (var item in fileExtensions.OrderBy(x => x, StringComparer.Ordinal))
+            {
+                formats.Append("*");
+                description.Append("*");
 
-            foreach (var item in data)
+                formats.Append(item);
+                description.Append(item);
+
+                formats.Append(";");
+                description.Append(", ");
+            }
+            // Remove the last separator. 
+            formats.Remove(formats.Length - 1, 1);
+            description.Remove(description.Length - 2, 2);
+            description.Append(")");
+
+            StringBuilder filters = new StringBuilder(description.ToString() + "|" + formats.ToString());
+
+            foreach (var item in GetFilterStrings(fileExtensions))
             {
                 filters.Append("|");
                 filters.Append(item);
             }
-
 
             return filters.ToString();
         }
@@ -229,14 +233,14 @@ namespace HostTest
 
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
-                string extString = GetString(info.GetFileExtensions);
-                string[] exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
-
+                string extString = GetString(info.GetFileExtensions).ToLowerInvariant();
+                
+                // Remove any duplicate extensions.
+                var exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries).Except(extensions, StringComparer.Ordinal);
                 extensions.AddRange(exts);
             }
 
             return extensions.AsReadOnly();
         }
-
     }
 }
