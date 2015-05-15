@@ -23,7 +23,7 @@ namespace HostTest
 {
     internal static class WICHelpers
     {
-        private static readonly char[] splitChars = new char[] { ' ', ',' };
+        private static readonly char[] SplitChars = new char[] { ' ', ',' };
         delegate uint GetStringMethod(uint cch, StringBuilder wz);
 
         private static string GetString(GetStringMethod method)
@@ -189,7 +189,7 @@ namespace HostTest
             {
                 string extString = GetString(info.GetFileExtensions);
 
-                string[] exts = extString.Split(splitChars, StringSplitOptions.RemoveEmptyEntries);
+                string[] exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
 
                 extList.Add(exts);
 
@@ -230,7 +230,7 @@ namespace HostTest
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
                 string extString = GetString(info.GetFileExtensions);
-                string[] exts = extString.Split(splitChars, StringSplitOptions.RemoveEmptyEntries);
+                string[] exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries);
 
                 extensions.AddRange(exts);
             }
