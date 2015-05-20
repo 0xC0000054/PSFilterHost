@@ -112,7 +112,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new System.ArgumentNullException("info");
+				throw new ArgumentNullException("info");
 			}
 
 			this.unit = info.GetUInt32("unit");
@@ -121,6 +121,11 @@ namespace PSFilterHostDll
 
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
 		{
+			if (info == null)
+			{
+				throw new ArgumentNullException("info");
+			}
+
 			info.AddValue("unit", this.unit);
 			info.AddValue("value", this.value);
 		}
