@@ -396,31 +396,13 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException("path");
 			}
 
-			using (ShellLink shortcut = new ShellLink())
+			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchSubdirectories, true))
 			{
-				foreach (var file in FileEnumerator.EnumerateFiles(path, new string[] { ".8bf", ".lnk" }, searchSubdirectories))
+				while (enumerator.MoveNext())
 				{
-					if (file.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
+					foreach (var item in LoadPsFilter.QueryPlugin(enumerator.Current))
 					{
-						if (shortcut.Load(file))
-						{
-							string linkPath = shortcut.Path;
-
-							if (linkPath.EndsWith(".8bf", StringComparison.OrdinalIgnoreCase))
-							{
-								foreach (var item in LoadPsFilter.QueryPlugin(ShortcutHelper.FixWoW64ShortcutPath(linkPath)))
-								{
-									yield return item;
-								}
-							} 
-						}
-					}
-					else
-					{
-						foreach (var item in LoadPsFilter.QueryPlugin(file))
-						{
-							yield return item;
-						}
+						yield return item;
 					}
 				}
 			}
