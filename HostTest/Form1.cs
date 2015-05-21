@@ -351,8 +351,13 @@ namespace HostTest
 			}
 		}
 
-		private void FilterCompleted()
+		private void FilterCompleted(bool setRepeatFilter)
 		{
+			if (setRepeatFilter)
+			{
+				SetRepeatEffectMenuItem();
+			}
+
 			this.filterThread.Join();
 			this.filterThread = null;
 
@@ -367,6 +372,12 @@ namespace HostTest
 		{
 			if (string.IsNullOrEmpty(srcImageTempFileName))
 			{
+				if (historyStack.Count == 0)
+				{
+					// Add the original image to the history stack.
+					this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.srcImage);
+				}
+
 				this.srcImageTempFileName = Path.GetTempFileName();
 
 				BitmapMetadata metaData = null;
@@ -414,15 +425,7 @@ namespace HostTest
 			{
 				selection = new Region(canvas.ClipPath);
 			}
-			if (historyStack.Count == 0)
-			{
-				// add the original image to the history stack.
-				base.BeginInvoke(new Action(delegate()
-				{
-					this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.srcImage);
-				}));
-			}
-
+			
 			BitmapSource image = null;
 
 			if (dstImage == null)
@@ -446,6 +449,7 @@ namespace HostTest
 			}
 
 			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
+			bool setRepeatFilter = false;
 
 			try
 			{
@@ -517,7 +521,7 @@ namespace HostTest
 
 							this.pseudoResources = host.PseudoResources;
 							this.hostInfo = host.HostInfo;
-							base.BeginInvoke(new Action(SetRepeatEffectMenuItem));
+							setRepeatFilter = true;
 						}
 
 					}
@@ -550,7 +554,7 @@ namespace HostTest
 					selection.Dispose();
 					selection = null;
 				}
-				base.BeginInvoke(new Action(FilterCompleted));
+				base.BeginInvoke(new Action(() => FilterCompleted(setRepeatFilter)));
 			}
 
 		}
