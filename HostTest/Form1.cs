@@ -154,11 +154,25 @@ namespace HostTest
 					{
 						OpenFile(args[1]);
 					}
-					catch (FileFormatException)
+					catch (FileNotFoundException ex)
 					{
+						ShowErrorMessage(ex.Message);
 					}
-					catch (NotSupportedException) // WINCODEC_ERR_COMPONENTNOTFOUND
+					catch (FileFormatException ex)
 					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (IOException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (NotSupportedException ex) // WINCODEC_ERR_COMPONENTNOTFOUND
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (UnauthorizedAccessException ex)
+					{
+						ShowErrorMessage(ex.Message);
 					}
 				}
 			}
@@ -638,13 +652,21 @@ namespace HostTest
 			{
 				try
 				{
-					this.OpenFile(openFileDialog1.FileName);
+					OpenFile(openFileDialog1.FileName);
 				}
 				catch (FileNotFoundException ex)
 				{
 					ShowErrorMessage(ex.Message);
 				}
 				catch (FileFormatException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (IOException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (NotSupportedException ex) // WINCODEC_ERR_COMPONENTNOTFOUND
 				{
 					ShowErrorMessage(ex.Message);
 				}
