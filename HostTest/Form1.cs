@@ -305,9 +305,12 @@ namespace HostTest
 					{
 						ToolStripItem repeatMenuItem = items[i];
 
-						PluginData data = (PluginData)repeatMenuItem.Tag;
+						if (repeatMenuItem is ToolStripMenuItem)
+						{
+							PluginData data = (PluginData)repeatMenuItem.Tag;
 
-						repeatMenuItem.Enabled = data.SupportsImageMode(format);
+							repeatMenuItem.Enabled = data.SupportsImageMode(format); 
+						}
 					}
 				}
 					
