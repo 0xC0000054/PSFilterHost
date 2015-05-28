@@ -579,20 +579,27 @@ namespace HostTest
 			{
 				if (!filtersToolStripMenuItem.DropDownItems.ContainsKey("repeatEffect"))
 				{
-					ToolStripMenuItem repeatItem = new ToolStripMenuItem(Resources.RepeatEffectMenuText + this.currentFilterMenuItem.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
+					ToolStripMenuItem repeatItem = new ToolStripMenuItem(this.currentFilterMenuItem.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
 					{
 						Name = "repeatEffect",
 						Tag = this.currentFilterMenuItem.Tag,
 						ShowShortcutKeys = true,
 						ShortcutKeys = Keys.Control | Keys.F
 					};
+					ToolStripSeparator repeatSeparator = new ToolStripSeparator();
 
-					filtersToolStripMenuItem.DropDownItems.Insert(0, repeatItem);
+					ToolStripItem[] filterCategories = new ToolStripItem[filtersToolStripMenuItem.DropDownItems.Count];
+					filtersToolStripMenuItem.DropDownItems.CopyTo(filterCategories, 0);
+
+					filtersToolStripMenuItem.DropDownItems.Clear();
+					filtersToolStripMenuItem.DropDownItems.Add(repeatItem);
+					filtersToolStripMenuItem.DropDownItems.Add(repeatSeparator);
+					filtersToolStripMenuItem.DropDownItems.AddRange(filterCategories);
 				}
 				else
 				{
 					ToolStripMenuItem repeatItem = (ToolStripMenuItem)filtersToolStripMenuItem.DropDownItems[0];
-					repeatItem.Text = Resources.RepeatEffectMenuText + this.currentFilterMenuItem.Text.TrimEnd('.');
+					repeatItem.Text = this.currentFilterMenuItem.Text.TrimEnd('.');
 					repeatItem.Tag = this.currentFilterMenuItem.Tag;
 				} 
 			}
