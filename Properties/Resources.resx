@@ -182,10 +182,10 @@
     <value>8-bit Grayscale</value>
   </data>
   <data name="RGB48Mode" xml:space="preserve">
-    <value>16-bit RGB</value>
+    <value>48-bit RGB</value>
   </data>
   <data name="RGBMode" xml:space="preserve">
-    <value>8-bit RGB</value>
+    <value>24-bit RGB</value>
   </data>
   <data name="BlankDataNotSupported" xml:space="preserve">
     <value>The filter does not support processing completely transparent images.</value>

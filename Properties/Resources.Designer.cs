@@ -304,7 +304,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 16-bit RGB.
+        ///   Looks up a localized string similar to 48-bit RGB.
         /// </summary>
         internal static string RGB48Mode {
             get {
@@ -313,7 +313,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 8-bit RGB.
+        ///   Looks up a localized string similar to 24-bit RGB.
         /// </summary>
         internal static string RGBMode {
             get {
