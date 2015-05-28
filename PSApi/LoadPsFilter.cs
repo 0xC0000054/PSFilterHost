@@ -1962,26 +1962,43 @@ namespace PSFilterHostDll.PSApi
 		/// <param name="lockRect">The rectangle to clamp the size to.</param>
 		private unsafe void ScaleTempSurface(int inputRate, Rectangle lockRect)
 		{
+			// If the scale rectangle bounds are not valid return a copy of the original surface.
+			if (lockRect.X >= source.Width || lockRect.Y >= source.Height)
+			{
+				if ((tempSurface == null) || tempSurface.Width != source.Width || tempSurface.Height != source.Height)
+				{
+					if (tempSurface != null)
+					{
+						tempSurface.Dispose();
+						tempSurface = null;
+					}
+
+					tempSurface = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, imageMode);
+					tempSurface.CopySurface(source);
+				}
+				return;
+			}
+
 			int scaleFactor = FixedToInt32(inputRate);
 			if (scaleFactor == 0)
 			{
 				scaleFactor = 1;
 			}
 
-			int scalew = source.Width / scaleFactor;
-			int scaleh = source.Height / scaleFactor;
+			int scaleWidth = source.Width / scaleFactor;
+			int scaleHeight = source.Height / scaleFactor;
 
-			if (lockRect.Width > scalew)
+			if (lockRect.Width > scaleWidth)
 			{
-				scalew = lockRect.Width;
+				scaleWidth = lockRect.Width;
 			}
 
-			if (lockRect.Height > scaleh)
+			if (lockRect.Height > scaleHeight)
 			{
-				scaleh = lockRect.Height;
+				scaleHeight = lockRect.Height;
 			}
 
-			if ((tempSurface == null) || scalew != tempSurface.Width || scaleh != tempSurface.Height)
+			if ((tempSurface == null) || scaleWidth != tempSurface.Width || scaleHeight != tempSurface.Height)
 			{
 				if (tempSurface != null)
 				{
@@ -1991,7 +2008,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (scaleFactor > 1) // Filter preview
 				{
-					tempSurface = SurfaceFactory.CreateFromImageMode(scalew, scaleh, imageMode);
+					tempSurface = SurfaceFactory.CreateFromImageMode(scaleWidth, scaleHeight, imageMode);
 					tempSurface.SuperSampleFitSurface(source);
 				}
 				else
@@ -2060,18 +2077,13 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
-			bool validImageBounds = (inRect.left < source.Width && inRect.top < source.Height);
-
-			if (validImageBounds)
+			try
 			{
-				try
-				{
-					ScaleTempSurface(filterRecord->inputRate, lockRect);
-				}
-				catch (OutOfMemoryException)
-				{
-					return PSError.memFullErr;
-				}
+				ScaleTempSurface(filterRecord->inputRate, lockRect);
+			}
+			catch (OutOfMemoryException)
+			{
+				return PSError.memFullErr;
 			}
 
 
@@ -2089,6 +2101,7 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
+			bool validImageBounds = (inRect.left < source.Width && inRect.top < source.Height);
 			short padErr = SetFilterPadding(inDataPtr, stride, inRect, nplanes, channelOffset, filterRecord->inputPadding, lockRect, tempSurface);
 			if (padErr != PSError.noErr || !validImageBounds)
 			{
@@ -2434,25 +2447,43 @@ namespace PSFilterHostDll.PSApi
 
 		private unsafe void ScaleTempMask(int maskRate, Rectangle lockRect)
 		{
+			// If the rectangle bounds are not valid return a copy of the original surface.
+			if (lockRect.X >= mask.Width || lockRect.Y >= mask.Height)
+			{
+				if ((tempMask == null) || tempMask.Width != mask.Width || tempMask.Height != mask.Height)
+				{
+					if (tempMask != null)
+					{
+						tempMask.Dispose();
+						tempMask = null;
+					}
+
+					tempMask = new Surface8(mask.Width, mask.Height);
+					tempMask.CopySurface(mask);
+				}
+				return;
+			}
+
 			int scaleFactor = FixedToInt32(maskRate);
 
 			if (scaleFactor == 0)
 			{
 				scaleFactor = 1;
 			}
-			int scalew = source.Width / scaleFactor;
-			int scaleh = source.Height / scaleFactor;
+			int scaleWidth = mask.Width / scaleFactor;
+			int scaleHeight = mask.Height / scaleFactor;
 
-			if (lockRect.Width > scalew)
+			if (lockRect.Width > scaleWidth)
 			{
-				scalew = lockRect.Width;
+				scaleWidth = lockRect.Width;
 			}
 
-			if (lockRect.Height > scaleh)
+			if (lockRect.Height > scaleHeight)
 			{
-				scaleh = lockRect.Height;
+				scaleHeight = lockRect.Height;
 			}
-			if ((tempMask == null) || scalew != tempMask.Width || scaleh != tempMask.Height)
+
+			if ((tempMask == null) || scaleWidth != tempMask.Width || scaleHeight != tempMask.Height)
 			{
 				if (tempMask != null)
 				{
@@ -2462,7 +2493,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (scaleFactor > 1)
 				{
-					tempMask = new Surface8(scalew, scaleh);
+					tempMask = new Surface8(scaleWidth, scaleHeight);
 					tempMask.SuperSampleFitSurface(mask);
 				}
 				else
@@ -2470,7 +2501,6 @@ namespace PSFilterHostDll.PSApi
 					tempMask = new Surface8(mask.Width, mask.Height);
 					tempMask.CopySurface(mask);
 				}
-
 			}
 		}
 
@@ -2504,17 +2534,13 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
-			bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
-			if (validImageBounds)
+			try
 			{
-				try
-				{
-					ScaleTempMask(filterRecord->maskRate, lockRect);
-				}
-				catch (OutOfMemoryException)
-				{
-					return PSError.memFullErr;
-				}
+				ScaleTempMask(filterRecord->maskRate, lockRect);
+			}
+			catch (OutOfMemoryException)
+			{
+				return PSError.memFullErr;
 			}
 
 			if (maskDataPtr == IntPtr.Zero)
@@ -2532,7 +2558,8 @@ namespace PSFilterHostDll.PSApi
 			}
 			filterRecord->maskData = maskDataPtr;
 			filterRecord->maskRowBytes = width;
-
+			
+			bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
 			short err = SetFilterPadding(maskDataPtr, width, maskRect, 1, 0, filterRecord->maskPadding, lockRect, mask);
 			if (err != PSError.noErr || !validImageBounds)
 			{
@@ -5839,8 +5866,6 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			Ping(DebugFlags.ResourceSuite, PropToString(ofType));
 #endif
-			short count = ResourceCountProc(ofType);
-
 			int size = HandleGetSizeProc(data);
 			try
 			{
@@ -5852,7 +5877,8 @@ namespace PSFilterHostDll.PSApi
 					HandleUnlockProc(data);
 				}
 
-				pseudoResources.Add(new PSResource(ofType, count, bytes));
+				int index = ResourceCountProc(ofType) + 1;
+				pseudoResources.Add(new PSResource(ofType, index, bytes));
 			}
 			catch (OutOfMemoryException)
 			{
