@@ -10,13 +10,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using PSFilterHostDll.PSApi;
+using PSFilterHostDll.Properties;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Security;
 using System.IO;
-using PSFilterHostDll.PSApi;
-using PSFilterHostDll.Properties;
+using System.Threading;
 
 #if !GDIPLUS
 using System.Windows.Media.Imaging;
@@ -315,7 +316,7 @@ namespace PSFilterHostDll
 		/// Queries the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubDirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
 		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -331,7 +332,7 @@ namespace PSFilterHostDll
 		/// Queries the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubDirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
 		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -343,14 +344,14 @@ namespace PSFilterHostDll
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static FilterCollection QueryDirectory(string path, bool searchSubDirectories)
+		public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
 		{
 			if (path == null)
 			{
 				throw new ArgumentNullException("path");
 			}
 
-			var filters = PSFilterHost.EnumerateFilters(path, searchSubDirectories);
+			var filters = PSFilterHost.EnumerateFilters(path, searchSubdirectories);
 
 			return new FilterCollection(filters);
 		}
@@ -361,7 +362,7 @@ namespace PSFilterHostDll
 		/// Enumerates the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubDirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
 		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -377,7 +378,7 @@ namespace PSFilterHostDll
 		/// Enumerates the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubDirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
 		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -389,14 +390,14 @@ namespace PSFilterHostDll
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubDirectories)
+		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
 		{
 			if (path == null)
 			{
 				throw new ArgumentNullException("path");
 			}
 
-			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchSubDirectories, true))
+			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchSubdirectories, true))
 			{
 				while (enumerator.MoveNext())
 				{
@@ -549,7 +550,7 @@ namespace PSFilterHostDll
 				}
 				catch (Exception ex)
 				{
-					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is System.Threading.ThreadAbortException)
+					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
 					{
 						throw;
 					}
@@ -629,7 +630,7 @@ namespace PSFilterHostDll
 				}
 				catch (Exception ex)
 				{
-					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is System.Threading.ThreadAbortException)
+					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
 					{
 						throw;
 					}
@@ -657,7 +658,11 @@ namespace PSFilterHostDll
 				progress = 100.0;
 			}
 
-			UpdateProgress.Invoke(this, new FilterProgressEventArgs((int)progress)); 
+			EventHandler<FilterProgressEventArgs> handler = UpdateProgress;
+			if (handler != null)
+			{
+				handler(this, new FilterProgressEventArgs((int)progress));
+			}
 		}
 
 		/// <summary>
