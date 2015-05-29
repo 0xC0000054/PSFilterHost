@@ -86,10 +86,14 @@ namespace HostTest.Tools
         {
             if ((e.KeyCode == Keys.Escape) || (e.Modifiers == Keys.Control && e.KeyCode == Keys.D))
             {
-                e.Handled = true;// clear the selection if Escape or Ctrl + D is pressed.
-                this.selectPoints.Clear();
-
-                this.RenderSelection();
+                e.Handled = true;
+                
+                // Clear the selection if Escape or Ctrl + D is pressed.
+                if (selectPoints != null)
+                {
+                    this.selectPoints.Clear();
+                    this.RenderSelection(); 
+                }
             }
         }
 
