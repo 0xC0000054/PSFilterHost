@@ -19,6 +19,6 @@ namespace PSFilterHostDll
     /// <param name="defaultRed">The red component of the color that the filter wants selected in the host's color dialog.</param>
     /// <param name="defaultGreen">The green component of the color that the filter wants selected in the host's color dialog.</param>
     /// <param name="defaultBlue">The blue component of the color that the filter wants selected in the host's color dialog.</param>
-    /// <returns>A <see cref="ColorPickerResult" /> containing the user's chosen color; otherwise, null (Nothing in Visual Basic) if the user canceled the dialog.</returns>
+    /// <returns>A <see cref="ColorPickerResult" /> containing the user's chosen color; otherwise, <c>null</c> (<c>Nothing</c> in Visual Basic) if the user canceled the dialog.</returns>
     public delegate ColorPickerResult PickColor(string prompt, byte defaultRed, byte defaultGreen, byte defaultBlue);
 }
