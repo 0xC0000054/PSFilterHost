@@ -17,7 +17,7 @@
 using System;
 using System.Collections;
 
-namespace ns
+namespace HostTest
 {
     internal sealed class StringLogicalComparer : IComparer
     {

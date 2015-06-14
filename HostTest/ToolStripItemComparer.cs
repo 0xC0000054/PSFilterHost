@@ -20,7 +20,7 @@ namespace HostTest
     {
         public int Compare(ToolStripItem x, ToolStripItem y)
         {
-            return ns.StringLogicalComparer.Compare(x.Text, y.Text);
+            return StringLogicalComparer.Compare(x.Text, y.Text);
         }
     }
 
