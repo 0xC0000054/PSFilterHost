@@ -10,6 +10,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using HostTest.Properties;
+using HostTest.Tools;
+using PSFilterHostDll;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -20,9 +23,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using HostTest.Properties;
-using HostTest.Tools;
-using PSFilterHostDll;
 
 namespace HostTest
 {
@@ -37,7 +37,7 @@ namespace HostTest
 		private ToolStripItem currentFilterMenuItem;
 		private bool setFilterApplyText;
 		private string filterName;
-		private string titleString;
+		private string applicationName;
 		private string imageFileName;
 		private string imageType;
 		private string dropImageFileName;
@@ -77,7 +77,7 @@ namespace HostTest
 				this.Text += " x64";
 			}
 
-			this.titleString = this.Text;
+			this.applicationName = this.Text;
 			
 			this.messageFilter = new AbortMessageFilter();
 			Application.AddMessageFilter(this.messageFilter);
@@ -782,7 +782,7 @@ namespace HostTest
 				}
 				else
 				{
-					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.titleString, this.imageFileName, 100, this.imageType });
+					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.applicationName, this.imageFileName, 100, this.imageType });
 
 					this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
 					this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
@@ -985,7 +985,7 @@ namespace HostTest
 				percent = (int)Math.Round(e.NewZoom * 100f);
 			}
 
-			this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.titleString, this.imageFileName, percent, this.imageType });
+			this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.applicationName, this.imageFileName, percent, this.imageType });
 		}
 
 
