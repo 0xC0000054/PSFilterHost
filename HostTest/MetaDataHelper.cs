@@ -916,11 +916,11 @@ namespace HostTest
 
 				if (littleEndian)
 				{
-					return (ushort)(byte0 | (((byte1 << 8) | (byte2 << 16)) | (byte3 << 24)));
+					return (uint)(byte0 | (((byte1 << 8) | (byte2 << 16)) | (byte3 << 24)));
 				}
 				else
 				{
-					return (ushort)((((byte0 << 24) | (byte1 << 16)) | (byte2 << 8)) | byte3);
+					return (uint)((((byte0 << 24) | (byte1 << 16)) | (byte2 << 8)) | byte3);
 				}
 			}
 
