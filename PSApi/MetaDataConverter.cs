@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Text;
 using System.Linq;
 using System.IO;
 
@@ -49,125 +48,71 @@ namespace PSFilterHostDll.PSApi
         }
 
         /// <summary>
-        /// Converts the IFD meta data to JPEG format.
+        /// Converts the EXIF meta data to JPEG format.
         /// </summary>
         /// <param name="metaData">The meta data to convert.</param>
-        /// <param name="exif">set to <c>true</c> if the EXIF data is requested.</param>
         /// <returns>The converted meta data or null.</returns>
-        private static BitmapMetadata ConvertIFDMetaData(BitmapMetadata metaData, bool exif)
+        private static BitmapMetadata ConvertEXIFMetaData(BitmapMetadata metaData)
         {
+            BitmapMetadata exifData = null;
+
+            try
+            {
+                exifData = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
+            }
+            catch (IOException)
+            {
+                // WINCODEC_ERR_INVALIDQUERYREQUEST
+            }
+
+            // Return null if the EXIF block does not contain any data.
+            if ((exifData == null) || !exifData.Any())
+            {
+                return null;
+            }
+
             BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
 
-            if (exif)
+            if (!jpegMetaData.ContainsQuery("/app1/ifd/exif"))
             {
-                BitmapMetadata exifData = null;
+                jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
+            }
 
-                try
+            foreach (var tag in exifData)
+            {
+                object value = exifData.GetQuery(tag);
+                BitmapMetadata exifSub = value as BitmapMetadata;
+
+                if (exifSub != null)
                 {
-                    exifData = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
+                    CopySubBlockRecursive(ref jpegMetaData, exifSub, "/app1/ifd/exif" + tag);
                 }
-                catch (IOException)
+                else
                 {
-                    // WINCODEC_ERR_INVALIDQUERYREQUEST
-                }
-
-                if ((exifData == null) || !exifData.Any())  // Return null if the EXIF block does not contain any data.
-                {
-                    return null;
-                }
-
-                if (!jpegMetaData.ContainsQuery("/app1/ifd/exif"))
-                {
-                    jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
-                }
-
-                foreach (var tag in exifData)
-                {
-                    object value = exifData.GetQuery(tag);
-                    BitmapMetadata exifSub = value as BitmapMetadata;
-
-                    if (exifSub != null)
-                    {
-                        CopySubBlockRecursive(ref jpegMetaData, exifSub, "/app1/ifd/exif" + tag);
-                    }
-                    else
-                    {
-                        jpegMetaData.SetQuery("/app1/ifd/exif" + tag, value);
-                    }
-                }
-
-                // set the fields that are relevant for EXIF.
-                try
-                {
-                    if (!string.IsNullOrEmpty(metaData.ApplicationName))
-                    {
-                        jpegMetaData.ApplicationName = metaData.ApplicationName;
-                    }
-
-                    if (!string.IsNullOrEmpty(metaData.CameraManufacturer))
-                    {
-                        jpegMetaData.CameraManufacturer = metaData.CameraManufacturer;
-                    }
-
-                    if (!string.IsNullOrEmpty(metaData.CameraModel))
-                    {
-                        jpegMetaData.CameraModel = metaData.CameraModel;
-                    }
-                }
-                catch (NotSupportedException)
-                {
+                    jpegMetaData.SetQuery("/app1/ifd/exif" + tag, value);
                 }
             }
-            else
+
+            // set the fields that are relevant for EXIF.
+            try
             {
-                BitmapMetadata xmpData = null;
-
-                try
+                if (!string.IsNullOrEmpty(metaData.ApplicationName))
                 {
-                    xmpData = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
-                }
-                catch (IOException)
-                {
-                    // WINCODEC_ERR_INVALIDQUERYREQUEST
+                    jpegMetaData.ApplicationName = metaData.ApplicationName;
                 }
 
-                if (xmpData == null)
+                if (!string.IsNullOrEmpty(metaData.CameraManufacturer))
                 {
-                    try
-                    {
-                        xmpData = metaData.GetQuery("/xmp") as BitmapMetadata; // Some codecs may store the XMP data outside of the IFD block.
-                    }
-                    catch (IOException)
-                    {
-                        // WINCODEC_ERR_INVALIDQUERYREQUEST
-                    }
+                    jpegMetaData.CameraManufacturer = metaData.CameraManufacturer;
                 }
 
-                if ((xmpData == null) || !xmpData.Any()) // Return null if the XMP block does not contain any data.
+                if (!string.IsNullOrEmpty(metaData.CameraModel))
                 {
-                    return null;
+                    jpegMetaData.CameraModel = metaData.CameraModel;
                 }
-
-                if (!jpegMetaData.ContainsQuery("/xmp"))
-                {
-                    jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
-                }
-
-                foreach (var tag in xmpData)
-                {
-                    object value = xmpData.GetQuery(tag);
-                    BitmapMetadata xmpSub = value as BitmapMetadata;
-
-                    if (xmpSub != null)
-                    {
-                        CopySubBlockRecursive(ref jpegMetaData, xmpSub, "/xmp" + tag);
-                    }
-                    else
-                    {
-                        jpegMetaData.SetQuery("/xmp" + tag, value);
-                    }
-
-                }
+            }
+            catch (NotSupportedException)
+            {
             }
 
             return jpegMetaData;
@@ -198,92 +143,58 @@ namespace PSFilterHostDll.PSApi
                 if (dec.Frames.Count == 1)
                 {
                     BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
-                    BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
-
-                    return block;
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Converts the PNG XMP meta data to JPEG format.
-        /// </summary>
-        /// <param name="metadata">The meta data.</param>
-        /// <param name="exif">if set to <c>true</c> convert the EXIF data; otherwise convert the XMP data.</param>
-        /// <returns>The converted XMP meta data; or null.</returns>
-        private static BitmapMetadata ConvertPNGMetaData(BitmapMetadata metadata, bool exif)
-        {
-            if (!exif) // Only XMP is documented for PNG.
-            {
-                BitmapMetadata textChunk = null;
-
-                try
-                {
-                    textChunk = metadata.GetQuery("/iTXt") as BitmapMetadata;
-                }
-                catch (IOException)
-                {
-                    // WINCODEC_ERR_INVALIDQUERYREQUEST
-                }
-
-                if (textChunk != null)
-                {
-                    string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-                    if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+                    if (meta != null)
                     {
-                        string xmp = textChunk.GetQuery("/TextEntry") as string;
+                        BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
 
-                        if (!string.IsNullOrEmpty(xmp))
-                        {
-                            BitmapMetadata xmpData = LoadPNGMetaData(xmp);
-
-                            if (xmpData != null)
-                            {
-                                BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
-
-                                if (!jpegMetaData.ContainsQuery("/xmp"))
-                                {
-                                    jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
-                                }
-
-                                foreach (var tag in xmpData)
-                                {
-                                    object value = xmpData.GetQuery(tag);
-                                    BitmapMetadata xmpSub = value as BitmapMetadata;
-
-                                    if (xmpSub != null)
-                                    {
-                                        CopySubBlockRecursive(ref jpegMetaData, xmpSub, "/xmp" + tag);
-                                    }
-                                    else
-                                    {
-                                        jpegMetaData.SetQuery("/xmp" + tag, value);
-                                    }
-
-                                }
-
-                                return jpegMetaData;
-                            }
-                        }
+                        return block;
                     }
-
                 }
             }
 
             return null;
         }
-        
+
         /// <summary>
-        /// Determines whether the specified meta data is in JPEG format.
+        /// Converts the XMP meta data to TIFF format.
+        /// </summary>
+        /// <param name="xmpData">The XMP data.</param>
+        /// <returns>The</returns>
+        private static BitmapMetadata ConvertXMPMetaData(BitmapMetadata xmpData)
+        {
+            // Return null if the XMP block does not contain any data.
+            if ((xmpData == null) || !xmpData.Any())
+            {
+                return null;
+            }
+
+            BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+            tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+
+            foreach (var tag in xmpData)
+            {
+                object value = xmpData.GetQuery(tag);
+                BitmapMetadata xmpSub = value as BitmapMetadata;
+
+                if (xmpSub != null)
+                {
+                    CopySubBlockRecursive(ref tiffMetaData, xmpSub, "/ifd/xmp" + tag);
+                }
+                else
+                {
+                    tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
+                }
+            }
+
+            return tiffMetaData;
+        }
+
+        /// <summary>
+        /// Retrieves the EXIF meta data in JPEG format.
         /// </summary>
         /// <param name="metaData">The meta data.</param>
-        /// <returns>
-        ///   <c>true</c> if the meta data is JPEG format; otherwise, <c>false</c>.
-        /// </returns>
-        internal static bool IsJPEGMetaData(BitmapMetadata metaData)
+        /// <returns>The EXIF meta data, or null.</returns>
+        internal static BitmapMetadata GetEXIFMetaData(BitmapMetadata metaData)
         {
             string format = string.Empty;
 
@@ -298,16 +209,35 @@ namespace PSFilterHostDll.PSApi
             {
             }
 
-            return (format == "jpg");
+            if (format == "jpg")
+            {
+                try
+                {
+                    if (metaData.GetQuery("/app1/ifd/exif") != null)
+                    {
+                        return metaData;
+                    }
+                }
+                catch (IOException)
+                {
+                    // WINCODEC_ERR_INVALIDQUERYREQUEST
+                }
+            }
+            else if (format != "gif" && format != "png")
+            {
+                // GIF and PNG files do not contain EXIF meta data.
+                return ConvertEXIFMetaData(metaData);
+            }
+
+            return null;
         }
 
         /// <summary>
-        /// Converts the meta data to JPEG format.
+        /// Retrieves the XMP meta data in TIFF format.
         /// </summary>
         /// <param name="metaData">The meta data.</param>
-        /// <param name="exif">if set to <c>true</c> convert the EXIF data; otherwise convert the XMP data.</param>
-        /// <returns>The converted meta data, or null.</returns>
-        internal static BitmapMetadata ConvertMetaDataToJPEG(BitmapMetadata metaData, bool exif)
+        /// <returns>The XMP meta data, or null.</returns>
+        internal static BitmapMetadata GetXMPMetaData(BitmapMetadata metaData)
         {
             string format = string.Empty;
 
@@ -315,31 +245,71 @@ namespace PSFilterHostDll.PSApi
             {
                 format = metaData.Format; // Some WIC codecs do not implement the format property.
             }
-            catch (ArgumentException) 
+            catch (ArgumentException)
             {
             }
             catch (NotSupportedException)
-            { 
-            }
-
-            if (format != "jpg")
             {
-                if (format == "gif")
+            }
+
+            // GIF files do not contain frame-level XMP meta data.
+            if (format != "gif")
+            {
+                try
                 {
-                    return null; // GIF files do not contain frame-level EXIF or XMP meta data.
+                    BitmapMetadata xmpData = null;
+
+                    if (format == "png")
+                    {
+                        BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
+
+                        if (textChunk != null)
+                        {
+                            string keyWord = textChunk.GetQuery("/Keyword") as string;
+
+                            if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+                            {
+                                string textEntry = textChunk.GetQuery("/TextEntry") as string;
+
+                                if (!string.IsNullOrEmpty(textEntry))
+                                {
+                                    xmpData = LoadPNGMetaData(textEntry);
+                                }
+                            }
+                        }
+                    }
+                    else if (format == "jpg")
+                    {
+                        xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            xmpData = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
+                        }
+                        catch (IOException)
+                        {
+                            // WINCODEC_ERR_INVALIDQUERYREQUEST
+                        }
+
+                        if (xmpData == null)
+                        {
+                            // Some codecs may store the XMP data outside of the IFD block.
+                            xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
+                        }
+                    }
+
+                    return ConvertXMPMetaData(xmpData);
                 }
-                else if (format == "png")
+                catch (IOException)
                 {
-                    return ConvertPNGMetaData(metaData, exif);
-                }
-                else
-                {
-                    return ConvertIFDMetaData(metaData, exif);
+                    // WINCODEC_ERR_INVALIDQUERYREQUEST
                 }
             }
 
-            return metaData;
+            return null;
         }
-    } 
+    }
 #endif
 }
