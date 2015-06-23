@@ -93,7 +93,7 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            // set the fields that are relevant for EXIF.
+            // Set the fields that are relevant for EXIF.
             try
             {
                 if (!string.IsNullOrEmpty(metaData.ApplicationName))
@@ -159,7 +159,7 @@ namespace PSFilterHostDll.PSApi
         /// Converts the XMP meta data to TIFF format.
         /// </summary>
         /// <param name="xmpData">The XMP data.</param>
-        /// <returns>The</returns>
+        /// <returns>The converted meta data or null.</returns>
         private static BitmapMetadata ConvertXMPMetaData(BitmapMetadata xmpData)
         {
             // Return null if the XMP block does not contain any data.
