@@ -37,7 +37,7 @@ namespace HostTest
 		private ToolStripItem currentFilterMenuItem;
 		private bool setFilterApplyText;
 		private string filterName;
-		private string applicationName;
+		private readonly string applicationName;
 		private string imageFileName;
 		private string imageType;
 		private string dropImageFileName;
