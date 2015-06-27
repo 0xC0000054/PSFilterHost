@@ -410,79 +410,77 @@ namespace HostTest
 		{
 			BitmapMetadata xmp = null;
 
-			if (format == "png")
+			// GIF files do not contain frame level XMP meta data.
+			if (format != "gif")
 			{
-				BitmapMetadata textChunk = null;
-
 				try
 				{
-					textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-
-				if (textChunk != null)
-				{
-					string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-					if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+					if (format == "png")
 					{
-						string data = textChunk.GetQuery("/TextEntry") as string;
+						BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
 
-						if (data != null)
+						string keyWord = textChunk.GetQuery("/Keyword") as string;
+
+						if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
 						{
-							// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
-							BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+							string data = textChunk.GetQuery("/TextEntry") as string;
 
-							tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-							tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data));
-
-							using (MemoryStream stream = new MemoryStream())
+							if (data != null)
 							{
-								BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
-								TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-								encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
-								encoder.Save(stream);
+								// PNG stores the XMP meta-data as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+								BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 
-								BitmapDecoder dec = TiffBitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
-								
-								if (dec.Frames.Count == 1)
+								tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+								tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data));
+
+								using (MemoryStream stream = new MemoryStream())
 								{
-									BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
-									BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
+									BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+									TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+									encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+									encoder.Save(stream);
 
-									xmp = block.Clone();
-								}                           
-																
+									BitmapDecoder dec = TiffBitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+
+									if (dec.Frames.Count == 1)
+									{
+										BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
+										if (meta != null)
+										{
+											BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
+
+											xmp = block.Clone();
+										}
+									}
+								}
 							}
-							
 						}
 					}
-				}
-			}
-			else
-			{
-				try
-				{
-					xmp = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-
-				if (xmp == null)
-				{
-					try
+					else if (format == "jpg")
 					{
 						xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
 					}
-					catch (IOException)
+					else
 					{
-						// WINCODEC_ERR_INVALIDQUERYREQUEST
+						try
+						{
+							xmp = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
+						}
+						catch (IOException)
+						{
+							// WINCODEC_ERR_INVALIDQUERYREQUEST
+						}
+
+						if (xmp == null)
+						{
+							// Some codecs may store the XMP data outside of the IFD block.
+							xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
+						}
 					}
+				}
+				catch (IOException)
+				{
+					// WINCODEC_ERR_INVALIDQUERYREQUEST
 				}
 			}
 
@@ -577,9 +575,8 @@ namespace HostTest
 			}
 
 			byte[] xmpBytes = null;
-			MemoryStream stream = new MemoryStream();
-
-			try
+			
+			using (MemoryStream stream = new MemoryStream())
 			{
 				// Create a dummy tiff to extract the XMP packet from.
 				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
@@ -587,20 +584,7 @@ namespace HostTest
 				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
 				encoder.Save(stream);
 
-				using (BinaryReader reader = new BinaryReader(stream))
-				{
-					stream = null;
-
-					xmpBytes = TiffReader.ExtractXMP(reader);
-				}
-			}
-			finally
-			{
-				if (stream != null)
-				{
-					stream.Dispose();
-					stream = null;
-				} 
+				xmpBytes = TiffReader.ExtractXMP(stream);
 			}
 
 			return xmpBytes;
@@ -861,12 +845,12 @@ namespace HostTest
 		private static class TiffReader
 		{
 			enum DataType : ushort
-			{ 
+			{
 				Byte = 1,
 				Ascii = 2,
 				Short = 3,
 				Long = 4,
-				Rational = 5, 
+				Rational = 5,
 				SByte = 6,
 				Undefined = 7,
 				SShort = 8,
@@ -878,100 +862,140 @@ namespace HostTest
 
 			struct IFD
 			{
-				public ushort tag;
-				public DataType type;
-				public uint count;
-				public uint offset;
+				public readonly ushort tag;
+				public readonly DataType type;
+				public readonly uint count;
+				public readonly uint offset;
 
-				public IFD(BinaryReader reader, bool littleEndian)
+				public IFD(Stream stream, bool littleEndian)
 				{
-					this.tag = ReadShort(reader, littleEndian);
-					this.type = (DataType)ReadShort(reader, littleEndian);
-					this.count = ReadLong(reader, littleEndian);
-					this.offset = ReadLong(reader, littleEndian);
+					this.tag = ReadShort(stream, littleEndian);
+					this.type = (DataType)ReadShort(stream, littleEndian);
+					this.count = ReadLong(stream, littleEndian);
+					this.offset = ReadLong(stream, littleEndian);
 				}
 			}
 
-			private static ushort ReadShort(BinaryReader reader, bool littleEndian)
+			private static ushort ReadShort(Stream stream, bool littleEndian)
 			{
-				byte byte0 = reader.ReadByte();
-				byte byte1 = reader.ReadByte();
+				int byte1 = stream.ReadByte();
+				if (byte1 == -1)
+				{
+					throw new EndOfStreamException();
+				}
+
+				int byte2 = stream.ReadByte();
+				if (byte2 == -1)
+				{
+					throw new EndOfStreamException();
+				}
 
 				if (littleEndian)
 				{
-					return (ushort)(byte0 | (byte1 << 8));
+					return (ushort)(byte1 | (byte2 << 8));
 				}
 				else
 				{
-					return (ushort)((byte0 << 8) | byte1);
+					return (ushort)((byte1 << 8) | byte2);
 				}
 			}
 
-			private static uint ReadLong(BinaryReader reader, bool littleEndian)
+			private static uint ReadLong(Stream stream, bool littleEndian)
 			{
-				byte byte0 = reader.ReadByte();
-				byte byte1 = reader.ReadByte();
-				byte byte2 = reader.ReadByte();
-				byte byte3 = reader.ReadByte();
+				int byte1 = stream.ReadByte();
+				if (byte1 == -1)
+				{
+					throw new EndOfStreamException();
+				}
+
+				int byte2 = stream.ReadByte();
+				if (byte2 == -1)
+				{
+					throw new EndOfStreamException();
+				}
+
+				int byte3 = stream.ReadByte();
+				if (byte3 == -1)
+				{
+					throw new EndOfStreamException();
+				}
+
+				int byte4 = stream.ReadByte();
+				if (byte4 == -1)
+				{
+					throw new EndOfStreamException();
+				}
 
 				if (littleEndian)
 				{
-					return (uint)(byte0 | (((byte1 << 8) | (byte2 << 16)) | (byte3 << 24)));
+					return (uint)(byte1 | (((byte2 << 8) | (byte3 << 16)) | (byte4 << 24)));
 				}
 				else
 				{
-					return (uint)((((byte0 << 24) | (byte1 << 16)) | (byte2 << 8)) | byte3);
+					return (uint)((((byte1 << 24) | (byte2 << 16)) | (byte3 << 8)) | byte4);
 				}
 			}
 
-			private const ushort IntelByteOrder = 0x4949;
+			private const ushort LittleEndianByteOrder = 0x4949;
+			private const ushort TIFFSignature = 42;
 			private const ushort XmpTag = 700;
 
 			/// <summary>
 			/// Extracts the XMP packet from a TIFF file.
 			/// </summary>
-			/// <param name="reader">The reader.</param>
+			/// <param name="stream">The stream to read.</param>
 			/// <returns>The extracted XMP packet, or null.</returns>
-			internal static byte[] ExtractXMP(BinaryReader reader)
+			internal static byte[] ExtractXMP(Stream stream)
 			{
-				reader.BaseStream.Position = 0L;
+				stream.Position = 0L;
 
-				ushort byteOrder = reader.ReadUInt16();
-
-				bool littleEndian = byteOrder == IntelByteOrder;
-
-				reader.BaseStream.Position += 2L; // skip the TIFF signature.
-
-				uint ifdOffset = ReadLong(reader, littleEndian);
-				reader.BaseStream.Seek((long)ifdOffset, SeekOrigin.Begin);
-
-				int ifdCount = ReadShort(reader, littleEndian);
-				
-				IFD xmpIfd = new IFD();
- 
-				for (int i = 0; i < ifdCount; i++)
+				try
 				{
-					IFD ifd = new IFD(reader, littleEndian);
+					ushort byteOrder = ReadShort(stream, false);
 
-					if (ifd.tag == XmpTag)
+					bool littleEndian = byteOrder == LittleEndianByteOrder;
+
+					ushort signature = ReadShort(stream, littleEndian);
+
+					if (signature == TIFFSignature)
 					{
-						xmpIfd = ifd;
-						break;
+						uint ifdOffset = ReadLong(stream, littleEndian);
+						stream.Seek((long)ifdOffset, SeekOrigin.Begin);
+
+						int ifdCount = ReadShort(stream, littleEndian);
+
+						for (int i = 0; i < ifdCount; i++)
+						{
+							IFD ifd = new IFD(stream, littleEndian);
+
+							if (ifd.tag == XmpTag && (ifd.type == DataType.Byte || ifd.type == DataType.Undefined))
+							{
+								stream.Seek((long)ifd.offset, SeekOrigin.Begin);
+
+								int count = (int)ifd.count;
+
+								byte[] xmpBytes = new byte[count];
+
+								int numBytesToRead = count;
+								int numBytesRead = 0;
+								do
+								{
+									int n = stream.Read(xmpBytes, numBytesRead, numBytesToRead);
+									numBytesRead += n;
+									numBytesToRead -= n;
+								} while (numBytesToRead > 0);
+
+								return xmpBytes;
+							}
+						}
 					}
 				}
-
-				if (xmpIfd.tag != 0 && (xmpIfd.type == DataType.Byte || xmpIfd.type == DataType.Undefined))
+				catch (EndOfStreamException)
 				{
-					reader.BaseStream.Seek((long)xmpIfd.offset, SeekOrigin.Begin);
-
-					byte[] bytes = reader.ReadBytes((int)xmpIfd.count);
-
-					return bytes;
 				}
 
 				return null;
 			}
 		}
-
 	}
 }
