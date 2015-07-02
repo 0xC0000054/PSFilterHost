@@ -4127,17 +4127,16 @@ namespace PSFilterHostDll.PSApi
 			{
 				for (int y = top; y < bottom; y++)
 				{
-					byte* src = tempDisplaySurface.GetRowAddressUnchecked(y - top);
-					byte* dst = baseAddr + (y * srcPixelMap.rowBytes) + left;
+					byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
+					byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
 
 					for (int x = 0; x < width; x++)
 					{
-						src[0] = src[1] = src[2] = *dst;
+						dst[0] = dst[1] = dst[2] = *src;
 
-						src += 4;
-						dst += srcPixelMap.colBytes;
+						src += srcPixelMap.colBytes;
+						dst += 4;
 					}
-
 				}
 			}
 			else
