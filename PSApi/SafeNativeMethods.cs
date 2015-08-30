@@ -18,20 +18,20 @@ namespace PSFilterHostDll.PSApi
     [System.Security.SuppressUnmanagedCodeSecurity]
     internal static class SafeNativeMethods
     {
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         internal static extern IntPtr HeapCreate([In()] uint flOptions, [In()] UIntPtr dwInitialsize, [In()] UIntPtr dwMaximumSize);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool HeapDestroy([In()] IntPtr hHeap);
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         internal static extern IntPtr GetProcessHeap();
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern IntPtr HeapAlloc([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] UIntPtr dwSize);
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool HeapFree([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] IntPtr lpMem);
 
@@ -47,7 +47,7 @@ namespace PSFilterHostDll.PSApi
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern IntPtr VirtualAlloc([In()] IntPtr lpAddress, [In()] UIntPtr dwSize, [In()] uint flAllocationType, [In()] uint flProtect);
 
-        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool VirtualFree([In()] IntPtr lpAddress, [In()] UIntPtr dwSize, [In()] uint dwFreeType);
 
