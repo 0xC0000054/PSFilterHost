@@ -3594,6 +3594,18 @@ namespace PSFilterHostDll.PSApi
 		private unsafe IntPtr CreateReadChannelDesc(int channel, string name, int depth, VRect bounds)
 		{
 			IntPtr addressPtr = Memory.Allocate(Marshal.SizeOf(typeof(ReadChannelDesc)), true);
+			IntPtr namePtr = IntPtr.Zero;
+			try
+			{
+				namePtr = Marshal.StringToHGlobalAnsi(name);
+			}
+			catch (Exception)
+			{
+				Memory.Free(addressPtr);
+				throw;
+			}
+			channelReadDescPtrs.Add(new ChannelDescPtrs() { address = addressPtr, name = namePtr });
+
 			ReadChannelDesc* desc = (ReadChannelDesc*)addressPtr.ToPointer();
 			desc->minVersion = PSConstants.kCurrentMinVersReadChannelDesc;
 			desc->maxVersion = PSConstants.kCurrentMaxVersReadChannelDesc;
@@ -3630,11 +3642,7 @@ namespace PSFilterHostDll.PSApi
 					desc->channelType = ChannelTypes.SelectionMask;
 					break;
 			}
-			IntPtr namePtr = Marshal.StringToHGlobalAnsi(name);
-
 			desc->name = namePtr;
-
-			channelReadDescPtrs.Add(new ChannelDescPtrs() { address = addressPtr, name = namePtr });
 
 			return addressPtr;
 		}
