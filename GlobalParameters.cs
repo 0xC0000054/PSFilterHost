@@ -169,17 +169,9 @@ namespace PSFilterHostDll
             this.pluginDataStorageMethod = (DataStorageMethod)info.GetValue("pluginDataStorageMethod", typeof(DataStorageMethod));
             this.pluginDataExecutable = info.GetBoolean("pluginDataExecutable");
         }
-        /// <summary>
-        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
-        /// </summary>
-        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
-        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
-        /// <exception cref="T:System.Security.SecurityException">
-        /// The caller does not have the required permission.
-        ///   </exception>
-        /// <exception cref="System.ArgumentNullException"><paramref name="info"/> is null.</exception>
+
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
                 throw new ArgumentNullException("info", "info is null.");
