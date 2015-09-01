@@ -351,7 +351,7 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException("path");
 			}
 
-			var filters = PSFilterHost.EnumerateFilters(path, searchSubdirectories);
+			var filters = EnumerateFilters(path, searchSubdirectories);
 
 			return new FilterCollection(filters);
 		}
@@ -414,7 +414,7 @@ namespace PSFilterHostDll
 		/// Enumerates the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchOption">One of the <see cref="System.IO.SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
 		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -431,7 +431,7 @@ namespace PSFilterHostDll
 		/// Enumerates the directory for filters to load.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
-		/// <param name="searchOption">One of the <see cref="System.IO.SearchOption"/> values that specifies whether the search operation should include all subdirectories or only the current directory.</param>
+		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
 		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
