@@ -387,20 +387,24 @@ namespace HostTest
 		private static BitmapMetadata GetEXIFMetaData(BitmapMetadata metaData, string format)
 		{
 			BitmapMetadata exif = null;
-			try
+			// GIF and PNG files do not contain EXIF meta data.
+			if (format != "gif" && format != "png")
 			{
-				if (format == "jpg")
+				try
 				{
-					exif = metaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
+					if (format == "jpg")
+					{
+						exif = metaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
+					}
+					else
+					{
+						exif = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
+					}
 				}
-				else
+				catch (IOException)
 				{
-					exif = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
-				}
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
+					// WINCODEC_ERR_INVALIDQUERYREQUEST
+				} 
 			}
 
 			return exif;
