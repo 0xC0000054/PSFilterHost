@@ -36,8 +36,6 @@ namespace PSFilterHostDll.PSApi
 		private bool extractedXMP;
 		private bool disposed;
 
-		private static readonly Encoding Windows1252Encoding = Encoding.GetEncoding(1252);
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ImageMetaData"/> class.
 		/// </summary>
@@ -93,7 +91,7 @@ namespace PSFilterHostDll.PSApi
 					{
 						p += 2; // skip the header bytes
 
-						string sig = new string((sbyte*)p + 2, 0, 6, Windows1252Encoding);
+						string sig = new string((sbyte*)p + 2, 0, 6, Encoding.UTF8);
 
 						if (sig == "Exif\0\0")
 						{
