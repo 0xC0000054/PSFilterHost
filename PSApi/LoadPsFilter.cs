@@ -878,11 +878,11 @@ namespace PSFilterHostDll.PSApi
 				return;
 			}
 
-			FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
-
 			byte[] parameterDataBytes = globalParameters.GetParameterDataBytes();
 			if (parameterDataBytes != null)
 			{
+				FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
+
 				switch (globalParameters.ParameterDataStorageMethod)
 				{
 					case GlobalParameters.DataStorageMethod.HandleSuite:
@@ -3039,7 +3039,6 @@ namespace PSFilterHostDll.PSApi
 					break;
 				case ColorServicesSelector.GetSpecialColor:
 
-					FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 					switch (info.selectorParameter.specialColorID)
 					{
 						case SpecialColorID.BackgroundColor:
