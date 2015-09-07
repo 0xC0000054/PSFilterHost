@@ -158,10 +158,62 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// Converts the XMP meta data to TIFF format.
         /// </summary>
-        /// <param name="xmpData">The XMP data.</param>
+        /// <param name="metaData">The meta data to convert.</param>
+        /// <param name="format">The format of the meta data.</param>
         /// <returns>The converted meta data or null.</returns>
-        private static BitmapMetadata ConvertXMPMetaData(BitmapMetadata xmpData)
+        private static BitmapMetadata ConvertXMPMetaData(BitmapMetadata metaData, string format)
         {
+            BitmapMetadata xmpData = null;
+
+            try
+            {
+                if (format == "png")
+                {
+                    BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
+
+                    if (textChunk != null)
+                    {
+                        string keyWord = textChunk.GetQuery("/Keyword") as string;
+
+                        if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+                        {
+                            string textEntry = textChunk.GetQuery("/TextEntry") as string;
+
+                            if (!string.IsNullOrEmpty(textEntry))
+                            {
+                                xmpData = LoadPNGMetaData(textEntry);
+                            }
+                        }
+                    }
+                }
+                else if (format == "jpg")
+                {
+                    xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
+                }
+                else
+                {
+                    try
+                    {
+                        xmpData = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
+                    }
+                    catch (IOException)
+                    {
+                        // WINCODEC_ERR_INVALIDQUERYREQUEST
+                    }
+
+                    if (xmpData == null)
+                    {
+                        // Some codecs may store the XMP data outside of the IFD block.
+                        xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
+                    }
+                }
+            }
+            catch (IOException)
+            {
+                // WINCODEC_ERR_INVALIDQUERYREQUEST
+            }
+
+
             // Return null if the XMP block does not contain any data.
             if ((xmpData == null) || !xmpData.Any())
             {
@@ -211,16 +263,9 @@ namespace PSFilterHostDll.PSApi
 
             if (format == "jpg")
             {
-                try
+                if (metaData.ContainsQuery("/app1/ifd/exif"))
                 {
-                    if (metaData.GetQuery("/app1/ifd/exif") != null)
-                    {
-                        return metaData;
-                    }
-                }
-                catch (IOException)
-                {
-                    // WINCODEC_ERR_INVALIDQUERYREQUEST
+                    return metaData;
                 }
             }
             else if (format != "gif" && format != "png")
@@ -252,60 +297,17 @@ namespace PSFilterHostDll.PSApi
             {
             }
 
-            // GIF files do not contain frame-level XMP meta data.
-            if (format != "gif")
+            if (format == "tiff")
             {
-                try
+                if (metaData.ContainsQuery("/ifd/xmp"))
                 {
-                    BitmapMetadata xmpData = null;
-
-                    if (format == "png")
-                    {
-                        BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
-
-                        if (textChunk != null)
-                        {
-                            string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-                            if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
-                            {
-                                string textEntry = textChunk.GetQuery("/TextEntry") as string;
-
-                                if (!string.IsNullOrEmpty(textEntry))
-                                {
-                                    xmpData = LoadPNGMetaData(textEntry);
-                                }
-                            }
-                        }
-                    }
-                    else if (format == "jpg")
-                    {
-                        xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            xmpData = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
-                        }
-                        catch (IOException)
-                        {
-                            // WINCODEC_ERR_INVALIDQUERYREQUEST
-                        }
-
-                        if (xmpData == null)
-                        {
-                            // Some codecs may store the XMP data outside of the IFD block.
-                            xmpData = metaData.GetQuery("/xmp") as BitmapMetadata;
-                        }
-                    }
-
-                    return ConvertXMPMetaData(xmpData);
+                    return metaData;
                 }
-                catch (IOException)
-                {
-                    // WINCODEC_ERR_INVALIDQUERYREQUEST
-                }
+            }
+            else if (format != "gif")
+            {
+                // GIF files do not contain frame-level XMP meta data.
+                return ConvertXMPMetaData(metaData, format);
             }
 
             return null;
