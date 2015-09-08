@@ -5532,7 +5532,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			if (signature != PSConstants.kPhotoshopSignature)
 			{
-				return PSError.errPlugInHostInsufficient;
+				return PSError.errPlugInPropertyUndefined;
 			}
 
 			byte[] bytes = null;
@@ -5711,7 +5711,7 @@ namespace PSFilterHostDll.PSApi
 					}
 					break;
 				case PSProperties.URL:
-					if ((hostInfo.Url != null) && !string.IsNullOrEmpty(hostInfo.Url.OriginalString))
+					if (hostInfo.Url != null)
 					{
 						bytes = Encoding.ASCII.GetBytes(hostInfo.Url.ToString());
 						complexProperty = HandleNewProc(bytes.Length);
@@ -5794,7 +5794,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			if (signature != PSConstants.kPhotoshopSignature)
 			{
-				return PSError.errPlugInHostInsufficient;
+				return PSError.errPlugInPropertyUndefined;
 			}
 
 			int size = 0;
