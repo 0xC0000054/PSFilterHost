@@ -72,11 +72,7 @@ namespace PSFilterHostDll.PSApi
             }
 
             BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
-
-            if (!jpegMetaData.ContainsQuery("/app1/ifd/exif"))
-            {
-                jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
-            }
+            jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
 
             foreach (var tag in exifData)
             {
