@@ -888,12 +888,13 @@ namespace PSFilterHostDll.PSApi
 					case GlobalParameters.DataStorageMethod.HandleSuite:
 
 						filterRecord->parameters = HandleNewProc(parameterDataBytes.Length);
-
-						if (filterRecord->parameters != IntPtr.Zero)
+						if (filterRecord->parameters == IntPtr.Zero)
 						{
-							Marshal.Copy(parameterDataBytes, 0, HandleLockProc(filterRecord->parameters, 0), parameterDataBytes.Length);
-							HandleUnlockProc(filterRecord->parameters);
+							throw new OutOfMemoryException(Resources.OutOfMemoryError);
 						}
+
+						Marshal.Copy(parameterDataBytes, 0, HandleLockProc(filterRecord->parameters, 0), parameterDataBytes.Length);
+						HandleUnlockProc(filterRecord->parameters);
 						break;
 					case GlobalParameters.DataStorageMethod.OTOFHandle:
 
@@ -932,12 +933,13 @@ namespace PSFilterHostDll.PSApi
 					case GlobalParameters.DataStorageMethod.HandleSuite:
 
 						dataPtr = HandleNewProc(pluginDataBytes.Length);
-
-						if (dataPtr != IntPtr.Zero)
+						if (dataPtr == IntPtr.Zero)
 						{
-							Marshal.Copy(pluginDataBytes, 0, HandleLockProc(dataPtr, 0), pluginDataBytes.Length);
-							HandleUnlockProc(dataPtr);
+							throw new OutOfMemoryException(Resources.OutOfMemoryError);
 						}
+
+						Marshal.Copy(pluginDataBytes, 0, HandleLockProc(dataPtr, 0), pluginDataBytes.Length);
+						HandleUnlockProc(dataPtr);
 						break;
 					case GlobalParameters.DataStorageMethod.OTOFHandle:
 
