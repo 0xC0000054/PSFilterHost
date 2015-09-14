@@ -2958,7 +2958,23 @@ namespace PSFilterHostDll.PSApi
 
 		private int BufferSpaceProc()
 		{
-			return 1000000000;
+			// Assume that we have at least 1 GB of available space.
+			int space = 1024 * 1024 * 1024;
+
+			NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX();
+			buffer.dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX));
+
+			if (SafeNativeMethods.GlobalMemoryStatusEx(ref buffer))
+			{
+				// A 64-bit process (or a 32-bit process with IMAGE_FILE_LARGE_ADDRESS_AWARE set) should have more than 2 GB of virtual memory available,
+				// but as this method returns a signed 32-bit integer we return 1 GB instead of int.MaxValue to avoid any potential bugs in plug-in code.
+				if (buffer.ullAvailVirtual < int.MaxValue)
+				{
+					space = (int)buffer.ullAvailVirtual;
+				}
+			}
+
+			return space;
 		}
 
 		private bool ShowColorPickerDialog(string prompt, ref short[] rgb)
