@@ -25,7 +25,7 @@ namespace PSFilterHostDll.PSApi
     internal delegate IntPtr OpenWriteDescriptorProc();
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short CloseWriteDescriptorProc([In()] IntPtr descriptor, ref IntPtr descriptorHandle);
+    internal delegate short CloseWriteDescriptorProc([In()] IntPtr descriptor, [In(), Out()] ref IntPtr descriptorHandle);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short PutIntegerProc([In()] IntPtr descriptor, [In()] uint key, [In()] int data);
@@ -93,52 +93,52 @@ namespace PSFilterHostDll.PSApi
     internal delegate short CloseReadDescriptorProc([In()] IntPtr descriptor);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate byte GetKeyProc([In()] IntPtr descriptor, ref uint key, ref uint type, ref int flags);
+    internal delegate byte GetKeyProc([In()] IntPtr descriptor, [In(), Out()] ref uint key, [In(), Out()] ref uint type, [In(), Out()] ref int flags);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetIntegerProc([In()] IntPtr descriptor, ref int data);
+    internal delegate short GetIntegerProc([In()] IntPtr descriptor, [In(), Out()] ref int data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetFloatProc([In()] IntPtr descriptor, ref double data);
+    internal delegate short GetFloatProc([In()] IntPtr descriptor, [In(), Out()] ref double data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetUnitFloatProc([In()] IntPtr descriptor, ref uint unit, ref double data);
+    internal delegate short GetUnitFloatProc([In()] IntPtr descriptor, [In(), Out()] ref uint unit, [In(), Out()] ref double data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetBooleanProc([In()] IntPtr descriptor, ref byte data);
+    internal delegate short GetBooleanProc([In()] IntPtr descriptor, [In(), Out()] ref byte data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetTextProc([In()] IntPtr descriptor, ref IntPtr data);
+    internal delegate short GetTextProc([In()] IntPtr descriptor, [In(), Out()] ref IntPtr data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetAliasProc([In()] IntPtr descriptor, ref IntPtr data);
+    internal delegate short GetAliasProc([In()] IntPtr descriptor, [In(), Out()] ref IntPtr data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetEnumeratedProc([In()] IntPtr descriptor, ref uint data);
+    internal delegate short GetEnumeratedProc([In()] IntPtr descriptor, [In(), Out()] ref uint data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetClassProc([In()] IntPtr descriptor, ref uint data);
+    internal delegate short GetClassProc([In()] IntPtr descriptor, [In(), Out()] ref uint data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetSimpleReferenceProc([In()] IntPtr descriptor, ref PIDescriptorSimpleReference data);
+    internal delegate short GetSimpleReferenceProc([In()] IntPtr descriptor, [In(), Out()] ref PIDescriptorSimpleReference data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetObjectProc([In()] IntPtr descriptor, ref uint type, ref IntPtr data);
+    internal delegate short GetObjectProc([In()] IntPtr descriptor, [In(), Out()] ref uint type, [In(), Out()] ref IntPtr data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetCountProc([In()] IntPtr descriptor, ref uint count);
+    internal delegate short GetCountProc([In()] IntPtr descriptor, [In(), Out()] ref uint count);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short GetStringProc([In()] IntPtr descriptor, [In()] IntPtr data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetPinnedIntegerProc([In()] IntPtr descriptor, [In()] int min, [In()] int max, ref int data);
+    internal delegate short GetPinnedIntegerProc([In()] IntPtr descriptor, [In()] int min, [In()] int max, [In(), Out()] ref int data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetPinnedFloatProc([In()] IntPtr descriptor, [In()] ref double min, [In()] ref double max, ref double data);
+    internal delegate short GetPinnedFloatProc([In()] IntPtr descriptor, [In()] ref double min, [In()] ref double max, [In(), Out()] ref double data);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short GetPinnedUnitFloatProc([In()] IntPtr descriptor, [In()] ref double min, [In()] ref double max, [In()] ref uint unit, ref double data);
+    internal delegate short GetPinnedUnitFloatProc([In()] IntPtr descriptor, [In()] ref double min, [In()] ref double max, [In()] ref uint unit, [In(), Out()] ref double data);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct WriteDescriptorProcs
