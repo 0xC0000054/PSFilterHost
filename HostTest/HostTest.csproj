@@ -291,8 +291,7 @@
   <PropertyGroup>
     <PostBuildEvent>IF $(PlatformName) == x86 (
 call "$(DevEnvDir)..\tools\vsvars32.bat"
-editbin.exe /NXCOMPAT:NO "$(TargetPath)" 
-editbin.exe /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
+editbin.exe /NXCOMPAT:NO /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
