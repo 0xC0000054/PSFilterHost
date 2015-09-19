@@ -46,8 +46,7 @@ namespace PSFilterHostDll
         private enum FindExInfoLevel : int
         {
             Standard = 0,
-            Basic,
-            MaxInfoLevel
+            Basic
         }
 
         private enum FindExSearchOp : int
@@ -69,11 +68,17 @@ namespace PSFilterHostDll
         private static class UnsafeNativeMethods
         {
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-            internal static extern SafeFindHandle FindFirstFileExW([In(), MarshalAs(UnmanagedType.LPWStr)] string fileName, [In()] FindExInfoLevel infoLevel, out WIN32_FIND_DATAW data, [In()] FindExSearchOp searchOp, [In()] IntPtr searchFilter, [In()] FindExAdditionalFlags flags);
+            internal static extern SafeFindHandle FindFirstFileExW(
+                [In(), MarshalAs(UnmanagedType.LPWStr)] string fileName,
+                [In()] FindExInfoLevel infoLevel,
+                [Out()] out WIN32_FIND_DATAW data,
+                [In()] FindExSearchOp searchOp,
+                [In()] IntPtr searchFilter,
+                [In()] FindExAdditionalFlags flags);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, out WIN32_FIND_DATAW lpFindFileData);
+            internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, [Out()] out WIN32_FIND_DATAW lpFindFileData);
 
             [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             [return: MarshalAs(UnmanagedType.Bool)]
@@ -87,7 +92,7 @@ namespace PSFilterHostDll
 
             [DllImport("kernel32.dll", ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool SetThreadErrorMode([In()] uint dwNewMode, out uint lpOldMode);
+            internal static extern bool SetThreadErrorMode([In()] uint dwNewMode, [Out()] out uint lpOldMode);
         }
 
         private static class NativeConstants
@@ -204,7 +209,7 @@ namespace PSFilterHostDll
         }
 
         private const int STATE_INIT = 0;
-        private const int STATE_FIND_NEXT_FILE = 1;
+        private const int STATE_FIND_FILES = 1;
         private const int STATE_FINISH = 2;
 
         private int state;
@@ -420,7 +425,7 @@ namespace PSFilterHostDll
             switch (this.state)
             {
                 case STATE_INIT:
-                    this.state = STATE_FIND_NEXT_FILE;
+                    this.state = STATE_FIND_FILES;
 
                     if (this.current != null)
                     {
@@ -428,9 +433,9 @@ namespace PSFilterHostDll
                     }
                     else
                     {
-                        goto case STATE_FIND_NEXT_FILE;
+                        goto case STATE_FIND_FILES;
                     }
-                case STATE_FIND_NEXT_FILE:
+                case STATE_FIND_FILES:
                     do
                     {
                         if (this.handle == null)
