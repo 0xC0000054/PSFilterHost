@@ -410,6 +410,42 @@ namespace HostTest
 			return exif;
 		}
 
+		/// <summary>
+		/// Loads the PNG XMP meta data using a dummy TIFF.
+		/// </summary>
+		/// <param name="xmp">The XMP string to load.</param>
+		/// <returns>The loaded XMP block, or null.</returns>
+		private static BitmapMetadata LoadPNGMetaData(string xmp)
+		{
+			BitmapMetadata xmpData = null;
+
+			using (MemoryStream stream = new MemoryStream())
+			{
+				// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+				tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+
+				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+				TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+				encoder.Save(stream);
+
+				TiffBitmapDecoder dec = new TiffBitmapDecoder(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+
+				if (dec.Frames.Count == 1)
+				{
+					BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
+					if (meta != null)
+					{
+						xmpData = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
+					}
+				}
+			}
+
+			return xmpData;
+		}
+
 		private static BitmapMetadata GetXMPMetaData(BitmapMetadata metaData, string format)
 		{
 			BitmapMetadata xmp = null;
@@ -423,41 +459,19 @@ namespace HostTest
 					{
 						BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
 
-						string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-						if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+						if (textChunk != null)
 						{
-							string data = textChunk.GetQuery("/TextEntry") as string;
+							string keyWord = textChunk.GetQuery("/Keyword") as string;
 
-							if (data != null)
+							if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
 							{
-								// PNG stores the XMP meta-data as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
-								BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+								string data = textChunk.GetQuery("/TextEntry") as string;
 
-								tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-								tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data));
-
-								using (MemoryStream stream = new MemoryStream())
+								if (data != null)
 								{
-									BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
-									TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-									encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
-									encoder.Save(stream);
-
-									BitmapDecoder dec = TiffBitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
-
-									if (dec.Frames.Count == 1)
-									{
-										BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
-										if (meta != null)
-										{
-											BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
-
-											xmp = block.Clone();
-										}
-									}
+									xmp = LoadPNGMetaData(data);
 								}
-							}
+							} 
 						}
 					}
 					else if (format == "jpg")
