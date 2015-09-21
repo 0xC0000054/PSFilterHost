@@ -199,7 +199,6 @@
     <Compile Include="PSApi\PluginPhase.cs" />
     <Compile Include="PSApi\Point.cs" />
     <Compile Include="PSApi\ProcessEventProc.cs" />
-    <Compile Include="PSApi\ProgressFunc.cs" />
     <Compile Include="PSApi\ProgressProc.cs" />
     <Compile Include="PSApi\PropertyProcs.cs" />
     <Compile Include="PSApi\PSConstants.cs" />
