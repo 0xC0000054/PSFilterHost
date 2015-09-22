@@ -97,7 +97,7 @@ namespace PSFilterHostDll.PSApi
 
 				int stringLength = 0;
 
-				if (suiteCount == 1) // There should only be one scripting event
+				if (suiteCount == 1) // There should only be one vendor suite
 				{
 					string vend = StringFromPString(propPtr, out stringLength);
 					propPtr += stringLength;
@@ -112,7 +112,7 @@ namespace PSFilterHostDll.PSApi
 					short eventCount = *(short*)propPtr;
 					propPtr += 2;
 
-					if (eventCount == 1) // There should only be one vendor suite
+					if (eventCount == 1) // There should only be one scripting event
 					{
 						string vend2 = StringFromPString(propPtr, out stringLength);
 						propPtr += stringLength;
@@ -418,6 +418,7 @@ namespace PSFilterHostDll.PSApi
 					enumData.HasAboutBox = false;
 				}
 
+				// The property data is padded to a 4 byte boundary.
 				int propertyDataPaddedLength = (pipp->propertyLength + 3) & ~3;
 				propPtr += (PIProperty.SizeOf + propertyDataPaddedLength);
 			}
@@ -520,7 +521,7 @@ namespace PSFilterHostDll.PSApi
 				return true;
 			}
 
-			// add the supported modes to the plug-in data as it can be used later to disable filters that do not support the image type.
+			// Add the supported modes to the plug-in data as it can be used later to disable filters that do not support the image type.
 			enumData.supportedModes = 0;
 			if ((info->supportsMode & PSConstants.supportsGrayScale) == PSConstants.supportsGrayScale)
 			{
