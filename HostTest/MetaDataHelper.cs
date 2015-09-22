@@ -467,7 +467,7 @@ namespace HostTest
 							{
 								string data = textChunk.GetQuery("/TextEntry") as string;
 
-								if (data != null)
+								if (!string.IsNullOrEmpty(data))
 								{
 									xmp = LoadPNGMetaData(data);
 								}
