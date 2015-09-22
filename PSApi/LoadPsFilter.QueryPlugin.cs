@@ -65,19 +65,19 @@ namespace PSFilterHostDll.PSApi
 				IntPtr hRes = UnsafeNativeMethods.FindResourceW(hModule, lpszName, lpszType);
 				if (hRes == IntPtr.Zero)
 				{
-					return true;
+					return false;
 				}
 
 				IntPtr loadRes = UnsafeNativeMethods.LoadResource(hModule, hRes);
 				if (loadRes == IntPtr.Zero)
 				{
-					return true;
+					return false;
 				}
 
 				IntPtr lockRes = UnsafeNativeMethods.LockResource(loadRes);
 				if (lockRes == IntPtr.Zero)
 				{
-					return true;
+					return false;
 				}
 
 				byte* ptr = (byte*)lockRes.ToPointer() + 2;
