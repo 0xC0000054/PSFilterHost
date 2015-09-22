@@ -121,14 +121,16 @@ namespace PSFilterHostDll.PSApi
         /// <returns>The loaded XMP block, or null.</returns>
         private static BitmapMetadata LoadPNGMetaData(string xmp)
         {
-            // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
-            BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-
-            tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-            tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+            BitmapMetadata xmpData = null;
 
             using (MemoryStream stream = new MemoryStream())
-            {
+            {            
+                // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+                BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+
+                tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+                tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+
                 BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
                 TiffBitmapEncoder encoder = new TiffBitmapEncoder();
                 encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
@@ -141,14 +143,12 @@ namespace PSFilterHostDll.PSApi
                     BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
                     if (meta != null)
                     {
-                        BitmapMetadata block = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
-
-                        return block;
+                        xmpData = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
                     }
                 }
             }
 
-            return null;
+            return xmpData;
         }
 
         /// <summary>
