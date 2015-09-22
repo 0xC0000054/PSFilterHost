@@ -134,7 +134,7 @@ namespace PSFilterHostDll.PSApi
                 encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
                 encoder.Save(stream);
 
-                BitmapDecoder dec = TiffBitmapDecoder.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                TiffBitmapDecoder dec = new TiffBitmapDecoder(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
 
                 if (dec.Frames.Count == 1)
                 {
