@@ -75,10 +75,7 @@ namespace HostTest
 
 			if (ifd != null)
 			{
-				if (!tiffMetaData.ContainsQuery("/ifd"))
-				{
-					tiffMetaData.SetQuery("/ifd", new BitmapMetadata("ifd"));
-				}
+				tiffMetaData.SetQuery("/ifd", new BitmapMetadata("ifd"));
 
 				foreach (var tag in ifd)
 				{
@@ -101,10 +98,7 @@ namespace HostTest
 
 			if (xmp != null)
 			{
-				if (!tiffMetaData.ContainsQuery("/ifd/xmp"))
-				{
-					tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-				}
+				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
 				foreach (var tag in xmp)
 				{
@@ -170,10 +164,7 @@ namespace HostTest
 
 			if (exif != null)
 			{
-				if (!tiffMetaData.ContainsQuery("/ifd/exif"))
-				{
-					tiffMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
-				}
+				tiffMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
 
 				foreach (var tag in exif)
 				{
@@ -196,10 +187,7 @@ namespace HostTest
 
 			if (xmp != null)
 			{
-				if (!tiffMetaData.ContainsQuery("/ifd/xmp"))
-				{
-					tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-				}
+				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
 				foreach (var tag in xmp)
 				{
@@ -222,10 +210,7 @@ namespace HostTest
 
 			if (iptc != null)
 			{
-				if (!tiffMetaData.ContainsQuery("/ifd/iptc"))
-				{
-					tiffMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
-				}
+				tiffMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
 
 				foreach (var tag in iptc)
 				{
@@ -519,10 +504,7 @@ namespace HostTest
 
 			if (exif != null)
 			{
-				if (!jpegMetaData.ContainsQuery("/app1/ifd/exif"))
-				{
-					jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
-				}
+				jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
 
 				foreach (var tag in exif)
 				{
@@ -546,10 +528,7 @@ namespace HostTest
 
 			if (xmp != null)
 			{
-				if (!jpegMetaData.ContainsQuery("/xmp"))
-				{
-					jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
-				}
+				jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
 
 				foreach (var tag in xmp)
 				{
@@ -648,10 +627,7 @@ namespace HostTest
 
 			if (exif != null)
 			{
-				if (!wmpMetaData.ContainsQuery("/ifd/exif"))
-				{
-					wmpMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
-				}
+				wmpMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
 
 				foreach (var tag in exif)
 				{
@@ -675,10 +651,7 @@ namespace HostTest
 
 			if (xmp != null)
 			{
-				if (!wmpMetaData.ContainsQuery("/ifd/xmp"))
-				{
-					wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-				}
+				wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
 				foreach (var tag in xmp)
 				{
