@@ -636,156 +636,68 @@ namespace HostTest
 
 		private static BitmapMetadata ConvertMetaDataToWMPhoto(BitmapMetadata metaData, string format)
 		{
-			// If the meta-data contains an IFD block (DNG, TIFF etc) we copy it along with any sub IFD blocks, otherwise we only copy the EXIF and/or XMP blocks.
-			if (metaData.ContainsQuery("/ifd")) 
+			BitmapMetadata exif = GetEXIFMetaData(metaData, format);
+			BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+
+			if (exif == null && xmp == null)
 			{
-				BitmapMetadata ifd = null;
-				BitmapMetadata xmp = null;
-
-				try
-				{
-					ifd = metaData.GetQuery("/ifd") as BitmapMetadata;
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-
-				try
-				{
-					xmp = metaData.GetQuery("/xmp") as BitmapMetadata; // Some codecs may store the XMP data outside the IFD block.
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-
-				if (ifd == null && xmp == null)
-				{
-					return null;
-				}
-
-				BitmapMetadata wmpMetaData = new BitmapMetadata("wmphoto");
-
-				if (ifd != null)
-				{
-					if (!wmpMetaData.ContainsQuery("/ifd"))
-					{
-						wmpMetaData.SetQuery("/ifd", new BitmapMetadata("ifd"));
-					}
-
-					foreach (var tag in ifd)
-					{
-						object value = ifd.GetQuery(tag);
-
-						BitmapMetadata ifdSub = value as BitmapMetadata;
-
-						if (ifdSub != null)
-						{
-							string baseQuery = "/ifd" + tag;
-
-							CopySubIFDRecursive(ref wmpMetaData, ifdSub, baseQuery);
-						}
-						else
-						{
-							wmpMetaData.SetQuery("/ifd" + tag, value);
-						}
-					}
-				}
-
-				if (xmp != null)
-				{
-					if (!wmpMetaData.ContainsQuery("/ifd/xmp"))
-					{
-						wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-					}
-
-					foreach (var tag in xmp)
-					{
-						object value = xmp.GetQuery(tag);
-
-						BitmapMetadata xmpSub = value as BitmapMetadata;
-
-						if (xmpSub != null)
-						{
-							string baseQuery = "/ifd/xmp" + tag;
-
-							CopySubIFDRecursive(ref wmpMetaData, xmpSub, baseQuery);
-						}
-						else
-						{
-							wmpMetaData.SetQuery("/ifd/xmp" + tag, value);
-						}
-					}
-				}
-
-				return wmpMetaData;
+				return null;
 			}
-			else
+
+			BitmapMetadata wmpMetaData = new BitmapMetadata("wmphoto");
+
+			if (exif != null)
 			{
-				BitmapMetadata exif = GetEXIFMetaData(metaData, format);
-				BitmapMetadata xmp = GetXMPMetaData(metaData, format);
-
-				if (exif == null && xmp == null)
+				if (!wmpMetaData.ContainsQuery("/ifd/exif"))
 				{
-					return null;
+					wmpMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
 				}
 
-				BitmapMetadata wmpMetaData = new BitmapMetadata("wmphoto");
-
-				if (exif != null)
+				foreach (var tag in exif)
 				{
-					if (!wmpMetaData.ContainsQuery("/ifd/exif"))
+					object value = exif.GetQuery(tag);
+
+					BitmapMetadata exifSub = value as BitmapMetadata;
+
+					if (exifSub != null)
 					{
-						wmpMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
+						string baseQuery = "/ifd/exif" + tag;
+
+						CopySubIFDRecursive(ref wmpMetaData, exifSub, baseQuery);
 					}
-
-					foreach (var tag in exif)
+					else
 					{
-						object value = exif.GetQuery(tag);
-
-						BitmapMetadata exifSub = value as BitmapMetadata;
-
-						if (exifSub != null)
-						{
-							string baseQuery = "/ifd/exif" + tag;
-
-							CopySubIFDRecursive(ref wmpMetaData, exifSub, baseQuery);
-						}
-						else
-						{
-							wmpMetaData.SetQuery("/ifd/exif" + tag, value);
-						}
-					}
-
-				}
-
-				if (xmp != null)
-				{
-					if (!wmpMetaData.ContainsQuery("/ifd/xmp"))
-					{
-						wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-					}
-
-					foreach (var tag in xmp)
-					{
-						object value = xmp.GetQuery(tag);
-
-						BitmapMetadata xmpSub = value as BitmapMetadata;
-
-						if (xmpSub != null)
-						{
-							CopySubIFDRecursive(ref wmpMetaData, xmpSub, "/ifd/xmp" + tag);
-						}
-						else
-						{
-							wmpMetaData.SetQuery("/ifd/xmp" + tag, value);
-						}
+						wmpMetaData.SetQuery("/ifd/exif" + tag, value);
 					}
 				}
 
-				return wmpMetaData; 
 			}
+
+			if (xmp != null)
+			{
+				if (!wmpMetaData.ContainsQuery("/ifd/xmp"))
+				{
+					wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+				}
+
+				foreach (var tag in xmp)
+				{
+					object value = xmp.GetQuery(tag);
+
+					BitmapMetadata xmpSub = value as BitmapMetadata;
+
+					if (xmpSub != null)
+					{
+						CopySubIFDRecursive(ref wmpMetaData, xmpSub, "/ifd/xmp" + tag);
+					}
+					else
+					{
+						wmpMetaData.SetQuery("/ifd/xmp" + tag, value);
+					}
+				}
+			}
+
+			return wmpMetaData;
 		}
 		#endregion
 
