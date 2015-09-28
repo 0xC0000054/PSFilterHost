@@ -107,10 +107,16 @@ namespace PSFilterHostDll.PSApi
 			public static readonly int SizeOf = Marshal.SizeOf(typeof(PSHandle));
 		}
 
-		private struct ChannelDescPtrs
+		private sealed class ChannelDescPtrs
 		{
-			public IntPtr address;
-			public IntPtr name;
+			public readonly IntPtr address;
+			public readonly IntPtr name;
+
+			public ChannelDescPtrs(IntPtr address, IntPtr name)
+			{
+				this.address = address;
+				this.name = name;
+			}
 		}
 		
 		private Dictionary<IntPtr, PSHandle> handles;
@@ -3619,7 +3625,7 @@ namespace PSFilterHostDll.PSApi
 				Memory.Free(addressPtr);
 				throw;
 			}
-			channelReadDescPtrs.Add(new ChannelDescPtrs() { address = addressPtr, name = namePtr });
+			channelReadDescPtrs.Add(new ChannelDescPtrs(addressPtr, namePtr));
 
 			ReadChannelDesc* desc = (ReadChannelDesc*)addressPtr.ToPointer();
 			desc->minVersion = PSConstants.kCurrentMinVersReadChannelDesc;
