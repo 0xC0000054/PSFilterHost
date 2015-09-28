@@ -102,9 +102,20 @@ namespace PSFilterHostDll.PSApi
 		private struct PSHandle
 		{
 			public IntPtr pointer;
-			public int size;
 
 			public static readonly int SizeOf = Marshal.SizeOf(typeof(PSHandle));
+		}
+
+		private sealed class HandleEntry
+		{
+			public readonly IntPtr pointer;
+			public readonly int size;
+
+			public HandleEntry(IntPtr pointer, int size)
+			{
+				this.pointer = pointer;
+				this.size = size;
+			}
 		}
 
 		private sealed class ChannelDescPtrs
@@ -119,7 +130,7 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 		
-		private Dictionary<IntPtr, PSHandle> handles;
+		private Dictionary<IntPtr, HandleEntry> handles;
 		private List<ChannelDescPtrs> channelReadDescPtrs;
 		private List<IntPtr> bufferIDs;
 
@@ -473,7 +484,7 @@ namespace PSFilterHostDll.PSApi
 			progressFunc = null;
 			pickColor = null;
 			this.pseudoResources = new List<PSResource>();
-			this.handles = new Dictionary<IntPtr, PSHandle>();
+			this.handles = new Dictionary<IntPtr, HandleEntry>();
 			this.bufferIDs = new List<IntPtr>();
 
 			this.keys = null;
@@ -5283,14 +5294,15 @@ namespace PSFilterHostDll.PSApi
 			IntPtr handle = IntPtr.Zero;
 			try
 			{
+				// The Photoshop API 'Handle' is a double indirect pointer.
+				// As some plug-ins may dereference the pointer instead of calling HandleLockProc we recreate that implementation.
 				handle = Memory.Allocate(PSHandle.SizeOf, true);
 
 				PSHandle* hand = (PSHandle*)handle.ToPointer();
 
 				hand->pointer = Memory.Allocate(size, true);
-				hand->size = size;
 
-				handles.Add(handle, *hand);
+				handles.Add(handle, new HandleEntry(hand->pointer, size));
 #if DEBUG
 				Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}, pointer: 0x{1}, size: {2}", handle.ToHexString(), hand->pointer.ToHexString(), size));
 #endif
@@ -5467,9 +5479,8 @@ namespace PSFilterHostDll.PSApi
 				IntPtr ptr = Memory.ReAlloc(handle->pointer, newSize);
 
 				handle->pointer = ptr;
-				handle->size = newSize;
 
-				handles.AddOrUpdate(h, *handle);
+				handles.AddOrUpdate(h, new HandleEntry(ptr, newSize));
 			}
 			catch (OutOfMemoryException)
 			{
