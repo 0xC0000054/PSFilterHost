@@ -182,6 +182,17 @@ namespace PSFilterHostDll
             return path + Path.DirectorySeparatorChar; // Demand permission for the current directory and all subdirectories.
         }
 
+        /// <summary>
+        /// Performs a FileIOPermission demand for PathDiscovery on the specified directory.
+        /// </summary>
+        /// <param name="directory">The path.</param>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        private static void DoDemand(string directory)
+        {
+            string demandPath = GetPermissionPath(directory, false);
+            new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
+        }
+
         private static string GetWin32ErrorMessage(int error)
         {
             return new Win32Exception(error).Message;
@@ -219,6 +230,7 @@ namespace PSFilterHostDll
         private Queue<SearchData> searchDirectories;
         private SearchData searchData;
         private string current;
+        private bool needsPathDiscoveryDemand;
 
         private readonly FindExInfoLevel infoLevel;
         private readonly FindExAdditionalFlags additionalFlags;
@@ -260,6 +272,7 @@ namespace PSFilterHostDll
             string fullPath = Path.GetFullPath(path);
             string demandPath = GetPermissionPath(fullPath, false);
             new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
+            this.needsPathDiscoveryDemand = false;
 
             this.searchData = new SearchData(fullPath, false);
             this.fileExtension = fileExtension;
@@ -294,7 +307,7 @@ namespace PSFilterHostDll
             Init();
         }
 
-        private bool IsResultIncluded(string file)
+        private bool FileMatchesFilter(string file)
         {
             return file.EndsWith(this.fileExtension, StringComparison.OrdinalIgnoreCase);
         }
@@ -329,7 +342,7 @@ namespace PSFilterHostDll
             }
 
             this.state = STATE_INIT;
-            if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0 && IsResultIncluded(findData.cFileName))
+            if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0 && FileMatchesFilter(findData.cFileName))
             {
                 this.current = Path.Combine(this.searchData.path, findData.cFileName);
             }
@@ -462,6 +475,7 @@ namespace PSFilterHostDll
                                     goto case STATE_FINISH;
                                 }
                             }
+                            this.needsPathDiscoveryDemand = true;
                         }
 
                         while (UnsafeNativeMethods.FindNextFileW(this.handle, findData))
@@ -483,7 +497,7 @@ namespace PSFilterHostDll
                                                 // If the shortcut target is a directory, add it to the search list.
                                                 this.searchDirectories.Enqueue(new SearchData(target, true));
                                             }
-                                            else if (IsResultIncluded(target))
+                                            else if (FileMatchesFilter(target))
                                             {
                                                 this.current = target;
                                                 return true;
@@ -491,13 +505,19 @@ namespace PSFilterHostDll
                                         }
                                     }
                                 }
-                                else if (IsResultIncluded(findData.cFileName))
+                                else if (FileMatchesFilter(findData.cFileName))
                                 {
+                                    if (this.needsPathDiscoveryDemand)
+                                    {
+                                        DoDemand(this.searchData.path);
+                                        this.needsPathDiscoveryDemand = false;
+                                    }
+
                                     this.current = Path.Combine(this.searchData.path, findData.cFileName);
                                     return true;
                                 }
                             }
-                            else if (this.searchSubDirectories && findData.cFileName != "." && findData.cFileName != "..")
+                            else if (this.searchSubDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
                             {
                                 this.searchDirectories.Enqueue(new SearchData(Path.Combine(this.searchData.path, findData.cFileName), this.searchData.isShortcut));
                             }
