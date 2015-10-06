@@ -103,6 +103,7 @@ namespace PSFilterHostDll
             internal const int ERROR_FILE_NOT_FOUND = 2;
             internal const int ERROR_PATH_NOT_FOUND = 3;
             internal const int ERROR_ACCESS_DENIED = 5;
+            internal const int ERROR_NO_MORE_FILES = 18;
             internal const int ERROR_DIRECTORY = 267;
             internal const uint SEM_FAILCRITICALERRORS = 1U;
         }
@@ -313,11 +314,27 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
+        /// Throws an exception for the specified Win32 error code.
+        /// </summary>
+        /// <param name="win32Error">The Win32 error code.</param>
+        private void HandleError(int win32Error)
+        {
+            Dispose();
+            switch (win32Error)
+            {
+                case NativeConstants.ERROR_PATH_NOT_FOUND:
+                    throw new DirectoryNotFoundException();
+                case NativeConstants.ERROR_ACCESS_DENIED:
+                    throw new UnauthorizedAccessException(Properties.Resources.PathAccessDenied);
+                case NativeConstants.ERROR_DIRECTORY:
+                default:
+                    throw new IOException(GetWin32ErrorMessage(win32Error), MakeHRFromWin32Error(win32Error));
+            }
+        }
+
+        /// <summary>
         /// Initializes this instance.
         /// </summary>
-        /// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by path does not exist.</exception>
-        /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
-        /// <exception cref="System.IO.IOException">path is a file.</exception>
         private void Init()
         {
             WIN32_FIND_DATAW findData = new WIN32_FIND_DATAW();
@@ -328,23 +345,24 @@ namespace PSFilterHostDll
             {
                 int error = Marshal.GetLastWin32Error();
 
-                switch (error)
+                if (error != NativeConstants.ERROR_FILE_NOT_FOUND && error != NativeConstants.ERROR_NO_MORE_FILES)
                 {
-                    case NativeConstants.ERROR_FILE_NOT_FOUND:
-                    case NativeConstants.ERROR_PATH_NOT_FOUND:
-                        throw new DirectoryNotFoundException();
-                    case NativeConstants.ERROR_ACCESS_DENIED:
-                        throw new UnauthorizedAccessException(PSFilterHostDll.Properties.Resources.PathAccessDenied);
-                    case NativeConstants.ERROR_DIRECTORY:
-                    default:
-                        throw new IOException(GetWin32ErrorMessage(error), MakeHRFromWin32Error(error));
+                    HandleError(error);
+                }
+                else
+                {
+                    // If no matching files are found exit when MoveNext is called.
+                    // This may happen for an empty root directory.
+                    this.state = STATE_FINISH;
                 }
             }
-
-            this.state = STATE_INIT;
-            if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0 && FileMatchesFilter(findData.cFileName))
+            else
             {
-                this.current = Path.Combine(this.searchData.path, findData.cFileName);
+                this.state = STATE_INIT;
+                if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0 && FileMatchesFilter(findData.cFileName))
+                {
+                    this.current = Path.Combine(this.searchData.path, findData.cFileName);
+                } 
             }
         }
 
