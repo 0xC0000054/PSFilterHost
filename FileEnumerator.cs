@@ -71,14 +71,14 @@ namespace PSFilterHostDll
             internal static extern SafeFindHandle FindFirstFileExW(
                 [In(), MarshalAs(UnmanagedType.LPWStr)] string fileName,
                 [In()] FindExInfoLevel infoLevel,
-                [Out()] out WIN32_FIND_DATAW data,
+                [Out()] WIN32_FIND_DATAW data,
                 [In()] FindExSearchOp searchOp,
                 [In()] IntPtr searchFilter,
                 [In()] FindExAdditionalFlags flags);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
             [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, [Out()] out WIN32_FIND_DATAW lpFindFileData);
+            internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, [Out()] WIN32_FIND_DATAW lpFindFileData);
 
             [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
             [return: MarshalAs(UnmanagedType.Bool)]
@@ -108,7 +108,7 @@ namespace PSFilterHostDll
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        private struct WIN32_FIND_DATAW
+        private sealed class WIN32_FIND_DATAW
         {
             public uint dwFileAttributes;
             public FILETIME ftCreationTime;
@@ -307,9 +307,9 @@ namespace PSFilterHostDll
         /// <exception cref="System.IO.IOException">path is a file.</exception>
         private void Init()
         {
-            WIN32_FIND_DATAW findData;
+            WIN32_FIND_DATAW findData = new WIN32_FIND_DATAW();
             string searchPath = Path.Combine(this.searchData.path, "*");
-            this.handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, this.infoLevel, out findData, FindExSearchOp.NameMatch, IntPtr.Zero, this.additionalFlags);
+            this.handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, this.infoLevel, findData, FindExSearchOp.NameMatch, IntPtr.Zero, this.additionalFlags);
 
             if (this.handle.IsInvalid)
             {
@@ -420,7 +420,7 @@ namespace PSFilterHostDll
         /// </returns>
         public bool MoveNext()
         {
-            WIN32_FIND_DATAW findData;
+            WIN32_FIND_DATAW findData = new WIN32_FIND_DATAW();
 
             switch (this.state)
             {
@@ -445,7 +445,7 @@ namespace PSFilterHostDll
                             string demandPath = GetPermissionPath(this.searchData.path, false);
                             new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
                             string searchPath = Path.Combine(this.searchData.path, "*");
-                            this.handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, this.infoLevel, out findData, FindExSearchOp.NameMatch, IntPtr.Zero, this.additionalFlags);
+                            this.handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, this.infoLevel, findData, FindExSearchOp.NameMatch, IntPtr.Zero, this.additionalFlags);
 
                             if (this.handle.IsInvalid)
                             {
@@ -464,7 +464,7 @@ namespace PSFilterHostDll
                             }
                         }
 
-                        while (UnsafeNativeMethods.FindNextFileW(this.handle, out findData))
+                        while (UnsafeNativeMethods.FindNextFileW(this.handle, findData))
                         {
                             if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0)
                             {
