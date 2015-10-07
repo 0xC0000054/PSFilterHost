@@ -232,6 +232,7 @@ namespace PSFilterHostDll
         private SearchData searchData;
         private string current;
         private bool needsPathDiscoveryDemand;
+        private string shellLinkTarget;
 
         private readonly FindExInfoLevel infoLevel;
         private readonly FindExAdditionalFlags additionalFlags;
@@ -289,6 +290,7 @@ namespace PSFilterHostDll
                 this.shellLink = null;
                 this.dereferenceLinks = false;
             }
+            this.shellLinkTarget = null;
 
             if (OS.IsWindows7OrLater)
             {
@@ -359,9 +361,9 @@ namespace PSFilterHostDll
             else
             {
                 this.state = STATE_INIT;
-                if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0 && FileMatchesFilter(findData.cFileName))
+                if (FirstFileIncluded(findData))
                 {
-                    this.current = Path.Combine(this.searchData.path, findData.cFileName);
+                    this.current = CreateFilePath(findData);
                 } 
             }
         }
@@ -405,6 +407,75 @@ namespace PSFilterHostDll
             }
 
             return null;
+        }
+
+        private bool FirstFileIncluded(WIN32_FIND_DATAW findData)
+        {
+            if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY)
+            {
+                if (this.searchSubDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
+                {
+                    this.searchDirectories.Enqueue(new SearchData(Path.Combine(this.searchData.path, findData.cFileName), this.searchData.isShortcut));
+                }
+            }
+            else
+            {
+                return IsFileIncluded(findData);
+            }
+
+            return false;
+        }
+
+        private bool IsFileIncluded(WIN32_FIND_DATAW findData)
+        {
+            if (findData.cFileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) && this.dereferenceLinks)
+            {
+                // Do not search shortcuts recursively.
+                if (!this.searchData.isShortcut && this.shellLink.Load(Path.Combine(this.searchData.path, findData.cFileName)))
+                {
+                    bool isDirectory;
+                    string target = ResolveShortcutTarget(this.shellLink.Path, out isDirectory);
+
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        if (isDirectory)
+                        {
+                            // If the shortcut target is a directory, add it to the search list.
+                            this.searchDirectories.Enqueue(new SearchData(target, true));
+                        }
+                        else if (FileMatchesFilter(target))
+                        {
+                            this.shellLinkTarget = target;
+                            return true;
+                        }
+                    }
+                }
+            }
+            else if (FileMatchesFilter(findData.cFileName))
+            {
+                if (this.needsPathDiscoveryDemand)
+                {
+                    DoDemand(this.searchData.path);
+                    this.needsPathDiscoveryDemand = false;
+                }
+                this.shellLinkTarget = null;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private string CreateFilePath(WIN32_FIND_DATAW findData)
+        {
+            if (this.shellLinkTarget != null)
+            {
+                return this.shellLinkTarget;
+            }
+            else
+            {
+                return Path.Combine(this.searchData.path, findData.cFileName);
+            }
         }
 
         /// <summary>
@@ -494,44 +565,20 @@ namespace PSFilterHostDll
                                 }
                             }
                             this.needsPathDiscoveryDemand = true;
+                            if (FirstFileIncluded(findData))
+                            {
+                                this.current = CreateFilePath(findData);
+                                return true;
+                            }
                         }
 
                         while (UnsafeNativeMethods.FindNextFileW(this.handle, findData))
                         {
                             if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == 0)
                             {
-                                if (findData.cFileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase) && this.dereferenceLinks)
+                                if (IsFileIncluded(findData))
                                 {
-                                    // Do not search shortcuts recursively.
-                                    if (!this.searchData.isShortcut && this.shellLink.Load(Path.Combine(this.searchData.path, findData.cFileName)))
-                                    {
-                                        bool isDirectory;
-                                        string target = ResolveShortcutTarget(this.shellLink.Path, out isDirectory);
-
-                                        if (!string.IsNullOrEmpty(target))
-                                        {
-                                            if (isDirectory)
-                                            {
-                                                // If the shortcut target is a directory, add it to the search list.
-                                                this.searchDirectories.Enqueue(new SearchData(target, true));
-                                            }
-                                            else if (FileMatchesFilter(target))
-                                            {
-                                                this.current = target;
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                }
-                                else if (FileMatchesFilter(findData.cFileName))
-                                {
-                                    if (this.needsPathDiscoveryDemand)
-                                    {
-                                        DoDemand(this.searchData.path);
-                                        this.needsPathDiscoveryDemand = false;
-                                    }
-
-                                    this.current = Path.Combine(this.searchData.path, findData.cFileName);
+                                    this.current = CreateFilePath(findData);
                                     return true;
                                 }
                             }
