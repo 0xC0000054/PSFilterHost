@@ -16,8 +16,8 @@ namespace PSFilterHostDll
 {
     internal static class OS
     {
-        private static bool checkedIsWindows7OrLater;
-        private static bool isWindows7OrLater;
+        private static volatile bool checkedIsWindows7OrLater;
+        private static volatile bool isWindows7OrLater;
 
         public static bool IsWindows7OrLater
         {
