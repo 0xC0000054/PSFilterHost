@@ -685,7 +685,7 @@ namespace PSFilterHostDll.PSApi
 			}
 			finally
 			{
-				if (!dll.IsInvalid && !dll.IsClosed)
+				if (!dll.IsClosed)
 				{
 					dll.Dispose();
 					dll = null;
@@ -694,9 +694,9 @@ namespace PSFilterHostDll.PSApi
 
 			if (pluginData.Count > 1)
 			{
-				/* If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
-				 * Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
-				 */
+				// If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
+				// Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
+
 				string[] entryPoints = new string[pluginData.Count];
 
 				for (int i = 0; i < entryPoints.Length; i++)
