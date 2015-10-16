@@ -374,7 +374,7 @@ namespace PSFilterHostDll.PSApi
 					if (signature == TIFFSignature)
 					{
 						uint ifdOffset = ReadLong(stream, littleEndian);
-						stream.Seek((long)ifdOffset, SeekOrigin.Begin);
+						stream.Seek(ifdOffset, SeekOrigin.Begin);
 
 						int ifdCount = ReadShort(stream, littleEndian);
 
@@ -384,7 +384,7 @@ namespace PSFilterHostDll.PSApi
 
 							if (ifd.tag == XmpTag && (ifd.type == DataType.Byte || ifd.type == DataType.Undefined))
 							{
-								stream.Seek((long)ifd.offset, SeekOrigin.Begin);
+								stream.Seek(ifd.offset, SeekOrigin.Begin);
 
 								int count = (int)ifd.count;
 
