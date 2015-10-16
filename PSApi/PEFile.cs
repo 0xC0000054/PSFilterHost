@@ -68,7 +68,7 @@ namespace PSFilterHostDll.PSApi
         private const uint IMAGE_NT_SIGNATURE = 0x00004550; // PE00
         private const ushort IMAGE_FILE_MACHINE_I386 = 0x14C;
         private const ushort IMAGE_FILE_MACHINE_AMD64 = 0x8664;
-        private const int NtHeaderOffsetLocation = 0x3C;
+        private const int NTSignatureOffsetLocation = 0x3C;
 
         /// <summary>
         /// Checks that the processor architecture of the DLL matches the current process.
@@ -84,14 +84,14 @@ namespace PSFilterHostDll.PSApi
                     ushort dosSignature = ReadUInt16(stream);
                     if (dosSignature == IMAGE_DOS_SIGNATURE)
                     {
-                        stream.Seek(NtHeaderOffsetLocation, SeekOrigin.Begin);
+                        stream.Seek(NTSignatureOffsetLocation, SeekOrigin.Begin);
 
-                        uint ntHeaderOffset = ReadUInt32(stream);
+                        uint ntSignatureOffset = ReadUInt32(stream);
 
-                        stream.Seek(ntHeaderOffset, SeekOrigin.Begin);
+                        stream.Seek(ntSignatureOffset, SeekOrigin.Begin);
 
-                        uint ntHeaderSignature = ReadUInt32(stream);
-                        if (ntHeaderSignature == IMAGE_NT_SIGNATURE)
+                        uint ntSignature = ReadUInt32(stream);
+                        if (ntSignature == IMAGE_NT_SIGNATURE)
                         {
                             ushort machineType = ReadUInt16(stream);
 
