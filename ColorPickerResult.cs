@@ -19,11 +19,12 @@ namespace PSFilterHostDll
 	public sealed class ColorPickerResult
 	{
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
+		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class from the specified red, green and blue components.
 		/// </summary>
 		/// <param name="red">The red component of the user's chosen color.</param>
 		/// <param name="green">The green component of the user's chosen color.</param>
 		/// <param name="blue">The blue component of the user's chosen color.</param>
+		/// <overloads>Initializes a new instance of the <see cref="ColorPickerResult"/> class.</overloads>
 		public ColorPickerResult(byte red, byte green, byte blue)
 		{
 			this.R = red;
@@ -32,7 +33,7 @@ namespace PSFilterHostDll
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
+		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class from the specified <see cref="System.Drawing.Color"/>.
 		/// </summary>
 		/// <param name="color">The user's chosen color.</param>
 		public ColorPickerResult(System.Drawing.Color color) : this(color.R, color.G, color.B)
@@ -41,7 +42,7 @@ namespace PSFilterHostDll
 
 #if !GDIPLUS
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class.
+		/// Initializes a new instance of the <see cref="ColorPickerResult"/> class from the specified <see cref="System.Windows.Media.Color"/>
 		/// </summary>
 		/// <param name="color">The user's chosen color.</param>
 		public ColorPickerResult(System.Windows.Media.Color color) : this(color.R, color.G, color.B)
