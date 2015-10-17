@@ -62,20 +62,22 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
 		/// </summary>
 		/// <param name="sourceImage">The image to filter.</param>
 		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
 		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
 		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
 		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
 		/// </summary>
 		/// <param name="sourceImage">The image to filter.</param>
 		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
+		/// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
 		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
 		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
@@ -94,7 +96,7 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
 		/// </summary>
 		/// <param name="sourceImage">The image to filter.</param>
 		/// <param name="primary">The primary (foreground) color of the host application.</param>
@@ -107,7 +109,7 @@ namespace PSFilterHostDll
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class.
+		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
 		/// </summary>
 		/// <param name="sourceImage">The image to filter.</param>
 		/// <param name="primary">The primary (foreground) color of the host application.</param>
@@ -359,11 +361,12 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Enumerates the directory for filters to load.
+		/// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
 		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+		/// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
 		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
 		/// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
@@ -375,10 +378,11 @@ namespace PSFilterHostDll
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Enumerates the directory for filters to load.
+		/// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
 		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+		/// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
 		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
 		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
 		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
@@ -411,7 +415,7 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Enumerates the directory for filters to load.
+		/// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
 		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
@@ -428,7 +432,7 @@ namespace PSFilterHostDll
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Enumerates the directory for filters to load.
+		/// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
 		/// </summary>
 		/// <param name="path">The directory to search.</param>
 		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
