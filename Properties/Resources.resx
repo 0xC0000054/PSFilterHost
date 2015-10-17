@@ -121,7 +121,7 @@
     <value>Alpha</value>
   </data>
   <data name="FilterBadParameters" xml:space="preserve">
-    <value>A problem with the filter module interface.</value>
+    <value>An unknown error has occured.</value>
   </data>
   <data name="BlueChannelName" xml:space="preserve">
     <value>Blue</value>
@@ -133,10 +133,10 @@
     <value>This host does not support colBytes other than 1.</value>
   </data>
   <data name="PlugInHostInsufficient" xml:space="preserve">
-    <value>Requires services not provided by this host.</value>
+    <value>The filter requires services not provided by this host.</value>
   </data>
   <data name="PlugInPropertyUndefined" xml:space="preserve">
-    <value>A requested property could not be found.</value>
+    <value>The filter requested a property that could not be found.</value>
   </data>
   <data name="FileIOError" xml:space="preserve">
     <value>A file I/O error occurred.</value>
