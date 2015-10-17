@@ -466,7 +466,7 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Runs the specified filter.
+		/// Executes the specified filter.
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
 		/// <returns>
@@ -478,9 +478,9 @@ namespace PSFilterHostDll
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
 		[SecurityCritical()]
-#else      
+#else
 		/// <summary>
-		/// Runs the specified filter.
+		/// Executes the specified filter.
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
 		/// <returns>
@@ -586,7 +586,7 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
 		/// <summary>
-		/// Shows the filter's about dialog.
+		/// Displays the about box of the specified filter.
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
 		/// <param name="parentWindowHandle">The parent window handle.</param>
@@ -597,7 +597,7 @@ namespace PSFilterHostDll
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Shows the filter's about dialog.
+		/// Displays the about box of the specified filter.
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
 		/// <param name="parentWindowHandle">The parent window handle.</param>
