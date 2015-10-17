@@ -993,13 +993,13 @@ namespace PSFilterHostDll.PSApi
 			short result = PSError.noErr;
 			error = string.Empty;
 
-			PlatformData platform = new PlatformData()
-			{
-				hwnd = owner
-			};
-
 			using (PluginModule module = new PluginModule(pdata.FileName, pdata.EntryPoint))
 			{
+			    PlatformData platform = new PlatformData()
+			    {
+				    hwnd = owner
+			    };
+
 				GCHandle platformDataHandle = GCHandle.Alloc(platform, GCHandleType.Pinned);
 				try
 				{
@@ -1684,8 +1684,6 @@ namespace PSFilterHostDll.PSApi
 
 		internal static bool ShowAboutDialog(PluginData pdata, IntPtr owner, out string errorMessage)
 		{
-			errorMessage = string.Empty;
-
 			return PluginAbout(pdata, owner, out errorMessage);
 		}
 
