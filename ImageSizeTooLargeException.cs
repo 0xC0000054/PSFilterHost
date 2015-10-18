@@ -25,11 +25,12 @@ namespace PSFilterHostDll
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class.
         /// </summary>
+        /// <overloads>Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class.</overloads>
         public ImageSizeTooLargeException() : base()
         {
         }
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class.
+        /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message to display.</param>
         public ImageSizeTooLargeException(string message)
@@ -38,9 +39,9 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class.
+        /// Initializes a new instance of the <see cref="ImageSizeTooLargeException"/> class with a specified error message and inner exception.
         /// </summary>
-        /// <param name="message">The message.</param>
+        /// <param name="message">The message to display.</param>
         /// <param name="inner">The inner exception.</param>
         public ImageSizeTooLargeException(string message, Exception inner)
             : base(message, inner)
