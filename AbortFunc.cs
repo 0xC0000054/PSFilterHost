@@ -11,10 +11,10 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 namespace PSFilterHostDll
-{ 
+{
     /// <summary>
-    /// The delegate the filter can call for the host to tell it to abort.
+    /// The delegate the filter can call for the host to tell it to cancel any rendering currently in progress.
     /// </summary>
-    /// <returns>True if the filter should abort; otherwise false.</returns>
+    /// <returns><c>true</c> if the filter should cancel rendering; otherwise <c>false</c>.</returns>
     public delegate bool AbortFunc();
 }
