@@ -25,12 +25,13 @@ namespace PSFilterHostDll
         /// <summary>
         /// Initializes a new instance of the <see cref="FilterRunException"/> class.
         /// </summary>
+        /// <overloads>Initializes a new instance of the <see cref="FilterRunException"/> class.</overloads>
         public FilterRunException() : base()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterRunException"/> class with the specified message.
+        /// Initializes a new instance of the <see cref="FilterRunException"/> class with a specified error message.
         /// </summary>
         /// <param name="message">The message.</param>
         public FilterRunException(string message) : base(message)
@@ -38,7 +39,7 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FilterRunException"/> class.
+        /// Initializes a new instance of the <see cref="FilterRunException"/> class with a specified error message and inner exception.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="inner">The inner exception.</param>
