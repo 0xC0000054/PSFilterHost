@@ -197,7 +197,7 @@ namespace PSFilterHostDll.PSApi
 				using (MemoryStream ms = new MemoryStream())
 				{
 #if GDIPLUS
-					this.image.Save(ms, ImageFormat.Jpeg);
+					this.image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 #else
 					JpegBitmapEncoder enc = new JpegBitmapEncoder();
 					enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
@@ -213,7 +213,7 @@ namespace PSFilterHostDll.PSApi
 				using (MemoryStream ms = new MemoryStream())
 				{
 #if GDIPLUS
-					this.image.Save(ms, ImageFormat.Tiff);
+					this.image.Save(ms, System.Drawing.Imaging.ImageFormat.Tiff);
 #else
 					TiffBitmapEncoder enc = new TiffBitmapEncoder();
 					enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
