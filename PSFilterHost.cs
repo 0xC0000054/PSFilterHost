@@ -463,37 +463,79 @@ namespace PSFilterHostDll
 			return EnumerateFilters(path, searchOption == SearchOption.AllDirectories);
 		}
 
-
-#if NET_40_OR_GREATER
 		/// <summary>
 		/// Executes the specified filter.
 		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
+		/// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
 		/// <returns>
 		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
 		/// </returns>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
+		/// <overloads>Executes the specified filter.</overloads>
+		/// <remarks>
+		/// <para>
+		/// When the <see cref="FilterParameters"/> have been set to execute a filter with settings from a previous session this method will not display the user interface.
+		/// The <see cref="RunFilter(PluginData, bool)" /> overload must be used if the host wants the filter to display its user interface.
+		/// </para>
+		/// </remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
 		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+		/// <exception cref="FilterRunException">The filter returns an error.</exception>
+		public bool RunFilter(PluginData pluginData)
+		{
+			return RunFilter(pluginData, filterParameters == null);
+		}
+
+#if NET_40_OR_GREATER
+		/// <summary>
+		/// Executes the specified filter, optionally displaying the user interface.
+		/// </summary>
+		/// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
+		/// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
+		/// <returns>
+		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
+		/// </returns>
+		/// <remarks>
+		/// <para>
+		/// <paramref name="showUI"/> allows the host to control weather a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
+		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
+		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
+		/// </para>
+		/// </remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
+		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+		/// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
 		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
 		[SecurityCritical()]
 #else
 		/// <summary>
-		/// Executes the specified filter.
+		/// Executes the specified filter, optionally displaying the user interface.
 		/// </summary>
 		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
+		/// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
 		/// <returns>
 		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
 		/// </returns>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
+		/// <remarks>
+		/// <para>
+		/// <paramref name="showUI"/> allows the host to control weather a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
+		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
+		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
+		/// </para>
+		/// </remarks>
+		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
 		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+		/// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
 		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission> 
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public bool RunFilter(PluginData pluginData)
+		public bool RunFilter(PluginData pluginData, bool showUI)
 		{
 			if (pluginData == null)
 			{
@@ -503,6 +545,11 @@ namespace PSFilterHostDll
 			if (disposed)
 			{
 				throw new ObjectDisposedException("PSFilterHost");
+			}
+
+			if (!showUI && filterParameters == null)
+			{
+				throw new InvalidOperationException(Resources.ParametersNotSet);
 			}
 
 			bool result = false;
@@ -527,7 +574,7 @@ namespace PSFilterHostDll
 				if (filterParameters != null)
 				{
 					lps.ParameterData = filterParameters;
-					lps.IsRepeatEffect = true;
+					lps.ShowUI = showUI;
 				}
 
 				if (pseudoResources.Count > 0)

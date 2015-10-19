@@ -250,6 +250,15 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The FilterParameters property must be set before running a filter without its UI..
+        /// </summary>
+        internal static string ParametersNotSet {
+            get {
+                return ResourceManager.GetString("ParametersNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Access to the path is denied.
         /// </summary>
         internal static string PathAccessDenied {

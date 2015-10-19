@@ -245,7 +245,9 @@ namespace PSFilterHostDll.PSApi
 		private PluginAETE aete;
 		private Dictionary<uint, AETEValue> aeteDict;
 		private GlobalParameters globalParameters;
-		private bool isRepeatEffect;
+		private bool showUI;
+		private bool parameterDataRestored;
+		private bool pluginDataRestored;
 
 		private AbortFunc abortFunc;
 		private ProgressProc progressFunc;
@@ -400,14 +402,15 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 		}
+
 		/// <summary>
-		/// Is the filter a repeat Effect.
+		/// Determines weather the filter should show its user interface.
 		/// </summary>
-		internal bool IsRepeatEffect
+		internal bool ShowUI
 		{
 			set
 			{
-				this.isRepeatEffect = value;
+				this.showUI = value;
 			}
 		}
 
@@ -472,7 +475,9 @@ namespace PSFilterHostDll.PSApi
 			this.writesOutsideSelection = false;
 			this.sizesSetup = false;
 			this.frValuesSetup = false;
-			this.isRepeatEffect = false;
+			this.showUI = true;
+			this.parameterDataRestored = false;
+			this.pluginDataRestored = false;
 			this.globalParameters = new GlobalParameters();
 			this.errorMessage = string.Empty;
 			this.filterParametersHandle = IntPtr.Zero;
@@ -939,6 +944,7 @@ namespace PSFilterHostDll.PSApi
 					default:
 						throw new InvalidEnumArgumentException("ParameterDataStorageMethod", (int)globalParameters.ParameterDataStorageMethod, typeof(GlobalParameters.DataStorageMethod));
 				}
+				parameterDataRestored = true;
 			}
 
 			byte[] pluginDataBytes = globalParameters.GetPluginDataBytes();
@@ -984,6 +990,7 @@ namespace PSFilterHostDll.PSApi
 					default:
 						throw new InvalidEnumArgumentException("PluginDataStorageMethod", (int)globalParameters.PluginDataStorageMethod, typeof(GlobalParameters.DataStorageMethod));
 				}
+				pluginDataRestored = true;
 			}
 
 		}
@@ -1179,7 +1186,7 @@ namespace PSFilterHostDll.PSApi
 			Ping(DebugFlags.Call, "After FilterSelectorFinish");
 #endif
 
-			if (!isRepeatEffect && result == PSError.noErr)
+			if (showUI && result == PSError.noErr)
 			{
 				SaveParameters();
 			}
@@ -1203,6 +1210,7 @@ namespace PSFilterHostDll.PSApi
 			// Photoshop sets the size info before the filterSelectorParameters call even though the documentation says it does not.
 			SetupSizes();
 			SetFilterRecordValues();
+			RestoreParameters();
 #if DEBUG
 			Ping(DebugFlags.Call, "Before filterSelectorParameters");
 #endif
@@ -1652,7 +1660,7 @@ namespace PSFilterHostDll.PSApi
 
 			PreProcessInputData();
 
-			if (!isRepeatEffect)
+			if (showUI)
 			{
 				if (!PluginParameters())
 				{
@@ -6513,26 +6521,26 @@ namespace PSFilterHostDll.PSApi
 			descriptorParameters->readDescriptorProcs = readDescriptorPtr;
 			descriptorParameters->writeDescriptorProcs = writeDescriptorPtr;
 
-			if (isRepeatEffect)
+			if (showUI)
 			{
-				descriptorParameters->recordInfo = RecordInfo.plugInDialogNone;
+				descriptorParameters->recordInfo = RecordInfo.plugInDialogOptional;
 			}
 			else
 			{
-				descriptorParameters->recordInfo = RecordInfo.plugInDialogOptional;
+				descriptorParameters->recordInfo = RecordInfo.plugInDialogNone;
 			}
 
 
 			if (aeteDict.Count > 0)
 			{
 				descriptorParameters->descriptor = HandleNewProc(0);
-				if (isRepeatEffect)
+				if (showUI)
 				{
-					descriptorParameters->playInfo = PlayInfo.plugInDialogDontDisplay;
+					descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
 				}
 				else
 				{
-					descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
+					descriptorParameters->playInfo = PlayInfo.plugInDialogDontDisplay;
 				}
 			}
 			else
@@ -6899,7 +6907,7 @@ namespace PSFilterHostDll.PSApi
 
 					if (filterRecord->parameters != IntPtr.Zero)
 					{
-						if (isRepeatEffect && !IsHandleValid(filterRecord->parameters))
+						if (parameterDataRestored && !IsHandleValid(filterRecord->parameters))
 						{
 							if (filterParametersHandle != IntPtr.Zero)
 							{
@@ -6954,7 +6962,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (dataPtr != IntPtr.Zero)
 				{
-					if (isRepeatEffect && !IsHandleValid(dataPtr))
+					if (pluginDataRestored && !IsHandleValid(dataPtr))
 					{
 						if (pluginDataHandle != IntPtr.Zero)
 						{

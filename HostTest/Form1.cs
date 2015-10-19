@@ -332,7 +332,7 @@ namespace HostTest
 			PluginData pluginData = (PluginData)item.Tag;
 			this.currentFilterMenuItem = item;
 			
-			RunPhotoshopFilterThread(pluginData, false);
+			RunPhotoshopFilterThread(pluginData, true);
 		}
 
 		private void ShowFilterAboutDialog(object sender, EventArgs e)
@@ -354,13 +354,13 @@ namespace HostTest
 			}
 		}
 
-		private void RunPhotoshopFilterThread(PluginData pluginData, bool repeatEffect)
+		private void RunPhotoshopFilterThread(PluginData pluginData, bool showUI)
 		{
 			if (filterThread == null)
 			{
 				this.Cursor = Cursors.WaitCursor;
 
-				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, repeatEffect));
+				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, showUI));
 				this.filterThread.IsBackground = true;
 				this.filterThread.Priority = ThreadPriority.AboveNormal;
 				this.filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
@@ -434,7 +434,7 @@ namespace HostTest
 			return System.Windows.Media.Color.FromArgb(color.A, color.R, color.G, color.B);
 		}
 
-		private void RunPhotoshopFilterImpl(PluginData pluginData, bool repeatEffect)
+		private void RunPhotoshopFilterImpl(PluginData pluginData, bool showUI)
 		{
 			Region selection = null;
 
@@ -478,7 +478,7 @@ namespace HostTest
 					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilterCallback));
 					host.SetPickColorCallback(new PickColor(PickColorCallback));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
-					if (repeatEffect && filterParameters.ContainsKey(pluginData))
+					if (filterParameters.ContainsKey(pluginData))
 					{
 						host.FilterParameters = filterParameters[pluginData];
 					}
@@ -494,7 +494,7 @@ namespace HostTest
 					this.setFilterApplyText = false;
 					this.messageFilter.Reset();
 
-					if (host.RunFilter(pluginData))
+					if (host.RunFilter(pluginData, showUI))
 					{
 						this.dstImage = host.Dest;
 
@@ -525,7 +525,7 @@ namespace HostTest
 
 						this.canvas.ResumePaint();
 
-						if (!repeatEffect)
+						if (showUI)
 						{
 							if (filterParameters.ContainsKey(pluginData))
 							{
@@ -613,7 +613,7 @@ namespace HostTest
 			ToolStripItem item = (ToolStripItem)sender;
 			if (item.Tag != null)
 			{
-				RunPhotoshopFilterThread((PluginData)item.Tag, true);
+				RunPhotoshopFilterThread((PluginData)item.Tag, false);
 			}
 		}
 
