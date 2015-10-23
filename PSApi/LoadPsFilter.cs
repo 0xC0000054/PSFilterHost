@@ -1025,14 +1025,14 @@ namespace PSFilterHostDll.PSApi
 						IntPtr dataPtr = IntPtr.Zero;
 
 						// If the filter only has one entry point call about on it.
-						if (pdata.moduleEntryPoints == null)
+						if (pdata.ModuleEntryPoints == null)
 						{
 							module.entryPoint(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
 						}
 						else
 						{
 							// Otherwise call about on all the entry points in the module, per the SDK docs only one of the entry points will display the about box.
-							foreach (var entryPoint in pdata.moduleEntryPoints)
+							foreach (var entryPoint in pdata.ModuleEntryPoints)
 							{
 								PluginEntryPoint ep = module.GetEntryPoint(entryPoint);
 
