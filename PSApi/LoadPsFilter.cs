@@ -1621,11 +1621,12 @@ namespace PSFilterHostDll.PSApi
 
 			if (pdata.FilterInfo != null)
 			{
-				int index = this.filterCase - 1;
-				this.copyToDest = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
-				this.writesOutsideSelection = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
+				FilterCaseInfoFlags filterCaseFlags = pdata.FilterInfo[this.filterCase - 1].flags1;
 
-				bool worksWithBlankData = ((pdata.FilterInfo[index].flags1 & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
+				this.copyToDest = ((filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
+				this.writesOutsideSelection = ((filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
+
+				bool worksWithBlankData = ((filterCaseFlags & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
 
 				if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) && !worksWithBlankData)
 				{
