@@ -34,9 +34,9 @@ namespace PSFilterHostDll
         private string title;
         private FilterCaseInfo[] filterInfo;
         private PluginAETE aete;
-        internal string enableInfo;
-        internal ushort? supportedModes;
-        internal string[] moduleEntryPoints;
+        private string enableInfo;
+        private ushort? supportedModes;
+        private string[] moduleEntryPoints;
         [OptionalField(VersionAdded = 2)]
         private bool hasAboutBox;
 
@@ -93,7 +93,10 @@ namespace PSFilterHostDll
                 this.title = value; 
             }
         }
- 
+
+        /// <summary>
+        /// Gets or sets the filter information that describes how images with transparency should be processed.
+        /// </summary>
         internal FilterCaseInfo[] FilterInfo
         {
             get 
@@ -106,6 +109,9 @@ namespace PSFilterHostDll
             }
         }
 
+        /// <summary>
+        /// Gets or sets the scripting information used by the plug-in.
+        /// </summary>
         internal PluginAETE Aete
         {
             get 
@@ -117,7 +123,44 @@ namespace PSFilterHostDll
                 this.aete = value; 
             }
         }
-        
+
+        /// <summary>
+        /// Sets the information describing the conditions that the plug-in requires to execute.
+        /// </summary>
+        internal string EnableInfo
+        {
+            set
+            {
+                this.enableInfo = value;
+            }
+        }
+
+        /// <summary>
+        /// Sets the bit field describing the image modes supported by the plug-in.
+        /// </summary>
+        internal ushort? SupportedModes
+        {
+            set
+            {
+                this.supportedModes = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the entry points used to show the about box for a module containing multiple plug-ins.
+        /// </summary>
+        internal string[] ModuleEntryPoints
+        {
+            get
+            {
+                return this.moduleEntryPoints;
+            }
+            set
+            {
+                this.moduleEntryPoints = value;
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating whether this filter has an about box.
         /// </summary>
