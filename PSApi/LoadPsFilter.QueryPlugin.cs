@@ -344,7 +344,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 						return true;
 					}
-					enumData.supportedModes = *(ushort*)dataPtr;
+					enumData.SupportedModes = *(ushort*)dataPtr;
 #endif
 				}
 				else if (propKey == PIPropertyID.PICategoryProperty)
@@ -400,7 +400,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
 				{
-					enumData.enableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
+					enumData.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIRequiredHostProperty)
 				{
@@ -522,16 +522,17 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			// Add the supported modes to the plug-in data as it can be used later to disable filters that do not support the image type.
-			enumData.supportedModes = 0;
+			ushort supportedModes = 0;
 			if ((info->supportsMode & PSConstants.supportsGrayScale) == PSConstants.supportsGrayScale)
 			{
-				enumData.supportedModes |= PSConstants.flagSupportsGrayScale;
+				supportedModes |= PSConstants.flagSupportsGrayScale;
 			}
 
 			if ((info->supportsMode & PSConstants.supportsRGBColor) == PSConstants.supportsRGBColor)
 			{
-				enumData.supportedModes |= PSConstants.flagSupportsRGBColor;
+				supportedModes |= PSConstants.flagSupportsRGBColor;
 			}
+			enumData.SupportedModes = supportedModes;
 #endif
 
 			if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.noRequiredHost)
@@ -706,7 +707,7 @@ namespace PSFilterHostDll.PSApi
 
 				for (int i = 0; i < entryPoints.Length; i++)
 				{
-					pluginData[i].moduleEntryPoints = entryPoints;
+					pluginData[i].ModuleEntryPoints = entryPoints;
 				}
 			}
 
