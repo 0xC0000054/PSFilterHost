@@ -18,16 +18,41 @@ using System.Runtime.InteropServices;
 namespace PSFilterHostDll.PSApi
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VRect
+    internal struct VRect : System.IEquatable<VRect>
     {
         public int top;
         public int left;
         public int bottom;
         public int right;
 
+        public override bool Equals(object obj)
+        {
+            if (obj is VRect)
+            {
+                return Equals((VRect)obj);
+            }
+
+            return false;
+        }
+
         public bool Equals(VRect rect)
         {
             return (this.left == rect.left && this.top == rect.top && this.right == rect.right && this.bottom == rect.bottom);
+        }
+
+        public override int GetHashCode()
+        {
+            return (this.left.GetHashCode() ^ this.top.GetHashCode() ^ this.bottom.GetHashCode() ^ this.right.GetHashCode());
+        }
+
+        public static bool operator ==(VRect left, VRect right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(VRect left, VRect right)
+        {
+            return !left.Equals(right);
         }
 
 #if DEBUG
