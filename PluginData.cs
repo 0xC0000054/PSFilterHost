@@ -278,7 +278,7 @@ namespace PSFilterHostDll
             this.hasAboutBox = true;
         }
 
-        [OnDeserializedAttribute]
+        [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
         }
