@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
-#pragma warning disable 0659
+    [StructLayout(LayoutKind.Sequential)]
     internal struct Rect16 : System.IEquatable<Rect16>
     {
         public short top;
@@ -47,6 +47,16 @@ namespace PSFilterHostDll.PSApi
             return (this.left.GetHashCode() ^ this.top.GetHashCode() ^ this.bottom.GetHashCode() ^ this.right.GetHashCode());
         }
 
+        public static bool operator ==(Rect16 left, Rect16 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Rect16 left, Rect16 right)
+        {
+            return !left.Equals(right);
+        }
+
 #if DEBUG
         public override string ToString()
         {
@@ -56,5 +66,4 @@ namespace PSFilterHostDll.PSApi
         public static readonly Rect16 Empty = new Rect16();
 
     }
-#pragma warning restore 0659
 }
