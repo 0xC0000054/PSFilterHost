@@ -24,8 +24,8 @@ namespace PSFilterHostDll
 	[Serializable]
 	public sealed class PSResource : IEquatable<PSResource>, ISerializable
 	{
-		private uint key;
-		private int index;
+		private readonly uint key;
+		private readonly int index;
 		private byte[] data;
 
 		/// <summary>
@@ -48,10 +48,6 @@ namespace PSFilterHostDll
 			{
 				return index;
 			}
-			internal set
-			{
-				index = value;
-			}
 		}
 
 		/// <summary>
@@ -60,20 +56,53 @@ namespace PSFilterHostDll
 		/// <returns>The resource data byte array.</returns>
 		public byte[] GetData()
 		{
+			return (byte[])data.Clone();
+		}
+
+		/// <summary>
+		/// Gets the resource data without cloning the array.
+		/// </summary>
+		/// <returns>A direct reference to the resource data array.</returns>
+		internal byte[] GetDataReadOnly()
+		{
 			return data;
 		}
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PSResource"/> class.
 		/// </summary>
-		/// <param name="key">The resource key.</param>
-		/// <param name="index">The resource index.</param>
-		/// <param name="data">The resource data.</param>
-		internal PSResource(uint key, int index, byte[] data)
+		/// <param name="resourceKey">The resource key.</param>
+		/// <param name="resourceIndex">The resource index.</param>
+		/// <param name="resourceData">The resource data.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="resourceData"/> is null.</exception>
+		internal PSResource(uint resourceKey, int resourceIndex, byte[] resourceData)
 		{
-			this.key = key;
-			this.index = index;
-			this.data = data;
+			if (resourceData == null)
+			{
+				throw new ArgumentNullException("resourceData");
+			}
+
+			this.key = resourceKey;
+			this.index = resourceIndex;
+			this.data = (byte[])resourceData.Clone();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PSResource"/> class, from an existing instance with a new resource index.
+		/// </summary>
+		/// <param name="existing">The existing instance.</param>
+		/// <param name="newIndex">The new resource index for the instance.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="existing"/> is null.</exception>
+		internal PSResource(PSResource existing, int newIndex)
+		{
+			if (existing == null)
+			{
+				throw new ArgumentNullException("existing");
+			}
+
+			this.key = existing.key;
+			this.index = newIndex;
+			this.data = (byte[])existing.data.Clone();
 		}
 
 		/// <summary>
