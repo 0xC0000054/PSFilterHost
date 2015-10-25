@@ -1002,10 +1002,10 @@ namespace PSFilterHostDll.PSApi
 
 			using (PluginModule module = new PluginModule(pdata.FileName, pdata.EntryPoint))
 			{
-			    PlatformData platform = new PlatformData()
-			    {
-				    hwnd = owner
-			    };
+				PlatformData platform = new PlatformData()
+				{
+					hwnd = owner
+				};
 
 				GCHandle platformDataHandle = GCHandle.Alloc(platform, GCHandleType.Pinned);
 				try
@@ -5977,12 +5977,16 @@ namespace PSFilterHostDll.PSApi
 
 					if (next < 0) break;
 
-					pseudoResources[next].Index = i - 1;
+					PSResource existing = pseudoResources[next];
+					int newIndex = i - 1;
+
+					pseudoResources[next] = new PSResource(existing, newIndex);
 
 					i++;
 				}
 			}
 		}
+
 		private IntPtr ResourceGetProc(uint ofType, short index)
 		{
 #if DEBUG
@@ -5995,7 +5999,7 @@ namespace PSFilterHostDll.PSApi
 
 			if (res != null)
 			{
-				byte[] data = res.GetData();
+				byte[] data = res.GetDataReadOnly();
 
 				IntPtr h = HandleNewProc(data.Length);
 				if (h != IntPtr.Zero)
