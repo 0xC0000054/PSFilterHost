@@ -77,11 +77,11 @@ namespace PSFilterHostDll
 		}
 
 		/// <summary>
-		/// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
+		/// Determines whether the specified <see cref="Object"/> is equal to this instance.
 		/// </summary>
-		/// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
+		/// <param name="obj">The <see cref="Object"/> to compare with this instance.</param>
 		/// <returns>
-		///   <c>true</c> if the specified <see cref="System.Object"/> is equal to this instance; otherwise, <c>false</c>.
+		///   <c>true</c> if the specified <see cref="Object"/> is equal to this instance; otherwise, <c>false</c>.
 		/// </returns>
 		public override bool Equals(object obj)
 		{
@@ -103,7 +103,9 @@ namespace PSFilterHostDll
 		public bool Equals(PSResource other)
 		{
 			if (other == null)
+			{
 				return false;
+			}
 
 			return (this.key == other.key && this.index == other.index);
 		}
@@ -143,7 +145,9 @@ namespace PSFilterHostDll
 		private PSResource(SerializationInfo info, StreamingContext context)
 		{
 			if (info == null)
+			{
 				throw new ArgumentNullException("info", "info is null.");
+			}
 
 			this.key = info.GetUInt32("key");
 			this.index = info.GetInt32("index");
@@ -155,7 +159,7 @@ namespace PSFilterHostDll
 		/// </summary>
 		/// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
 		/// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
-		/// <exception cref="System.ArgumentNullException"><paramref name="info"/> is null.</exception>
+		/// <exception cref="ArgumentNullException"><paramref name="info"/> is null.</exception>
 		/// <exception cref="T:System.Security.SecurityException">
 		/// The caller does not have the required permission.
 		///   </exception>
@@ -163,7 +167,9 @@ namespace PSFilterHostDll
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			if (info == null)
+			{
 				throw new ArgumentNullException("info", "info is null.");
+			}
 
 			info.AddValue("key", this.key);
 			info.AddValue("index", this.index);
