@@ -134,6 +134,7 @@
     <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="HashCodeHelper.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
     <Compile Include="OS.cs" />
