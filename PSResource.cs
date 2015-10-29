@@ -151,6 +151,37 @@ namespace PSFilterHostDll
 		}
 
 		/// <summary>
+		/// Determines whether two PSResource instances have the same value.
+		/// </summary>
+		/// <param name="p1">The first object to compare.</param>
+		/// <param name="p2">The second object to compare.</param>
+		/// <returns>
+		/// <c>true</c> if the PSResource instances are equal; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool operator ==(PSResource p1, PSResource p2)
+		{
+			if (((object)p1) == null || ((object)p2) == null)
+			{
+				return Object.Equals(p1, p2);
+			}
+
+			return p1.Equals(p2);
+		}
+
+		/// <summary>
+		/// Determines whether two PSResource instances do not have the same value.
+		/// </summary>
+		/// <param name="p1">The first object to compare.</param>
+		/// <param name="p2">The second object to compare.</param>
+		/// <returns>
+		/// <c>true</c> if the PSResource instances are not equal; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool operator !=(PSResource p1, PSResource p2)
+		{
+			return !(p1 == p2);
+		}
+
+		/// <summary>
 		/// Compares this instance to the specified key and index for equality.
 		/// </summary>
 		/// <param name="otherKey">The key to compare.</param>

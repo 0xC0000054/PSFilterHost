@@ -340,5 +340,36 @@ namespace PSFilterHostDll
 
             return (this.fileName == other.fileName && this.category == other.category && this.entryPoint == other.entryPoint && this.title == other.title);
         }
+
+        /// <summary>
+        /// Determines whether two PluginData instances have the same value.
+        /// </summary>
+        /// <param name="p1">The first object to compare.</param>
+        /// <param name="p2">The second object to compare.</param>
+        /// <returns>
+        /// <c>true</c> if the PluginData instances are equal; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool operator ==(PluginData p1, PluginData p2)
+        {
+            if (((object)p1) == null || ((object)p2) == null)
+            {
+                return Object.Equals(p1, p2);
+            }
+
+            return p1.Equals(p2);
+        }
+
+        /// <summary>
+        /// Determines whether two PluginData instances do not have the same value.
+        /// </summary>
+        /// <param name="p1">The first object to compare.</param>
+        /// <param name="p2">The second object to compare.</param>
+        /// <returns>
+        /// <c>true</c> if the PluginData instances are not equal; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool operator !=(PluginData p1, PluginData p2)
+        {
+            return !(p1 == p2);
+        }
     }
 }
