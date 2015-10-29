@@ -147,7 +147,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return (key.GetHashCode() ^ index.GetHashCode());
+			return HashCodeHelper.GetHashCode(this.key, this.index);
 		}
 
 		/// <summary>

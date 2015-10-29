@@ -302,7 +302,7 @@ namespace PSFilterHostDll
         /// </returns>
         public override int GetHashCode()
         {
-            return (this.fileName.GetHashCode() ^ this.category.GetHashCode() ^ this.title.GetHashCode() ^ this.entryPoint.GetHashCode());
+            return HashCodeHelper.GetHashCode(this.fileName, this.entryPoint, this.category, this.title);
         }
 
         /// <summary>

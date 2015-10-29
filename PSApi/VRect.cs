@@ -42,7 +42,7 @@ namespace PSFilterHostDll.PSApi
 
         public override int GetHashCode()
         {
-            return (this.left.GetHashCode() ^ this.top.GetHashCode() ^ this.bottom.GetHashCode() ^ this.right.GetHashCode());
+            return HashCodeHelper.GetHashCode(this.left, this.top, this.right, this.bottom);
         }
 
         public static bool operator ==(VRect left, VRect right)
