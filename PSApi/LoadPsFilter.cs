@@ -5957,19 +5957,20 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			Ping(DebugFlags.ResourceSuite, string.Format("{0}, {1}", PropToString(ofType), index));
 #endif
-			PSResource res = pseudoResources.Find(delegate(PSResource r)
+			int resourceIndex = pseudoResources.FindIndex(delegate(PSResource r)
 			{
 				return r.Equals(ofType, index);
 			});
 
-			if (res != null)
+			if (resourceIndex >= 0)
 			{
-				pseudoResources.Remove(res);
+				pseudoResources.RemoveAt(resourceIndex);
 
 				int i = index + 1;
 
-				while (true) // renumber the index of subsequent items.
+				while (true) 
 				{
+					// Renumber the index of subsequent items.
 					int next = pseudoResources.FindIndex(delegate(PSResource r)
 					{
 						return r.Equals(ofType, i);
