@@ -595,27 +595,34 @@ namespace PSFilterHostDll.PSApi
 			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
 			if ((data.FilterInfo == null) || data.Category == "Axion")
 			{
-				switch (filterCase)
+				if (source.HasTransparency())
 				{
-					case FilterCase.EditableTransparencyNoSelection:
-						this.filterCase = FilterCase.FlatImageNoSelection;
-						break;
-					case FilterCase.EditableTransparencyWithSelection:
-						this.filterCase = FilterCase.FlatImageWithSelection;
-						break;
+					this.filterCase = FilterCase.FloatingSelection;
+				}
+				else
+				{
+					switch (filterCase)
+					{
+						case FilterCase.EditableTransparencyNoSelection:
+							this.filterCase = FilterCase.FlatImageNoSelection;
+							break;
+						case FilterCase.EditableTransparencyWithSelection:
+							this.filterCase = FilterCase.FlatImageWithSelection;
+							break;
+					} 
 				}
 
 				return true;
 			}
 
 			int filterCaseIndex = this.filterCase - 1;
+			FilterCaseInfo[] filterInfo = data.FilterInfo;
 
 			// If the EditableTransparency cases are not supported use the other modes.
-			if (data.FilterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
+			if (filterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 			{
-				// Use the FlatImage modes if the filter doesn't support the ProtectedTransparency cases or image does not have any transparency.
-
-				if (data.FilterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter || !source.HasTransparency())
+				bool hasTransparency = source.HasTransparency();
+				if (!hasTransparency)
 				{
 					switch (filterCase)
 					{
@@ -626,6 +633,29 @@ namespace PSFilterHostDll.PSApi
 							this.filterCase = FilterCase.FlatImageWithSelection;
 							break;
 					}
+
+					return true;
+				}
+				else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
+				{
+					// If the protected transparency modes are not supported use the next most appropriate mode.
+					if (hasTransparency && filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
+					{
+						this.filterCase = FilterCase.FloatingSelection;
+					}
+					else
+					{
+						switch (filterCase)
+						{
+							case FilterCase.EditableTransparencyNoSelection:
+								this.filterCase = FilterCase.FlatImageNoSelection;
+								break;
+							case FilterCase.EditableTransparencyWithSelection:
+								this.filterCase = FilterCase.FlatImageWithSelection;
+								break;
+						}
+					}
+
 					return true;
 				}
 				else
@@ -644,7 +674,7 @@ namespace PSFilterHostDll.PSApi
 
 			}
 
-			FilterCaseInfo info = data.FilterInfo[this.filterCase - 1];
+			FilterCaseInfo info = filterInfo[this.filterCase - 1];
 			this.inputHandling = info.inputHandling;
 			this.outputHandling = info.outputHandling;
 
@@ -1261,6 +1291,8 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->outRowBytes = 0;
 
 			filterRecord->isFloating = 0;
+			filterRecord->haveMask = 0;
+			filterRecord->autoMask = 0;
 
 			if (selectedRegion != null)
 			{
@@ -1268,9 +1300,11 @@ namespace PSFilterHostDll.PSApi
 				filterRecord->haveMask = 1;
 				filterRecord->autoMask = 1;
 			}
-			else
+			else if (filterCase == FilterCase.FloatingSelection)
 			{
-				filterRecord->haveMask = 0;
+				DrawFloatingSelectionMask();
+				filterRecord->isFloating = 1;
+				filterRecord->haveMask = 1;
 				filterRecord->autoMask = 0;
 			}
 			filterRecord->maskRect = Rect16.Empty;
@@ -4326,6 +4360,54 @@ namespace PSFilterHostDll.PSApi
 					{
 						*ptr = 255;
 						ptr++;
+					}
+				}
+			}
+		}
+
+		private unsafe void DrawFloatingSelectionMask()
+		{
+			int width = source.Width;
+			int height = source.Height;
+			mask = new Surface8(width, height);
+
+			SafeNativeMethods.memset(mask.Scan0.Pointer, 0, new UIntPtr((ulong)mask.Scan0.Length));
+
+			if (imageMode == ImageModes.RGB48)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+					byte* dst = mask.GetRowAddressUnchecked(y);
+
+					for (int x = 0; x < width; x++)
+					{
+						if (src[3] > 0)
+						{
+							*dst = 255;
+						}
+
+						src += 4;
+						dst++;
+					}
+				}
+			}
+			else
+			{
+				for (int y = 0; y < height; y++)
+				{
+					byte* src = source.GetRowAddressUnchecked(y);
+					byte* dst = mask.GetRowAddressUnchecked(y);
+
+					for (int x = 0; x < width; x++)
+					{
+						if (src[3] > 0)
+						{
+							*dst = 255;
+						}
+
+						src += 4;
+						dst++;
 					}
 				}
 			}
