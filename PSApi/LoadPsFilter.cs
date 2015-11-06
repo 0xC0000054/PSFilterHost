@@ -4146,17 +4146,17 @@ namespace PSFilterHostDll.PSApi
 
 			int width = srcRect.right - srcRect.left;
 			int height = srcRect.bottom - srcRect.top;
-			int nplanes = ((FilterRecord*)filterRecordPtr.ToPointer())->planes;
 
 			bool hasTransparencyMask = srcPixelMap.version >= 1 && srcPixelMap.masks != IntPtr.Zero;
 
-			// Ignore the alpha plane if the PSPixelMap does not have a transparency mask.  
-			if (!hasTransparencyMask && nplanes == 4)
+			try
 			{
-				nplanes = 3;
+				SetupTempDisplaySurface(width, height, hasTransparencyMask);
 			}
-
-			SetupTempDisplaySurface(width, height, hasTransparencyMask);
+			catch (OutOfMemoryException)
+			{
+				return PSError.memFullErr;
+			}
 
 			byte* baseAddr = (byte*)srcPixelMap.baseAddr.ToPointer();
 
@@ -4195,10 +4195,10 @@ namespace PSFilterHostDll.PSApi
 					{
 						byte* row = tempDisplaySurface.GetRowAddressUnchecked(surfaceY);
 						int srcStride = y * srcPixelMap.rowBytes; // cache the destination row and source stride.
-						for (int i = 0; i < nplanes; i++)
+						for (int i = 0; i < 3; i++)
 						{
 							int ofs = i;
-							switch (i) // Photoshop uses RGBA pixel order so map the Red and Blue channels to BGRA order
+							switch (i) // Photoshop uses RGB pixel order so map the Red and Blue channels to BGR order
 							{
 								case 0:
 									ofs = 2;
@@ -4254,33 +4254,31 @@ namespace PSFilterHostDll.PSApi
 					// Apply the transparency mask for the Protected Transparency cases.
 					if (hasTransparencyMask && (this.filterCase == FilterCase.ProtectedTransparencyNoSelection || this.filterCase == FilterCase.ProtectedTransparencyWithSelection)) 
 					{
-						PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
-						byte* maskData = (byte*)srcMask->maskData.ToPointer();
+					PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
+					byte* maskData = (byte*)srcMask->maskData.ToPointer();
 
-						for (int y = 0; y < height; y++)
-						{
-							byte* src = maskData + (y * srcMask->rowBytes);
-							byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y);
-
-							for (int x = 0; x < width; x++)
-							{
-								dst[3] = *src;
-
-								src += srcMask->colBytes;
-								dst += 4;
-							}
-						}
-
-						Display32BitBitmap(gr, dstCol, dstRow);
-					}
-					else
+					for (int y = 0; y < height; y++)
 					{
-						using (Bitmap bmp = tempDisplaySurface.CreateAliasedBitmap())
+						byte* src = maskData + (y * srcMask->rowBytes);
+						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y);
+
+						for (int x = 0; x < width; x++)
 						{
-							gr.DrawImageUnscaled(bmp, dstCol, dstRow);
+							dst[3] = *src;
+
+							src += srcMask->colBytes;
+							dst += 4;
 						}
 					}
 
+					Display32BitBitmap(gr, dstCol, dstRow);
+				}
+				else
+				{
+					using (Bitmap bmp = tempDisplaySurface.CreateAliasedBitmap())
+					{
+						gr.DrawImageUnscaled(bmp, dstCol, dstRow);
+					}
 				}
 			}
 
