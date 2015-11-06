@@ -4230,10 +4230,6 @@ namespace PSFilterHostDll.PSApi
 							dst[0] = src[2];
 							dst[1] = src[1];
 							dst[2] = src[0];
-							if (srcPixelMap.colBytes == 4)
-							{
-								dst[3] = src[3];
-							}
 
 							src += srcPixelMap.colBytes;
 							dst += 4;
@@ -4245,15 +4241,9 @@ namespace PSFilterHostDll.PSApi
 
 			using (Graphics gr = Graphics.FromHdc(platformContext))
 			{
-				if (srcPixelMap.colBytes == 4 || nplanes == 4 && srcPixelMap.colBytes == 1)
+				// Apply the transparency mask if present.
+				if (hasTransparencyMask) 
 				{
-					Display32BitBitmap(gr, dstCol, dstRow);
-				}
-				else
-				{
-					// Apply the transparency mask for the Protected Transparency cases.
-					if (hasTransparencyMask && (this.filterCase == FilterCase.ProtectedTransparencyNoSelection || this.filterCase == FilterCase.ProtectedTransparencyWithSelection)) 
-					{
 					PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
 					byte* maskData = (byte*)srcMask->maskData.ToPointer();
 
