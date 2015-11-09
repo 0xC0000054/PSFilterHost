@@ -36,16 +36,28 @@ namespace PSFilterHostDll.PSApi
         internal static extern bool HeapFree([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] IntPtr lpMem);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern IntPtr HeapReAlloc([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] IntPtr lpMem, [In()] UIntPtr dwBytes);
+        internal static extern IntPtr HeapReAlloc(
+            [In()] IntPtr hHeap,
+            [In()] uint dwFlags, 
+            [In()] IntPtr lpMem, 
+            [In()] UIntPtr dwBytes);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern UIntPtr HeapSize([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] IntPtr lpMem);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern unsafe uint HeapSetInformation([In()] IntPtr HeapHandle, [In()] int HeapInformationClass, [In()] void* HeapInformation, [In()] UIntPtr HeapInformationLength);
+        internal static extern unsafe uint HeapSetInformation(
+            [In()] IntPtr HeapHandle,
+            [In()] int HeapInformationClass,
+            [In()] void* HeapInformation, 
+            [In()] UIntPtr HeapInformationLength);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern IntPtr VirtualAlloc([In()] IntPtr lpAddress, [In()] UIntPtr dwSize, [In()] uint flAllocationType, [In()] uint flProtect);
+        internal static extern IntPtr VirtualAlloc(
+            [In()] IntPtr lpAddress,
+            [In()] UIntPtr dwSize, 
+            [In()] uint flAllocationType,
+            [In()] uint flProtect);
 
         [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
