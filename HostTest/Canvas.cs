@@ -325,13 +325,11 @@ namespace HostTest
 			{
 				CompositingMode oldCM = pe.Graphics.CompositingMode;
 
+				pe.Graphics.CompositingMode = CompositingMode.SourceCopy;
 				if (this.checkerBoardBitmap != null)
 				{
 					pe.Graphics.DrawImage(this.checkerBoardBitmap, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
-				}
-				else
-				{
-					pe.Graphics.CompositingMode = CompositingMode.SourceCopy;
+					pe.Graphics.CompositingMode = CompositingMode.SourceOver;
 				}
 
 				if (this.scaledImage != null)
