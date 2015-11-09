@@ -109,6 +109,7 @@ namespace PSFilterHostDll
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        [BestFitMapping(false)]
         private sealed class WIN32_FIND_DATAW
         {
             public uint dwFileAttributes;
