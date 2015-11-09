@@ -509,17 +509,8 @@ namespace HostTest
 						}
 
 						this.canvas.SuspendPaint();
-						using (MemoryStream stream = new MemoryStream())
-						{
-							PngBitmapEncoder enc = new PngBitmapEncoder();
-							enc.Frames.Add(BitmapFrame.Create(convertedImage ?? this.dstImage));
-							enc.Save(stream);
 
-							base.Invoke(new Action<MemoryStream>(delegate(MemoryStream ms)
-							{
-								this.canvas.Surface = new Bitmap(ms, true);
-							}), new object[] { stream });
-						}
+						UpdateCanvasImage(convertedImage ?? this.dstImage);
 
 						this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.dstImage);
 
@@ -687,6 +678,28 @@ namespace HostTest
 			}
 		}
 
+		private void UpdateCanvasImage(BitmapSource image)
+		{
+			using (MemoryStream stream = new MemoryStream())
+			{
+				PngBitmapEncoder enc = new PngBitmapEncoder();
+				enc.Frames.Add(BitmapFrame.Create(image, null, null, null));
+				enc.Save(stream);
+
+				if (base.InvokeRequired)
+				{
+					base.Invoke(new Action<MemoryStream>(delegate (MemoryStream ms)
+					{
+						this.canvas.Surface = new Bitmap(ms, true);
+					}), new object[] { stream });
+				}
+				else
+				{
+					this.canvas.Surface = new Bitmap(stream); 
+				}
+			}
+		}
+
 		private void OpenFile(string path)
 		{
 			this.Cursor = Cursors.WaitCursor;
@@ -713,17 +726,6 @@ namespace HostTest
 					this.imageType = "RGB/";
 				}
 
-				// Set the meta data manually as some codecs may not implement all the properties required for BitmapMetadata.Clone() to succeed.
-				BitmapMetadata metaData = null;
-
-				try
-				{
-					metaData = srcImage.Metadata as BitmapMetadata;
-				}
-				catch (NotSupportedException)
-				{
-				}
-
 				this.panel1.SuspendLayout();
 
 				if (bitsPerChannel >= 16)
@@ -734,27 +736,13 @@ namespace HostTest
 					conv.DestinationFormat = channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24;
 					conv.EndInit();
 
-					using (MemoryStream ms = new MemoryStream())
-					{
-						PngBitmapEncoder enc = new PngBitmapEncoder();
-						enc.Frames.Add(BitmapFrame.Create(conv, null, metaData, null));
-						enc.Save(ms);
-
-						this.canvas.Surface = new Bitmap(ms, true);
-					}
+					UpdateCanvasImage(conv);
 
 					this.imageType += "16";
 				}
 				else
 				{
-					using (MemoryStream ms = new MemoryStream())
-					{
-						PngBitmapEncoder enc = new PngBitmapEncoder();
-						enc.Frames.Add(BitmapFrame.Create(srcImage, null, metaData, null));
-						enc.Save(ms);
-
-						this.canvas.Surface = new Bitmap(ms, true);
-					}
+					UpdateCanvasImage(srcImage);
 
 					this.imageType += "8";
 				}
