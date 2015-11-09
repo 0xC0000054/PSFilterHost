@@ -121,7 +121,7 @@
     <value>Alpha</value>
   </data>
   <data name="FilterBadParameters" xml:space="preserve">
-    <value>An unknown error has occured.</value>
+    <value>An unknown error has occurred.</value>
   </data>
   <data name="BlueChannelName" xml:space="preserve">
     <value>Blue</value>

@@ -142,7 +142,7 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unknown error has occured..
+        ///   Looks up a localized string similar to An unknown error has occurred..
         /// </summary>
         internal static string FilterBadParameters {
             get {
