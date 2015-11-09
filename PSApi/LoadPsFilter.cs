@@ -4222,42 +4222,37 @@ namespace PSFilterHostDll.PSApi
 			}
 			else
 			{
-				for (int y = top; y < bottom; y++)
+				if (srcPixelMap.colBytes == 1)
 				{
-					int surfaceY = y - top;
-					if (srcPixelMap.colBytes == 1)
+					int greenPlaneOffset = srcPixelMap.planeBytes;
+					int bluePlaneOffset = srcPixelMap.planeBytes * 2;
+					for (int y = top; y < bottom; y++)
 					{
-						byte* row = tempDisplaySurface.GetRowAddressUnchecked(surfaceY);
-						int srcStride = y * srcPixelMap.rowBytes; // cache the destination row and source stride.
-						for (int i = 0; i < 3; i++)
+						byte* redPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
+						byte* greenPlane = redPlane + greenPlaneOffset;
+						byte* bluePlane = redPlane + bluePlaneOffset;
+
+						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
+
+						for (int x = 0; x < width; x++)
 						{
-							int ofs = i;
-							switch (i) // Photoshop uses RGB pixel order so map the Red and Blue channels to BGR order
-							{
-								case 0:
-									ofs = 2;
-									break;
-								case 2:
-									ofs = 0;
-									break;
-							}
-							byte* src = baseAddr + srcStride + (i * srcPixelMap.planeBytes) + left;
-							byte* dst = row + ofs;
+							dst[2] = *redPlane;
+							dst[1] = *greenPlane;
+							dst[0] = *bluePlane;
 
-							for (int x = 0; x < width; x++)
-							{
-								*dst = *src;
-
-								src += srcPixelMap.colBytes;
-								dst += 4;
-							}
+							redPlane++;
+							greenPlane++;
+							bluePlane++;
+							dst += 4;
 						}
-
 					}
-					else
+				}
+				else
+				{
+					for (int y = top; y < bottom; y++)
 					{
-						byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
-						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(surfaceY);
+						byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
+						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
 
 						for (int x = 0; x < width; x++)
 						{
@@ -4268,7 +4263,7 @@ namespace PSFilterHostDll.PSApi
 							src += srcPixelMap.colBytes;
 							dst += 4;
 						}
-					}
+					} 
 				}
 			}
 
