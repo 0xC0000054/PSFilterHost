@@ -209,3 +209,9 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Scope = "member", Target = "PSFilterHostDll.PSApi.PluginAETE.#suiteLevel")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields", Scope = "member", Target = "PSFilterHostDll.PSApi.PluginAETE.#suiteVersion")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Scope = "member", Target = "PSFilterHostDll.PluginData.#OnDeserialized(System.Runtime.Serialization.StreamingContext)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PluginData.#op_Inequality(PSFilterHostDll.PluginData,PSFilterHostDll.PluginData)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PluginData.#op_Equality(PSFilterHostDll.PluginData,PSFilterHostDll.PluginData)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PSResource.#op_Inequality(PSFilterHostDll.PSResource,PSFilterHostDll.PSResource)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PSResource.#op_Equality(PSFilterHostDll.PSResource,PSFilterHostDll.PSResource)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Scope = "member", Target = "PSFilterHostDll.PSApi.LoadPsFilter.#RestoreParameters()")]
+
