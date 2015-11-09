@@ -77,7 +77,7 @@ namespace PSFilterHostDll.PSApi
         public IntPtr displayPixels;
         public IntPtr handleProcs; 
 
-        /* New in 3.0 */
+        // New in 3.0
         public byte supportsDummyChannels;
         public byte supportsAlternateLayouts;
         public short wantLayout;
@@ -133,7 +133,7 @@ namespace PSFilterHostDll.PSApi
         public int outColumnBytes;
         public int outPlaneBytes;
 
-        /* New in 3.0.4. */
+        // New in 3.0.4
         public IntPtr imageServicesProcs;
         public IntPtr propertyProcs;
 
@@ -153,13 +153,13 @@ namespace PSFilterHostDll.PSApi
         public short maskTileWidth;
         public Point16 maskTileOrigin;
 
-        /* New in 4.0*/
+        // New in 4.0
         public IntPtr descriptorParameters;
         public IntPtr errorString;
         public IntPtr channelPortProcs;
         public IntPtr documentInfo;
 
-        /* New in 5.0 */
+        // New in 5.0
         public IntPtr sSPBasic;
         public IntPtr plugInRef;
         public int depth;
