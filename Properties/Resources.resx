@@ -190,8 +190,8 @@
   <data name="BlankDataNotSupported" xml:space="preserve">
     <value>The filter does not support processing completely transparent images.</value>
   </data>
-  <data name="PathAccessDenied" xml:space="preserve">
-    <value>Access to the path is denied</value>
+  <data name="AccessDeniedWithPath" xml:space="preserve">
+    <value>Access to '{0}' is denied</value>
   </data>
   <data name="PluginEntryPointNotFound" xml:space="preserve">
     <value>Unable to find an entry point named '{0}' in  '{1}'</value>
@@ -210,5 +210,8 @@
   </data>
   <data name="ParametersNotSet" xml:space="preserve">
     <value>The FilterParameters property must be set before running a filter without its UI.</value>
+  </data>
+  <data name="DirectoryNotFoundWithPath" xml:space="preserve">
+    <value>Could not find a part of the path '{0}'.</value>
   </data>
 </root>

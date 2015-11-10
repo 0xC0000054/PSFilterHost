@@ -61,6 +61,15 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access to &apos;{0}&apos; is denied.
+        /// </summary>
+        internal static string AccessDeniedWithPath {
+            get {
+                return ResourceManager.GetString("AccessDeniedWithPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Alpha.
         /// </summary>
         internal static string AlphaChannelName {
@@ -84,6 +93,15 @@ namespace PSFilterHostDll.Properties {
         internal static string BlueChannelName {
             get {
                 return ResourceManager.GetString("BlueChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find a part of the path &apos;{0}&apos;..
+        /// </summary>
+        internal static string DirectoryNotFoundWithPath {
+            get {
+                return ResourceManager.GetString("DirectoryNotFoundWithPath", resourceCulture);
             }
         }
         
@@ -255,15 +273,6 @@ namespace PSFilterHostDll.Properties {
         internal static string ParametersNotSet {
             get {
                 return ResourceManager.GetString("ParametersNotSet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Access to the path is denied.
-        /// </summary>
-        internal static string PathAccessDenied {
-            get {
-                return ResourceManager.GetString("PathAccessDenied", resourceCulture);
             }
         }
         
