@@ -11,9 +11,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using Microsoft.Win32.SafeHandles;
+using PSFilterHostDll.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
@@ -326,9 +328,9 @@ namespace PSFilterHostDll
             switch (win32Error)
             {
                 case NativeConstants.ERROR_PATH_NOT_FOUND:
-                    throw new DirectoryNotFoundException();
+                    throw new DirectoryNotFoundException(string.Format(CultureInfo.InvariantCulture, Resources.DirectoryNotFoundWithPath, this.searchData.path));
                 case NativeConstants.ERROR_ACCESS_DENIED:
-                    throw new UnauthorizedAccessException(Properties.Resources.PathAccessDenied);
+                    throw new UnauthorizedAccessException(string.Format(CultureInfo.InvariantCulture, Resources.AccessDeniedWithPath, this.searchData.path));
                 case NativeConstants.ERROR_DIRECTORY:
                 default:
                     throw new IOException(GetWin32ErrorMessage(win32Error), MakeHRFromWin32Error(win32Error));
