@@ -1298,7 +1298,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				DrawMask();
 				filterRecord->haveMask = 1;
-				filterRecord->autoMask = 1;
+				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
 			}
 			else if (filterCase == FilterCase.FloatingSelection)
 			{
