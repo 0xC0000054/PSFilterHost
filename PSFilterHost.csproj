@@ -140,6 +140,10 @@
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
+    <Compile Include="PSApi\BufferSuite.cs" />
+    <Compile Include="PSApi\DebugUtils.cs" />
+    <Compile Include="PSApi\DescriptorSuite.cs" />
+    <Compile Include="PSApi\HandleSuite.cs" />
     <Compile Include="PSApi\ImageMetaData.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
@@ -147,6 +151,7 @@
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
+    <Compile Include="PSApi\PseudoResourceSuite.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
