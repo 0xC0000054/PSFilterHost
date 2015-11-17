@@ -812,8 +812,8 @@ namespace PSFilterHostDll.PSApi
 								long ps = SafeNativeMethods.GlobalSize(hPtr).ToInt64();
 								if (ps > 0L)
 								{
-									byte[] buf = new byte[ps];
-									Marshal.Copy(hPtr, buf, 0, (int)ps);
+									byte[] buf = new byte[(int)ps];
+									Marshal.Copy(hPtr, buf, 0, buf.Length);
 									this.globalParameters.SetParameterDataBytes(buf);
 									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
 									// Some filters may store executable code in the parameter block.
@@ -833,7 +833,7 @@ namespace PSFilterHostDll.PSApi
 
 									byte[] buf = new byte[ps];
 
-									Marshal.Copy(hPtr, buf, 0, ps);
+									Marshal.Copy(hPtr, buf, 0, buf.Length);
 									this.globalParameters.SetParameterDataBytes(buf);
 									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 								}
@@ -841,7 +841,7 @@ namespace PSFilterHostDll.PSApi
 								{
 									byte[] buf = new byte[(int)size];
 
-									Marshal.Copy(parameters, buf, 0, (int)size);
+									Marshal.Copy(parameters, buf, 0, buf.Length);
 									this.globalParameters.SetParameterDataBytes(buf);
 									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 								}
@@ -883,7 +883,7 @@ namespace PSFilterHostDll.PSApi
 						int ps = HandleGetSizeProc(pluginData);
 						byte[] dataBuf = new byte[ps];
 
-						Marshal.Copy(HandleLockProc(pluginData, 0), dataBuf, 0, ps);
+						Marshal.Copy(HandleLockProc(pluginData, 0), dataBuf, 0, dataBuf.Length);
 						HandleUnlockProc(pluginData);
 
 						this.globalParameters.SetPluginDataBytes(dataBuf);
@@ -895,8 +895,8 @@ namespace PSFilterHostDll.PSApi
 						long ps = SafeNativeMethods.GlobalSize(hPtr).ToInt64();
 						if (ps > 0L)
 						{
-							byte[] dataBuf = new byte[ps];
-							Marshal.Copy(hPtr, dataBuf, 0, (int)ps);
+							byte[] dataBuf = new byte[(int)ps];
+							Marshal.Copy(hPtr, dataBuf, 0, dataBuf.Length);
 							this.globalParameters.SetPluginDataBytes(dataBuf);
 							this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
 							this.globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
@@ -905,8 +905,8 @@ namespace PSFilterHostDll.PSApi
 					}
 					else if (pluginDataSize > 0)
 					{
-						byte[] dataBuf = new byte[pluginDataSize];
-						Marshal.Copy(pluginData, dataBuf, 0, (int)pluginDataSize);
+						byte[] dataBuf = new byte[(int)pluginDataSize];
+						Marshal.Copy(pluginData, dataBuf, 0, dataBuf.Length);
 						this.globalParameters.SetPluginDataBytes(dataBuf);
 						this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 					}
