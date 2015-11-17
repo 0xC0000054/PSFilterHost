@@ -763,6 +763,32 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
+		/// Determines whether the specified address is a fake indirect pointer.
+		/// </summary>
+		/// <param name="address">The address to check.</param>
+		/// <param name="baseAddress">The base address of the memory block.</param>
+		/// <param name="baseAddressSize">The size of the memory block at the base address.</param>
+		/// <param name="size">The size.</param>
+		/// <returns><c>true</c> if the address is a fake indirect pointer; otherwise, <c>false</c></returns>
+		private static bool IsFakeIndirectPointer(IntPtr address, IntPtr baseAddress, long baseAddressSize, out long size)
+		{
+			size = 0L;
+
+			bool result = false;
+
+			// Some plug-ins may use an indirect pointer to the same memory block.
+			IntPtr fakeIndirectAddress = new IntPtr(baseAddress.ToInt64() + IntPtr.Size);
+
+			if (address == fakeIndirectAddress)
+			{
+				result = true;
+				size = baseAddressSize - IntPtr.Size;
+			}
+
+			return result;
+		}
+
+		/// <summary>
 		/// Loads a filter from the PluginData.
 		/// </summary>
 		/// <param name="pdata">The PluginData of the filter to load.</param>
@@ -823,15 +849,10 @@ namespace PSFilterHostDll.PSApi
 							}
 							else
 							{
-								if (!IsBadReadPtr(hPtr))
+								long pointerSize = SafeNativeMethods.GlobalSize(hPtr).ToInt64();
+								if (pointerSize > 0L || IsFakeIndirectPointer(hPtr, parameters, size, out pointerSize))
 								{
-									int ps = SafeNativeMethods.GlobalSize(hPtr).ToInt32();
-									if (ps == 0)
-									{
-										ps = ((int)size - IntPtr.Size); // Some plug-ins do not use the pointer to a pointer trick.
-									}
-
-									byte[] buf = new byte[ps];
+									byte[] buf = new byte[(int)pointerSize];
 
 									Marshal.Copy(hPtr, buf, 0, buf.Length);
 									this.globalParameters.SetParameterDataBytes(buf);
