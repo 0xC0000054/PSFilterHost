@@ -669,7 +669,7 @@ namespace PSFilterHostDll.PSApi
 					HandleSuite.Instance.UnlockHandle(data);
 					break;
 				case DescriptorTypes.typeBoolean:
-					data = HandleSuite.Instance.NewHandle(sizeof(Byte));
+					data = HandleSuite.Instance.NewHandle(sizeof(byte));
 
 					if (data == IntPtr.Zero)
 					{
@@ -680,7 +680,7 @@ namespace PSFilterHostDll.PSApi
 					HandleSuite.Instance.UnlockHandle(data);
 					break;
 				case DescriptorTypes.typeInteger:
-					data = HandleSuite.Instance.NewHandle(sizeof(Int32));
+					data = HandleSuite.Instance.NewHandle(sizeof(int));
 
 					if (data == IntPtr.Zero)
 					{
@@ -692,7 +692,7 @@ namespace PSFilterHostDll.PSApi
 					break;
 				case DescriptorTypes.typeFloat:
 				case DescriptorTypes.typeUintFloat:
-					data = HandleSuite.Instance.NewHandle(sizeof(Double));
+					data = HandleSuite.Instance.NewHandle(sizeof(double));
 
 					if (data == IntPtr.Zero)
 					{
