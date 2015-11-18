@@ -296,7 +296,7 @@ namespace PSFilterHostDll.PSApi
 				PIProperty* pipp = (PIProperty*)propPtr;
 				uint propKey = pipp->propertyKey;
 #if DEBUG
-				Ping(DebugFlags.PiPL, string.Format("prop {0}: {1}", i, PropToString(propKey)));
+				DebugUtils.Ping(DebugFlags.PiPL, string.Format("prop {0}: {1}", i, DebugUtils.PropToString(propKey)));
 #endif
 				byte* dataPtr = propPtr + PIProperty.SizeOf;
 				if (propKey == PIPropertyID.PIKindProperty)
@@ -411,7 +411,7 @@ namespace PSFilterHostDll.PSApi
 					if (host != PSConstants.kPhotoshopSignature && host != PSConstants.noRequiredHost)
 					{
 #if DEBUG
-						System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, PropToString(host)));
+						System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, DebugUtils.PropToString(host)));
 #endif
 						return true;
 					}
@@ -541,7 +541,7 @@ namespace PSFilterHostDll.PSApi
 			if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.noRequiredHost)
 			{
 #if DEBUG
-				System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, PropToString(info->requireHost)));
+				System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, DebugUtils.PropToString(info->requireHost)));
 #endif
 				return true;
 			}
@@ -627,7 +627,7 @@ namespace PSFilterHostDll.PSApi
 			List<PluginData> pluginData = new List<PluginData>();
 
 #if DEBUG
-			debugFlags |= DebugFlags.PiPL;
+			DebugUtils.GlobalDebugFlags |= DebugFlags.PiPL;
 #endif
 			SafeLibraryHandle dll = UnsafeNativeMethods.LoadLibraryExW(pluginFileName, IntPtr.Zero, NativeConstants.LOAD_LIBRARY_AS_DATAFILE);
 			try
@@ -660,7 +660,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 						else
 						{
-							Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", pluginFileName));
+							DebugUtils.Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", pluginFileName));
 						}
 #endif
 
