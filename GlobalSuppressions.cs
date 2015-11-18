@@ -214,4 +214,7 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PSResource.#op_Inequality(PSFilterHostDll.PSResource,PSFilterHostDll.PSResource)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "p", Scope = "member", Target = "PSFilterHostDll.PSResource.#op_Equality(PSFilterHostDll.PSResource,PSFilterHostDll.PSResource)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes", Scope = "member", Target = "PSFilterHostDll.PSApi.LoadPsFilter.#RestoreParameters()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Scope = "member", Target = "PSFilterHostDll.PSApi.BufferSuite+BufferSuiteSingleton.#.cctor()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1810:InitializeReferenceTypeStaticFieldsInline", Scope = "member", Target = "PSFilterHostDll.PSApi.HandleSuite+HandleSuiteSingleton.#.cctor()")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1506:AvoidExcessiveClassCoupling", Scope = "member", Target = "PSFilterHostDll.PSApi.DescriptorSuite.#.ctor()")]
 
