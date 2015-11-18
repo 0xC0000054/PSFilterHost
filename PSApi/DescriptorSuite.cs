@@ -18,6 +18,17 @@ namespace PSFilterHostDll.PSApi
 {
 	internal sealed class DescriptorSuite
 	{
+		private struct ReadDescriptorState
+		{
+			public uint currentKey;
+			public int lastReadError;
+			public int keyArrayIndex;
+			public int keyArrayCount;
+			public IntPtr keys;
+
+			public static readonly int SizeOf = Marshal.SizeOf(typeof(ReadDescriptorState));
+		}
+
 		private readonly OpenReadDescriptorProc openReadDescriptorProc;
 		private readonly CloseReadDescriptorProc closeReadDescriptorProc;
 		private readonly GetKeyProc getKeyProc;
@@ -53,16 +64,10 @@ namespace PSFilterHostDll.PSApi
 		private readonly PutScopedClassProc putScopedClassProc;
 		private readonly PutScopedObjectProc putScopedObjectProc;
 
-		private short descErr;
-		private short descErrValue;
-		private uint getKey;
-		private int getKeyIndex;
-		private List<uint> keys;
-		private List<uint> subKeys;
-		private bool isSubKey;
-		private int subKeyIndex;
-		private int subClassIndex;
-		private Dictionary<uint, AETEValue> subClassDict;
+		private short lastDescriptorError;
+		private Dictionary<IntPtr, Dictionary<uint, AETEValue>> readDescriptorHandles;
+		private Dictionary<IntPtr, Dictionary<uint, AETEValue>> descriptorSubKeys;
+		private Dictionary<IntPtr, Dictionary<uint, AETEValue>> writeDescriptorHandles;
 		private Dictionary<uint, AETEValue> scriptingData;
 		private PluginAETE aete;
 
@@ -135,15 +140,11 @@ namespace PSFilterHostDll.PSApi
 			this.putTextProc = new PutTextProc(PutTextProc);
 			this.putUnitFloatProc = new PutUnitFloatProc(PutUnitFloatProc);
 
-			this.descErr = PSError.noErr;
+			this.lastDescriptorError = PSError.noErr;
+			this.readDescriptorHandles = new Dictionary<IntPtr, Dictionary<uint, AETEValue>>();
+			this.descriptorSubKeys = new Dictionary<IntPtr, Dictionary<uint, AETEValue>>();
+			this.writeDescriptorHandles = new Dictionary<IntPtr, Dictionary<uint, AETEValue>>();
 			this.scriptingData = new Dictionary<uint, AETEValue>();
-			this.keys = null;
-			this.aete = null;
-			this.getKey = 0;
-			this.getKeyIndex = 0;
-			this.subKeys = null;
-			this.subKeyIndex = 0;
-			this.isSubKey = false;
 		}
 
 		public IntPtr CreateReadDescriptor()
@@ -212,83 +213,85 @@ namespace PSFilterHostDll.PSApi
 		private unsafe IntPtr OpenReadDescriptorProc(IntPtr descriptor, IntPtr keyArray)
 		{
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Empty);
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("descriptor: 0x{0}", descriptor.ToHexString()));
 #endif
-			if (scriptingData.Count > 0)
+			if (descriptor != IntPtr.Zero)
 			{
-				if (keys == null)
+				Dictionary<uint, AETEValue> dictionary;
+				if (this.descriptorSubKeys.Count > 0)
 				{
-					keys = new List<uint>();
-					if (keyArray != IntPtr.Zero)
-					{
-						uint* ptr = (uint*)keyArray.ToPointer();
-						while (*ptr != 0U)
-						{
-#if DEBUG
-							DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key = {0}", DebugUtils.PropToString(*ptr)));
-#endif
-
-							keys.Add(*ptr);
-							ptr++;
-						}
-
-						// trim the list to the actual values in the dictionary
-						uint[] values = keys.ToArray();
-						foreach (var item in values)
-						{
-							if (!scriptingData.ContainsKey(item))
-							{
-								keys.Remove(item);
-							}
-						}
-					}
-
-					if (keys.Count == 0)
-					{
-						keys.AddRange(scriptingData.Keys); // if the keyArray is a null pointer or if it does not contain any valid keys get them from the scriptingData.
-					}
-
+					// If the current descriptor is a sub key, grab the data and remove it from the list of sub keys.
+					dictionary = this.descriptorSubKeys[descriptor];
+					this.descriptorSubKeys.Remove(descriptor);
 				}
 				else
 				{
-					subKeys = new List<uint>();
-					if (keyArray != IntPtr.Zero)
-					{
-						uint* ptr = (uint*)keyArray.ToPointer();
-						while (*ptr != 0U)
-						{
-#if DEBUG
-							DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("subKey = {0}", DebugUtils.PropToString(*ptr)));
-#endif
-
-							subKeys.Add(*ptr);
-							ptr++;
-						}
-					}
-					isSubKey = true;
-					subClassDict = null;
-					subClassIndex = 0;
-
-					if (scriptingData.ContainsKey(getKey) && scriptingData[getKey].Value is Dictionary<uint, AETEValue>)
-					{
-						subClassDict = (Dictionary<uint, AETEValue>)scriptingData[getKey].Value;
-					}
-					else
-					{
-						// trim the list to the actual values in the dictionary
-						uint[] values = subKeys.ToArray();
-						foreach (var item in values)
-						{
-							if (!scriptingData.ContainsKey(item))
-							{
-								subKeys.Remove(item);
-							}
-						}
-					}
-
+					dictionary = this.scriptingData;
 				}
 
-				return HandleSuite.Instance.NewHandle(0); // return a dummy handle to the key value pairs
+
+				List<uint> keys = new List<uint>();
+				if (keyArray != IntPtr.Zero)
+				{
+					uint* ptr = (uint*)keyArray.ToPointer();
+					while (*ptr != 0U)
+					{
+#if DEBUG
+						DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key = {0}", DebugUtils.PropToString(*ptr)));
+#endif
+
+						keys.Add(*ptr);
+						ptr++;
+					}
+
+					// trim the list to the actual values in the dictionary
+					uint[] values = keys.ToArray();
+					foreach (var item in values)
+					{
+						if (!dictionary.ContainsKey(item))
+						{
+							keys.Remove(item);
+						}
+					}
+				}
+
+				if (keys.Count == 0)
+				{
+					// If the keyArray is a null pointer or if it does not contain any valid keys, add all of the keys in the dictionary.
+					keys.AddRange(dictionary.Keys);
+				}
+
+				IntPtr handle = IntPtr.Zero;
+				try
+				{
+					handle = Memory.Allocate(ReadDescriptorState.SizeOf, true);
+
+					ReadDescriptorState* state = (ReadDescriptorState*)handle.ToPointer();
+					state->currentKey = 0;
+					state->keyArrayIndex = 0;
+					state->keyArrayCount = keys.Count;
+					state->keys = Memory.Allocate(state->keyArrayCount * sizeof(uint), false);
+
+					uint* ptr = (uint*)state->keys.ToPointer();
+					for (int i = 0; i < keys.Count; i++)
+					{
+						*ptr = keys[i];
+						ptr++;
+					}
+
+					this.readDescriptorHandles.Add(handle, dictionary);
+
+					return handle;
+				}
+				catch (OutOfMemoryException)
+				{
+					if (handle != IntPtr.Zero)
+					{
+						Memory.Free(handle);
+						handle = IntPtr.Zero;
+					}
+				}
+
 			}
 
 			return IntPtr.Zero;
@@ -299,112 +302,70 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Empty);
 #endif
-			if (isSubKey)
+			if (descriptor != IntPtr.Zero)
 			{
-				isSubKey = false;
-				subClassDict = null;
-				subClassIndex = 0;
+				unsafe
+				{
+					ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
+					if (state->keys != IntPtr.Zero)
+					{
+						IntPtr keys = state->keys;
+						state->keys = IntPtr.Zero;
+
+						Memory.Free(keys);
+					}
+				}
+				this.readDescriptorHandles.Remove(descriptor);
+				Memory.Free(descriptor);
 			}
 
-			return descErrValue;
+			return this.lastDescriptorError;
 		}
 
-		private byte GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags)
+		private unsafe byte GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags)
 		{
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Empty);
 #endif
-			if (descErr != PSError.noErr)
-			{
-				descErrValue = descErr;
-			}
 
-			if (scriptingData.Count > 0)
+			if (descriptor != IntPtr.Zero)
 			{
-				if (isSubKey)
+				ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
+				if (state->lastReadError != PSError.noErr)
 				{
-					if (subClassDict != null)
-					{
-						if (subClassIndex >= subClassDict.Count)
-						{
-							return 0;
-						}
-
-						getKey = key = subKeys[subClassIndex];
-						AETEValue value = subClassDict[key];
-						try
-						{
-							type = value.Type;
-						}
-						catch (NullReferenceException)
-						{
-						}
-
-						try
-						{
-							flags = value.Flags;
-						}
-						catch (NullReferenceException)
-						{
-						}
-
-						subClassIndex++;
-					}
-					else
-					{
-						if (subKeyIndex >= subKeys.Count)
-						{
-							return 0;
-						}
-
-						getKey = key = subKeys[subKeyIndex];
-
-						AETEValue value = scriptingData[key];
-						try
-						{
-							type = value.Type;
-						}
-						catch (NullReferenceException)
-						{
-						}
-
-						try
-						{
-							flags = value.Flags;
-						}
-						catch (NullReferenceException)
-						{
-						}
-
-						subKeyIndex++;
-					}
+					this.lastDescriptorError = (short)state->lastReadError;
+					state->lastReadError = PSError.noErr;
 				}
-				else
+
+				if (state->keyArrayIndex >= state->keyArrayCount)
 				{
-					if (getKeyIndex >= keys.Count)
-					{
-						return 0;
-					}
-					getKey = key = keys[getKeyIndex];
+					return 0;
+				}
 
-					AETEValue value = scriptingData[key];
-					try
-					{
-						type = value.Type;
-					}
-					catch (NullReferenceException)
-					{
-					}
+				uint* keyArray = (uint*)state->keys.ToPointer();
 
-					try
-					{
-						flags = value.Flags;
-					}
-					catch (NullReferenceException)
-					{
-					}
+				state->currentKey = key = keyArray[state->keyArrayIndex];
+				state->keyArrayIndex++;
 
-					getKeyIndex++;
+				Dictionary<uint, AETEValue> items = this.readDescriptorHandles[descriptor];
+
+				AETEValue value = items[key];
+				try
+				{
+					type = value.Type;
+				}
+				catch (NullReferenceException)
+				{
+				}
+
+				try
+				{
+					flags = value.Flags;
+				}
+				catch (NullReferenceException)
+				{
 				}
 
 				return 1;
@@ -413,60 +374,45 @@ namespace PSFilterHostDll.PSApi
 			return 0;
 		}
 
-		private short GetIntegerProc(IntPtr descriptor, ref int data)
+		private unsafe short GetIntegerProc(IntPtr descriptor, ref int data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			data = (int)item.Value;
 
 			return PSError.noErr;
 		}
 
-		private short GetFloatProc(IntPtr descriptor, ref double data)
+		private unsafe short GetFloatProc(IntPtr descriptor, ref double data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			data = (double)item.Value;
 
 			return PSError.noErr;
 		}
 
-		private short GetUnitFloatProc(IntPtr descriptor, ref uint unit, ref double data)
+		private unsafe short GetUnitFloatProc(IntPtr descriptor, ref uint unit, ref double data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			UnitFloat unitFloat = (UnitFloat)item.Value;
 
@@ -483,46 +429,37 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private short GetBooleanProc(IntPtr descriptor, ref byte data)
+		private unsafe short GetBooleanProc(IntPtr descriptor, ref byte data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			data = (byte)item.Value;
 
 			return PSError.noErr;
 		}
 
-		private short GetTextProc(IntPtr descriptor, ref IntPtr data)
+		private unsafe short GetTextProc(IntPtr descriptor, ref IntPtr data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			int size = item.Size;
 			data = HandleSuite.Instance.NewHandle(size);
 
 			if (data == IntPtr.Zero)
 			{
+				state->lastReadError = PSError.memFullErr;
 				return PSError.memFullErr;
 			}
 
@@ -532,26 +469,22 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private short GetAliasProc(IntPtr descriptor, ref IntPtr data)
+		private unsafe short GetAliasProc(IntPtr descriptor, ref IntPtr data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			int size = item.Size;
 			data = HandleSuite.Instance.NewHandle(size);
 
 			if (data == IntPtr.Zero)
 			{
+				state->lastReadError = PSError.memFullErr;
 				return PSError.memFullErr;
 			}
 
@@ -561,73 +494,63 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private short GetEnumeratedProc(IntPtr descriptor, ref uint type)
+		private unsafe short GetEnumeratedProc(IntPtr descriptor, ref uint type)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			type = (uint)item.Value;
 
 			return PSError.noErr;
 		}
 
-		private short GetClassProc(IntPtr descriptor, ref uint type)
+		private unsafe short GetClassProc(IntPtr descriptor, ref uint type)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			type = (uint)item.Value;
 
 			return PSError.noErr;
 		}
 
-		private short GetSimpleReferenceProc(IntPtr descriptor, ref PIDescriptorSimpleReference data)
+		private unsafe short GetSimpleReferenceProc(IntPtr descriptor, ref PIDescriptorSimpleReference data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			if (scriptingData.ContainsKey(getKey))
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = null;
+
+			if (dictionary.TryGetValue(state->currentKey, out item))
 			{
-				data = (PIDescriptorSimpleReference)scriptingData[getKey].Value;
+				data = (PIDescriptorSimpleReference)item.Value;
 				return PSError.noErr;
 			}
 			return PSError.errPlugInHostInsufficient;
 		}
 
-		private short GetObjectProc(IntPtr descriptor, ref uint retType, ref IntPtr data)
+		private unsafe short GetObjectProc(IntPtr descriptor, ref uint retType, ref IntPtr data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0}", DebugUtils.PropToString(getKey)));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 
 			uint type = item.Type;
@@ -641,116 +564,111 @@ namespace PSFilterHostDll.PSApi
 				// ignore it
 			}
 
-			switch (type)
+			if (item.Value is Dictionary<uint, AETEValue>)
 			{
+				data = HandleSuite.Instance.NewHandle(0); // assign a zero byte handle to allow it to work correctly in the OpenReadDescriptorProc(). 
+				this.descriptorSubKeys.Add(data, (Dictionary<uint, AETEValue>)item.Value);
+			}
+			else
+			{
+				switch (type)
+				{
 
-				case DescriptorTypes.classRGBColor:
-				case DescriptorTypes.classCMYKColor:
-				case DescriptorTypes.classGrayscale:
-				case DescriptorTypes.classLabColor:
-				case DescriptorTypes.classHSBColor:
-				case DescriptorTypes.classPoint:
-					data = HandleSuite.Instance.NewHandle(0); // assign a zero byte handle to allow it to work correctly in the OpenReadDescriptorProc(). 
-					break;
+					case DescriptorTypes.typeAlias:
+					case DescriptorTypes.typePath:
+					case DescriptorTypes.typeChar:
 
-				case DescriptorTypes.typeAlias:
-				case DescriptorTypes.typePath:
-				case DescriptorTypes.typeChar:
+						int size = item.Size;
+						data = HandleSuite.Instance.NewHandle(size);
 
-					int size = item.Size;
-					data = HandleSuite.Instance.NewHandle(size);
+						if (data == IntPtr.Zero)
+						{
+							state->lastReadError = PSError.memFullErr;
+							return PSError.memFullErr;
+						}
 
-					if (data == IntPtr.Zero)
-					{
-						return PSError.memFullErr;
-					}
+						Marshal.Copy((byte[])item.Value, 0, HandleSuite.Instance.LockHandle(data, 0), size);
+						HandleSuite.Instance.UnlockHandle(data);
+						break;
+					case DescriptorTypes.typeBoolean:
+						data = HandleSuite.Instance.NewHandle(sizeof(byte));
 
-					Marshal.Copy((byte[])item.Value, 0, HandleSuite.Instance.LockHandle(data, 0), size);
-					HandleSuite.Instance.UnlockHandle(data);
-					break;
-				case DescriptorTypes.typeBoolean:
-					data = HandleSuite.Instance.NewHandle(sizeof(byte));
+						if (data == IntPtr.Zero)
+						{
+							state->lastReadError = PSError.memFullErr;
+							return PSError.memFullErr;
+						}
 
-					if (data == IntPtr.Zero)
-					{
-						return PSError.memFullErr;
-					}
+						Marshal.WriteByte(HandleSuite.Instance.LockHandle(data, 0), (byte)item.Value);
+						HandleSuite.Instance.UnlockHandle(data);
+						break;
+					case DescriptorTypes.typeInteger:
+						data = HandleSuite.Instance.NewHandle(sizeof(int));
 
-					Marshal.WriteByte(HandleSuite.Instance.LockHandle(data, 0), (byte)item.Value);
-					HandleSuite.Instance.UnlockHandle(data);
-					break;
-				case DescriptorTypes.typeInteger:
-					data = HandleSuite.Instance.NewHandle(sizeof(int));
+						if (data == IntPtr.Zero)
+						{
+							state->lastReadError = PSError.memFullErr;
+							return PSError.memFullErr;
+						}
 
-					if (data == IntPtr.Zero)
-					{
-						return PSError.memFullErr;
-					}
+						Marshal.WriteInt32(HandleSuite.Instance.LockHandle(data, 0), (int)item.Value);
+						HandleSuite.Instance.UnlockHandle(data);
+						break;
+					case DescriptorTypes.typeFloat:
+					case DescriptorTypes.typeUintFloat:
+						data = HandleSuite.Instance.NewHandle(sizeof(double));
 
-					Marshal.WriteInt32(HandleSuite.Instance.LockHandle(data, 0), (int)item.Value);
-					HandleSuite.Instance.UnlockHandle(data);
-					break;
-				case DescriptorTypes.typeFloat:
-				case DescriptorTypes.typeUintFloat:
-					data = HandleSuite.Instance.NewHandle(sizeof(double));
+						if (data == IntPtr.Zero)
+						{
+							state->lastReadError = PSError.memFullErr;
+							return PSError.memFullErr;
+						}
 
-					if (data == IntPtr.Zero)
-					{
-						return PSError.memFullErr;
-					}
+						double value;
+						if (type == DescriptorTypes.typeUintFloat)
+						{
+							UnitFloat unitFloat = (UnitFloat)item.Value;
+							value = unitFloat.Value;
+						}
+						else
+						{
+							value = (double)item.Value;
+						}
 
-					double value;
-					if (type == DescriptorTypes.typeUintFloat)
-					{
-						UnitFloat unitFloat = (UnitFloat)item.Value;
-						value = unitFloat.Value;
-					}
-					else
-					{
-						value = (double)item.Value;
-					}
+						Marshal.Copy(new double[] { value }, 0, HandleSuite.Instance.LockHandle(data, 0), 1);
+						HandleSuite.Instance.UnlockHandle(data);
+						break;
 
-					Marshal.Copy(new double[] { value }, 0, HandleSuite.Instance.LockHandle(data, 0), 1);
-					HandleSuite.Instance.UnlockHandle(data);
-					break;
-
-				default:
-					break;
+					default:
+						break;
+				}
 			}
 
 			return PSError.noErr;
 		}
 
-		private short GetCountProc(IntPtr descriptor, ref uint count)
+		private unsafe short GetCountProc(IntPtr descriptor, ref uint count)
 		{
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", ((ReadDescriptorState*)descriptor.ToPointer())->currentKey));
 #endif
-			if (subClassDict != null)
-			{
-				count = (uint)subClassDict.Count;
-			}
-			else
-			{
-				count = (uint)scriptingData.Count;
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+
+			count = (uint)dictionary.Count;
+
 			return PSError.noErr;
 		}
 
-		private short GetStringProc(IntPtr descriptor, IntPtr data)
+		private unsafe short GetStringProc(IntPtr descriptor, IntPtr data)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
+
 			int size = item.Size;
 
 			Marshal.WriteByte(data, (byte)size);
@@ -759,33 +677,30 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private short GetPinnedIntegerProc(IntPtr descriptor, int min, int max, ref int intNumber)
+		private unsafe short GetPinnedIntegerProc(IntPtr descriptor, int min, int max, ref int intNumber)
 		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
-#endif
-			descErr = PSError.noErr;
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
 
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+#if DEBUG
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
+#endif
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
+
+			short descErr = PSError.noErr;
 
 			int amount = (int)item.Value;
 			if (amount < min)
 			{
 				amount = min;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 			else if (amount > max)
 			{
 				amount = max;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 
 			intNumber = amount;
@@ -793,60 +708,54 @@ namespace PSFilterHostDll.PSApi
 			return descErr;
 		}
 
-		private short GetPinnedFloatProc(IntPtr descriptor, ref double min, ref double max, ref double floatNumber)
+		private unsafe short GetPinnedFloatProc(IntPtr descriptor, ref double min, ref double max, ref double floatNumber)
 		{
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
+
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
 #endif
-			descErr = PSError.noErr;
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+			short descErr = PSError.noErr;
+
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			double amount = (double)item.Value;
 			if (amount < min)
 			{
 				amount = min;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 			else if (amount > max)
 			{
 				amount = max;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 			floatNumber = amount;
 
 			return descErr;
 		}
 
-		private short GetPinnedUnitFloatProc(IntPtr descriptor, ref double min, ref double max, ref uint units, ref double floatNumber)
+		private unsafe short GetPinnedUnitFloatProc(IntPtr descriptor, ref double min, ref double max, ref uint units, ref double floatNumber)
 		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", getKey));
-#endif
-			descErr = PSError.noErr;
+			ReadDescriptorState* state = (ReadDescriptorState*)descriptor.ToPointer();
 
-			AETEValue item = null;
-			if (subClassDict != null)
-			{
-				item = subClassDict[getKey];
-			}
-			else
-			{
-				item = scriptingData[getKey];
-			}
+#if DEBUG
+			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}", state->currentKey));
+#endif
+			short descErr = PSError.noErr;
+
+			Dictionary<uint, AETEValue> dictionary = this.readDescriptorHandles[descriptor];
+			AETEValue item = dictionary[state->currentKey];
 
 			UnitFloat unitFloat = (UnitFloat)item.Value;
 
 			if (unitFloat.Unit != units)
 			{
 				descErr = PSError.paramErr;
+				state->lastReadError = descErr;
 			}
 
 			double amount = unitFloat.Value;
@@ -854,11 +763,13 @@ namespace PSFilterHostDll.PSApi
 			{
 				amount = min;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 			else if (amount > max)
 			{
 				amount = max;
 				descErr = PSError.coercedParamErr;
+				state->lastReadError = descErr;
 			}
 			floatNumber = amount;
 
@@ -866,7 +777,7 @@ namespace PSFilterHostDll.PSApi
 		}
 		#endregion
 
-		#region  WriteDescriptorProcs
+		#region WriteDescriptorProcs
 		private IntPtr OpenWriteDescriptorProc()
 		{
 #if DEBUG
@@ -877,10 +788,11 @@ namespace PSFilterHostDll.PSApi
 			try
 			{
 				handle = CreateWriteDescriptor();
+
+				this.writeDescriptorHandles.Add(handle, new Dictionary<uint, AETEValue>());
 			}
 			catch (OutOfMemoryException)
 			{
-				return IntPtr.Zero;
 			}
 
 			return handle;
@@ -891,12 +803,21 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Empty);
 #endif
-			if (isSubKey)
+			descriptorHandle = HandleSuite.Instance.NewHandle(0);
+
+			if (this.writeDescriptorHandles.Count > 1)
 			{
-				isSubKey = false;
+				// Add the items to the sub key dictionary.
+				// The plug-in will attach the sub keys to a parent descriptor by calling PutObjectProc.
+				this.descriptorSubKeys.Add(descriptorHandle, this.writeDescriptorHandles[descriptor]);
+			}
+			else
+			{
+				this.scriptingData = this.writeDescriptorHandles[descriptor];
 			}
 
-			descriptorHandle = HandleSuite.Instance.NewHandle(0);
+			Memory.Free(descriptor);
+			this.writeDescriptorHandles.Remove(descriptor);
 
 			return PSError.noErr;
 		}
@@ -923,7 +844,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeInteger, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeInteger, GetAETEParamFlags(key), 0, data));
 			return PSError.noErr;
 		}
 
@@ -932,7 +853,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeFloat, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeFloat, GetAETEParamFlags(key), 0, data));
 			return PSError.noErr;
 		}
 
@@ -943,7 +864,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			UnitFloat item = new UnitFloat(unit, data);
 
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeUintFloat, GetAETEParamFlags(key), 0, item));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeUintFloat, GetAETEParamFlags(key), 0, item));
 			return PSError.noErr;
 		}
 
@@ -952,7 +873,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeBoolean, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeBoolean, GetAETEParamFlags(key), 0, data));
 			return PSError.noErr;
 		}
 
@@ -972,7 +893,7 @@ namespace PSFilterHostDll.PSApi
 					byte[] data = new byte[size];
 					Marshal.Copy(hPtr, data, 0, size);
 
-					scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), size, data));
+					this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), size, data));
 				}
 				finally
 				{
@@ -996,7 +917,7 @@ namespace PSFilterHostDll.PSApi
 				byte[] data = new byte[size];
 				Marshal.Copy(hPtr, data, 0, size);
 
-				scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeAlias, GetAETEParamFlags(key), size, data));
+				this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeAlias, GetAETEParamFlags(key), size, data));
 			}
 			finally
 			{
@@ -1010,7 +931,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, data));
 			return PSError.noErr;
 		}
 
@@ -1019,7 +940,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeClass, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeClass, GetAETEParamFlags(key), 0, data));
 
 			return PSError.noErr;
 		}
@@ -1029,7 +950,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeObjectRefrence, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeObjectRefrence, GetAETEParamFlags(key), 0, data));
 			return PSError.noErr;
 		}
 
@@ -1038,83 +959,33 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0}, type: {1}", DebugUtils.PropToString(key), DebugUtils.PropToString(type)));
 #endif
-			Dictionary<uint, AETEValue> classDict = null;
-			// Only the built-in Photoshop classes are supported.
-			switch (type)
+			// If the handle is a sub key add it to the parent descriptor.
+			Dictionary<uint, AETEValue> subKeys;
+			if (this.descriptorSubKeys.TryGetValue(handle, out subKeys))
 			{
-				case DescriptorTypes.classRGBColor:
-					classDict = new Dictionary<uint, AETEValue>(3);
-					classDict.Add(DescriptorKeys.keyRed, scriptingData[DescriptorKeys.keyRed]);
-					classDict.Add(DescriptorKeys.keyGreen, scriptingData[DescriptorKeys.keyGreen]);
-					classDict.Add(DescriptorKeys.keyBlue, scriptingData[DescriptorKeys.keyBlue]);
+				this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, subKeys));
+			}
+			else
+			{
+				switch (type)
+				{
 
-					scriptingData.Remove(DescriptorKeys.keyRed);// remove the existing keys
-					scriptingData.Remove(DescriptorKeys.keyGreen);
-					scriptingData.Remove(DescriptorKeys.keyBlue);
+					case DescriptorTypes.typeAlias:
+					case DescriptorTypes.typePath:
+					case DescriptorTypes.typeChar:
+						int size = HandleSuite.Instance.GetHandleSize(handle);
+						byte[] bytes = new byte[size];
 
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-					break;
-				case DescriptorTypes.classCMYKColor:
-					classDict = new Dictionary<uint, AETEValue>(4);
-					classDict.Add(DescriptorKeys.keyCyan, scriptingData[DescriptorKeys.keyCyan]);
-					classDict.Add(DescriptorKeys.keyMagenta, scriptingData[DescriptorKeys.keyMagenta]);
-					classDict.Add(DescriptorKeys.keyYellow, scriptingData[DescriptorKeys.keyYellow]);
-					classDict.Add(DescriptorKeys.keyBlack, scriptingData[DescriptorKeys.keyBlack]);
-
-					scriptingData.Remove(DescriptorKeys.keyCyan);
-					scriptingData.Remove(DescriptorKeys.keyMagenta);
-					scriptingData.Remove(DescriptorKeys.keyYellow);
-					scriptingData.Remove(DescriptorKeys.keyBlack);
-
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-					break;
-				case DescriptorTypes.classGrayscale:
-					classDict = new Dictionary<uint, AETEValue>(1);
-					classDict.Add(DescriptorKeys.keyGray, scriptingData[DescriptorKeys.keyGray]);
-
-					scriptingData.Remove(DescriptorKeys.keyGray);
-
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-					break;
-				case DescriptorTypes.classLabColor:
-					classDict = new Dictionary<uint, AETEValue>(3);
-					classDict.Add(DescriptorKeys.keyLuminance, scriptingData[DescriptorKeys.keyLuminance]);
-					classDict.Add(DescriptorKeys.keyA, scriptingData[DescriptorKeys.keyA]);
-					classDict.Add(DescriptorKeys.keyB, scriptingData[DescriptorKeys.keyB]);
-
-					scriptingData.Remove(DescriptorKeys.keyLuminance);
-					scriptingData.Remove(DescriptorKeys.keyA);
-					scriptingData.Remove(DescriptorKeys.keyB);
-
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-					break;
-				case DescriptorTypes.classHSBColor:
-					classDict = new Dictionary<uint, AETEValue>(3);
-					classDict.Add(DescriptorKeys.keyHue, scriptingData[DescriptorKeys.keyHue]);
-					classDict.Add(DescriptorKeys.keySaturation, scriptingData[DescriptorKeys.keySaturation]);
-					classDict.Add(DescriptorKeys.keyBrightness, scriptingData[DescriptorKeys.keyBrightness]);
-
-					scriptingData.Remove(DescriptorKeys.keyHue);
-					scriptingData.Remove(DescriptorKeys.keySaturation);
-					scriptingData.Remove(DescriptorKeys.keyBrightness);
-
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-					break;
-				case DescriptorTypes.classPoint:
-					classDict = new Dictionary<uint, AETEValue>(2);
-
-					classDict.Add(DescriptorKeys.keyHorizontal, scriptingData[DescriptorKeys.keyHorizontal]);
-					classDict.Add(DescriptorKeys.keyVertical, scriptingData[DescriptorKeys.keyVertical]);
-
-					scriptingData.Remove(DescriptorKeys.keyHorizontal);
-					scriptingData.Remove(DescriptorKeys.keyVertical);
-
-					scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, classDict));
-
-					break;
-
-				default:
-					return PSError.errPlugInHostInsufficient;
+						if (size > 0)
+						{
+							Marshal.Copy(HandleSuite.Instance.LockHandle(handle, 0), bytes, 0, size);
+							HandleSuite.Instance.UnlockHandle(handle);
+						}
+						this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, bytes));
+						break;
+					default:
+						break;
+				}
 			}
 
 			return PSError.noErr;
@@ -1125,6 +996,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
+
 			return PSError.noErr;
 		}
 
@@ -1133,11 +1005,11 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-			int size = (int)Marshal.ReadByte(stringHandle);
+			int size = Marshal.ReadByte(stringHandle);
 			byte[] data = new byte[size];
 			Marshal.Copy(new IntPtr(stringHandle.ToInt64() + 1L), data, 0, size);
 
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), size, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), size, data));
 
 			return PSError.noErr;
 		}
@@ -1147,7 +1019,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: {0:X4}", key));
 #endif
-			scriptingData.AddOrUpdate(key, new AETEValue(DescriptorTypes.typeClass, GetAETEParamFlags(key), 0, data));
+			this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(DescriptorTypes.typeClass, GetAETEParamFlags(key), 0, data));
 
 			return PSError.noErr;
 		}
@@ -1165,7 +1037,7 @@ namespace PSFilterHostDll.PSApi
 				byte[] data = new byte[size];
 				Marshal.Copy(hPtr, data, 0, size);
 
-				scriptingData.AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), size, data));
+				this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), size, data));
 			}
 			finally
 			{
