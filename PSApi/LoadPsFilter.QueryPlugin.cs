@@ -440,12 +440,13 @@ namespace PSFilterHostDll.PSApi
 		/// Reads a C string from a pointer.
 		/// </summary>
 		/// <param name="ptr">The pointer to read from.</param>
-		/// <param name="length">The length of the resulting string.</param>
+		/// <param name="lengthWithTerminator">The length of the resulting string including the NUL terminator.</param>
 		/// <returns>The resulting string</returns>
-		private static string StringFromCString(IntPtr ptr, out int length)
+		private static string StringFromCString(IntPtr ptr, out int lengthWithTerminator)
 		{
 			string data = Marshal.PtrToStringAnsi(ptr);
-			length = data.Length + 1; // skip the trailing null
+			// Add the terminating NUL to the total length.
+			lengthWithTerminator = data.Length + 1;
 
 			return data.Trim(TrimChars);
 		}
