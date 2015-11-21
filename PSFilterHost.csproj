@@ -150,6 +150,11 @@
     <Compile Include="PSApi\LoadPsFilter.QueryPlugin.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
+    <Compile Include="PSApi\PICA\PICABufferSuite.cs" />
+    <Compile Include="PSApi\PICA\PICAColorSpaceSuite.cs" />
+    <Compile Include="PSApi\PICA\PICAHandleSuite.cs" />
+    <Compile Include="PSApi\PICA\PICASPPluginsSuite.cs" />
+    <Compile Include="PSApi\PICA\PICAUIHooksSuite.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
     <Compile Include="PSApi\PseudoResourceSuite.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
