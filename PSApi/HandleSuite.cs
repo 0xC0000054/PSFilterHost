@@ -134,7 +134,7 @@ namespace PSFilterHostDll.PSApi
 		/// <returns>
 		///   <c>true</c> if the pointer is invalid; otherwise, <c>false</c>.
 		/// </returns>
-		internal static bool IsBadReadPtr(IntPtr ptr)
+		private static bool IsBadReadPtr(IntPtr ptr)
 		{
 			bool result = false;
 			NativeStructs.MEMORY_BASIC_INFORMATION mbi = new NativeStructs.MEMORY_BASIC_INFORMATION();
