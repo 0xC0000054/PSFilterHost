@@ -18,19 +18,21 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
     internal static class NativeStructs
     {
-        [System.Runtime.InteropServices.StructLayoutAttribute(System.Runtime.InteropServices.LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential)]
         internal struct MEMORY_BASIC_INFORMATION
         {
-            public System.IntPtr BaseAddress;
-            public System.IntPtr AllocationBase;
+            public IntPtr BaseAddress;
+            public IntPtr AllocationBase;
             public uint AllocationProtect;
-            public System.UIntPtr RegionSize;
+            public UIntPtr RegionSize;
             public uint State;
             public uint Protect;
             public uint Type;
