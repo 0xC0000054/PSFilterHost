@@ -133,7 +133,8 @@ namespace HostTest
 
 			if (toolStrip.ImageScalingSize != scaledImageSize)
 			{
-				// Temporarily disable the AutoSize property so the new ImageScalingSize will be used during layout, see http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstrip.imagescalingsize.aspx.
+				// Temporarily disable the AutoSize property so the new ImageScalingSize will be used during layout,
+				// see http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstrip.imagescalingsize.aspx.
 				toolStrip.AutoSize = false;  
 				toolStrip.ImageScalingSize = scaledImageSize;
 				toolStrip.PerformLayout();
