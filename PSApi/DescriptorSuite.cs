@@ -964,6 +964,7 @@ namespace PSFilterHostDll.PSApi
 			if (this.descriptorSubKeys.TryGetValue(handle, out subKeys))
 			{
 				this.writeDescriptorHandles[descriptor].AddOrUpdate(key, new AETEValue(type, GetAETEParamFlags(key), 0, subKeys));
+				this.descriptorSubKeys.Remove(handle);
 			}
 			else
 			{
