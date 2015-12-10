@@ -40,7 +40,8 @@ namespace PSFilterHostDll.PSApi
             [In()] IntPtr hHeap,
             [In()] uint dwFlags, 
             [In()] IntPtr lpMem, 
-            [In()] UIntPtr dwBytes);
+            [In()] UIntPtr dwBytes
+            );
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern UIntPtr HeapSize([In()] IntPtr hHeap, [In()] uint dwFlags, [In()] IntPtr lpMem);
@@ -50,14 +51,16 @@ namespace PSFilterHostDll.PSApi
             [In()] IntPtr HeapHandle,
             [In()] int HeapInformationClass,
             [In()] void* HeapInformation, 
-            [In()] UIntPtr HeapInformationLength);
+            [In()] UIntPtr HeapInformationLength
+            );
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern IntPtr VirtualAlloc(
             [In()] IntPtr lpAddress,
             [In()] UIntPtr dwSize, 
             [In()] uint flAllocationType,
-            [In()] uint flProtect);
+            [In()] uint flProtect
+            );
 
         [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

@@ -31,7 +31,8 @@ namespace PSFilterHostDll.PSApi
             [In()] IntPtr hModule, 
             [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszType,
             [In()] EnumResNameDelegate lpEnumFunc, 
-            [In()] IntPtr lParam);
+            [In()] IntPtr lParam
+            );
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         internal static extern IntPtr FindResourceW([In()] IntPtr hModule, [In()] IntPtr lpName, [In()] IntPtr lpType);
