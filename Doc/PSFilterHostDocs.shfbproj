@@ -22,7 +22,7 @@
       <DocumentationSource sourceFile="..\bin\Release\PSFilterHost.dll" />
       <DocumentationSource sourceFile="..\bin\Release\PSFilterHost.xml" />
     </DocumentationSources>
-    <FrameworkVersion>.NET Framework 4.0</FrameworkVersion>
+    <FrameworkVersion>.NET Framework 4.5.2</FrameworkVersion>
     <HelpFileFormat>HtmlHelp1</HelpFileFormat>
     <WebsiteSdkLinkType>Msdn</WebsiteSdkLinkType>
     <IndentHtml>False</IndentHtml>
