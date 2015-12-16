@@ -1529,10 +1529,6 @@ namespace PSFilterHostDll.PSApi
 			{
 				CopySourceAlpha();
 			}
-			else
-			{
-				DrawCheckerBoardBitmap();
-			}
 
 			this.descriptorSuite.Aete = pdata.Aete;
 
