@@ -695,8 +695,12 @@ namespace HostTest
 
 				this.imageFileName = Path.GetFileName(path);
 
-				if (format == PixelFormats.BlackWhite || format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8 ||
-					format == PixelFormats.Gray16 || format == PixelFormats.Gray32Float)
+				if (format == PixelFormats.BlackWhite ||
+					format == PixelFormats.Gray2 ||
+					format == PixelFormats.Gray4 ||
+					format == PixelFormats.Gray8 ||
+					format == PixelFormats.Gray16 ||
+					format == PixelFormats.Gray32Float)
 				{
 					this.imageType = "Gray/";
 				}
@@ -709,13 +713,8 @@ namespace HostTest
 
 				if (bitsPerChannel >= 16)
 				{
-					FormatConvertedBitmap conv = new FormatConvertedBitmap();
-					conv.BeginInit();
-					conv.Source = srcImage;
-					conv.DestinationFormat = channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24;
-					conv.EndInit();
-
-					UpdateCanvasImage(conv);
+					// Convert the image to an 8 bits-per-channel format for display.
+					UpdateCanvasImage(new FormatConvertedBitmap(srcImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0));
 
 					this.imageType += "16";
 				}
