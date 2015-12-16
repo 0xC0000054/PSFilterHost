@@ -89,33 +89,11 @@ namespace HostTest
 			InitializeDPIScaling();
 		}
 
-		private static bool CheckForDotNet452()
-		{
-			// The .NET 4.5 detection code is adapted from http://msdn.microsoft.com/en-us/library/hh925568.aspx.
-			const int Net452ReleaseKey = 379893;
-
-			bool result = false;
-
-			using (Microsoft.Win32.RegistryKey ndpKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full\\", false))
-			{
-				if (ndpKey != null)
-				{
-					int releaseKey = Convert.ToInt32(ndpKey.GetValue("Release"));
-					if (releaseKey >= Net452ReleaseKey)
-					{
-						result = true;
-					}
-				}
-			}
-
-			return result;
-		}
-
 		private void InitializeDPIScaling()
 		{
-			// DPI scaling for the ToolStrip and MenuStrip classes was added in .NET 4.5.2, as .NET 4.5 is an in-place upgrade this will also be available to .NET 4.0 applications.
+			// DPI scaling for the ToolStrip and MenuStrip classes was added in .NET 4.5.2, when targeting .NET 3.5 and earlier we have to scale the image size manually.
 			// The scroll buttons in the ToolStripDropDownMenu have not been updated with high DPI support, so we will scale them when the menu is first opened.
-			if (!CheckForDotNet452())
+			if (Environment.Version.Major < 4)
 			{
 				ScaleToolStripImageSize(this.menuStrip1);
 				ScaleToolStripImageSize(this.toolStrip1);
