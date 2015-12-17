@@ -48,7 +48,7 @@ namespace HostTest
         /// </summary>
         public HistoryItem(CanvasHistoryState historyCanvas, BitmapSource currentImage)
         {
-            this.backingFile = Path.GetTempFileName();
+            this.backingFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             this.state = HistoryItemState.Memory;
             this.chunk = new HistoryChunk(historyCanvas, currentImage);
 
