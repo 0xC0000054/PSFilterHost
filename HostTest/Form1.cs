@@ -374,7 +374,7 @@ namespace HostTest
 					this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.srcImage);
 				}
 
-				this.srcImageTempFileName = Path.GetTempFileName();
+				this.srcImageTempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tif");
 
 				BitmapMetadata metaData = null;
 
