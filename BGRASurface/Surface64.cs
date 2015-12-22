@@ -122,7 +122,6 @@ namespace PSFilterHostDll.BGRASurface
         protected override unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi)
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
-            Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, width - 1, height - 1));
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -137,7 +136,6 @@ namespace PSFilterHostDll.BGRASurface
                 double srcColumn = (double)(dstX * (srcWidth - 1)) / (double)(width - 1);
                 double srcColumnFloor = Math.Floor(srcColumn);
                 double srcColumnFrac = srcColumn - srcColumnFloor;
-                int srcColumnInt = (int)srcColumn;
 
                 for (int m = -1; m <= 2; ++m)
                 {
@@ -172,7 +170,6 @@ namespace PSFilterHostDll.BGRASurface
                 {
                     double srcColumn = (double)(dstX * (srcWidth - 1)) / (double)(width - 1);
                     double srcColumnFloor = Math.Floor(srcColumn);
-                    double srcColumnFrac = srcColumn - srcColumnFloor;
                     int srcColumnInt = (int)srcColumn;
 
                     double blueSum = 0;
@@ -241,7 +238,6 @@ namespace PSFilterHostDll.BGRASurface
         protected override unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi)
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
-            Rectangle roiIn = Rectangle.Intersect(dstRoi, new Rectangle(1, 1, width - 1, height - 1));
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -256,7 +252,6 @@ namespace PSFilterHostDll.BGRASurface
                 double srcColumn = (double)(dstX * (srcWidth - 1)) / (double)(width - 1);
                 double srcColumnFloor = Math.Floor(srcColumn);
                 double srcColumnFrac = srcColumn - srcColumnFloor;
-                int srcColumnInt = (int)srcColumn;
 
                 for (int m = -1; m <= 2; ++m)
                 {
@@ -293,7 +288,6 @@ namespace PSFilterHostDll.BGRASurface
                 {
                     double srcColumn = (double)(dstX * (srcWidth - 1)) / (double)(width - 1);
                     double srcColumnFloor = Math.Floor(srcColumn);
-                    double srcColumnFrac = srcColumn - srcColumnFloor;
                     int srcColumnInt = (int)srcColumn;
 
                     double blueSum = 0;
