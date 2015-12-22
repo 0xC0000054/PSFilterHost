@@ -96,19 +96,13 @@ namespace HostTest
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        private void Dispose(bool disposing)
-        {
-            if (!disposed && disposing)
+            if (!disposed)
             {
                 File.Delete(this.backingFile);
                 this.chunk.Dispose();
                 this.state = HistoryItemState.Disposed;
-                this.disposed = true;
+                this.disposed = true; 
             }
-
         }
         #endregion
         
@@ -171,12 +165,7 @@ namespace HostTest
             /// </summary>
             public void Dispose()
             {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-            private void Dispose(bool disposing)
-            {
-                if (!disposed && disposing)
+                if (!disposed)
                 {
                     this.disposed = true;
                     if (canvas != null)
@@ -185,7 +174,6 @@ namespace HostTest
                         this.canvas = null;
                     } 
                 }
-
             }
         }
     }

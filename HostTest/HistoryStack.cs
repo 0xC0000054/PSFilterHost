@@ -154,12 +154,7 @@ namespace HostTest
 		/// </summary>
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-		private void Dispose(bool disposing)
-		{
-			if (!disposed && disposing)
+			if (!disposed)
 			{
 				for (int i = 0; i < this.historyList.Count; i++)
 				{
@@ -168,7 +163,6 @@ namespace HostTest
 				this.historyList = null;
 				this.disposed = true;
 			}
-
 		}
 		#endregion
 	}
