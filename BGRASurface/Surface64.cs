@@ -374,7 +374,6 @@ namespace PSFilterHostDll.BGRASurface
 
             int height = this.height;
             int width = this.width;
-            long stride = this.stride;
 
             for (int dstY = dstRoi2.Top; dstY < dstRoi2.Bottom; ++dstY)
             {
