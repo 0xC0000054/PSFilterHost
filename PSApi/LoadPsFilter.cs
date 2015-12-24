@@ -158,7 +158,7 @@ namespace PSFilterHostDll.PSApi
 		private SurfaceBase source;
 		private SurfaceBase dest;
 		private Surface8 mask;
-		private Surface32 tempDisplaySurface;
+		private Surface32 displaySurface;
 		private Surface8 tempMask;
 		private SurfaceBase tempSurface;
 		private Bitmap checkerBoardBitmap;
@@ -3890,21 +3890,21 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private void SetupTempDisplaySurface(int width, int height, bool haveMask)
+		private void SetupDisplaySurface(int width, int height, bool haveMask)
 		{
-			if ((tempDisplaySurface == null) || width != tempDisplaySurface.Width || height != tempDisplaySurface.Height)
+			if ((displaySurface == null) || width != displaySurface.Width || height != displaySurface.Height)
 			{
-				if (tempDisplaySurface != null)
+				if (displaySurface != null)
 				{
-					tempDisplaySurface.Dispose();
-					tempDisplaySurface = null;
+					displaySurface.Dispose();
+					displaySurface = null;
 				}
 
-				tempDisplaySurface = new Surface32(width, height);
+				displaySurface = new Surface32(width, height);
 
 				if (ignoreAlpha || !haveMask)
 				{
-					tempDisplaySurface.SetAlphaToOpaque();
+					displaySurface.SetAlphaToOpaque();
 				}
 			}
 		}
@@ -3922,15 +3922,15 @@ namespace PSFilterHostDll.PSApi
 			// Skip the rendering of the checker board if the surface does not contain any transparency.
 			if (allOpaque)
 			{
-				using (Bitmap bmp = tempDisplaySurface.CreateAliasedBitmap())
+				using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
 				{
 					gr.DrawImageUnscaled(bmp, dstCol, dstRow);
 				}
 			}
 			else
 			{
-				int width = tempDisplaySurface.Width;
-				int height = tempDisplaySurface.Height;
+				int width = displaySurface.Width;
+				int height = displaySurface.Height;
 
 				try
 				{
@@ -3947,7 +3947,7 @@ namespace PSFilterHostDll.PSApi
 						using (Graphics tempGr = Graphics.FromImage(temp))
 						{
 							tempGr.DrawImageUnscaledAndClipped(checkerBoardBitmap, rect);
-							using (Bitmap bmp = tempDisplaySurface.CreateAliasedBitmap())
+							using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
 							{
 								tempGr.DrawImageUnscaled(bmp, rect);
 							}
@@ -3986,7 +3986,7 @@ namespace PSFilterHostDll.PSApi
 
 			try
 			{
-				SetupTempDisplaySurface(width, height, hasTransparencyMask);
+				SetupDisplaySurface(width, height, hasTransparencyMask);
 			}
 			catch (OutOfMemoryException)
 			{
@@ -4010,7 +4010,7 @@ namespace PSFilterHostDll.PSApi
 				for (int y = top; y < bottom; y++)
 				{
 					byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
-					byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
+					byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
 					for (int x = 0; x < width; x++)
 					{
@@ -4033,7 +4033,7 @@ namespace PSFilterHostDll.PSApi
 						byte* greenPlane = redPlane + greenPlaneOffset;
 						byte* bluePlane = redPlane + bluePlaneOffset;
 
-						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
+						byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
 						for (int x = 0; x < width; x++)
 						{
@@ -4053,7 +4053,7 @@ namespace PSFilterHostDll.PSApi
 					for (int y = top; y < bottom; y++)
 					{
 						byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
-						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y - top);
+						byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
 						for (int x = 0; x < width; x++)
 						{
@@ -4081,7 +4081,7 @@ namespace PSFilterHostDll.PSApi
 					for (int y = 0; y < height; y++)
 					{
 						byte* src = maskData + (y * srcMask->rowBytes);
-						byte* dst = tempDisplaySurface.GetRowAddressUnchecked(y);
+						byte* dst = displaySurface.GetRowAddressUnchecked(y);
 
 						for (int x = 0; x < width; x++)
 						{
@@ -4100,7 +4100,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else
 				{
-					using (Bitmap bmp = tempDisplaySurface.CreateAliasedBitmap())
+					using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
 					{
 						gr.DrawImageUnscaled(bmp, dstCol, dstRow);
 					}
@@ -5230,10 +5230,10 @@ namespace PSFilterHostDll.PSApi
 						selectedRegion = null;
 					}
 
-					if (tempDisplaySurface != null)
+					if (displaySurface != null)
 					{
-						tempDisplaySurface.Dispose();
-						tempDisplaySurface = null;
+						displaySurface.Dispose();
+						displaySurface = null;
 					}
 
 					if (scaledChannelSurface != null)
