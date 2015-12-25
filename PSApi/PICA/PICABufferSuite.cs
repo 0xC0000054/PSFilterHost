@@ -67,7 +67,21 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private static uint PSBufferGetSpace()
         {
-            return 1000000000;
+            // Assume that we have 1 GB of available space.
+            uint space = 1024 * 1024 * 1024;
+
+            NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX();
+            buffer.dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX));
+
+            if (SafeNativeMethods.GlobalMemoryStatusEx(ref buffer))
+            {
+                if (buffer.ullAvailVirtual < uint.MaxValue)
+                {
+                    space = (uint)buffer.ullAvailVirtual;
+                }
+            }
+
+            return space;
         }
 
         public static PSBufferSuite1 CreateBufferSuite1()
