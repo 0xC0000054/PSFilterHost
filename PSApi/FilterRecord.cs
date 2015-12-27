@@ -12,7 +12,7 @@
 
 /* Adapted from PIFilter.h
  * Copyright (c) 1990-1991, Thomas Knoll.
- * Copyright (c) 1992-1998, Adobe Systems Incorporated.
+ * Copyright (c) 1992-2000, Adobe Systems Incorporated.
  * All rights reserved.
 */
 
@@ -164,6 +164,11 @@ namespace PSFilterHostDll.PSApi
         public IntPtr plugInRef;
         public int depth;
 
-        public fixed byte reserved[66]; 
+        // New in 6.0
+        public IntPtr iCCprofileData;
+        public int iCCprofileSize;
+        public int canUseICCProfiles;
+
+        public fixed byte reserved[54]; 
     }
 }

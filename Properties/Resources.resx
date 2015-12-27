@@ -214,4 +214,13 @@
   <data name="DirectoryNotFoundWithPath" xml:space="preserve">
     <value>Could not find a part of the path '{0}'.</value>
   </data>
+  <data name="CreateTransformError" xml:space="preserve">
+    <value>Unable to create the color transform.</value>
+  </data>
+  <data name="OpenDocumentColorProfileError" xml:space="preserve">
+    <value>Unable to open the document color profile.</value>
+  </data>
+  <data name="OpenMonitorColorProfileError" xml:space="preserve">
+    <value>Unable to open the monitor color profile.</value>
+  </data>
 </root>

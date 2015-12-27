@@ -15,6 +15,7 @@ using HostTest.Tools;
 using PSFilterHostDll;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -48,8 +49,13 @@ namespace HostTest
 		private HostInformation hostInfo;
 		private BitmapMetadata srcMetaData;
 		private readonly bool highDPIMode;
-	 
-		private static readonly System.Collections.ObjectModel.ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
+		private ColorContext srcColorContext;
+		private ColorContext monitorColorContext;
+		private string monitorColorProfilePath;
+		private HostColorManagement hostColorProfiles;
+
+		private static readonly ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
+		private static readonly ColorContext SrgbColorContext = ColorProfileHelper.GetSrgbColorContext();
 		
 		public Form1()
 		{
@@ -71,6 +77,11 @@ namespace HostTest
 			this.currentPluginDirectory = string.Empty;
 			this.hostInfo = new HostInformation();
 			this.srcMetaData = null;
+			this.srcMetaData = null;
+			this.srcColorContext = null;
+			this.monitorColorContext = null;
+			this.monitorColorProfilePath = null;
+			this.hostColorProfiles = null;
 
 			if (IntPtr.Size == 8)
 			{
@@ -157,6 +168,23 @@ namespace HostTest
 			}
 		}
 
+		private void UpdateMonitorColorProfile()
+		{
+			string newMonitorProfile = ColorProfileHelper.GetMonitorColorProfilePath(this.Handle);
+			if (string.IsNullOrEmpty(newMonitorProfile))
+			{
+				// If the current monitor does not have a color profile use the default sRGB profile. 
+				this.monitorColorProfilePath = SrgbColorContext.ProfileUri.LocalPath;
+				this.monitorColorContext = SrgbColorContext;
+			}
+			else if (!newMonitorProfile.Equals(monitorColorProfilePath, StringComparison.OrdinalIgnoreCase))
+			{
+				this.monitorColorProfilePath = newMonitorProfile;
+				Uri uri = new Uri(newMonitorProfile, UriKind.Absolute);
+				this.monitorColorContext = new ColorContext(uri);
+			}
+		}
+
 		static class NativeMethods
 		{
 			[DllImport("kernel32.dll", EntryPoint = "SetProcessDEPPolicy")]
@@ -202,7 +230,23 @@ namespace HostTest
 				QueryDirectory(pluginDir);
 			}
 
+			UpdateMonitorColorProfile();
+
 			ProcessCommandLine();
+		}
+
+		protected override void OnLocationChanged(EventArgs e)
+		{
+			base.OnLocationChanged(e);
+
+			UpdateMonitorColorProfile();
+		}
+
+		protected override void OnSizeChanged(EventArgs e)
+		{
+			base.OnSizeChanged(e);
+
+			UpdateMonitorColorProfile();
 		}
 
 		private void ShowErrorMessage(string message)
@@ -398,7 +442,30 @@ namespace HostTest
 					}
 					metaData = convertedMetaData;
 				}
-					
+
+				this.hostColorProfiles = null;
+				if (srcColorContext != null && srcColorContext != monitorColorContext)
+				{
+					byte[] documentColorProfile = null;
+					using (Stream stream = srcColorContext.OpenProfileStream())
+					{
+						int length = (int)stream.Length;
+
+						documentColorProfile = new byte[length];
+
+						int numBytesToRead = length;
+						int numBytesRead = 0;
+						do
+						{
+							int n = stream.Read(documentColorProfile, numBytesRead, numBytesToRead);
+							numBytesRead += n;
+							numBytesToRead -= n;
+						} while (numBytesToRead > 0);
+					}
+
+					this.hostColorProfiles = new HostColorManagement(documentColorProfile, this.monitorColorProfilePath);
+				}
+
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Create, FileAccess.Write))
 				{
 					TiffBitmapEncoder encoder = new TiffBitmapEncoder();
@@ -468,6 +535,10 @@ namespace HostTest
 					}
 
 					host.HostInfo = this.hostInfo;
+					if (hostColorProfiles != null)
+					{
+						host.SetColorProfiles(hostColorProfiles);
+					}
 
 					this.filterName = pluginData.Title.TrimEnd('.');
 					this.setFilterApplyText = false;
@@ -661,15 +732,30 @@ namespace HostTest
 		{
 			using (MemoryStream stream = new MemoryStream())
 			{
+				BitmapSource colorCorrectedImage = null;
+				if (srcColorContext != null && srcColorContext != monitorColorContext)
+				{
+					PixelFormat format = image.Format.BitsPerPixel <= 24 ? PixelFormats.Bgr24 : PixelFormats.Bgra32;
+					try
+					{
+						colorCorrectedImage = new ColorConvertedBitmap(image, srcColorContext, monitorColorContext, format);
+					}
+					catch (FileFormatException)
+					{
+						// Ignore the image color context if it is not valid.
+						this.srcColorContext = null;
+					}
+				}
+
 				PngBitmapEncoder enc = new PngBitmapEncoder();
-				enc.Frames.Add(BitmapFrame.Create(image, null, null, null));
+				enc.Frames.Add(BitmapFrame.Create(colorCorrectedImage ?? image, null, null, null));
 				enc.Save(stream);
 
 				if (base.InvokeRequired)
 				{
 					base.Invoke(new Action<MemoryStream>(delegate (MemoryStream ms)
 					{
-						this.canvas.Surface = new Bitmap(ms, true);
+						this.canvas.Surface = new Bitmap(ms);
 					}), new object[] { stream });
 				}
 				else
@@ -688,6 +774,16 @@ namespace HostTest
 
 				srcImage = frame.Clone();
 				srcImage.Freeze();
+
+				if (frame.ColorContexts != null)
+				{
+					this.srcColorContext = frame.ColorContexts[0];
+				}
+				else
+				{
+					// If the image does not have an embedded color profile assume it is sRGB.
+					this.srcColorContext = SrgbColorContext;
+				}
 
 				PixelFormat format = srcImage.Format;
 				int channelCount = format.Masks.Count;
@@ -850,7 +946,13 @@ namespace HostTest
 						metaData = MetaDataHelper.ConvertSaveMetaDataFormat(metaData, encoder);
 					}
 
-					encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, null));
+					ReadOnlyCollection<ColorContext> colorContexts = null;
+					if (srcColorContext != null)
+					{
+						colorContexts = Array.AsReadOnly(new ColorContext[] { this.srcColorContext });
+					}
+
+					encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, colorContexts));
 
 					using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
 					{

@@ -112,5 +112,27 @@ namespace PSFilterHostDll.PSApi
         [DllImport("kernel32.dll", ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GlobalMemoryStatusEx([In(), Out()] ref NativeStructs.MEMORYSTATUSEX lpBuffer);
+
+        [DllImport("gdi32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern IntPtr CreateDCW(
+            [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszDriver,
+            [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszDevice,
+            [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszOutput,
+            [In()] IntPtr lpInitData
+            );
+
+        [DllImport("gdi32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetICMProfileW([In()] IntPtr hdc, [In(), Out()] ref uint bufferSize, [Out()] System.Text.StringBuilder buffer);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        internal static extern int GetSystemMetrics([In()] int nIndex);
+
+        [DllImport("user32.dll", ExactSpelling = true)]
+        internal static extern IntPtr MonitorFromPoint([In()] NativeStructs.POINT pt, [In()] uint dwFlags);
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetMonitorInfoW([In()] IntPtr hMonitor, [In(), Out()] ref NativeStructs.MONITORINFOEX lpmi);
     }
 }

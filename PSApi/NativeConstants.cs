@@ -33,5 +33,11 @@ namespace PSFilterHostDll.PSApi
         internal const int PAGE_EXECUTE_READWRITE = 64;
         internal const int PAGE_EXECUTE_WRITECOPY = 128;
         internal const int PAGE_GUARD = 256;
+
+        internal const int SM_CMONITORS = 80;
+        internal const uint MONITOR_DEFAULTTOPRIMARY = 1;
+
+        internal const int CMM_FROM_PROFILE = 0;
+        internal const int ERROR_SUCCESS = 0;
     }
 }

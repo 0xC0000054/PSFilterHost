@@ -97,6 +97,15 @@ namespace PSFilterHostDll.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to create the color transform..
+        /// </summary>
+        internal static string CreateTransformError {
+            get {
+                return ResourceManager.GetString("CreateTransformError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find a part of the path &apos;{0}&apos;..
         /// </summary>
         internal static string DirectoryNotFoundWithPath {
@@ -255,6 +264,24 @@ namespace PSFilterHostDll.Properties {
         internal static string MaskChannelName {
             get {
                 return ResourceManager.GetString("MaskChannelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to open the document color profile..
+        /// </summary>
+        internal static string OpenDocumentColorProfileError {
+            get {
+                return ResourceManager.GetString("OpenDocumentColorProfileError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to open the monitor color profile..
+        /// </summary>
+        internal static string OpenMonitorColorProfileError {
+            get {
+                return ResourceManager.GetString("OpenMonitorColorProfileError", resourceCulture);
             }
         }
         

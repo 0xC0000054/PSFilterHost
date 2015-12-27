@@ -85,5 +85,60 @@ namespace PSFilterHostDll.PSApi
             internal int bottom;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct POINT
+        {
+            public int x;
+            public int y;
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        internal struct MONITORINFOEX
+        {
+            public uint cbSize;
+            public RECT rcMonitor;
+            public RECT rcWork;
+            public uint dwFlags;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
+            public string szDeviceName;
+        }
+
+        internal static class Mscms
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            internal struct PROFILE
+            {
+                public NativeEnums.Mscms.ProfileType dwType;
+                public unsafe void* pProfileData;
+                public uint cbDataSize;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            internal unsafe struct PROFILEHEADER
+            {
+                public uint phSize;
+                public uint phCMMType;
+                public uint phVersion;
+                public uint phClass;
+                public uint phDataColorSpace;
+                public uint phConnectionSpace;
+                public uint phDateTime1;
+                public uint phDateTime2;
+                public uint phDateTime3;
+                public uint phSignature;
+                public uint phPlatform;
+                public uint phProfileFlags;
+                public uint phManufacturer;
+                public uint phModel;
+                public uint phAttributes1;
+                public uint phAttributes2;
+                public uint phRenderingIntent;
+                public int phIlluminantX;
+                public int phIlluminantY;
+                public int phIlluminantZ;
+                public uint phCreator;
+                public fixed byte phReserved[44];
+            }
+        }
     }
 }

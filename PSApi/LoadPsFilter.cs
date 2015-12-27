@@ -44,7 +44,7 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		private static readonly Encoding Windows1252Encoding = Encoding.GetEncoding(1252);
 		private static readonly char[] TrimChars = new char[] { ' ', '\0' };
-		
+
 		/// <summary>
 		/// Reads a Pascal String into a string.
 		/// </summary>
@@ -162,6 +162,7 @@ namespace PSFilterHostDll.PSApi
 		private Surface8 tempMask;
 		private SurfaceBase tempSurface;
 		private Bitmap checkerBoardBitmap;
+		private Surface32 colorCorrectedDisplaySurface;
 
 		private PluginPhase phase;
 		private PluginModule module;
@@ -212,6 +213,8 @@ namespace PSFilterHostDll.PSApi
 		private bool useChannelPorts;
 		private bool usePICASuites;
 		private ActivePICASuites activePICASuites;
+		private ColorProfileConverter colorProfileConverter;
+		private byte[] documentColorProfile;
 
 		private DescriptorSuite descriptorSuite;
 		private PseudoResourceSuite pseudoResourceSuite;
@@ -265,6 +268,16 @@ namespace PSFilterHostDll.PSApi
 			pickColor = value;
 		}
 
+		internal void SetColorProfiles(HostColorManagement colorProfiles)
+		{
+			if (colorProfiles == null)
+			{
+				throw new ArgumentNullException("colorProfiles");
+			}
+
+			this.colorProfileConverter.Initialize(colorProfiles);
+			this.documentColorProfile = colorProfiles.GetDocumentColorProfile();
+		}
 
 		public string ErrorMessage
 		{
@@ -389,6 +402,8 @@ namespace PSFilterHostDll.PSApi
 			this.usePICASuites = false;
 			this.activePICASuites = new ActivePICASuites();
 			this.hostInfo = new HostInformation();
+			this.colorProfileConverter = new ColorProfileConverter();
+			this.documentColorProfile = null;
 
 			this.lastInRect = Rect16.Empty;
 			this.lastOutRect = Rect16.Empty;
@@ -442,7 +457,7 @@ namespace PSFilterHostDll.PSApi
 						break;
 				}
 			}
-			
+
 			this.foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
 			this.backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
@@ -493,7 +508,7 @@ namespace PSFilterHostDll.PSApi
 						case FilterCase.EditableTransparencyWithSelection:
 							this.filterCase = FilterCase.FlatImageWithSelection;
 							break;
-					} 
+					}
 				}
 
 				return true;
@@ -938,7 +953,7 @@ namespace PSFilterHostDll.PSApi
 					{
 						platformDataHandle.Free();
 					}
-				} 
+				}
 			}
 
 
@@ -1035,7 +1050,7 @@ namespace PSFilterHostDll.PSApi
 				}
 
 				// Per the SDK the host can call filterSelectorFinish in between filterSelectorContinue calls if it detects a cancel request.
-				if (AbortProc()) 
+				if (AbortProc())
 				{
 					result = PSError.noErr;
 					module.entryPoint(FilterSelector.Finish, filterRecordPtr, ref dataPtr, ref result);
@@ -1650,7 +1665,7 @@ namespace PSFilterHostDll.PSApi
 				{
 					case PSError.filterBadMode:
 						message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
-						break;					
+						break;
 					case PSError.filterBadParameters:
 						message = Resources.FilterBadParameters;
 						break;
@@ -1930,7 +1945,7 @@ namespace PSFilterHostDll.PSApi
 		private unsafe short FillInputBuffer(FilterRecord* filterRecord)
 		{
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { filterRecord->inRowBytes, filterRecord->inRect, 
+			DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("inRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}, inputRate: {4}", new object[] { filterRecord->inRowBytes, filterRecord->inRect,
 			filterRecord->inLoPlane, filterRecord->inHiPlane, FixedToInt32(filterRecord->inputRate) }));
 #endif
 			Rect16 inRect = filterRecord->inRect;
@@ -1972,7 +1987,7 @@ namespace PSFilterHostDll.PSApi
 					lockRect.X = 0;
 					lockRect.Width -= -inRect.left;
 				}
-				
+
 				if (lockRect.Top < 0)
 				{
 					lockRect.Y = 0;
@@ -2147,7 +2162,7 @@ namespace PSFilterHostDll.PSApi
 		private unsafe short FillOutputBuffer(FilterRecord* filterRecord)
 		{
 #if DEBUG
-			DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane, 
+			DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane,
 				filterRecord->outHiPlane }));
 
 			using (Bitmap dst = dest.CreateAliasedBitmap())
@@ -2429,7 +2444,7 @@ namespace PSFilterHostDll.PSApi
 					lockRect.X = 0;
 					lockRect.Width -= -maskRect.left;
 				}
-				
+
 				if (lockRect.Top < 0)
 				{
 					lockRect.Y = 0;
@@ -2461,7 +2476,7 @@ namespace PSFilterHostDll.PSApi
 			}
 			filterRecord->maskData = maskDataPtr;
 			filterRecord->maskRowBytes = width;
-			
+
 			bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
 			short err = SetFilterPadding(maskDataPtr, width, maskRect, 1, 0, filterRecord->maskPadding, lockRect, mask);
 			if (err != PSError.noErr || !validImageBounds)
@@ -2516,7 +2531,7 @@ namespace PSFilterHostDll.PSApi
 				{
 					return;
 				}
-			
+
 				int nplanes = hiplane - loplane + 1;
 
 				int ofs = loplane;
@@ -2964,7 +2979,7 @@ namespace PSFilterHostDll.PSApi
 									info.colorComponents[3] = 0;
 									break;
 							}
-							
+
 							err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 						}
 					}
@@ -3405,7 +3420,7 @@ namespace PSFilterHostDll.PSApi
 				{
 					string name = null;
 					switch (i)
-					{ 
+					{
 						case PSConstants.ChannelPorts.Green:
 							name = Resources.GreenChannelName;
 							break;
@@ -3890,7 +3905,7 @@ namespace PSFilterHostDll.PSApi
 			return PSError.noErr;
 		}
 
-		private void SetupDisplaySurface(int width, int height, bool haveMask)
+		private void SetupDisplaySurface(int width, int height, bool haveMask, int displayImageMode)
 		{
 			if ((displaySurface == null) || width != displaySurface.Width || height != displaySurface.Height)
 			{
@@ -3906,6 +3921,35 @@ namespace PSFilterHostDll.PSApi
 				{
 					displaySurface.SetAlphaToOpaque();
 				}
+
+				// As some plug-ins may use planar order RGB data and the Windows Color System APIs do not support that format
+				// we first have to convert the data to interleaved BGR(A) and then use a second surface for color correction. 
+				if (displayImageMode == PSConstants.plugInModeRGBColor && colorProfileConverter.ColorCorrectionRequired)
+				{
+					if (colorCorrectedDisplaySurface != null)
+					{
+						colorCorrectedDisplaySurface.Dispose();
+						colorCorrectedDisplaySurface = null;
+					}
+
+					colorCorrectedDisplaySurface = new Surface32(width, height);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets the preview bitmap for the RGB image modes and applies color correction if necessary.
+		/// </summary>
+		/// <returns>The resulting bitmap.</returns>
+		private Bitmap GetRGBPreviewBitmap()
+		{
+			if (colorProfileConverter.ColorCorrectionRequired && colorProfileConverter.ColorCorrectBGRASurface(displaySurface, colorCorrectedDisplaySurface))
+			{
+				return colorCorrectedDisplaySurface.CreateAliasedBitmap();
+			}
+			else
+			{
+				return displaySurface.CreateAliasedBitmap();
 			}
 		}
 
@@ -3922,7 +3966,7 @@ namespace PSFilterHostDll.PSApi
 			// Skip the rendering of the checker board if the surface does not contain any transparency.
 			if (allOpaque)
 			{
-				using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
+				using (Bitmap bmp = GetRGBPreviewBitmap())
 				{
 					gr.DrawImageUnscaled(bmp, dstCol, dstRow);
 				}
@@ -3947,7 +3991,7 @@ namespace PSFilterHostDll.PSApi
 						using (Graphics tempGr = Graphics.FromImage(temp))
 						{
 							tempGr.DrawImageUnscaledAndClipped(checkerBoardBitmap, rect);
-							using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
+							using (Bitmap bmp = GetRGBPreviewBitmap())
 							{
 								tempGr.DrawImageUnscaled(bmp, rect);
 							}
@@ -3959,7 +4003,7 @@ namespace PSFilterHostDll.PSApi
 				catch (OutOfMemoryException)
 				{
 					return PSError.memFullErr;
-				} 
+				}
 			}
 
 			return PSError.noErr;
@@ -3986,7 +4030,7 @@ namespace PSFilterHostDll.PSApi
 
 			try
 			{
-				SetupDisplaySurface(width, height, hasTransparencyMask);
+				SetupDisplaySurface(width, height, hasTransparencyMask, srcPixelMap.imageMode);
 			}
 			catch (OutOfMemoryException)
 			{
@@ -4007,17 +4051,21 @@ namespace PSFilterHostDll.PSApi
 
 			if (srcPixelMap.imageMode == PSConstants.plugInModeGrayScale)
 			{
-				for (int y = top; y < bottom; y++)
+				// Perform color correction if required and fall back to the uncorrected data if it fails.
+				if (!colorProfileConverter.ColorCorrectionRequired || !colorProfileConverter.ColorCorrectGrayScale(srcPixelMap.baseAddr, srcPixelMap.rowBytes, displaySurface))
 				{
-					byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
-					byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
-
-					for (int x = 0; x < width; x++)
+					for (int y = top; y < bottom; y++)
 					{
-						dst[0] = dst[1] = dst[2] = *src;
+						byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
+						byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
-						src += srcPixelMap.colBytes;
-						dst += 4;
+						for (int x = 0; x < width; x++)
+						{
+							dst[0] = dst[1] = dst[2] = *src;
+
+							src += srcPixelMap.colBytes;
+							dst += 4;
+						}
 					}
 				}
 			}
@@ -4064,39 +4112,49 @@ namespace PSFilterHostDll.PSApi
 							src += srcPixelMap.colBytes;
 							dst += 4;
 						}
-					} 
+					}
 				}
 			}
 
 			short error = PSError.noErr;
 			using (Graphics gr = Graphics.FromHdc(platformContext))
 			{
-				// Apply the transparency mask if present.
-				if (hasTransparencyMask) 
+				if (srcPixelMap.imageMode == PSConstants.plugInModeRGBColor)
 				{
-					bool allOpaque = true;
-					PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
-					byte* maskData = (byte*)srcMask->maskData.ToPointer();
-
-					for (int y = 0; y < height; y++)
+					// Apply the transparency mask if present.
+					if (hasTransparencyMask)
 					{
-						byte* src = maskData + (y * srcMask->rowBytes);
-						byte* dst = displaySurface.GetRowAddressUnchecked(y);
+						bool allOpaque = true;
+						PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
+						byte* maskData = (byte*)srcMask->maskData.ToPointer();
 
-						for (int x = 0; x < width; x++)
+						for (int y = 0; y < height; y++)
 						{
-							dst[3] = *src;
-							if (*src < 255)
-							{
-								allOpaque = false;
-							}
+							byte* src = maskData + (y * srcMask->rowBytes);
+							byte* dst = displaySurface.GetRowAddressUnchecked(y);
 
-							src += srcMask->colBytes;
-							dst += 4;
+							for (int x = 0; x < width; x++)
+							{
+								dst[3] = *src;
+								if (*src < 255)
+								{
+									allOpaque = false;
+								}
+
+								src += srcMask->colBytes;
+								dst += 4;
+							}
+						}
+
+					    error = Display32BitBitmap(gr, dstCol, dstRow, allOpaque);
+					}
+					else
+					{
+						using (Bitmap bmp = GetRGBPreviewBitmap())
+						{
+							gr.DrawImageUnscaled(bmp, dstCol, dstRow);
 						}
 					}
-
-					error = Display32BitBitmap(gr, dstCol, dstRow, allOpaque);
 				}
 				else
 				{
@@ -4486,7 +4544,7 @@ namespace PSFilterHostDll.PSApi
 					}
 					else
 					{
-						bytes = Encoding.ASCII.GetBytes(title); 
+						bytes = Encoding.ASCII.GetBytes(title);
 					}
 					complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
 
@@ -4581,11 +4639,11 @@ namespace PSFilterHostDll.PSApi
 						bytes = new byte[size];
 						Marshal.Copy(HandleSuite.Instance.LockHandle(complexProperty, 0), bytes, 0, size);
 						HandleSuite.Instance.UnlockHandle(complexProperty);
-						
+
 						Uri temp;
 						if (Uri.TryCreate(Encoding.ASCII.GetString(bytes, 0, size), UriKind.Absolute, out temp))
 						{
-							hostInfo.Url = temp; 
+							hostInfo.Url = temp;
 						}
 					}
 					break;
@@ -4898,7 +4956,7 @@ namespace PSFilterHostDll.PSApi
 		/// Setup the delegates for this instance.
 		/// </summary>
 		private void SetupDelegates()
-		{			
+		{
 			// Misc Callbacks
 			advanceProc = new AdvanceStateProc(AdvanceStateProc);
 			colorProc = new ColorServicesProc(ColorServicesProc);
@@ -5029,7 +5087,7 @@ namespace PSFilterHostDll.PSApi
 				basicSuitePtr = IntPtr.Zero;
 			}
 		}
-		
+
 		/// <summary>
 		/// Setup the filter record for this instance.
 		/// </summary>
@@ -5152,6 +5210,23 @@ namespace PSFilterHostDll.PSApi
 					filterRecord->depth = 16;
 					break;
 			}
+
+			if (documentColorProfile != null)
+			{
+				filterRecord->iCCprofileData = HandleSuite.Instance.NewHandle(documentColorProfile.Length);
+				if (filterRecord->iCCprofileData != IntPtr.Zero)
+				{
+					Marshal.Copy(documentColorProfile, 0, HandleSuite.Instance.LockHandle(filterRecord->iCCprofileData, 0), documentColorProfile.Length);
+					HandleSuite.Instance.UnlockHandle(filterRecord->parameters);
+					filterRecord->iCCprofileSize = documentColorProfile.Length;
+				}
+			}
+			else
+			{
+				filterRecord->iCCprofileData = IntPtr.Zero;
+				filterRecord->iCCprofileSize = 0;
+			}
+			filterRecord->canUseICCProfiles = 1;
 		}
 
 		#region IDisposable Members
@@ -5193,19 +5268,19 @@ namespace PSFilterHostDll.PSApi
 						source.Dispose();
 						source = null;
 					}
-					
+
 					if (dest != null)
 					{
 						dest.Dispose();
 						dest = null;
 					}
-					
+
 					if (checkerBoardBitmap != null)
 					{
 						checkerBoardBitmap.Dispose();
 						checkerBoardBitmap = null;
 					}
-					
+
 					if (tempSurface != null)
 					{
 						tempSurface.Dispose();
@@ -5265,8 +5340,20 @@ namespace PSFilterHostDll.PSApi
 						imageMetaData.Dispose();
 						imageMetaData = null;
 					}
+
+					if (colorCorrectedDisplaySurface != null)
+					{
+						colorCorrectedDisplaySurface.Dispose();
+						colorCorrectedDisplaySurface = null;
+					}
+
+					if (colorProfileConverter != null)
+					{
+						colorProfileConverter.Dispose();
+						colorProfileConverter = null;
+					}
 				}
-				
+
 				if (platFormDataPtr != IntPtr.Zero)
 				{
 					Memory.Free(platFormDataPtr);
@@ -5278,7 +5365,7 @@ namespace PSFilterHostDll.PSApi
 					Memory.Free(bufferProcsPtr);
 					bufferProcsPtr = IntPtr.Zero;
 				}
-				
+
 				if (handleProcsPtr != IntPtr.Zero)
 				{
 					Memory.Free(handleProcsPtr);
@@ -5340,13 +5427,13 @@ namespace PSFilterHostDll.PSApi
 					Memory.Free(descriptorParametersPtr);
 					descriptorParametersPtr = IntPtr.Zero;
 				}
-				
+
 				if (readDescriptorPtr != IntPtr.Zero)
 				{
 					Memory.Free(readDescriptorPtr);
 					readDescriptorPtr = IntPtr.Zero;
 				}
-				
+
 				if (writeDescriptorPtr != IntPtr.Zero)
 				{
 					Memory.Free(writeDescriptorPtr);
@@ -5418,6 +5505,13 @@ namespace PSFilterHostDll.PSApi
 						Memory.Free(maskDataPtr);
 						maskDataPtr = IntPtr.Zero;
 						filterRecord->maskData = IntPtr.Zero;
+					}
+
+					if (filterRecord->iCCprofileData != IntPtr.Zero)
+					{
+						HandleSuite.Instance.UnlockHandle(filterRecord->iCCprofileData);
+						HandleSuite.Instance.DisposeHandle(filterRecord->iCCprofileData);
+						filterRecord->iCCprofileData = IntPtr.Zero;
 					}
 
 					Memory.Free(filterRecordPtr);

@@ -54,6 +54,7 @@ namespace PSFilterHostDll
 		private List<PSResource> pseudoResources;
 		private HostInformation hostInfo;
 		private PickColor pickColor;
+		private HostColorManagement hostColorProfiles;
 
 		/// <summary>
 		/// The event fired when the filter updates it's progress. 
@@ -188,6 +189,7 @@ namespace PSFilterHostDll
 			this.pseudoResources = new List<PSResource>();
 			this.abortFunc = null;
 			this.hostInfo = null;
+			this.hostColorProfiles = null;
 		}
 
 #if GDIPLUS
@@ -311,6 +313,21 @@ namespace PSFilterHostDll
 			}
 
 			this.pickColor = pickerCallback;
+		}
+
+		/// <summary>
+		/// Sets the information used to provide color correction when previewing the result of a filter.
+		/// </summary>
+		/// <param name="colorProfiles">The color management information.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="colorProfiles"/> is null.</exception>
+		public void SetColorProfiles(HostColorManagement colorProfiles)
+		{
+			if (colorProfiles == null)
+			{
+				throw new ArgumentNullException("colorProfiles");
+			}
+
+			this.hostColorProfiles = colorProfiles;
 		}
 
 #if NET_40_OR_GREATER
@@ -585,6 +602,11 @@ namespace PSFilterHostDll
 				if (hostInfo != null)
 				{
 					lps.HostInformation = hostInfo;
+				}
+
+				if (hostColorProfiles != null)
+				{
+					lps.SetColorProfiles(hostColorProfiles);
 				}
 
 				try

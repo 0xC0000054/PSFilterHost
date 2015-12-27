@@ -10,19 +10,22 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using Microsoft.Win32.SafeHandles;
+
 namespace HostTest
 {
-    internal static class NativeConstants
+    /// <summary>
+    /// Represents a handle to a device context
+    /// </summary>
+    internal sealed class SafeDCHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        internal const uint WM_MOUSEACTIVATE = 0x21;
-        internal const uint MA_ACTIVATE = 1;
-        internal const uint MA_ACTIVATEANDEAT = 2;
-        internal const uint MA_NOACTIVATE = 3;
-        internal const uint MA_NOACTIVATEANDEAT = 4;
+        private SafeDCHandle() : base(true)
+        {
+        }
 
-        internal const uint MONITOR_DEFAULTTONEAREST = 2;
-
-        internal const uint LCS_sRGB = 0x73524742;
-        internal const int MAX_PATH = 260;
+        protected override bool ReleaseHandle()
+        {
+            return SafeNativeMethods.DeleteDC(this.handle);
+        }
     }
 }

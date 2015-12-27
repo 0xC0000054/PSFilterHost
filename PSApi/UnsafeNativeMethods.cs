@@ -50,5 +50,56 @@ namespace PSFilterHostDll.PSApi
 
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false)]
         internal static extern IntPtr GetProcAddress([In()] SafeLibraryHandle hModule, [In(), MarshalAs(UnmanagedType.LPStr)] string lpProcName);
+
+        internal static class Mscms
+        {
+            [DllImport("mscms.dll", ExactSpelling = true, SetLastError = true)]
+            internal static extern SafeProfileHandle OpenColorProfileW(
+                [In()] ref NativeStructs.Mscms.PROFILE profile,
+                [In()] NativeEnums.Mscms.ProfileAccess desiredAccess,
+                [In()] NativeEnums.FileShare shareMode,
+                [In()] NativeEnums.CreateDisposition creationMode
+                );
+
+            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+            [DllImport("mscms.dll", ExactSpelling = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool CloseColorProfile([In()] IntPtr handle);
+
+            [DllImport("mscms.dll", ExactSpelling = true, SetLastError = true)]
+            internal static extern SafeTransformHandle CreateMultiProfileTransform(
+                [In()] IntPtr[] pahProfiles,
+                [In()] uint nProfiles,
+                [In()] uint[] padwIntent,
+                [In()] uint nIntents,
+                [In()] NativeEnums.Mscms.TransformFlags dwFlags,
+                [In()] uint indexPreferredCMM
+                );
+
+            [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+            [DllImport("mscms.dll", ExactSpelling = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool DeleteColorTransform([In()] IntPtr handle);
+
+            [DllImport("mscms.dll", ExactSpelling = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool TranslateBitmapBits(
+                [In()] SafeTransformHandle hTransform,
+                [In()] IntPtr pSrcBits,
+                [In()] NativeEnums.Mscms.BMFORMAT bmInput,
+                [In()] uint dwWidth,
+                [In()] uint dwHeight,
+                [In()] uint dwInputStride,
+                [In()] IntPtr pDestBits,
+                [In()] NativeEnums.Mscms.BMFORMAT bmOutput,
+                [In()] uint dwOutputStride,
+                [In()] IntPtr pfnCallback,
+                [In()] IntPtr ulCallbackData
+                );
+
+            [DllImport("mscms.dll", ExactSpelling = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool GetColorProfileHeader([In()] SafeProfileHandle hProfile, [Out()] out NativeStructs.Mscms.PROFILEHEADER pHeader);
+        }
     }
 }

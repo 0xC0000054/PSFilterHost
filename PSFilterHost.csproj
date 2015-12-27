@@ -126,6 +126,7 @@
     <Compile Include="BGRASurface\SurfaceBase.cs" />
     <Compile Include="BGRASurface\SurfaceFactory.cs" />
     <Compile Include="ColorPickerResult.cs" />
+    <Compile Include="ColorProfileHelper.cs" />
     <Compile Include="ColorSpace\CIELab.cs" />
     <Compile Include="ColorSpace\CIEXYZ.cs" />
     <Compile Include="ColorSpace\CMYK.cs" />
@@ -139,12 +140,14 @@
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HashCodeHelper.cs" />
+    <Compile Include="HostColorManagement.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
     <Compile Include="PSApi\BufferSuite.cs" />
+    <Compile Include="PSApi\ColorProfileConverter.cs" />
     <Compile Include="PSApi\DebugUtils.cs" />
     <Compile Include="PSApi\DescriptorSuite.cs" />
     <Compile Include="PSApi\HandleSuite.cs" />
@@ -153,6 +156,7 @@
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\LoadPsFilter.QueryPlugin.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
+    <Compile Include="PSApi\NativeEnums.cs" />
     <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="PSApi\PICA\PICABufferSuite.cs" />
     <Compile Include="PSApi\PICA\PICAColorSpaceSuite.cs" />
@@ -161,6 +165,8 @@
     <Compile Include="PSApi\PICA\PICAUIHooksSuite.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
     <Compile Include="PSApi\PseudoResourceSuite.cs" />
+    <Compile Include="PSApi\SafeProfileHandle.cs" />
+    <Compile Include="PSApi\SafeTransformHandle.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
@@ -266,6 +272,10 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\sRGB.icm" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
