@@ -54,6 +54,7 @@ namespace PSFilterHostDll.BGRASurface
         /// </summary>
         public unsafe void ScaleToPhotoshop16BitRange()
         {
+            ushort[] map = CreatePhotoshopRangeLookupTable();
             for (int y = 0; y < height; y++)
             {
                 ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
@@ -61,7 +62,7 @@ namespace PSFilterHostDll.BGRASurface
 
                 while (ptr < ptrEnd)
                 {
-                    *ptr = (ushort)(((ptr[0] * 32768) + 32767) / 65535);
+                    *ptr = map[*ptr];
 
                     ptr++;
                 }
