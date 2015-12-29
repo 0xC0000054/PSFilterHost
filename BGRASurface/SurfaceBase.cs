@@ -131,6 +131,28 @@ namespace PSFilterHostDll.BGRASurface
 
 		}
 
+		/// <summary>
+		/// Creates a lookup table for mapping the 16-bit pixel data from [0, 65535] to the internal 16 bit range used by Adobe(R) Photoshop(R).
+		/// </summary>
+		/// <returns>The resulting lookup table.</returns>
+		protected static ushort[] CreatePhotoshopRangeLookupTable()
+		{
+			ushort[] table = new ushort[65536];
+
+			// According to the Photoshop SDK 16-bit image data is stored in the range of [0, 32768].
+			for (int i = 0; i < table.Length; i++)
+			{
+				table[i] = (ushort)(((i * 32768) + 32767) / 65535);
+			}
+
+			return table;
+		}
+
+		/// <summary>
+		/// Normalizes the 16-bit image data to [0, 65535] from the internal 16 bit range used by Adobe(R) Photoshop(R).
+		/// </summary>
+		/// <param name="x">The value to normalize.</param>
+		/// <returns>The normalized value.</returns>
 		protected static ushort Fix16BitRange(ushort x)
 		{
 			int value = x * 2; // double the value and clamp between 0 and 65535.
