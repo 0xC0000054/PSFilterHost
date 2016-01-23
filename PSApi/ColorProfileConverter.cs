@@ -305,7 +305,7 @@ namespace PSFilterHostDll.PSApi
                 (uint)destSurface.Height,
                 (uint)srcStride,
                 destSurface.Scan0.Pointer,
-                NativeEnums.Mscms.BMFORMAT.BM_xBGRQUADS,
+                NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS,
                 (uint)destSurface.Stride,
                 IntPtr.Zero,
                 IntPtr.Zero
