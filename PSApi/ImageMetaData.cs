@@ -230,29 +230,20 @@ namespace PSFilterHostDll.PSApi
 
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		private void Dispose(bool disposing)
-		{
 			if (!this.disposed)
 			{
 				this.disposed = true;
 
-				if (disposing)
-				{
 #if GDIPLUS
-					if (this.image != null)
-					{
-						this.image.Dispose();
-						this.image = null;
-					} 
+				if (this.image != null)
+				{
+					this.image.Dispose();
+					this.image = null;
+				} 
 #endif
 
-					this.exifBytes = null;
-					this.xmpBytes = null;
-				}
+				this.exifBytes = null;
+				this.xmpBytes = null;
 			}
 		}
 
