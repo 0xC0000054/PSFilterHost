@@ -147,7 +147,7 @@ namespace PSFilterHostDll
             }
             set
             {
-                if (!Enum.IsDefined(typeof(HostRulerUnit), value))
+                if (value < HostRulerUnit.Pixels || value > HostRulerUnit.Percent)
                 {
                     throw new InvalidEnumArgumentException("value", (int)value, typeof(HostRulerUnit));
                 }
