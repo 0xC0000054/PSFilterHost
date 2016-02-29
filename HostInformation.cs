@@ -136,7 +136,9 @@ namespace PSFilterHostDll
         /// <value>
         /// The ruler measurement unit of the document.
         /// </value>
-        /// <exception cref="System.ComponentModel.InvalidEnumArgumentException">Ruler unit cannot be set as it does not use a valid value, as defined in the <see cref="HostRulerUnit"/> enumeration.</exception>
+        /// <exception cref="InvalidEnumArgumentException">
+        /// Ruler unit cannot be set as it does not use a valid value, as defined in the <see cref="HostRulerUnit"/> enumeration.
+        /// </exception>
         public HostRulerUnit RulerUnit
         {
             get
