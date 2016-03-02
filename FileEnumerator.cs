@@ -513,11 +513,6 @@ namespace PSFilterHostDll
         {
             get
             {
-                if (this.current == null)
-                {
-                    throw new InvalidOperationException();
-                }
-
                 return this.current;
             }
         }
@@ -555,7 +550,12 @@ namespace PSFilterHostDll
         {
             get
             {
-                return Current;
+                if (this.current == null)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return this.current;
             }
         }
 
