@@ -13,6 +13,7 @@
 using Microsoft.Win32.SafeHandles;
 using PSFilterHostDll.Properties;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -546,7 +547,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
         /// </summary>
-        object System.Collections.IEnumerator.Current
+        object IEnumerator.Current
         {
             get
             {
@@ -651,7 +652,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// Sets the enumerator to its initial position, which is before the first element in the collection.
         /// </summary>
-        public void Reset()
+        void IEnumerator.Reset()
         {
             throw new NotSupportedException();
         }
