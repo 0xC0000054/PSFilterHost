@@ -1264,30 +1264,34 @@ namespace HostTest
 
 			foreach (var plug in PSFilterHost.EnumerateFilters(args.Path, SearchOption.AllDirectories))
 			{
-				ToolStripMenuItem child = new ToolStripMenuItem(plug.Title, null, new EventHandler(RunPhotoshopFilter_Click)) { Name = plug.Title, Tag = plug };
-				ToolStripMenuItem aboutItem = new ToolStripMenuItem(plug.Title, null, new EventHandler(ShowFilterAboutDialog)) { Tag = plug };
-
-				if (filterList.ContainsKey(plug.Category))
+				// The **Hidden** category is used for filters that are not directly invoked by the user.
+				if (!plug.Category.Equals("**Hidden**", StringComparison.Ordinal))
 				{
-					ToolStripMenuItemEx parent = filterList[plug.Category];
+					ToolStripMenuItem child = new ToolStripMenuItem(plug.Title, null, new EventHandler(RunPhotoshopFilter_Click)) { Name = plug.Title, Tag = plug };
+					ToolStripMenuItem aboutItem = new ToolStripMenuItem(plug.Title, null, new EventHandler(ShowFilterAboutDialog)) { Tag = plug };
 
-					if (!parent.SubMenuItems.ContainsKey(plug.Title))
+					if (filterList.ContainsKey(plug.Category))
 					{
-						parent.SubMenuItems.Add(child);
-						if (plug.HasAboutBox)
+						ToolStripMenuItemEx parent = filterList[plug.Category];
+
+						if (!parent.SubMenuItems.ContainsKey(plug.Title))
 						{
-							aboutList.Add(aboutItem); 
+							parent.SubMenuItems.Add(child);
+							if (plug.HasAboutBox)
+							{
+								aboutList.Add(aboutItem);
+							}
 						}
 					}
-				}
-				else
-				{
-					ToolStripMenuItemEx parent = new ToolStripMenuItemEx(plug.Category, child);
-					filterList.Add(plug.Category, parent);
-					if (plug.HasAboutBox)
+					else
 					{
-						aboutList.Add(aboutItem); 
-					}
+						ToolStripMenuItemEx parent = new ToolStripMenuItemEx(plug.Category, child);
+						filterList.Add(plug.Category, parent);
+						if (plug.HasAboutBox)
+						{
+							aboutList.Add(aboutItem);
+						}
+					} 
 				}
 			}
 
