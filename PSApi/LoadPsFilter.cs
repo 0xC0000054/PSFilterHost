@@ -492,7 +492,8 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
-			if ((data.FilterInfo == null) || data.Category == "Axion")
+			if ((data.FilterInfo == null) || data.Category == "Axion" ||
+				data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
 			{
 				if (source.HasTransparency())
 				{
@@ -598,9 +599,9 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			const int ExecuteProtect = NativeConstants.PAGE_EXECUTE |
-						               NativeConstants.PAGE_EXECUTE_READ |
-						               NativeConstants.PAGE_EXECUTE_READWRITE |
-						               NativeConstants.PAGE_EXECUTE_WRITECOPY;
+									   NativeConstants.PAGE_EXECUTE_READ |
+									   NativeConstants.PAGE_EXECUTE_READWRITE |
+									   NativeConstants.PAGE_EXECUTE_WRITECOPY;
 
 			return ((mbi.Protect & ExecuteProtect) != 0);
 		}
