@@ -492,7 +492,8 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
-			if ((data.FilterInfo == null) || data.Category == "Axion" ||
+			if (data.FilterInfo == null || 
+				data.Category.Equals("Axion", StringComparison.Ordinal) ||
 				data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
 			{
 				if (source.HasTransparency())
