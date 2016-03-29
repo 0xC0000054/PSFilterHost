@@ -575,10 +575,6 @@ namespace PSFilterHostDll.PSApi
 
 			}
 
-			FilterCaseInfo info = filterInfo[this.filterCase - 1];
-			this.inputHandling = info.inputHandling;
-			this.outputHandling = info.outputHandling;
-
 			return false;
 		}
 
@@ -1521,7 +1517,11 @@ namespace PSFilterHostDll.PSApi
 
 			if (pdata.FilterInfo != null)
 			{
-				FilterCaseInfoFlags filterCaseFlags = pdata.FilterInfo[this.filterCase - 1].flags1;
+				FilterCaseInfo info = pdata.FilterInfo[this.filterCase - 1];
+				this.inputHandling = info.inputHandling;
+				this.outputHandling = info.outputHandling;
+
+				FilterCaseInfoFlags filterCaseFlags = info.flags1;
 
 				this.copyToDest = ((filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
 				this.writesOutsideSelection = ((filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
