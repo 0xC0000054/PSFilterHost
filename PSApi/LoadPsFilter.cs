@@ -1489,15 +1489,10 @@ namespace PSFilterHostDll.PSApi
 
 		private static bool EnablePICASuites(PluginData data)
 		{
-#if !PICASUITEDEBUG
-			if (data.Category == "Nik Collection")
-			{
-				return true;
-			}
-
-			return false;
-#else
+#if PICASUITEDEBUG
 			return true;
+#else
+			return data.Category.Equals("Nik Collection", StringComparison.Ordinal);
 #endif
 		}
 
@@ -1510,7 +1505,8 @@ namespace PSFilterHostDll.PSApi
 		{
 			LoadFilter(pdata);
 
-			this.useChannelPorts = pdata.Category == "Amico Perry"; // enable the channel ports suite for Luce 2
+			// Enable the channel ports suite for Luce 2.
+			this.useChannelPorts = pdata.Category.Equals("Amico Perry", StringComparison.Ordinal);
 			this.usePICASuites = EnablePICASuites(pdata);
 
 			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
