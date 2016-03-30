@@ -167,6 +167,7 @@
     <Compile Include="PSApi\PseudoResourceSuite.cs" />
     <Compile Include="PSApi\SafeProfileHandle.cs" />
     <Compile Include="PSApi\SafeTransformHandle.cs" />
+    <Compile Include="PSApi\StringUtil.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
