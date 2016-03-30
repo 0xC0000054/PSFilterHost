@@ -19,19 +19,6 @@ namespace PSFilterHostDll.PSApi
 {
 	internal partial class LoadPsFilter
 	{
-		/// <summary>
-		/// Reads a Pascal String into a string.
-		/// </summary>
-		/// <param name="ptr">The pointer to read from.</param>
-		/// <param name="length">The length of the resulting Pascal String.</param>
-		/// <returns>The resulting string</returns>
-		private static unsafe string StringFromPString(byte* ptr, out int length)
-		{
-			length = (int)ptr[0] + 1; // skip the first byte
-
-			return new string((sbyte*)ptr, 1, ptr[0], Windows1252Encoding);
-		}
-
 		private sealed class QueryAETE
 		{
 			public readonly IntPtr resourceID;
@@ -99,9 +86,9 @@ namespace PSFilterHostDll.PSApi
 
 				if (suiteCount == 1) // There should only be one vendor suite
 				{
-					string vend = StringFromPString(propPtr, out stringLength);
+					string vend = StringUtil.FromPascalString(propPtr, out stringLength);
 					propPtr += stringLength;
-					string desc = StringFromPString(propPtr, out stringLength);
+					string desc = StringUtil.FromPascalString(propPtr, out stringLength);
 					propPtr += stringLength;
 					uint suiteID = *(uint*)propPtr;
 					propPtr += 4;
@@ -114,9 +101,9 @@ namespace PSFilterHostDll.PSApi
 
 					if (eventCount == 1) // There should only be one scripting event
 					{
-						string vend2 = StringFromPString(propPtr, out stringLength);
+						string vend2 = StringUtil.FromPascalString(propPtr, out stringLength);
 						propPtr += stringLength;
-						string desc2 = StringFromPString(propPtr, out stringLength);
+						string desc2 = StringUtil.FromPascalString(propPtr, out stringLength);
 						propPtr += stringLength;
 						int eventClass = *(int*)propPtr;
 						propPtr += 4;
@@ -163,7 +150,7 @@ namespace PSFilterHostDll.PSApi
 							for (int p = 0; p < paramCount; p++)
 							{
 								parameters[p] = new AETEParameter();
-								parameters[p].name = StringFromPString(propPtr, out stringLength);
+								parameters[p].name = StringUtil.FromPascalString(propPtr, out stringLength);
 								propPtr += stringLength;
 
 								parameters[p].key = *(uint*)propPtr;
@@ -172,7 +159,7 @@ namespace PSFilterHostDll.PSApi
 								parameters[p].type = *(uint*)propPtr;
 								propPtr += 4;
 
-								parameters[p].desc = StringFromPString(propPtr, out stringLength);
+								parameters[p].desc = StringUtil.FromPascalString(propPtr, out stringLength);
 								propPtr += stringLength;
 
 								parameters[p].flags = *(short*)propPtr;
@@ -204,11 +191,11 @@ namespace PSFilterHostDll.PSApi
 									for (int e = 0; e < en.count; e++)
 									{
 										en.enums[e] = new AETEEnum();
-										en.enums[e].name = StringFromPString(propPtr, out stringLength);
+										en.enums[e].name = StringUtil.FromPascalString(propPtr, out stringLength);
 										propPtr += stringLength;
 										en.enums[e].type = *(uint*)propPtr;
 										propPtr += 4;
-										en.enums[e].desc = StringFromPString(propPtr, out stringLength);
+										en.enums[e].desc = StringUtil.FromPascalString(propPtr, out stringLength);
 										propPtr += stringLength;
 									}
 									enums[enc] = en;
@@ -352,11 +339,11 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == PIPropertyID.PICategoryProperty)
 				{
-					enumData.Category = StringFromPString(dataPtr);
+					enumData.Category = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PINameProperty)
 				{
-					enumData.Title = StringFromPString(dataPtr);
+					enumData.Title = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PIFilterCaseInfoProperty)
 				{
@@ -436,21 +423,6 @@ namespace PSFilterHostDll.PSApi
 			return true;
 		}
 
-		/// <summary>
-		/// Reads a C string from a pointer.
-		/// </summary>
-		/// <param name="ptr">The pointer to read from.</param>
-		/// <param name="lengthWithTerminator">The length of the resulting string including the NUL terminator.</param>
-		/// <returns>The resulting string</returns>
-		private static string StringFromCString(IntPtr ptr, out int lengthWithTerminator)
-		{
-			string data = Marshal.PtrToStringAnsi(ptr);
-			// Add the terminating NUL to the total length.
-			lengthWithTerminator = data.Length + 1;
-
-			return data.Trim(TrimChars);
-		}
-
 		private static unsafe bool EnumPiMI(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, IntPtr lParam)
 		{
 			GCHandle handle = GCHandle.FromIntPtr(lParam);
@@ -487,7 +459,7 @@ namespace PSFilterHostDll.PSApi
 
 			PluginData enumData = new PluginData(query.fileName);
 
-			enumData.Category = StringFromCString((IntPtr)ptr, out length);
+			enumData.Category = StringUtil.FromCString((IntPtr)ptr, out length);
 
 			ptr += length;
 
@@ -590,7 +562,7 @@ namespace PSFilterHostDll.PSApi
 
 			IntPtr resPtr = new IntPtr(filterLock.ToInt64() + 2L);
 
-			enumData.Title = StringFromCString(resPtr, out length);
+			enumData.Title = StringUtil.FromCString(resPtr);
 
 			// The entry point number is the same as the resource number.
 			enumData.EntryPoint = "ENTRYPOINT" + lpszName.ToInt32().ToString(CultureInfo.InvariantCulture);
