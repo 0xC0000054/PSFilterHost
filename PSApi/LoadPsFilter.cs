@@ -2939,6 +2939,8 @@ namespace PSFilterHostDll.PSApi
 
 					if ((point->h >= 0 && point->h < source.Width) && (point->v >= 0 && point->v < source.Height))
 					{
+						ColorSpace sourceSpace = ColorSpace.RGBSpace;
+
 						if (imageMode == ImageModes.Gray16 || imageMode == ImageModes.RGB48)
 						{
 							// As this function only handles 8-bit data return 255 if the source image is 16-bit, same as Adobe(R) Photoshop(R).
@@ -2948,6 +2950,7 @@ namespace PSFilterHostDll.PSApi
 								info.colorComponents[1] = 0;
 								info.colorComponents[2] = 0;
 								info.colorComponents[3] = 0;
+								sourceSpace = ColorSpace.GraySpace;
 							}
 							else
 							{
@@ -2960,8 +2963,6 @@ namespace PSFilterHostDll.PSApi
 						else
 						{
 							byte* pixel = source.GetPointAddressUnchecked(point->h, point->v);
-
-							ColorSpace sourceSpace = ColorSpace.RGBSpace;
 
 							switch (imageMode)
 							{
@@ -2979,9 +2980,8 @@ namespace PSFilterHostDll.PSApi
 									info.colorComponents[3] = 0;
 									break;
 							}
-
-							err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 						}
+						err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
 					}
 					else
 					{
