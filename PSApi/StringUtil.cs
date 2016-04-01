@@ -25,7 +25,7 @@ namespace PSFilterHostDll.PSApi
 		private static readonly char[] TrimChars = new char[] { ' ', '\0' };
 
 		/// <summary>
-		/// Creates a <see cref="string" /> from a Pascal string.
+		/// Creates a <see cref="string"/> from a Pascal string.
 		/// </summary>
 		/// <param name="pascalString">The pascal string to convert.</param>
 		/// <param name="defaultValue">The value returned if <paramref name="pascalString"/> is null.</param>
