@@ -126,7 +126,7 @@
     <Compile Include="ColorToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DPIAwareToolStripRenderer.cs" />
+    <Compile Include="DpiAwareToolStripRenderer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -16,7 +16,7 @@ using PaintDotNet.SystemLayer;
 
 namespace HostTest
 {
-    internal sealed class DPIAwareToolStripRenderer : ToolStripProfessionalRenderer
+    internal sealed class DpiAwareToolStripRenderer : ToolStripProfessionalRenderer
     {
         private static readonly int ArrowOffset2X = UI.ScaleWidth(2);
         private static readonly int ArrowOffset2Y = UI.ScaleHeight(2);
@@ -24,7 +24,7 @@ namespace HostTest
 
         private Point[] arrowPoints;
 
-        public DPIAwareToolStripRenderer() : base()
+        public DpiAwareToolStripRenderer() : base()
         {
             this.arrowPoints = new Point[3];
         }
