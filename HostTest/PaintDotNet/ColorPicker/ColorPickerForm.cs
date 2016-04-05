@@ -155,19 +155,19 @@ namespace HostTest
             }
         }
 
-        private Color userPrimaryColor;
-        public Color UserPrimaryColor
+        private Color color;
+        public Color Color
         {
             get
             {
-                return userPrimaryColor;
+                return color;
             }
 
-            private set
+            set
             {
-                if (userPrimaryColor != value)
+                if (color != value)
                 {
-                    userPrimaryColor = value;
+                    color = value;
 
                     ignore++;
 
@@ -188,18 +188,11 @@ namespace HostTest
                     }
 
                     SyncHsvFromRgb(value);
-                    this.colorDisplayWidget.RectangleColor = this.userPrimaryColor;
+                    this.colorDisplayWidget.RectangleColor = this.color;
 
                     this.colorDisplayWidget.Invalidate();
                 }
             }
-        }
-
-        internal void SetDefaultColor(byte r, byte g, byte b)
-        {
-            this.redUpDown.Value = r;
-            this.greenUpDown.Value = g;
-            this.blueUpDown.Value = b;
         }
 
         private static string GetHexNumericUpDownValue(int red, int green, int blue)
@@ -842,7 +835,7 @@ namespace HostTest
             SetColorGradientValuesRgb(color.R, color.G, color.B);
             SetColorGradientMinMaxColorsRgb(color.R, color.G, color.B);
 
-            this.UserPrimaryColor = color;
+            this.Color = color;
 
             PopIgnoreChangedEvents();
 
@@ -940,7 +933,7 @@ namespace HostTest
             string hexText = GetHexNumericUpDownValue(rgbColor.R, rgbColor.G, rgbColor.B);
             hexBox.Text = hexText;
 
-            UserPrimaryColor = rgbColor;
+            Color = rgbColor;
 
             Update();
         }
@@ -999,7 +992,7 @@ namespace HostTest
             hexBox.Text = hexText;
 
 
-            UserPrimaryColor = color;
+            Color = color;
 
 
             Update();
@@ -1078,7 +1071,7 @@ namespace HostTest
 
                     SyncHsvFromRgb(rgbColor);
 
-                    this.UserPrimaryColor = rgbColor;
+                    this.Color = rgbColor;
                 }
                 else if (sender == hexBox)
                 {
@@ -1124,7 +1117,7 @@ namespace HostTest
 
                     Color rgbColor = Color.FromArgb((byte)newRed, (byte)newGreen, (byte)newBlue);
                     SyncHsvFromRgb(rgbColor);
-                    this.UserPrimaryColor = rgbColor;
+                    this.Color = rgbColor;
                 }
                 else if (sender == hueUpDown || sender == saturationUpDown || sender == valueUpDown)
                 {
@@ -1140,7 +1133,7 @@ namespace HostTest
 
                         SyncRgbFromHsv(newHsvColor);
                         RgbColor rgbColor = newHsvColor.ToRgb();
-                        this.UserPrimaryColor = rgbColor.ToColor();
+                        this.Color = rgbColor.ToColor();
                     }
                 }
                 PopIgnoreChangedEvents();
@@ -1160,7 +1153,7 @@ namespace HostTest
 
         private void swatchControl_ColorClicked(object sender, IndexEventArgs e)
         {
-            this.UserPrimaryColor = paletteColors[e.Index];
+            this.Color = paletteColors[e.Index];
         }
 
         private void okBtn_Click(object sender, EventArgs e)
