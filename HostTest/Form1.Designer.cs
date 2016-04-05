@@ -69,7 +69,6 @@
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.canvas = new HostTest.Canvas();
-            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.pointerSelectBtn = new System.Windows.Forms.ToolStripButton();
             this.rectangleSelectBtn = new System.Windows.Forms.ToolStripButton();
             this.elipseSelectBtn = new System.Windows.Forms.ToolStripButton();
@@ -296,11 +295,6 @@
             this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
             this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
             // 
-            // colorDialog1
-            // 
-            this.colorDialog1.FullOpen = true;
-            this.colorDialog1.SolidColorOnly = true;
-            // 
             // pointerSelectBtn
             // 
             this.pointerSelectBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -492,7 +486,6 @@
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
-        private System.Windows.Forms.ColorDialog colorDialog1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;

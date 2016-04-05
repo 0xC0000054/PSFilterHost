@@ -1100,19 +1100,25 @@ namespace HostTest
 
 		private void primaryColorBtn_Click(object sender, EventArgs e)
 		{
-			this.colorDialog1.Color = this.primaryColorBtn.Color;
-			if (colorDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+			using (ColorPickerForm dialog = new ColorPickerForm(Resources.ChoosePrimaryColor))
 			{
-				this.primaryColorBtn.Color = colorDialog1.Color;
+				dialog.Color = this.primaryColorBtn.Color;
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					this.primaryColorBtn.Color = dialog.Color;
+				}
 			}
 		}
 
 		private void secondaryColorBtn_Click(object sender, EventArgs e)
 		{
-			this.colorDialog1.Color = this.secondaryColorBtn.Color;
-			if (colorDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+			using (ColorPickerForm dialog = new ColorPickerForm(Resources.ChooseSecondaryColor))
 			{
-				this.secondaryColorBtn.Color = colorDialog1.Color;
+				dialog.Color = this.secondaryColorBtn.Color;
+				if (dialog.ShowDialog() == DialogResult.OK)
+				{
+					this.secondaryColorBtn.Color = dialog.Color;
+				}
 			}
 		}
 
