@@ -1376,11 +1376,11 @@ namespace HostTest
 
 			using (ColorPickerForm dialog = new ColorPickerForm(prompt))
 			{
-				dialog.SetDefaultColor(defaultRed, defaultGreen, defaultBlue);
+				dialog.Color = System.Drawing.Color.FromArgb(defaultRed, defaultGreen, defaultBlue);
 
 				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 				{
-					color = new ColorPickerResult(dialog.UserPrimaryColor);
+					color = new ColorPickerResult(dialog.Color);
 				}
 
 			}
