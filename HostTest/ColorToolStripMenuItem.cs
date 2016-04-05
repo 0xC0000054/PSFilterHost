@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms; 
 
@@ -41,6 +42,7 @@ namespace HostTest
         /// <value>
         /// The color displayed by the <see cref="ColorToolStripMenuItem"/>.
         /// </value>
+        [Description("Specifies the color displayed as the image of the menu item.")]
         public Color Color
         {
             get
