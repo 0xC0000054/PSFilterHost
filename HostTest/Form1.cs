@@ -108,7 +108,7 @@ namespace HostTest
 			{
 				ScaleToolStripImageSize(this.menuStrip1);
 				ScaleToolStripImageSize(this.toolStrip1);
-				ToolStripManager.Renderer = new DPIAwareToolStripRenderer();
+				ToolStripManager.Renderer = new DpiAwareToolStripRenderer();
 			}
 		}
 
@@ -1393,7 +1393,7 @@ namespace HostTest
 			if (this.highDPIMode)
 			{
 				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
-				DPIAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
+				DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
 			}
 		}
 
@@ -1402,7 +1402,7 @@ namespace HostTest
 			if (this.highDPIMode)
 			{
 				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
-				DPIAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
+				DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
 			}
 		}
 	}
