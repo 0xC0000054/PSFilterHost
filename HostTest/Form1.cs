@@ -110,6 +110,14 @@ namespace HostTest
 				ScaleToolStripImageSize(this.toolStrip1);
 				ToolStripManager.Renderer = new DpiAwareToolStripRenderer();
 			}
+			if (primaryColorBtn.ImageSize != toolStrip1.ImageScalingSize)
+			{
+				primaryColorBtn.ImageSize = toolStrip1.ImageScalingSize;
+			}
+			if (secondaryColorBtn.ImageSize != toolStrip1.ImageScalingSize)
+			{
+				secondaryColorBtn.ImageSize = toolStrip1.ImageScalingSize;
+			}
 		}
 
 		/// <summary>
