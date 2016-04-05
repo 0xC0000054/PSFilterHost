@@ -18,19 +18,24 @@ namespace HostTest
 {
     internal sealed class ColorToolStripMenuItem : ToolStripMenuItem
     {
-        private SolidBrush colorBrush;
+        private Bitmap image;
         private Color color;
+
+        private int imageWidth;
+        private int imageHeight;
 
         public ColorToolStripMenuItem()
         {
+            this.imageWidth = 16;
+            this.imageHeight = 16;
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing && colorBrush != null)
+            if (disposing && image != null)
             {
-                this.colorBrush.Dispose();
-                this.colorBrush = null;
+                this.image.Dispose();
+                this.image = null;
             }
 
             base.Dispose(disposing);
@@ -55,23 +60,83 @@ namespace HostTest
                 {
                     this.color = value;
 
-                    if (colorBrush != null)
-                    {
-                        colorBrush.Dispose();
-                        colorBrush = null;
-                    }
-
-                    colorBrush = new SolidBrush(value);
+                    DrawImage();
                 }
             }
 
         }
 
-        protected override void OnPaint(PaintEventArgs e)
+        /// <summary>
+        /// Gets or sets the size of the image in pixels.
+        /// </summary>
+        /// <value>
+        /// The size of the image in pixels.
+        /// </value>
+        [Description("Specifies the size in pixels of the image displayed by the menu item.")]
+        [DefaultValue(typeof(Size), "16,16")]
+        public Size ImageSize
         {
-            base.OnPaint(e);
+            get
+            {
+                return new Size(imageWidth, imageHeight);
+            }
+            set
+            {
+                if (imageWidth != value.Width || imageHeight != value.Height)
+                {
+                    this.imageWidth = value.Width;
+                    this.imageHeight = value.Height;
+                    DrawImage();
+                }
+            }
+        } 
 
-            e.Graphics.FillRectangle(colorBrush, e.ClipRectangle);
+        private void DrawImage()
+        {
+            if (image != null)
+            {
+                image.Dispose();
+                image = null;
+            }
+            image = new Bitmap(imageWidth, imageHeight);
+
+            using (Graphics gr = Graphics.FromImage(image))
+            {
+                using (Pen borderPen = new Pen(Color.Black))
+                {
+                    gr.DrawRectangle(borderPen, 0, 0, imageWidth - 1, imageHeight - 1);
+                } 
+
+                using (SolidBrush brush = new SolidBrush(color))
+                {
+                    gr.FillRectangle(brush, 1, 1, imageWidth - 2, imageHeight - 2);
+                }
+            }
+            Invalidate();
+        }
+
+        public override Image BackgroundImage
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public override ToolStripItemDisplayStyle DisplayStyle
+        {
+            get
+            {
+                return ToolStripItemDisplayStyle.Image;
+            }
+        }
+
+        public override Image Image
+        {
+            get
+            {
+                return image;
+            }
         }
     }
 }
