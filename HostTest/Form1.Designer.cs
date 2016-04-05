@@ -423,7 +423,7 @@
             this.primaryColorBtn.Image = ((System.Drawing.Image)(resources.GetObject("primaryColorBtn.Image")));
             this.primaryColorBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.primaryColorBtn.Name = "primaryColorBtn";
-            this.primaryColorBtn.RectangleColor = System.Drawing.Color.Black;
+            this.primaryColorBtn.Color = System.Drawing.Color.Black;
             this.primaryColorBtn.Size = new System.Drawing.Size(26, 20);
             this.primaryColorBtn.Text = "toolStripButton1";
             this.primaryColorBtn.ToolTipText = "Primary color";
@@ -435,7 +435,7 @@
             this.secondaryColorBtn.Image = ((System.Drawing.Image)(resources.GetObject("secondaryColorBtn.Image")));
             this.secondaryColorBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.secondaryColorBtn.Name = "secondaryColorBtn";
-            this.secondaryColorBtn.RectangleColor = System.Drawing.Color.White;
+            this.secondaryColorBtn.Color = System.Drawing.Color.White;
             this.secondaryColorBtn.Size = new System.Drawing.Size(26, 20);
             this.secondaryColorBtn.Text = "toolStripButton2";
             this.secondaryColorBtn.ToolTipText = "Secondary color";

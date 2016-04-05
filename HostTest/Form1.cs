@@ -516,8 +516,8 @@ namespace HostTest
 
 			try
 			{
-				System.Windows.Media.Color primary = GDIPlusToWPFColor(this.primaryColorBtn.RectangleColor);
-				System.Windows.Media.Color secondary = GDIPlusToWPFColor(this.secondaryColorBtn.RectangleColor);
+				System.Windows.Media.Color primary = GDIPlusToWPFColor(this.primaryColorBtn.Color);
+				System.Windows.Media.Color secondary = GDIPlusToWPFColor(this.secondaryColorBtn.Color);
 
 				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))
 				{
@@ -1092,19 +1092,19 @@ namespace HostTest
 
 		private void primaryColorBtn_Click(object sender, EventArgs e)
 		{
-			this.colorDialog1.Color = this.primaryColorBtn.RectangleColor;
+			this.colorDialog1.Color = this.primaryColorBtn.Color;
 			if (colorDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 			{
-				this.primaryColorBtn.RectangleColor = colorDialog1.Color;
+				this.primaryColorBtn.Color = colorDialog1.Color;
 			}
 		}
 
 		private void secondaryColorBtn_Click(object sender, EventArgs e)
 		{
-			this.colorDialog1.Color = this.secondaryColorBtn.RectangleColor;
+			this.colorDialog1.Color = this.secondaryColorBtn.Color;
 			if (colorDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 			{
-				this.secondaryColorBtn.RectangleColor = colorDialog1.Color;
+				this.secondaryColorBtn.Color = colorDialog1.Color;
 			}
 		}
 

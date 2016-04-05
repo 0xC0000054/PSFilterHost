@@ -18,7 +18,7 @@ namespace HostTest
     internal sealed class ColorToolStripMenuItem : ToolStripMenuItem
     {
         private SolidBrush colorBrush;
-        private Color rectangleColor;
+        private Color color;
 
         public ColorToolStripMenuItem()
         {
@@ -36,22 +36,22 @@ namespace HostTest
         }
 
         /// <summary>
-        /// Gets or sets the color of the rectangle.
+        /// Gets or sets the displayed color.
         /// </summary>
         /// <value>
-        /// The color of the rectangle.
+        /// The color displayed by the <see cref="ColorToolStripMenuItem"/>.
         /// </value>
-        public Color RectangleColor
+        public Color Color
         {
             get
             {
-                return rectangleColor;
+                return color;
             }
             set
             {
-                if (rectangleColor != value)
+                if (color != value)
                 {
-                    this.rectangleColor = value;
+                    this.color = value;
 
                     if (colorBrush != null)
                     {
