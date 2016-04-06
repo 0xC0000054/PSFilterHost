@@ -84,14 +84,12 @@ namespace HostTest
             }
         }
 
-        private static IEnumerable<string> GetFilterStrings(IList<string> extensions)
+        private static IEnumerable<string> GetFilterStrings(IEnumerable<string> extensions)
         {
             Dictionary<string, List<string>> extDict = new Dictionary<string, List<string>>();
 
-            for (int i = 0; i < extensions.Count; i++)
+            foreach (string fileExtension in extensions)
             {
-                string fileExtension = extensions[i];
-
                 string friendlyName = null;
                 string progid = null;
 
@@ -186,15 +184,13 @@ namespace HostTest
 
         public static string GetOpenDialogFilterString()
         {
-            List<string> fileExtensions = new List<string>();
+            HashSet<string> fileExtensions = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
                 string extString = GetString(info.GetFileExtensions).ToLowerInvariant();
 
-                // Remove any duplicate extensions.
-                var exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries).Except(fileExtensions, StringComparer.Ordinal);
-                fileExtensions.AddRange(exts);
+                fileExtensions.UnionWith(extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries));
             }
 
             StringBuilder formats = new StringBuilder();
@@ -229,18 +225,16 @@ namespace HostTest
 
         public static System.Collections.ObjectModel.ReadOnlyCollection<string> GetDecoderFileExtensions()
         {
-            List<string> extensions = new List<string>();
+            HashSet<string> extensions = new HashSet<string>(StringComparer.Ordinal);
 
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
                 string extString = GetString(info.GetFileExtensions).ToLowerInvariant();
                 
-                // Remove any duplicate extensions.
-                var exts = extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries).Except(extensions, StringComparer.Ordinal);
-                extensions.AddRange(exts);
+                extensions.UnionWith(extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries));
             }
 
-            return extensions.AsReadOnly();
+            return new System.Collections.ObjectModel.ReadOnlyCollection<string>(extensions.ToList());
         }
     }
 }
