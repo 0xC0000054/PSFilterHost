@@ -147,7 +147,7 @@ namespace HostTest
                 }
             }
 
-            List<string> filters = new List<string>();
+            List<string> filters = new List<string>(extDict.Keys.Count);
 
             foreach (var item in extDict)
             {
