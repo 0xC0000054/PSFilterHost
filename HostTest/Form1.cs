@@ -1273,7 +1273,7 @@ namespace HostTest
 		{
 			WorkerArgs args = (WorkerArgs)e.Argument;
 
-			Dictionary<string, ToolStripMenuItemEx> filterList = new Dictionary<string, ToolStripMenuItemEx>();
+			Dictionary<string, ToolStripMenuItemEx> filterList = new Dictionary<string, ToolStripMenuItemEx>(StringComparer.Ordinal);
 			List<ToolStripItem> aboutList = new List<ToolStripItem>();
 
 			foreach (var plug in PSFilterHost.EnumerateFilters(args.Path, SearchOption.AllDirectories))
