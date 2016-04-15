@@ -27,7 +27,7 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// The signature used when a plug-in works with any host.
         /// </summary>
-        public const uint noRequiredHost = 0x20202020U;
+        public const uint AnyHostSignature = 0x20202020U;
 
         /// <summary>
         /// The filter type code - '8BFM'

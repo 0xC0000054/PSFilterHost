@@ -395,7 +395,7 @@ namespace PSFilterHostDll.PSApi
 				else if (propKey == PIPropertyID.PIRequiredHostProperty)
 				{
 					uint host = *(uint*)dataPtr;
-					if (host != PSConstants.kPhotoshopSignature && host != PSConstants.noRequiredHost)
+					if (host != PSConstants.kPhotoshopSignature && host != PSConstants.AnyHostSignature)
 					{
 #if DEBUG
 						System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, DebugUtils.PropToString(host)));
@@ -511,7 +511,7 @@ namespace PSFilterHostDll.PSApi
 			enumData.SupportedModes = supportedModes;
 #endif
 
-			if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.noRequiredHost)
+			if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.AnyHostSignature)
 			{
 #if DEBUG
 				System.Diagnostics.Debug.WriteLine(string.Format("{0} requires host '{1}'.", query.fileName, DebugUtils.PropToString(info->requireHost)));
