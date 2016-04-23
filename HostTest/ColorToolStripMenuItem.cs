@@ -93,12 +93,15 @@ namespace HostTest
 
         private void DrawImage()
         {
-            if (image != null)
+            if (image == null || image.Width != imageWidth || image.Height != imageHeight)
             {
-                image.Dispose();
-                image = null;
+                if (image != null)
+                {
+                    image.Dispose();
+                    image = null;
+                }
+                image = new Bitmap(imageWidth, imageHeight); 
             }
-            image = new Bitmap(imageWidth, imageHeight);
 
             using (Graphics gr = Graphics.FromImage(image))
             {
