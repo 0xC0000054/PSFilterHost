@@ -1185,6 +1185,33 @@ namespace HostTest
 			this.saveToolStripMenuItem.Enabled = e.Dirty; 
 		}
 
+		private static bool FileDropIsImage(string file)
+		{
+			bool result = false;
+
+			try
+			{
+				if ((File.GetAttributes(file) & FileAttributes.Directory) == 0)
+				{
+					result = ImageFileExtensions.Contains(Path.GetExtension(file), StringComparer.OrdinalIgnoreCase);
+				}
+			}
+			catch (ArgumentException)
+			{
+			}
+			catch (IOException)
+			{
+			}
+			catch (NotSupportedException)
+			{
+			}
+			catch (UnauthorizedAccessException)
+			{
+			}
+
+			return result;
+		}
+
 		protected override void OnDragEnter(DragEventArgs drgevent)
 		{
 			this.dropImageFileName = string.Empty;
@@ -1193,7 +1220,7 @@ namespace HostTest
 			{
 				string[] files = drgevent.Data.GetData(DataFormats.FileDrop, false) as string[];
 
-				if ((files.Length == 1) && ImageFileExtensions.Contains(Path.GetExtension(files[0]), StringComparer.OrdinalIgnoreCase) && (File.GetAttributes(files[0]) & FileAttributes.Directory) == 0)
+				if (files != null && files.Length == 1 && FileDropIsImage(files[0]))
 				{
 					drgevent.Effect = DragDropEffects.Copy;
 					this.dropImageFileName = files[0];
