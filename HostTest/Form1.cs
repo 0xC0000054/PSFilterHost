@@ -1188,6 +1188,7 @@ namespace HostTest
 		protected override void OnDragEnter(DragEventArgs drgevent)
 		{
 			this.dropImageFileName = string.Empty;
+			drgevent.Effect = DragDropEffects.None;
 			if (drgevent.Data.GetDataPresent(DataFormats.FileDrop, false))
 			{
 				string[] files = drgevent.Data.GetData(DataFormats.FileDrop, false) as string[];
