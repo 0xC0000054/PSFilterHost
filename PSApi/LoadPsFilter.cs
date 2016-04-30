@@ -3085,6 +3085,66 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
+		private unsafe short CreateDitheredChannelPortSurface()
+		{
+			int width = source.Width;
+			int height = source.Height;
+
+			try
+			{
+				switch (imageMode)
+				{
+					case ImageModes.Gray16:
+
+						convertedChannelImageMode = ImageModes.GrayScale;
+						convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+
+						for (int y = 0; y < height; y++)
+						{
+							ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+							byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+							for (int x = 0; x < width; x++)
+							{
+								*dst = (byte)((*src * 10) / 1285);
+
+								src++;
+								dst++;
+							}
+						}
+						break;
+
+					case ImageModes.RGB48:
+
+						convertedChannelImageMode = ImageModes.RGB;
+						convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+
+						for (int y = 0; y < height; y++)
+						{
+							ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
+							byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+							for (int x = 0; x < width; x++)
+							{
+								dst[0] = (byte)((src[0] * 10) / 1285);
+								dst[1] = (byte)((src[1] * 10) / 1285);
+								dst[2] = (byte)((src[2] * 10) / 1285);
+								dst[3] = (byte)((src[3] * 10) / 1285);
+
+								src += 4;
+								dst += 4;
+							}
+						}
+
+						break;
+				}
+			}
+			catch (OutOfMemoryException)
+			{
+				return PSError.memFullErr;
+			}
+
+			return PSError.noErr;
+		}
+
 		private unsafe short ReadPixelsProc(IntPtr port, ref PSScaling scaling, ref VRect writeRect, ref PixelMemoryDesc destination, ref VRect wroteRect)
 		{
 #if DEBUG
@@ -3196,68 +3256,11 @@ namespace PSFilterHostDll.PSApi
 				{
 					if (convertedChannelSurface == null)
 					{
-						int width = source.Width;
-						int height = source.Height;
-
-						try
+						short err = CreateDitheredChannelPortSurface();
+						if (err != PSError.noErr)
 						{
-							switch (imageMode)
-							{
-								case ImageModes.Gray16:
-
-									convertedChannelImageMode = ImageModes.GrayScale;
-									convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
-
-									for (int y = 0; y < height; y++)
-									{
-										ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-										byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
-										for (int x = 0; x < width; x++)
-										{
-											*dst = (byte)((*src * 10) / 1285);
-
-											src++;
-											dst++;
-										}
-									}
-									break;
-
-								case ImageModes.RGB48:
-
-									convertedChannelImageMode = ImageModes.RGB;
-									convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
-
-									for (int y = 0; y < height; y++)
-									{
-										ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-										byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
-										for (int x = 0; x < width; x++)
-										{
-											dst[0] = (byte)((src[0] * 10) / 1285);
-											dst[1] = (byte)((src[1] * 10) / 1285);
-											dst[2] = (byte)((src[2] * 10) / 1285);
-											dst[3] = (byte)((src[3] * 10) / 1285);
-
-											src += 4;
-											dst += 4;
-										}
-									}
-
-									break;
-							}
+							return err;
 						}
-						catch (OutOfMemoryException)
-						{
-							return PSError.memFullErr;
-						}
-
-
-
-#if DEBUG
-						using (Bitmap bmp = convertedChannelSurface.CreateAliasedBitmap())
-						{
-						}
-#endif
 					}
 
 					temp = convertedChannelSurface;
