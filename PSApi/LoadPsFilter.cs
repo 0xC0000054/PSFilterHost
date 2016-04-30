@@ -167,9 +167,9 @@ namespace PSFilterHostDll.PSApi
 		private IntPtr outDataPtr;
 
 		private SurfaceBase scaledChannelSurface;
-		private SurfaceBase convertedChannelSurface;
+		private SurfaceBase ditheredChannelSurface;
 		private Surface8 scaledSelectionMask;
-		private ImageModes convertedChannelImageMode;
+		private ImageModes ditheredChannelImageMode;
 
 		private bool disposed;
 		private bool sizesSetup;
@@ -3096,13 +3096,13 @@ namespace PSFilterHostDll.PSApi
 				{
 					case ImageModes.Gray16:
 
-						convertedChannelImageMode = ImageModes.GrayScale;
-						convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+						ditheredChannelImageMode = ImageModes.GrayScale;
+						ditheredChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, ditheredChannelImageMode);
 
 						for (int y = 0; y < height; y++)
 						{
 							ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-							byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+							byte* dst = ditheredChannelSurface.GetRowAddressUnchecked(y);
 							for (int x = 0; x < width; x++)
 							{
 								*dst = (byte)((*src * 10) / 1285);
@@ -3115,13 +3115,13 @@ namespace PSFilterHostDll.PSApi
 
 					case ImageModes.RGB48:
 
-						convertedChannelImageMode = ImageModes.RGB;
-						convertedChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, convertedChannelImageMode);
+						ditheredChannelImageMode = ImageModes.RGB;
+						ditheredChannelSurface = SurfaceFactory.CreateFromImageMode(width, height, ditheredChannelImageMode);
 
 						for (int y = 0; y < height; y++)
 						{
 							ushort* src = (ushort*)source.GetRowAddressUnchecked(y);
-							byte* dst = convertedChannelSurface.GetRowAddressUnchecked(y);
+							byte* dst = ditheredChannelSurface.GetRowAddressUnchecked(y);
 							for (int x = 0; x < width; x++)
 							{
 								dst[0] = (byte)((src[0] * 10) / 1285);
@@ -3254,7 +3254,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (source.BitsPerChannel == 16 && destination.depth == 8)
 				{
-					if (convertedChannelSurface == null)
+					if (ditheredChannelSurface == null)
 					{
 						short err = CreateDitheredChannelPortSurface();
 						if (err != PSError.noErr)
@@ -3263,8 +3263,8 @@ namespace PSFilterHostDll.PSApi
 						}
 					}
 
-					temp = convertedChannelSurface;
-					tempMode = convertedChannelImageMode;
+					temp = ditheredChannelSurface;
+					tempMode = ditheredChannelImageMode;
 				}
 				else
 				{
@@ -5286,10 +5286,10 @@ namespace PSFilterHostDll.PSApi
 						scaledChannelSurface = null;
 					}
 
-					if (convertedChannelSurface != null)
+					if (ditheredChannelSurface != null)
 					{
-						convertedChannelSurface.Dispose();
-						convertedChannelSurface = null;
+						ditheredChannelSurface.Dispose();
+						ditheredChannelSurface = null;
 					}
 
 					if (scaledSelectionMask != null)
