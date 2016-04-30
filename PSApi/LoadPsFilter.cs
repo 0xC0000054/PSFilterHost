@@ -3249,8 +3249,7 @@ namespace PSFilterHostDll.PSApi
 			}
 			else
 			{
-				SurfaceBase temp = null;
-				ImageModes tempMode = this.imageMode;
+				ImageModes mode = this.imageMode;
 
 				if (source.BitsPerChannel == 16 && destination.depth == 8)
 				{
@@ -3263,17 +3262,12 @@ namespace PSFilterHostDll.PSApi
 						}
 					}
 
-					temp = ditheredChannelSurface;
-					tempMode = ditheredChannelImageMode;
-				}
-				else
-				{
-					temp = source;
+					mode = ditheredChannelImageMode;
 				}
 
 				if (srcWidth == dstWidth && srcHeight == dstHeight)
 				{
-					FillChannelData(channel, destination, temp, srcRect, tempMode);
+					FillChannelData(channel, destination, ditheredChannelSurface ?? source, srcRect, mode);
 				}
 				else if (dstWidth < srcWidth || dstHeight < srcHeight) // scale down
 				{
@@ -3287,8 +3281,8 @@ namespace PSFilterHostDll.PSApi
 
 						try
 						{
-							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
-							scaledChannelSurface.SuperSampleFitSurface(temp);
+							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, mode);
+							scaledChannelSurface.SuperSampleFitSurface(ditheredChannelSurface ?? source);
 						}
 						catch (OutOfMemoryException)
 						{
@@ -3303,7 +3297,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 					}
 
-					FillChannelData(channel, destination, scaledChannelSurface, dstRect, tempMode);
+					FillChannelData(channel, destination, scaledChannelSurface, dstRect, mode);
 				}
 				else if (dstWidth > srcWidth || dstHeight > srcHeight) // scale up
 				{
@@ -3317,8 +3311,8 @@ namespace PSFilterHostDll.PSApi
 
 						try
 						{
-							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, tempMode);
-							scaledChannelSurface.BicubicFitSurface(temp);
+							scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, mode);
+							scaledChannelSurface.BicubicFitSurface(ditheredChannelSurface ?? source);
 						}
 						catch (OutOfMemoryException)
 						{
@@ -3326,7 +3320,7 @@ namespace PSFilterHostDll.PSApi
 						}
 					}
 
-					FillChannelData(channel, destination, scaledChannelSurface, dstRect, tempMode);
+					FillChannelData(channel, destination, scaledChannelSurface, dstRect, mode);
 				}
 			}
 
