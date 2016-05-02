@@ -12,7 +12,6 @@
 
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 
 #if GDIPLUS
@@ -58,59 +57,6 @@ namespace PSFilterHostDll.PSApi
 			this.extractedExif = false;
 			this.extractedXMP = false;
 			this.disposed = false;
-		}
-
-		/// <summary>
-		/// Reads the JPEG APP1 section to extract the EXIF meta data.
-		/// </summary>
-		/// <param name="jpegData">The JPEG image byte array.</param>
-		/// <returns> The extracted data or null.</returns>
-		/// <exception cref="System.ArgumentNullException"><paramref name="jpegData"/> is null.</exception>
-		private static unsafe byte[] ExtractEXIFMetaData(byte[] jpegData)
-		{
-			if (jpegData == null)
-			{
-				throw new ArgumentNullException("jpegData");
-			}
-
-			byte[] bytes = null;
-			fixed (byte* ptr = jpegData)
-			{
-				byte* p = ptr;
-				if (p[0] != 0xff && p[1] != 0xd8) // JPEG file signature
-				{
-					return null;
-				}
-				p += 2;
-
-				while ((p[0] == 0xff && (p[1] >= 0xe0 && p[1] <= 0xef)) && bytes == null) // APP sections
-				{
-					int sectionLength = ((p[2] << 8) | p[3]); // JPEG uses big-endian   
-
-					if (p[0] == 0xff && p[1] == 0xe1) // APP1
-					{
-						p += 2; // skip the header bytes
-
-						string sig = new string((sbyte*)p + 2, 0, 6, Encoding.UTF8);
-
-						if (sig == "Exif\0\0")
-						{
-							int exifLength = sectionLength - 8; // subtract the signature and section length size to get the data length. 
-							bytes = new byte[exifLength];
-
-							Marshal.Copy(new IntPtr(p + 8), bytes, 0, exifLength);
-						}
-
-						p += sectionLength;
-					}
-					else
-					{
-						p += sectionLength + 2;
-					}
-				}
-			}
-
-			return bytes;
 		}
 
 		/// <summary>
@@ -203,7 +149,7 @@ namespace PSFilterHostDll.PSApi
 					enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
 					enc.Save(ms);
 #endif
-					this.exifBytes = ExtractEXIFMetaData(ms.GetBuffer());
+					this.exifBytes = JpegReader.ExtractEXIF(ms.GetBuffer());
 					this.extractedExif = true;
 					bytes = this.exifBytes;
 				}
@@ -244,6 +190,99 @@ namespace PSFilterHostDll.PSApi
 
 				this.exifBytes = null;
 				this.xmpBytes = null;
+			}
+		}
+
+		private static class JpegReader
+		{
+			private static class JpegMarkers
+			{
+				internal const ushort StartOfImage = 0xFFD8;
+				internal const ushort EndOfImage = 0xFFD9;
+				internal const ushort StartOfScan = 0xFFDA;
+				internal const ushort App1 = 0xFFE1;
+			}
+
+			private const int EXIFSignatureLength = 6;
+			private const int EXIFSegmentHeaderLength = sizeof(ushort) + EXIFSignatureLength;
+
+			private static ushort ReadUInt16BigEndian(byte[] buffer, int startIndex)
+			{
+				return (ushort)((buffer[startIndex] << 8) | buffer[startIndex + 1]);
+			}
+
+			/// <summary>
+			/// Extracts the EXIF data from a JPEG image.
+			/// </summary>
+			/// <param name="jpegBytes">The JPEG image bytes.</param>
+			/// <returns>The extracted EXIF data, or null.</returns>
+			internal static byte[] ExtractEXIF(byte[] jpegBytes)
+			{
+				try
+				{
+					if (jpegBytes.Length > 2)
+					{
+						ushort marker = ReadUInt16BigEndian(jpegBytes, 0);
+
+						// Check the file signature.
+						if (marker == JpegMarkers.StartOfImage)
+						{
+							int index = 2;
+							int length = jpegBytes.Length;
+
+							while (index < length)
+							{
+								marker = ReadUInt16BigEndian(jpegBytes, index);
+								if (marker == 0xFFFF)
+								{
+									// Skip the first padding byte and read the marker again.
+									index++;
+									continue;
+								}
+								else
+								{
+									index += 2;
+								}
+
+								if (marker == JpegMarkers.StartOfScan || marker == JpegMarkers.EndOfImage)
+								{
+									// The application data segments always come before these markers.
+									break;
+								}
+
+								// The segment length field includes its own length in the total.
+								// The index is not incremented after reading it to avoid having to subtract
+								// 2 bytes from the length when skipping a segment.
+								ushort segmentLength = ReadUInt16BigEndian(jpegBytes, index);
+
+								if (marker == JpegMarkers.App1 && segmentLength >= EXIFSegmentHeaderLength)
+								{
+									string sig = Encoding.UTF8.GetString(jpegBytes, index + 2, EXIFSignatureLength);
+									if (sig.Equals("Exif\0\0", StringComparison.Ordinal))
+									{
+										int exifDataSize = segmentLength - EXIFSegmentHeaderLength;
+										byte[] exifData = null;
+
+										if (exifDataSize > 0)
+										{
+											exifData = new byte[exifDataSize];
+											Buffer.BlockCopy(jpegBytes, index + EXIFSegmentHeaderLength, exifData, 0, exifDataSize);
+										}
+
+										return exifData;
+									}
+								}
+
+								index += segmentLength;
+							}
+						} 
+					}
+				}
+				catch (IndexOutOfRangeException)
+				{
+				}
+
+				return null;
 			}
 		}
 
