@@ -15,11 +15,11 @@
  * All rights reserved.
 */
 
+#if USEIMAGESERVICES
 using System;
 using System.Runtime.InteropServices;
 namespace PSFilterHostDll.PSApi
 {
-#if USEIMAGESERVICES
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate short PIResampleProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method);
@@ -40,7 +40,7 @@ namespace PSFilterHostDll.PSApi
         Bicubic
     }
     
-#endif
 
 
 }
+#endif
