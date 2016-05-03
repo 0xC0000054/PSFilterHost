@@ -10,17 +10,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+#if !GDIPLUS
 using System;
 using System.Linq;
 using System.IO;
-
-#if !GDIPLUS
 using System.Windows.Media.Imaging;
-#endif
 
 namespace PSFilterHostDll.PSApi
 {
-#if !GDIPLUS
     internal static class MetaDataConverter
     {
         private static void CopySubBlockRecursive(ref BitmapMetadata parent, BitmapMetadata child, string query)
@@ -309,5 +306,5 @@ namespace PSFilterHostDll.PSApi
             return null;
         }
     }
-#endif
 }
+#endif
