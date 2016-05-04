@@ -509,7 +509,8 @@ namespace HostTest
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Open, FileAccess.Read))
 				{
-					image = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+					BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+					image = BitmapFrame.Create(stream, createOptions, BitmapCacheOption.OnLoad);
 				}
 
 				hostInfo.Caption = MetaDataHelper.GetIPTCCaption(image);
@@ -778,7 +779,8 @@ namespace HostTest
 			this.Cursor = Cursors.WaitCursor;
 			try
 			{
-				BitmapFrame frame = BitmapFrame.Create(new Uri(path), BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.None);
+				BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+				BitmapFrame frame = BitmapFrame.Create(new Uri(path), createOptions, BitmapCacheOption.None);
 
 				srcImage = frame.Clone();
 				srcImage.Freeze();
