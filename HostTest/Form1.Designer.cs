@@ -242,7 +242,7 @@
             // 
             // folderBrowserDialog1
             // 
-            this.folderBrowserDialog1.Description = "Select a folder containing Adobe® Photoshop® filters.";
+            this.folderBrowserDialog1.Description = "Select a folder containing Adobe® Photoshop®-compatible filters.";
             // 
             // openFileDialog1
             // 
