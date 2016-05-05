@@ -906,39 +906,39 @@ namespace HostTest
 				}
 				else
 				{
-					this.saveFileDialog1.Filter = "Bitmap Image (*.bmp)|*.bmp|GIF Image (*.gif)|*.gif|JPEG Image (*.jpg, *.jpe, *.jpeg, *.jfif)|*.jpg;*.jpe;*.jpeg;*.jfif|PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
+					this.saveFileDialog1.Filter = "Bitmap Image (*.bmp)|*.bmp|GIF Image (*.gif)|*.gif|JPEG Image (*.jpg, *.jpeg, *.jpe)|*.jpg;*.jpeg;*.jpe|PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
 					this.saveFileDialog1.FilterIndex = 4;
 				}
 
 				if (saveFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 				{
 					string path = this.saveFileDialog1.FileName;
-					string ext = Path.GetExtension(path).ToLowerInvariant();
 					BitmapEncoder encoder = null;
 
-					if (ext == ".bmp")
+					switch (Path.GetExtension(path).ToUpperInvariant())
 					{
-						encoder = new BmpBitmapEncoder();
-					}
-					else if (ext == ".gif")
-					{
-						encoder = new GifBitmapEncoder();
-					}
-					else if (ext == ".jpg" || ext == ".jpeg" || ext == ".jpe" || ext == ".jiff")
-					{
-						encoder = new JpegBitmapEncoder();
-					}
-					else if (ext == ".png")
-					{
-						encoder = new PngBitmapEncoder();
-					}
-					else if (ext == ".tif" || ext == ".tiff")
-					{
-						encoder = new TiffBitmapEncoder();
-					}
-					else if (ext == ".wdp" || ext == ".jxr")
-					{
-						encoder = new WmpBitmapEncoder();
+						case ".BMP":
+							encoder = new BmpBitmapEncoder();
+							break;
+						case ".GIF":
+							encoder = new GifBitmapEncoder();
+							break;
+						case ".JPG":
+						case ".JPEG":
+						case ".JPE":
+							encoder = new JpegBitmapEncoder();
+							break;
+						case ".PNG":
+							encoder = new PngBitmapEncoder();
+							break;
+						case ".TIF":
+						case ".TIFF":
+							encoder = new TiffBitmapEncoder();
+							break;
+						case ".WDP":
+						case ".JXR":
+							encoder = new WmpBitmapEncoder();
+							break;
 					}
 
 					BitmapMetadata metaData = null;
