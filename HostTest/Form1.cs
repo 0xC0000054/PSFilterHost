@@ -274,8 +274,6 @@ namespace HostTest
 
 		private void loadFiltersMenuItem_Click(object sender, EventArgs e)
 		{
-			this.folderBrowserDialog1.SelectedPath = string.Empty;
-
 			if (folderBrowserDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 			{
 				QueryDirectory(this.folderBrowserDialog1.SelectedPath);
