@@ -61,7 +61,7 @@
             this.aboutPluginsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutMenuToolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
+            this.folderBrowserDialog1 = new HostTest.PlatformFolderBrowserDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -242,7 +242,8 @@
             // 
             // folderBrowserDialog1
             // 
-            this.folderBrowserDialog1.Description = "Select a folder containing Adobe® Photoshop®-compatible filters.";
+            this.folderBrowserDialog1.ClassicFolderBrowserDescription = "Select a folder containing Adobe® Photoshop®-compatible filters.";
+            this.folderBrowserDialog1.VistaFolderBrowserTitle = "Select a Folder Containing Adobe® Photoshop®-Compatible Filters";
             // 
             // openFileDialog1
             // 
@@ -469,7 +470,7 @@
 
         private HostTest.MenuStripEx menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem filtersToolStripMenuItem;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
+        private HostTest.PlatformFolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
