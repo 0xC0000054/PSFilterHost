@@ -126,6 +126,12 @@
     <Compile Include="ColorToolStripMenuItem.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Dialogs\PlatformFolderBrowserDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Dialogs\VistaFolderBrowserDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DpiAwareToolStripRenderer.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -145,6 +151,8 @@
     </Compile>
     <Compile Include="MetaDataHelper.cs" />
     <Compile Include="NativeConstants.cs" />
+    <Compile Include="NativeEnums.cs" />
+    <Compile Include="NativeInterfaces.cs" />
     <Compile Include="NativeStructs.cs" />
     <Compile Include="PaintDotNet\ColorPicker\ColorGradientControl.cs">
       <SubType>UserControl</SubType>
