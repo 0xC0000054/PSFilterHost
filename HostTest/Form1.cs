@@ -907,6 +907,7 @@ namespace HostTest
 					this.saveFileDialog1.Filter = "Bitmap Image (*.bmp)|*.bmp|GIF Image (*.gif)|*.gif|JPEG Image (*.jpg, *.jpeg, *.jpe)|*.jpg;*.jpeg;*.jpe|PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
 					this.saveFileDialog1.FilterIndex = 4;
 				}
+				this.saveFileDialog1.FileName = Path.ChangeExtension(this.imageFileName, null);
 
 				if (saveFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 				{
