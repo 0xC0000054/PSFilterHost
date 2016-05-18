@@ -962,12 +962,31 @@ namespace HostTest
 
 					encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, colorContexts));
 
-					using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+					try
 					{
-						encoder.Save(fs);
-					}
+						using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+						{
+							encoder.Save(fs);
+						}
 
-					this.canvas.IsDirty = false;
+						this.canvas.IsDirty = false;
+					}
+					catch (ArgumentException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (IOException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (NotSupportedException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (UnauthorizedAccessException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
 				}
 			}
 		}
