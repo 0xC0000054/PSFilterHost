@@ -285,7 +285,7 @@ namespace PSFilterHostDll.PSApi
         /// <param name="destSurface">The destination surface.</param>
         /// <returns><c>true</c> if the image data was successfully converted; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="destSurface"/> is null.</exception>
-        public bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, Surface32 destSurface)
+        public bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, SurfaceBGRA32 destSurface)
         {
             if (destSurface == null)
             {
@@ -323,7 +323,7 @@ namespace PSFilterHostDll.PSApi
         /// or
         /// <paramref name="destinationSurface"/> is null.
         /// </exception>
-        public bool ColorCorrectBGRASurface(Surface32 sourceSurface, Surface32 destinationSurface)
+        public bool ColorCorrectBGRASurface(SurfaceBGRA32 sourceSurface, SurfaceBGRA32 destinationSurface)
         {
             if (sourceSurface == null)
             {
