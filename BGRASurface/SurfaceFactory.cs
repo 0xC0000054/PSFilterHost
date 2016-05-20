@@ -42,7 +42,7 @@ namespace PSFilterHostDll.BGRASurface
 			int height = image.Height;
 
 			imageMode = ImageModes.RGB;
-			Surface32 surface = new Surface32(width, height);
+			SurfaceBGRA32 surface = new SurfaceBGRA32(width, height);
 
 			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid meta-data that causes LockBits to fail.
 			{
@@ -84,7 +84,7 @@ namespace PSFilterHostDll.BGRASurface
 			if (format == PixelFormats.BlackWhite || format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8)
 			{
 				imageMode = ImageModes.GrayScale;
-				Surface8 surface = new Surface8(width, height);
+				SurfaceGray8 surface = new SurfaceGray8(width, height);
 
 				if (format != PixelFormats.Gray8)
 				{
@@ -101,7 +101,7 @@ namespace PSFilterHostDll.BGRASurface
 			else if (format == PixelFormats.Gray16 || format == PixelFormats.Gray32Float)
 			{
 				imageMode = ImageModes.Gray16;
-				Surface16 surface = new Surface16(width, height);
+				SurfaceGray16 surface = new SurfaceGray16(width, height);
 
 				if (format == PixelFormats.Gray32Float)
 				{
@@ -143,7 +143,7 @@ namespace PSFilterHostDll.BGRASurface
 				}
 
 				imageMode = ImageModes.RGB48;
-				Surface64 surface = new Surface64(width, height);
+				SurfaceBGRA64 surface = new SurfaceBGRA64(width, height);
 
 				fixed (ushort* ptr = pixels)
 				{
@@ -179,7 +179,7 @@ namespace PSFilterHostDll.BGRASurface
 			else
 			{
 				imageMode = ImageModes.RGB;
-				Surface32 surface = new Surface32(width, height);
+				SurfaceBGRA32 surface = new SurfaceBGRA32(width, height);
 
 				if (format != PixelFormats.Bgra32)
 				{
@@ -209,13 +209,13 @@ namespace PSFilterHostDll.BGRASurface
 			switch (mode)
 			{
 				case ImageModes.GrayScale:
-					return new Surface8(width, height);
+					return new SurfaceGray8(width, height);
 				case ImageModes.RGB:
-					return new Surface32(width, height);
+					return new SurfaceBGRA32(width, height);
 				case ImageModes.Gray16:
-					return new Surface16(width, height);
+					return new SurfaceGray16(width, height);
 				case ImageModes.RGB48:
-					return new Surface64(width, height);
+					return new SurfaceBGRA64(width, height);
 				default:
 					throw new InvalidEnumArgumentException("mode", (int)mode, typeof(ImageModes));
 			}
