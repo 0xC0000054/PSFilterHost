@@ -119,12 +119,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BGRASurface\MemoryBlock.cs" />
-    <Compile Include="BGRASurface\Surface16.cs" />
-    <Compile Include="BGRASurface\Surface32.cs" />
-    <Compile Include="BGRASurface\Surface64.cs" />
-    <Compile Include="BGRASurface\Surface8.cs" />
     <Compile Include="BGRASurface\SurfaceBase.cs" />
+    <Compile Include="BGRASurface\SurfaceBGRA32.cs" />
+    <Compile Include="BGRASurface\SurfaceBGRA64.cs" />
     <Compile Include="BGRASurface\SurfaceFactory.cs" />
+    <Compile Include="BGRASurface\SurfaceGray16.cs" />
+    <Compile Include="BGRASurface\SurfaceGray8.cs" />
     <Compile Include="ColorPickerResult.cs" />
     <Compile Include="ColorProfileHelper.cs" />
     <Compile Include="ColorSpace\CIELab.cs" />

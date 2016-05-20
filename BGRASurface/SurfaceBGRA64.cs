@@ -18,17 +18,18 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
+
 using System;
 using System.Drawing;
 
 namespace PSFilterHostDll.BGRASurface
 {
     /// <summary>
-    ///  Surface class for 8-bit gray scale image data.
+    ///  Surface class for 16-bit BGRA image data.
     /// </summary>
-    internal sealed class Surface8 : SurfaceBase
+    internal sealed class SurfaceBGRA64 : SurfaceBase
     {
-        public Surface8(int width, int height) : base(width, height, 1)
+        public SurfaceBGRA64(int width, int height) : base(width, height, 8)
         {
         }
 
@@ -36,7 +37,7 @@ namespace PSFilterHostDll.BGRASurface
         {
             get
             {
-                return 1;
+                return 4;
             }
         }
 
@@ -44,63 +45,86 @@ namespace PSFilterHostDll.BGRASurface
         {
             get
             {
-                return 8;
+                return 16;
             }
         }
 
+        private unsafe void BGRAtoRGBA()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                ColorBgra16* ptr = (ColorBgra16*)this.GetRowAddressUnchecked(y);
+                ColorBgra16* ptrEnd = ptr + width;
+
+                while (ptr < ptrEnd)
+                {
+                    ushort temp = ptr->B;
+                    ptr->B = ptr->R;
+                    ptr->R = temp;
+
+                    ptr++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Scales the data to the internal 16 bit range used by Adobe(R) Photoshop(R).
+        /// </summary>
+        public unsafe void ScaleToPhotoshop16BitRange()
+        {
+            ushort[] map = CreatePhotoshopRangeLookupTable();
+            for (int y = 0; y < height; y++)
+            {
+                ColorBgra16* ptr = (ColorBgra16*)this.GetRowAddressUnchecked(y);
+                ColorBgra16* ptrEnd = ptr + width;
+
+                while (ptr < ptrEnd)
+                {
+                    ptr->B = map[ptr->B];
+                    ptr->G = map[ptr->G];
+                    ptr->R = map[ptr->R];
+                    ptr->A = map[ptr->A];
+
+                    ptr++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Scales the data from the internal 16 bit range used by Adobe(R) Photoshop(R).
+        /// </summary>
+        private unsafe void ScaleFromPhotoshop16BitRange()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                ColorBgra16* ptr = (ColorBgra16*)this.GetRowAddressUnchecked(y);
+                ColorBgra16* ptrEnd = ptr + width;
+
+                while (ptr < ptrEnd)
+                {
+                    ptr->B = Fix16BitRange(ptr->B);
+                    ptr->G = Fix16BitRange(ptr->G);
+                    ptr->R = Fix16BitRange(ptr->R);
+                    ptr->A = Fix16BitRange(ptr->A);
+
+                    ptr++;
+                }
+            }
+        }
+
+
         public override unsafe Bitmap CreateAliasedBitmap()
         {
-            Bitmap image = null;
-            
-            using (Bitmap temp = new Bitmap(this.width, this.height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
-            {
-                System.Drawing.Imaging.ColorPalette pal = temp.Palette;
-
-                for (int i = 0; i < 256; i++)
-                {
-                    pal.Entries[i] = Color.FromArgb(i, i, i);
-                }
-
-                temp.Palette = pal;
-
-                System.Drawing.Imaging.BitmapData bd = temp.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, temp.PixelFormat); 
-
-                try
-                {
-                    byte* pixels = (byte*)this.scan0.VoidStar;
-
-                    byte* scan0 = (byte*)bd.Scan0.ToPointer();
-                    int bmpStride = bd.Stride;
-                    for (int y = 0; y < height; y++)
-                    {
-                        byte* src = pixels + (y * this.stride);
-                        byte* dst = scan0 + (y * bmpStride);
-                        
-                        for (int x = 0; x < width; x++)
-                        {
-                            *dst = *src;
-
-                            src++;
-                            dst++;
-                        }
-                    }
-                }
-                finally
-                {
-                    temp.UnlockBits(bd);
-                }
-
-
-                image = (Bitmap)temp.Clone();
-            }
-
-            return image;
+            return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format64bppArgb, this.scan0.Pointer);
         }
 
 #if !GDIPLUS
         public override unsafe System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource()
         {
-            return System.Windows.Media.Imaging.BitmapSource.Create(this.width, this.height, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, this.scan0.Pointer, (int)this.scan0.Length, (int)this.stride);
+            this.ScaleFromPhotoshop16BitRange();
+            this.BGRAtoRGBA();
+
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96d, 96d, System.Windows.Media.PixelFormats.Rgba64, null, this.scan0.Pointer, (int)this.scan0.Length, (int)stride);
         } 
 #endif
 
@@ -110,7 +134,7 @@ namespace PSFilterHostDll.BGRASurface
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
-            
+
             int srcWidth = source.Width;
             int srcHeight = source.Height;
             long srcStride = source.Stride;
@@ -139,7 +163,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcRowFloor = Math.Floor(srcRow);
                 double srcRowFrac = srcRow - srcRowFloor;
                 int srcRowInt = (int)srcRow;
-                byte* dstPtr = this.GetPointAddressUnchecked(roi.Left, dstY);
+                ColorBgra16* dstPtr = (ColorBgra16*)this.GetPointAddressUnchecked(roi.Left, dstY);
 
                 // Compute the R() values for this row
                 for (int n = -1; n <= 2; ++n)
@@ -149,7 +173,7 @@ namespace PSFilterHostDll.BGRASurface
                 }
 
                 rColCache = (double*)rColCacheIP.ToPointer();
-                byte* srcRowPtr = source.GetRowAddressUnchecked(srcRowInt - 1);
+                ColorBgra16* srcRowPtr = (ColorBgra16*)source.GetRowAddressUnchecked(srcRowInt - 1);
 
                 for (int dstX = roi.Left; dstX < roi.Right; dstX++)
                 {
@@ -157,11 +181,13 @@ namespace PSFilterHostDll.BGRASurface
                     double srcColumnFloor = Math.Floor(srcColumn);
                     int srcColumnInt = (int)srcColumn;
 
-                    double graySum = 0;
+                    double blueSum = 0;
+                    double greenSum = 0;
+                    double redSum = 0;
                     double alphaSum = 0;
                     double totalWeight = 0;
 
-                    byte* srcPtr = srcRowPtr + srcColumnInt - 1;
+                    ColorBgra16* srcPtr = srcRowPtr + srcColumnInt - 1;
                     for (int n = 0; n <= 3; ++n)
                     {
                         double w0 = rColCache[0] * rRowCache[n];
@@ -169,35 +195,47 @@ namespace PSFilterHostDll.BGRASurface
                         double w2 = rColCache[2] * rRowCache[n];
                         double w3 = rColCache[3] * rRowCache[n];
 
-                        double a0 = 255.0;
-                        double a1 = 255.0;
-                        double a2 = 255.0;
-                        double a3 = 255.0;
+                        double a0 = srcPtr[0].A;
+                        double a1 = srcPtr[1].A;
+                        double a2 = srcPtr[2].A;
+                        double a3 = srcPtr[3].A;
 
                         alphaSum += (a0 * w0) + (a1 * w1) + (a2 * w2) + (a3 * w3);
                         totalWeight += w0 + w1 + w2 + w3;
 
-                        graySum += (a0 * srcPtr[0] * w0) + (a1 * srcPtr[1] * w1) + (a2 * srcPtr[2] * w2) + (a3 * srcPtr[3] * w3);
+                        blueSum += (a0 * srcPtr[0].B * w0) + (a1 * srcPtr[1].B * w1) + (a2 * srcPtr[2].B * w2) + (a3 * srcPtr[3].B * w3);
+                        greenSum += (a0 * srcPtr[0].G * w0) + (a1 * srcPtr[1].G * w1) + (a2 * srcPtr[2].G * w2) + (a3 * srcPtr[3].G * w3);
+                        redSum += (a0 * srcPtr[0].R * w0) + (a1 * srcPtr[1].R * w1) + (a2 * srcPtr[2].R * w2) + (a3 * srcPtr[3].R * w3);
 
-                        srcPtr = ((byte*)srcPtr + srcStride);
+                        srcPtr = (ColorBgra16*)((byte*)srcPtr + srcStride);
                     }
 
                     double alpha = alphaSum / totalWeight;
 
-                    double gray;
+                    double blue;
+                    double green;
+                    double red;
 
                     if (alpha == 0)
                     {
-                        gray = 0;
+                        blue = 0;
+                        green = 0;
+                        red = 0;
                     }
                     else
                     {
-                        gray = graySum / alphaSum;
-                        // add 0.5 to ensure truncation to ushort results in rounding
-                        gray += 0.5;
+                        blue = blueSum / alphaSum;
+                        green = greenSum / alphaSum;
+                        red = redSum / alphaSum;
+
+                        // add 0.5 to ensure truncation to ulong results in rounding
+                        alpha += 0.5;
+                        blue += 0.5;
+                        green += 0.5;
+                        red += 0.5;
                     }
 
-                    *dstPtr = (byte)gray;
+                    dstPtr->Bgra = (ulong)blue + ((ulong)green << 16) + ((ulong)red << 32) + ((ulong)alpha << 48);
                     ++dstPtr;
                     rColCache += 4;
                 } // for (dstX...
@@ -212,7 +250,7 @@ namespace PSFilterHostDll.BGRASurface
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
-
+           
             int srcWidth = source.Width;
             int srcHeight = source.Height;
             long srcStride = source.Stride;
@@ -232,6 +270,7 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
 
+
             // Set this up so we can cache the R()'s for every row
             double* rRowCache = stackalloc double[4];
 
@@ -241,7 +280,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcRowFloor = (double)Math.Floor(srcRow);
                 double srcRowFrac = srcRow - srcRowFloor;
                 int srcRowInt = (int)srcRow;
-                byte* dstPtr = this.GetPointAddressUnchecked(roi.Left, dstY);
+                ColorBgra16* dstPtr = (ColorBgra16*)this.GetPointAddressUnchecked(roi.Left, dstY);
 
                 // Compute the R() values for this row
                 for (int n = -1; n <= 2; ++n)
@@ -260,7 +299,9 @@ namespace PSFilterHostDll.BGRASurface
                     double srcColumnFloor = Math.Floor(srcColumn);
                     int srcColumnInt = (int)srcColumn;
 
-                    double graySum = 0;
+                    double blueSum = 0;
+                    double greenSum = 0;
+                    double redSum = 0;
                     double alphaSum = 0;
                     double totalWeight = 0;
 
@@ -268,7 +309,7 @@ namespace PSFilterHostDll.BGRASurface
                     //int mFirst = Math.Max(-srcColumnInt, -1);
                     //int mLast = Math.Min(source.width - srcColumnInt - 1, 2);
 
-                    byte* srcPtr = source.GetPointAddressUnchecked(srcColumnInt - 1, srcRowInt - 1);
+                    ColorBgra16* srcPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcColumnInt - 1, srcRowInt - 1);
 
                     for (int n = -1; n <= 2; ++n)
                     {
@@ -287,8 +328,10 @@ namespace PSFilterHostDll.BGRASurface
                                 double w1 = rRowCache[n + 1];
                                 double w = w0 * w1;
 
-                                graySum += *srcPtr * w * 255.0;
-                                alphaSum += 255.0 * w;
+                                blueSum += srcPtr->B * w * srcPtr->A;
+                                greenSum += srcPtr->G * w * srcPtr->A;
+                                redSum += srcPtr->R * w * srcPtr->A;
+                                alphaSum += srcPtr->A * w;
 
                                 totalWeight += w;
                             }
@@ -296,25 +339,34 @@ namespace PSFilterHostDll.BGRASurface
                             ++srcPtr;
                         }
 
-                        srcPtr = ((byte*)(srcPtr - 4) + srcStride);
+                        srcPtr = (ColorBgra16*)((byte*)(srcPtr - 4) + srcStride);
                     }
 
                     double alpha = alphaSum / totalWeight;
-                    double gray;
+                    double blue;
+                    double green;
+                    double red;
 
                     if (alpha == 0)
                     {
-                        gray = 0;
+                        blue = 0;
+                        green = 0;
+                        red = 0;
                     }
                     else
                     {
-                        gray = graySum / alphaSum;
+                        blue = blueSum / alphaSum;
+                        green = greenSum / alphaSum;
+                        red = redSum / alphaSum;
 
-                        // add 0.5 to ensure truncation to ushort results in rounding
-                        gray += 0.5;
+                        // add 0.5 to ensure truncation to ulong results in rounding
+                        alpha += 0.5;
+                        blue += 0.5;
+                        green += 0.5;
+                        red += 0.5;
                     }
 
-                    *dstPtr = (byte)gray;
+                    dstPtr->Bgra = (ulong)blue + ((ulong)green << 16) + ((ulong)red << 32) + ((ulong)alpha << 48);
                     ++dstPtr;
                 } // for (dstX...
             } // for (dstY...
@@ -325,10 +377,12 @@ namespace PSFilterHostDll.BGRASurface
         public override unsafe void SuperSampleFitSurface(SurfaceBase source)
         {
             Rectangle dstRoi2 = Rectangle.Intersect(source.Bounds, this.Bounds);
-
             int srcHeight = source.Height;
             int srcWidth = source.Width;
             long srcStride = source.Stride;
+
+            int height = this.height;
+            int width = this.width;
 
             for (int dstY = dstRoi2.Top; dstY < dstRoi2.Bottom; ++dstY)
             {
@@ -342,7 +396,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcBottomWeight = srcBottom - srcBottomFloor;
                 int srcBottomInt = (int)srcBottomFloor;
 
-                byte* dstPtr = this.GetPointAddressUnchecked(dstRoi2.Left, dstY);
+                ColorBgra16* dstPtr = (ColorBgra16*)GetPointAddressUnchecked(dstRoi2.Left, dstY);
 
                 for (int dstX = dstRoi2.Left; dstX < dstRoi2.Right; ++dstX)
                 {
@@ -357,105 +411,175 @@ namespace PSFilterHostDll.BGRASurface
                     int srcRightInt = (int)srcRightFloor;
 
                     double blueSum = 0;
+                    double greenSum = 0;
+                    double redSum = 0;
                     double alphaSum = 0;
 
                     // left fractional edge
-                    byte* srcLeftPtr = source.GetPointAddressUnchecked(srcLeftInt, srcTopInt + 1);
+                    ColorBgra16* srcLeftPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcLeftInt, srcTopInt + 1);
 
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
-                        blueSum += srcLeftPtr[0] * srcLeftWeight * a;
-                        alphaSum += a * srcLeftWeight;
-                        srcLeftPtr = (srcLeftPtr + srcStride);
+                        double a = srcLeftPtr->A;
+                        blueSum += srcLeftPtr->B * srcLeftWeight * a;
+                        greenSum += srcLeftPtr->G * srcLeftWeight * a;
+                        redSum += srcLeftPtr->R * srcLeftWeight * a;
+                        alphaSum += srcLeftPtr->A * srcLeftWeight;
+                        srcLeftPtr = (ColorBgra16*)((byte*)srcLeftPtr + srcStride);
                     }
 
                     // right fractional edge
-                    byte* srcRightPtr = source.GetPointAddressUnchecked(srcRightInt, srcTopInt + 1);
+                    ColorBgra16* srcRightPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcRightInt, srcTopInt + 1);
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
-                        blueSum += srcRightPtr[0] * srcRightWeight * a;
-                        alphaSum += a * srcRightWeight;
-                        srcRightPtr = (srcRightPtr + srcStride);
+                        double a = srcRightPtr->A;
+                        blueSum += srcRightPtr->B * srcRightWeight * a;
+                        greenSum += srcRightPtr->G * srcRightWeight * a;
+                        redSum += srcRightPtr->R * srcRightWeight * a;
+                        alphaSum += srcRightPtr->A * srcRightWeight;
+                        srcRightPtr = (ColorBgra16*)((byte*)srcRightPtr + srcStride);
                     }
 
                     // top fractional edge
-                    byte* srcTopPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcTopInt);
+                    ColorBgra16* srcTopPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcLeftInt + 1, srcTopInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
-                        blueSum += srcTopPtr[0] * srcTopWeight * a;
-                        alphaSum += a * srcTopWeight;
+                        double a = srcTopPtr->A;
+                        blueSum += srcTopPtr->B * srcTopWeight * a;
+                        greenSum += srcTopPtr->G * srcTopWeight * a;
+                        redSum += srcTopPtr->R * srcTopWeight * a;
+                        alphaSum += srcTopPtr->A * srcTopWeight;
                         ++srcTopPtr;
                     }
 
                     // bottom fractional edge
-                    byte* srcBottomPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcBottomInt);
+                    ColorBgra16* srcBottomPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcLeftInt + 1, srcBottomInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
-                        blueSum += srcBottomPtr[0] * srcBottomWeight * a;
-                        alphaSum += 255.0 * srcBottomWeight;
+                        double a = srcBottomPtr->A;
+                        blueSum += srcBottomPtr->B * srcBottomWeight * a;
+                        greenSum += srcBottomPtr->G * srcBottomWeight * a;
+                        redSum += srcBottomPtr->R * srcBottomWeight * a;
+                        alphaSum += srcBottomPtr->A * srcBottomWeight;
                         ++srcBottomPtr;
                     }
 
                     // center area
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        byte* srcPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcY);
+                        ColorBgra16* srcPtr = (ColorBgra16*)source.GetPointAddressUnchecked(srcLeftInt + 1, srcY);
 
                         for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                         {
-                            blueSum += (double)srcPtr[0] * 255.0;
-                            alphaSum += 255.0;
+                            double a = srcPtr->A;
+                            blueSum += (double)srcPtr->B * a;
+                            greenSum += (double)srcPtr->G * a;
+                            redSum += (double)srcPtr->R * a;
+                            alphaSum += (double)srcPtr->A;
                             ++srcPtr;
                         }
                     }
 
                     // four corner pixels
-                    byte srcTL = *source.GetPointAddress(srcLeftInt, srcTopInt);
-                    double srcTLA = 255.0;
-                    blueSum += srcTL * (srcTopWeight * srcLeftWeight) * srcTLA;
-                    alphaSum += srcTLA * (srcTopWeight * srcLeftWeight);
+                    ColorBgra16 srcTL = *(ColorBgra16*)source.GetPointAddress(srcLeftInt, srcTopInt);
+                    double srcTLA = srcTL.A;
+                    blueSum += srcTL.B * (srcTopWeight * srcLeftWeight) * srcTLA;
+                    greenSum += srcTL.G * (srcTopWeight * srcLeftWeight) * srcTLA;
+                    redSum += srcTL.R * (srcTopWeight * srcLeftWeight) * srcTLA;
+                    alphaSum += srcTL.A * (srcTopWeight * srcLeftWeight);
 
-                    byte srcTR = *source.GetPointAddress(srcRightInt, srcTopInt);
-                    double srcTRA = 255.0;
-                    blueSum += srcTR * (srcTopWeight * srcRightWeight) * srcTRA;
-                    alphaSum += srcTRA * (srcTopWeight * srcRightWeight);
+                    ColorBgra16 srcTR = *(ColorBgra16*)source.GetPointAddress(srcRightInt, srcTopInt);
+                    double srcTRA = srcTR.A;
+                    blueSum += srcTR.B * (srcTopWeight * srcRightWeight) * srcTRA;
+                    greenSum += srcTR.G * (srcTopWeight * srcRightWeight) * srcTRA;
+                    redSum += srcTR.R * (srcTopWeight * srcRightWeight) * srcTRA;
+                    alphaSum += srcTR.A * (srcTopWeight * srcRightWeight);
 
-                    byte srcBL = *source.GetPointAddress(srcLeftInt, srcBottomInt);
-                    double srcBLA = 255.0;
-                    blueSum += srcBL * (srcBottomWeight * srcLeftWeight) * srcBLA;
-                    alphaSum += srcBLA * (srcBottomWeight * srcLeftWeight);
+                    ColorBgra16 srcBL = *(ColorBgra16*)source.GetPointAddress(srcLeftInt, srcBottomInt);
+                    double srcBLA = srcBL.A;
+                    blueSum += srcBL.B * (srcBottomWeight * srcLeftWeight) * srcBLA;
+                    greenSum += srcBL.G * (srcBottomWeight * srcLeftWeight) * srcBLA;
+                    redSum += srcBL.R * (srcBottomWeight * srcLeftWeight) * srcBLA;
+                    alphaSum += srcBL.A * (srcBottomWeight * srcLeftWeight);
 
-                    byte srcBR = *source.GetPointAddress(srcRightInt, srcBottomInt);
-                    double srcBRA = 255.0;
-                    blueSum += srcBR * (srcBottomWeight * srcRightWeight) * srcBRA;
-                    alphaSum += srcBRA * (srcBottomWeight * srcRightWeight);
+                    ColorBgra16 srcBR = *(ColorBgra16*)source.GetPointAddress(srcRightInt, srcBottomInt);
+                    double srcBRA = srcBR.A;
+                    blueSum += srcBR.B * (srcBottomWeight * srcRightWeight) * srcBRA;
+                    greenSum += srcBR.G * (srcBottomWeight * srcRightWeight) * srcBRA;
+                    redSum += srcBR.R * (srcBottomWeight * srcRightWeight) * srcBRA;
+                    alphaSum += srcBR.A * (srcBottomWeight * srcRightWeight);
 
                     double area = (srcRight - srcLeft) * (srcBottom - srcTop);
 
                     double alpha = alphaSum / area;
                     double blue;
+                    double green;
+                    double red;
 
                     if (alpha == 0)
                     {
                         blue = 0;
+                        green = 0;
+                        red = 0;
                     }
                     else
                     {
                         blue = blueSum / alphaSum;
+                        green = greenSum / alphaSum;
+                        red = redSum / alphaSum;
                     }
 
                     // add 0.5 so that rounding goes in the direction we want it to
                     blue += 0.5;
+                    green += 0.5;
+                    red += 0.5;
                     alpha += 0.5;
 
-                    dstPtr[0] = (byte)blue;
+                    dstPtr->Bgra = (ulong)blue + ((ulong)green << 16) + ((ulong)red << 32) + ((ulong)alpha << 48);
                     ++dstPtr;
                 }
             }
         }
+
+        public override unsafe bool HasTransparency()
+        {
+            for (int y = 0; y < height; y++)
+            {
+                ColorBgra16* ptr = (ColorBgra16*)GetRowAddressUnchecked(y);
+                ColorBgra16* endPtr = ptr + width;
+
+                while (ptr < endPtr)
+                {
+                    if (ptr->A < 32768)
+                    {
+                        return true;
+                    }
+                    ptr++;
+                }
+            }
+
+            return false;
+        }
+
+        protected override unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
+        {
+            int top = rect.Top;
+            int left = rect.Left;
+            int right = rect.Right;
+            int bottom = rect.Bottom;
+
+            for (int y = top; y < bottom; y++)
+            {
+                ColorBgra16* ptr = (ColorBgra16*)this.GetPointAddressUnchecked(left, y);
+
+                for (int x = left; x < right; x++)
+                {
+                    ptr->A = 32768; // Per the SDK the 16-bit range is 0 to 32768.
+
+                    ptr++;
+                }
+            }
+        }
+       
     }
 }

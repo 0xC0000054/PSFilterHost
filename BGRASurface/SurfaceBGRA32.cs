@@ -31,9 +31,9 @@ namespace PSFilterHostDll.BGRASurface
     /// <summary>
     /// Surface class for 8-bit BGRA image data.
     /// </summary>
-    internal class Surface32 : SurfaceBase
+    internal class SurfaceBGRA32 : SurfaceBase
     {
-        public Surface32(int width, int height) : base(width, height, 4)
+        public SurfaceBGRA32(int width, int height) : base(width, height, 4)
         {
         }
 
