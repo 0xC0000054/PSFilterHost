@@ -33,6 +33,14 @@ namespace PSFilterHostDll.BGRASurface
         {
         }
 
+        public override int ChannelCount
+        {
+            get
+            {
+                return 4;
+            }
+        }
+
         public override int BitsPerChannel
         {
             get
