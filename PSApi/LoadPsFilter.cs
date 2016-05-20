@@ -123,12 +123,12 @@ namespace PSFilterHostDll.PSApi
 
 		private SurfaceBase source;
 		private SurfaceBase dest;
-		private Surface8 mask;
-		private Surface32 displaySurface;
-		private Surface8 tempMask;
+		private SurfaceGray8 mask;
+		private SurfaceBGRA32 displaySurface;
+		private SurfaceGray8 tempMask;
 		private SurfaceBase tempSurface;
 		private Bitmap checkerBoardBitmap;
-		private Surface32 colorCorrectedDisplaySurface;
+		private SurfaceBGRA32 colorCorrectedDisplaySurface;
 
 		private PluginPhase phase;
 		private PluginModule module;
@@ -168,7 +168,7 @@ namespace PSFilterHostDll.PSApi
 
 		private SurfaceBase scaledChannelSurface;
 		private SurfaceBase ditheredChannelSurface;
-		private Surface8 scaledSelectionMask;
+		private SurfaceGray8 scaledSelectionMask;
 		private ImageModes ditheredChannelImageMode;
 
 		private bool disposed;
@@ -2342,7 +2342,7 @@ namespace PSFilterHostDll.PSApi
 						tempMask = null;
 					}
 
-					tempMask = new Surface8(mask.Width, mask.Height);
+					tempMask = new SurfaceGray8(mask.Width, mask.Height);
 					tempMask.CopySurface(mask);
 				}
 				return;
@@ -2377,12 +2377,12 @@ namespace PSFilterHostDll.PSApi
 
 				if (scaleFactor > 1)
 				{
-					tempMask = new Surface8(scaleWidth, scaleHeight);
+					tempMask = new SurfaceGray8(scaleWidth, scaleHeight);
 					tempMask.SuperSampleFitSurface(mask);
 				}
 				else
 				{
-					tempMask = new Surface8(mask.Width, mask.Height);
+					tempMask = new SurfaceGray8(mask.Width, mask.Height);
 					tempMask.CopySurface(mask);
 				}
 			}
@@ -3064,7 +3064,7 @@ namespace PSFilterHostDll.PSApi
 
 		}
 
-		private static unsafe void FillSelectionMask(PixelMemoryDesc destiniation, Surface8 source, VRect srcRect)
+		private static unsafe void FillSelectionMask(PixelMemoryDesc destiniation, SurfaceGray8 source, VRect srcRect)
 		{
 			byte* dstPtr = (byte*)destiniation.data.ToPointer();
 			int stride = destiniation.rowBits / 8;
@@ -3211,7 +3211,7 @@ namespace PSFilterHostDll.PSApi
 
 						try
 						{
-							scaledSelectionMask = new Surface8(dstWidth, dstHeight);
+							scaledSelectionMask = new SurfaceGray8(dstWidth, dstHeight);
 							scaledSelectionMask.SuperSampleFitSurface(mask);
 						}
 						catch (OutOfMemoryException)
@@ -3234,7 +3234,7 @@ namespace PSFilterHostDll.PSApi
 
 						try
 						{
-							scaledSelectionMask = new Surface8(dstWidth, dstHeight);
+							scaledSelectionMask = new SurfaceGray8(dstWidth, dstHeight);
 							scaledSelectionMask.BicubicFitSurface(mask);
 						}
 						catch (OutOfMemoryException)
@@ -3878,7 +3878,7 @@ namespace PSFilterHostDll.PSApi
 					displaySurface = null;
 				}
 
-				displaySurface = new Surface32(width, height);
+				displaySurface = new SurfaceBGRA32(width, height);
 
 				if (ignoreAlpha || !haveMask)
 				{
@@ -3895,7 +3895,7 @@ namespace PSFilterHostDll.PSApi
 						colorCorrectedDisplaySurface = null;
 					}
 
-					colorCorrectedDisplaySurface = new Surface32(width, height);
+					colorCorrectedDisplaySurface = new SurfaceBGRA32(width, height);
 				}
 			}
 		}
@@ -4163,7 +4163,7 @@ namespace PSFilterHostDll.PSApi
 
 		private unsafe void DrawMask()
 		{
-			mask = new Surface8(source.Width, source.Height);
+			mask = new SurfaceGray8(source.Width, source.Height);
 
 			SafeNativeMethods.memset(mask.Scan0.Pointer, 0, new UIntPtr((ulong)mask.Scan0.Length));
 
@@ -4191,7 +4191,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			int width = source.Width;
 			int height = source.Height;
-			mask = new Surface8(width, height);
+			mask = new SurfaceGray8(width, height);
 
 			SafeNativeMethods.memset(mask.Scan0.Pointer, 0, new UIntPtr((ulong)mask.Scan0.Length));
 
