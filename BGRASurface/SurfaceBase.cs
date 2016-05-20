@@ -58,20 +58,14 @@ namespace PSFilterHostDll.BGRASurface
 			get { return new Rectangle(0, 0, width, height); }
 		}
 
-		public virtual int ChannelCount
+		public abstract int ChannelCount
 		{
-			get
-			{
-				return 4;
-			}
+			get;
 		}
 
-		public virtual int BitsPerChannel
+		public abstract int BitsPerChannel
 		{
-			get
-			{
-				return 8;
-			}
+			get;
 		}
 
 		/// <summary>
