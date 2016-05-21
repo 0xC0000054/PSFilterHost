@@ -77,11 +77,14 @@ namespace PSFilterHostDll.BGRASurface
 		/// <returns></returns>
 		internal static unsafe SurfaceBase CreateFromBitmapSource(BitmapSource bitmap, out ImageModes imageMode)
 		{
-			System.Windows.Media.PixelFormat format = bitmap.Format;
+			PixelFormat format = bitmap.Format;
 			int width = bitmap.PixelWidth;
 			int height = bitmap.PixelHeight;
 
-			if (format == PixelFormats.BlackWhite || format == PixelFormats.Gray2 || format == PixelFormats.Gray4 || format == PixelFormats.Gray8)
+			if (format == PixelFormats.BlackWhite ||
+				format == PixelFormats.Gray2 ||
+				format == PixelFormats.Gray4 ||
+				format == PixelFormats.Gray8)
 			{
 				imageMode = ImageModes.GrayScale;
 				SurfaceGray8 surface = new SurfaceGray8(width, height);
@@ -117,12 +120,19 @@ namespace PSFilterHostDll.BGRASurface
 
 				return surface;
 			}
-			else if (format == PixelFormats.Rgb48 || format == PixelFormats.Rgba64 || format == PixelFormats.Rgba128Float || format == PixelFormats.Rgb128Float ||
-				format == PixelFormats.Prgba128Float || format == PixelFormats.Prgba64)
+			else if (format == PixelFormats.Rgb48 ||
+					 format == PixelFormats.Rgba64 ||
+					 format == PixelFormats.Rgba128Float ||
+					 format == PixelFormats.Rgb128Float ||
+					 format == PixelFormats.Prgba128Float ||
+					 format == PixelFormats.Prgba64)
 			{
 				int bpp, stride;
 				ushort[] pixels = null;
-				if (format == PixelFormats.Rgba128Float || format == PixelFormats.Rgb128Float || format == PixelFormats.Prgba128Float || format == PixelFormats.Prgba64)
+				if (format == PixelFormats.Rgba128Float ||
+					format == PixelFormats.Rgb128Float ||
+					format == PixelFormats.Prgba128Float ||
+					format == PixelFormats.Prgba64)
 				{
 					PixelFormat dstFormat = format == PixelFormats.Rgb128Float ? PixelFormats.Rgb48 : PixelFormats.Rgba64;
 					FormatConvertedBitmap conv = new FormatConvertedBitmap(bitmap, dstFormat, null, 0.0);
