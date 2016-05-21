@@ -15,6 +15,7 @@ using PSFilterHostDll.PSApi;
 
 #if GDIPLUS
 using System.Drawing;
+using System.Drawing.Imaging;
 #else
 using System.Windows;
 using System.Windows.Media;
@@ -46,7 +47,7 @@ namespace PSFilterHostDll.BGRASurface
 
 			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid meta-data that causes LockBits to fail.
 			{
-				System.Drawing.Imaging.BitmapData data = temp.LockBits(new System.Drawing.Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+				BitmapData data = temp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
 				try
 				{
