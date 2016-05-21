@@ -20,6 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace PSFilterHostDll.BGRASurface
 {
@@ -52,9 +53,9 @@ namespace PSFilterHostDll.BGRASurface
         {
             Bitmap image = null;
             
-            using (Bitmap temp = new Bitmap(this.width, this.height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed))
+            using (Bitmap temp = new Bitmap(this.width, this.height, PixelFormat.Format8bppIndexed))
             {
-                System.Drawing.Imaging.ColorPalette pal = temp.Palette;
+                ColorPalette pal = temp.Palette;
 
                 for (int i = 0; i < 256; i++)
                 {
@@ -63,7 +64,7 @@ namespace PSFilterHostDll.BGRASurface
 
                 temp.Palette = pal;
 
-                System.Drawing.Imaging.BitmapData bd = temp.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, temp.PixelFormat); 
+                BitmapData bd = temp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, temp.PixelFormat); 
 
                 try
                 {
