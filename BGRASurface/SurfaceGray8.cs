@@ -101,7 +101,17 @@ namespace PSFilterHostDll.BGRASurface
 #if !GDIPLUS
         public override unsafe System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource()
         {
-            return System.Windows.Media.Imaging.BitmapSource.Create(this.width, this.height, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, this.scan0.Pointer, (int)this.scan0.Length, (int)this.stride);
+            return System.Windows.Media.Imaging.BitmapSource.Create(
+                this.width,
+                this.height,
+                96.0,
+                96.0,
+                System.Windows.Media.PixelFormats.Gray8,
+                null,
+                this.scan0.Pointer,
+                (int)this.scan0.Length,
+                (int)this.stride
+                );
         } 
 #endif
 

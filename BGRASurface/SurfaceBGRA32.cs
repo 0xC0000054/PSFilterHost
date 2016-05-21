@@ -77,11 +77,31 @@ namespace PSFilterHostDll.BGRASurface
 
             if (HasTransparency())
             {
-                return BitmapSource.Create(width, height, 96.0, 96.0, PixelFormats.Bgra32, null, this.scan0.Pointer, (int)this.scan0.Length, (int)this.stride);
+                return BitmapSource.Create(
+                    this.width,
+                    this.height,
+                    96.0,
+                    96.0,
+                    PixelFormats.Bgra32,
+                    null,
+                    this.scan0.Pointer,
+                    (int)this.scan0.Length,
+                    (int)this.stride
+                    );
             }
             else
             {
-                return BitmapSource.Create(width, height, 96.0, 96.0, PixelFormats.Bgr32, null, this.scan0.Pointer, (int)this.scan0.Length, (int)this.stride);
+                return BitmapSource.Create(
+                    this.width,
+                    this.height,
+                    96.0,
+                    96.0,
+                    PixelFormats.Bgr32,
+                    null,
+                    this.scan0.Pointer,
+                    (int)this.scan0.Length,
+                    (int)this.stride
+                    );
             }
         } 
 #endif

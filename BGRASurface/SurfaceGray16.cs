@@ -100,7 +100,17 @@ namespace PSFilterHostDll.BGRASurface
         {
             this.ScaleFromPhotoshop16BitRange();
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(this.width, this.height, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray16, null, this.scan0.Pointer, (int)this.scan0.Length, (int)this.stride);
+            return System.Windows.Media.Imaging.BitmapSource.Create(
+                this.width,
+                this.height,
+                96.0,
+                96.0,
+                System.Windows.Media.PixelFormats.Gray16,
+                null,
+                this.scan0.Pointer,
+                (int)this.scan0.Length,
+                (int)this.stride
+                );
         } 
 #endif
 
