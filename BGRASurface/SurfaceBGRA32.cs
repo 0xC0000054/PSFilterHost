@@ -29,7 +29,7 @@ using System.Windows.Media.Imaging;
 namespace PSFilterHostDll.BGRASurface
 {
     /// <summary>
-    /// Surface class for 8-bit BGRA image data.
+    /// Surface class for 32 bits per pixel BGRA image data. Each channel is allocated 8 bits per pixel.
     /// </summary>
     internal sealed class SurfaceBGRA32 : SurfaceBase
     {

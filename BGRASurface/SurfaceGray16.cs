@@ -25,7 +25,7 @@ namespace PSFilterHostDll.BGRASurface
 {
  
     /// <summary>
-    /// Surface class for 16-bit gray scale image data.
+    /// Surface class for 16 bits per pixel gray scale image data.
     /// </summary>
     internal sealed class SurfaceGray16 : SurfaceBase
     {

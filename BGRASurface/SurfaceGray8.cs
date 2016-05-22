@@ -25,7 +25,7 @@ using System.Drawing.Imaging;
 namespace PSFilterHostDll.BGRASurface
 {
     /// <summary>
-    ///  Surface class for 8-bit gray scale image data.
+    /// Surface class for 8 bits per pixel gray scale image data.
     /// </summary>
     internal sealed class SurfaceGray8 : SurfaceBase
     {
