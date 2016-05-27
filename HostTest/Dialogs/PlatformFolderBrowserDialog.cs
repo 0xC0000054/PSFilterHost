@@ -89,17 +89,17 @@ namespace HostTest
         }
 
         /// <summary>
-        /// Gets or sets the title of the Vista folder browser dialog.
+        /// Gets or sets the title of the Vista-style folder browser dialog.
         /// </summary>
         /// <remarks>
-        /// The string is placed in the title bar of the <see cref="VistaFolderBrowserDialog"/>, this can be used to provide instructions to the user.
+        /// The string is placed in the title bar of the Vista-style folder browser dialog, this can be used to provide instructions to the user.
         /// If the title is an empty string, the system uses a default title.
         /// </remarks>
         /// <value>
-        /// The title of the Vista folder browser dialog. The default value is an empty string ("")
+        /// The title of the Vista-style folder browser dialog. The default value is an empty string ("")
         /// </value>
         [Category("Folder Browsing")]
-        [Description("The title of the Vista folder browser dialog.")]
+        [Description("The title of the Vista-style folder browser dialog.")]
         [DefaultValue("")]
         [Localizable(true)]
         public string VistaFolderBrowserTitle
@@ -116,7 +116,7 @@ namespace HostTest
 
         /// <summary>
         /// Gets or sets the root folder that browsing starts from.
-        /// The Vista dialog uses this property as the default folder when there is not a recently used folder value available.
+        /// The Vista-style dialog uses this property as the default folder when there is not a recently used folder value available.
         /// </summary>
         /// <value>
         /// The root folder that browsing starts from.
@@ -125,7 +125,7 @@ namespace HostTest
         /// The value assigned is not one of the <see cref="Environment.SpecialFolder"/> values.
         /// </exception>
         [Category("Folder Browsing")]
-        [Description("The root folder that browsing starts from. The Vista dialog uses this as the default when there is not a recently used folder.")]
+        [Description("The root folder that browsing starts from. The Vista-style dialog defaults to this when there is not a recently used folder.")]
         [DefaultValue(Environment.SpecialFolder.Desktop)]
         [Localizable(false)]
         public Environment.SpecialFolder RootFolder
