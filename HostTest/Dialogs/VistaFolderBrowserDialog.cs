@@ -234,7 +234,6 @@ namespace HostTest
             }
 
             bool result = false;
-            FolderBrowserDialogEvents dialogEvents = new FolderBrowserDialogEvents(this);
 
             NativeInterfaces.IFileOpenDialog dialog = null;
 
@@ -244,6 +243,7 @@ namespace HostTest
 
                 OnBeforeShow(dialog);
 
+                FolderBrowserDialogEvents dialogEvents = new FolderBrowserDialogEvents(this);
                 uint eventCookie;
                 dialog.Advise(dialogEvents, out eventCookie);
                 try
@@ -253,6 +253,8 @@ namespace HostTest
                 finally
                 {
                     dialog.Unadvise(eventCookie);
+                    // Prevent the IFileDialogEvents interface from being collected while the dialog is running.
+                    GC.KeepAlive(dialogEvents);
                 }
             }
             finally
