@@ -680,7 +680,6 @@ namespace HostTest
 				this.toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, this.filterName);
 				this.toolStripProgressBar1.Visible = true;
 			}
-			Application.DoEvents();
 		}
 
 		private void UpdateFilterProgress(object sender, FilterProgressEventArgs e)
