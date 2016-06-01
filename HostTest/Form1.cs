@@ -141,42 +141,42 @@ namespace HostTest
 
 		private void ProcessCommandLine()
 		{
-			string[] args = Environment.GetCommandLineArgs();
-			if (args.Length == 2)
-			{			
-				FileInfo info = new FileInfo(args[1]);
-
-				if (info.Exists && ImageFileExtensions.Contains(info.Extension, StringComparer.OrdinalIgnoreCase))
+			try
+			{
+				string[] args = Environment.GetCommandLineArgs();
+				if (args.Length == 2)
 				{
-					try
+					string path = args[1];
+
+					if (ImageFileExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase))
 					{
-						OpenFile(args[1]);
-					}
-					catch (ArgumentException ex)
-					{
-						ShowErrorMessage(ex.Message);
-					}
-					catch (FileNotFoundException ex)
-					{
-						ShowErrorMessage(ex.Message);
-					}
-					catch (FileFormatException ex)
-					{
-						ShowErrorMessage(ex.Message);
-					}
-					catch (IOException ex)
-					{
-						ShowErrorMessage(ex.Message);
-					}
-					catch (NotSupportedException ex) // WINCODEC_ERR_COMPONENTNOTFOUND
-					{
-						ShowErrorMessage(ex.Message);
-					}
-					catch (UnauthorizedAccessException ex)
-					{
-						ShowErrorMessage(ex.Message);
+						OpenFile(path);
 					}
 				}
+			}
+			catch (ArgumentException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (FileNotFoundException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (FileFormatException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (IOException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (NotSupportedException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (UnauthorizedAccessException ex)
+			{
+				ShowErrorMessage(ex.Message);
 			}
 		}
 
