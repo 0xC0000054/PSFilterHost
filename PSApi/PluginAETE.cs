@@ -22,6 +22,15 @@ namespace PSFilterHostDll.PSApi
         public uint type;
         public string desc;
         public short flags;
+
+        public AETEParameter(string name, uint key, uint type, string description, short flags)
+        {
+            this.name = name;
+            this.key = key;
+            this.type = type;
+            this.desc = description;
+            this.flags = flags;
+        }
     }
 
     [Serializable]
@@ -30,6 +39,13 @@ namespace PSFilterHostDll.PSApi
         public uint type;
         public short count;
         public AETEEnum[] enums;
+
+        public AETEEnums(uint type, short count, AETEEnum[] enums)
+        {
+            this.type = type;
+            this.count = count;
+            this.enums = enums;
+        }
     }
 
     [Serializable]
@@ -38,6 +54,13 @@ namespace PSFilterHostDll.PSApi
         public string name;
         public uint type;
         public string desc;
+
+        public AETEEnum(string name, uint type, string description)
+        {
+            this.name = name;
+            this.type = type;
+            this.desc = description;
+        }
     }
 
     [Serializable]
