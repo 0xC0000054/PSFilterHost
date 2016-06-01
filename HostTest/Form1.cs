@@ -152,6 +152,10 @@ namespace HostTest
 					{
 						OpenFile(args[1]);
 					}
+					catch (ArgumentException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
 					catch (FileNotFoundException ex)
 					{
 						ShowErrorMessage(ex.Message);
