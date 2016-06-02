@@ -20,6 +20,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media;
@@ -715,6 +716,10 @@ namespace HostTest
 				{
 					OpenFile(openFileDialog1.FileName);
 				}
+				catch (ArgumentException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
 				catch (FileNotFoundException ex)
 				{
 					ShowErrorMessage(ex.Message);
@@ -728,6 +733,10 @@ namespace HostTest
 					ShowErrorMessage(ex.Message);
 				}
 				catch (NotSupportedException ex) // WINCODEC_ERR_COMPONENTNOTFOUND
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (SecurityException ex)
 				{
 					ShowErrorMessage(ex.Message);
 				}
@@ -1261,11 +1270,27 @@ namespace HostTest
 				{
 					OpenFile(this.dropImageFileName);
 				}
+				catch (ArgumentException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
 				catch (FileNotFoundException ex)
 				{
 					ShowErrorMessage(ex.Message);
 				}
 				catch (FileFormatException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (IOException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (NotSupportedException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (SecurityException ex)
 				{
 					ShowErrorMessage(ex.Message);
 				}
