@@ -147,7 +147,7 @@ namespace HostTest
 				string[] args = Environment.GetCommandLineArgs();
 				if (args.Length == 2)
 				{
-					string path = args[1];
+					string path = Path.GetFullPath(args[1]);
 
 					if (ImageFileExtensions.Contains(Path.GetExtension(path), StringComparer.OrdinalIgnoreCase))
 					{
@@ -172,6 +172,10 @@ namespace HostTest
 				ShowErrorMessage(ex.Message);
 			}
 			catch (NotSupportedException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (SecurityException ex)
 			{
 				ShowErrorMessage(ex.Message);
 			}
