@@ -64,5 +64,12 @@ namespace HostTest
             [In()] ref Guid riid,
             [MarshalAs(UnmanagedType.Interface, IidParameterIndex = 2)] out NativeInterfaces.IShellItem ppv
             );
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetProcessDEPPolicy(uint dwFlags);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        internal static extern uint SetErrorMode(uint uMode);
     }
 }
