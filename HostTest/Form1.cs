@@ -202,19 +202,6 @@ namespace HostTest
 			}
 		}
 
-		static class NativeMethods
-		{
-			[DllImport("kernel32.dll", EntryPoint = "SetProcessDEPPolicy")]
-			[return: MarshalAs(UnmanagedType.Bool)]
-			internal static extern bool SetProcessDEPPolicy(uint dwFlags);
-
-			[DllImport("kernel32.dll", EntryPoint = "SetErrorMode")]
-			internal static extern uint SetErrorMode(uint uMode);
-
-			internal const uint SEM_FAILCRITICALERRORS = 1U;
-			internal const uint SEM_NOOPENFILEERRORBOX = 0x8000U;
-		}
-
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -224,7 +211,7 @@ namespace HostTest
 			{
 				try
 				{
-					NativeMethods.SetProcessDEPPolicy(0U);
+					SafeNativeMethods.SetProcessDEPPolicy(0U);
 				}
 				catch (EntryPointNotFoundException)
 				{
@@ -233,8 +220,8 @@ namespace HostTest
 			}
 
 			// Disable the error dialog that is shown when a filter cannot find a missing dependency.
-			uint oldMode = NativeMethods.SetErrorMode(0U);
-			NativeMethods.SetErrorMode(oldMode | NativeMethods.SEM_FAILCRITICALERRORS | NativeMethods.SEM_NOOPENFILEERRORBOX);
+			uint oldMode = SafeNativeMethods.SetErrorMode(0U);
+			SafeNativeMethods.SetErrorMode(oldMode | NativeConstants.SEM_FAILCRITICALERRORS | NativeConstants.SEM_NOOPENFILEERRORBOX);
 		}
 
 		protected override void OnShown(EventArgs e)
