@@ -121,8 +121,9 @@ namespace PSFilterHostDll.PSApi
             BitmapMetadata xmpData = null;
 
             using (MemoryStream stream = new MemoryStream())
-            {            
-                // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string, so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+            {
+                // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
+                // so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
                 BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 
                 tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
@@ -168,7 +169,7 @@ namespace PSFilterHostDll.PSApi
                     {
                         string keyWord = textChunk.GetQuery("/Keyword") as string;
 
-                        if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+                        if (keyWord == "XML:com.adobe.xmp")
                         {
                             string textEntry = textChunk.GetQuery("/TextEntry") as string;
 
