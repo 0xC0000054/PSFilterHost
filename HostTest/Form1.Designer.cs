@@ -302,7 +302,9 @@
             this.pointerSelectBtn.Enabled = false;
             this.pointerSelectBtn.Image = ((System.Drawing.Image)(resources.GetObject("pointerSelectBtn.Image")));
             this.pointerSelectBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.pointerSelectBtn.Margin = new System.Windows.Forms.Padding(0);
             this.pointerSelectBtn.Name = "pointerSelectBtn";
+            this.pointerSelectBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.pointerSelectBtn.Size = new System.Drawing.Size(26, 20);
             this.pointerSelectBtn.Text = "toolStripButton1";
             this.pointerSelectBtn.ToolTipText = "No selection";
@@ -314,7 +316,9 @@
             this.rectangleSelectBtn.Enabled = false;
             this.rectangleSelectBtn.Image = ((System.Drawing.Image)(resources.GetObject("rectangleSelectBtn.Image")));
             this.rectangleSelectBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.rectangleSelectBtn.Margin = new System.Windows.Forms.Padding(0);
             this.rectangleSelectBtn.Name = "rectangleSelectBtn";
+            this.rectangleSelectBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.rectangleSelectBtn.Size = new System.Drawing.Size(26, 20);
             this.rectangleSelectBtn.Text = "toolStripButton1";
             this.rectangleSelectBtn.ToolTipText = "Rectangle select tool";
@@ -326,7 +330,9 @@
             this.elipseSelectBtn.Enabled = false;
             this.elipseSelectBtn.Image = ((System.Drawing.Image)(resources.GetObject("elipseSelectBtn.Image")));
             this.elipseSelectBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.elipseSelectBtn.Margin = new System.Windows.Forms.Padding(0);
             this.elipseSelectBtn.Name = "elipseSelectBtn";
+            this.elipseSelectBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.elipseSelectBtn.Size = new System.Drawing.Size(26, 20);
             this.elipseSelectBtn.Text = "toolStripButton2";
             this.elipseSelectBtn.ToolTipText = "Elipse select tool";
@@ -343,7 +349,9 @@
             this.zoomInBtn.Enabled = false;
             this.zoomInBtn.Image = ((System.Drawing.Image)(resources.GetObject("zoomInBtn.Image")));
             this.zoomInBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.zoomInBtn.Margin = new System.Windows.Forms.Padding(0);
             this.zoomInBtn.Name = "zoomInBtn";
+            this.zoomInBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.zoomInBtn.Size = new System.Drawing.Size(26, 20);
             this.zoomInBtn.Text = "toolStripButton1";
             this.zoomInBtn.ToolTipText = "Zoom In";
@@ -355,7 +363,9 @@
             this.zoomOutBtn.Enabled = false;
             this.zoomOutBtn.Image = ((System.Drawing.Image)(resources.GetObject("zoomOutBtn.Image")));
             this.zoomOutBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.zoomOutBtn.Margin = new System.Windows.Forms.Padding(0);
             this.zoomOutBtn.Name = "zoomOutBtn";
+            this.zoomOutBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.zoomOutBtn.Size = new System.Drawing.Size(26, 20);
             this.zoomOutBtn.Text = "toolStripButton1";
             this.zoomOutBtn.ToolTipText = "Zoom Out";
@@ -367,7 +377,9 @@
             this.zoomToWindowBtn.Enabled = false;
             this.zoomToWindowBtn.Image = ((System.Drawing.Image)(resources.GetObject("zoomToWindowBtn.Image")));
             this.zoomToWindowBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.zoomToWindowBtn.Margin = new System.Windows.Forms.Padding(0);
             this.zoomToWindowBtn.Name = "zoomToWindowBtn";
+            this.zoomToWindowBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.zoomToWindowBtn.Size = new System.Drawing.Size(26, 20);
             this.zoomToWindowBtn.Text = "toolStripButton1";
             this.zoomToWindowBtn.ToolTipText = "Fit in Window";
@@ -379,7 +391,9 @@
             this.zoomToActualSizeBtn.Enabled = false;
             this.zoomToActualSizeBtn.Image = ((System.Drawing.Image)(resources.GetObject("zoomToActualSizeBtn.Image")));
             this.zoomToActualSizeBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.zoomToActualSizeBtn.Margin = new System.Windows.Forms.Padding(0);
             this.zoomToActualSizeBtn.Name = "zoomToActualSizeBtn";
+            this.zoomToActualSizeBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.zoomToActualSizeBtn.Size = new System.Drawing.Size(26, 20);
             this.zoomToActualSizeBtn.Text = "toolStripButton1";
             this.zoomToActualSizeBtn.ToolTipText = "Actual Size";
@@ -414,11 +428,13 @@
             // 
             // primaryColorBtn
             // 
+            this.primaryColorBtn.Color = System.Drawing.Color.Black;
             this.primaryColorBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.primaryColorBtn.Image = ((System.Drawing.Image)(resources.GetObject("primaryColorBtn.Image")));
             this.primaryColorBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.primaryColorBtn.Margin = new System.Windows.Forms.Padding(0);
             this.primaryColorBtn.Name = "primaryColorBtn";
-            this.primaryColorBtn.Color = System.Drawing.Color.Black;
+            this.primaryColorBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.primaryColorBtn.Size = new System.Drawing.Size(26, 20);
             this.primaryColorBtn.Text = "toolStripButton1";
             this.primaryColorBtn.ToolTipText = "Primary color";
@@ -426,11 +442,13 @@
             // 
             // secondaryColorBtn
             // 
+            this.secondaryColorBtn.Color = System.Drawing.Color.White;
             this.secondaryColorBtn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.secondaryColorBtn.Image = ((System.Drawing.Image)(resources.GetObject("secondaryColorBtn.Image")));
             this.secondaryColorBtn.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.secondaryColorBtn.Margin = new System.Windows.Forms.Padding(0);
             this.secondaryColorBtn.Name = "secondaryColorBtn";
-            this.secondaryColorBtn.Color = System.Drawing.Color.White;
+            this.secondaryColorBtn.Padding = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.secondaryColorBtn.Size = new System.Drawing.Size(26, 20);
             this.secondaryColorBtn.Text = "toolStripButton2";
             this.secondaryColorBtn.ToolTipText = "Secondary color";
