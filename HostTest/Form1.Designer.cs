@@ -79,8 +79,8 @@
             this.zoomToActualSizeBtn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.primaryColorBtn = new HostTest.ColorToolStripMenuItem();
-            this.secondaryColorBtn = new HostTest.ColorToolStripMenuItem();
+            this.primaryColorBtn = new HostTest.ColorToolStripButton();
+            this.secondaryColorBtn = new HostTest.ColorToolStripButton();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -502,8 +502,8 @@
         private System.Windows.Forms.ToolStripButton zoomToWindowBtn;
         private System.Windows.Forms.ToolStripButton zoomToActualSizeBtn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private ColorToolStripMenuItem primaryColorBtn;
-        private ColorToolStripMenuItem secondaryColorBtn;
+        private ColorToolStripButton primaryColorBtn;
+        private ColorToolStripButton secondaryColorBtn;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
