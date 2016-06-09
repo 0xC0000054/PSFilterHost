@@ -38,5 +38,8 @@ namespace HostTest
         internal const string IID_IFileDialogCustomize = "8016b7b3-3d49-4504-a0aa-2a37494e606f";
         internal const string IID_IShellItem = "43826D1E-E718-42EE-BC55-A1E261C37BFE";
         internal const string IID_IShellItemArray = "B63EA76D-1F85-456F-A19C-48159EFA858B";
+
+        internal const uint SEM_FAILCRITICALERRORS = 1;
+        internal const uint SEM_NOOPENFILEERRORBOX = 0x8000;
     }
 }
