@@ -123,7 +123,7 @@
     <Compile Include="CanvasDirtyChangedEventArgs.cs" />
     <Compile Include="CanvasZoomChangedEventArgs.cs" />
     <Compile Include="ColorProfileHelper.cs" />
-    <Compile Include="ColorToolStripMenuItem.cs">
+    <Compile Include="ColorToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Dialogs\PlatformFolderBrowserDialog.cs">

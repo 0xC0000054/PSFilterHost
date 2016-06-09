@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace HostTest
 {
-    internal sealed class ColorToolStripMenuItem : ToolStripMenuItem
+    internal sealed class ColorToolStripButton : ToolStripButton
     {
         private Bitmap image;
         private Color color;
@@ -24,7 +24,7 @@ namespace HostTest
         private int imageWidth;
         private int imageHeight;
 
-        public ColorToolStripMenuItem()
+        public ColorToolStripButton()
         {
             this.imageWidth = 16;
             this.imageHeight = 16;
@@ -45,9 +45,9 @@ namespace HostTest
         /// Gets or sets the displayed color.
         /// </summary>
         /// <value>
-        /// The color displayed by the <see cref="ColorToolStripMenuItem"/>.
+        /// The color displayed by the <see cref="ColorToolStripButton"/>.
         /// </value>
-        [Description("Specifies the color displayed as the image of the menu item.")]
+        [Description("Specifies the color displayed as the image of the button.")]
         public Color Color
         {
             get
@@ -72,7 +72,7 @@ namespace HostTest
         /// <value>
         /// The size of the image in pixels.
         /// </value>
-        [Description("Specifies the size in pixels of the image displayed by the menu item.")]
+        [Description("Specifies the size in pixels of the image displayed by the button.")]
         [DefaultValue(typeof(Size), "16,16")]
         public Size ImageSize
         {
