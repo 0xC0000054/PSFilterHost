@@ -177,7 +177,7 @@ namespace HostTest
                 filters.Add(filter);
             }
             // Sort the filters by name in ascending order.
-            filters.Sort(StringComparer.Ordinal);
+            filters.Sort(StringComparer.InvariantCulture);
 
             return filters;
         }
