@@ -86,7 +86,7 @@ namespace HostTest
 
         private static IEnumerable<string> GetFilterStrings(IEnumerable<string> extensions)
         {
-            Dictionary<string, List<string>> extDict = new Dictionary<string, List<string>>();
+            Dictionary<string, List<string>> extDict = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
             foreach (string fileExtension in extensions)
             {
