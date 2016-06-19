@@ -67,7 +67,11 @@ namespace PSFilterHostDll.PSApi
         internal static extern bool VirtualFree([In()] IntPtr lpAddress, [In()] UIntPtr dwSize, [In()] uint dwFreeType);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
-        internal static extern unsafe UIntPtr VirtualQuery([In()] IntPtr address, [In(), Out()] ref NativeStructs.MEMORY_BASIC_INFORMATION buffer, [In()] UIntPtr sizeOfBuffer);
+        internal static extern unsafe UIntPtr VirtualQuery(
+            [In()] IntPtr address,
+            [Out()] out NativeStructs.MEMORY_BASIC_INFORMATION buffer,
+            [In()] UIntPtr sizeOfBuffer
+            );
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern unsafe void memcpy([In()] void* dst, [In()] void* src, [In()] UIntPtr length);
