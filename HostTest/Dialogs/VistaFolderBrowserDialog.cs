@@ -53,6 +53,20 @@ namespace HostTest
             addToRecentDocuments = false;
         }
 
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public new event EventHandler HelpRequest
+        {
+            add
+            {
+                base.HelpRequest += value;
+            }
+            remove
+            {
+                base.HelpRequest -= value;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the folder browser dialog box title.
         /// </summary>
