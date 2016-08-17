@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// Contains methods to generate a hash code from multiple fields when overriding the <see cref="System.Object.GetHashCode"/> method.
+    /// Contains methods to generate a hash code from multiple fields when overriding the <see cref="object.GetHashCode"/> method.
     /// </summary>
     internal static class HashCodeHelper
     {
