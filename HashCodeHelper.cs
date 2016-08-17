@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using System;
 using System.Collections.Generic;
 
 namespace PSFilterHostDll
@@ -24,6 +25,11 @@ namespace PSFilterHostDll
 
         private static int CombineHashCodes(params int[] hashCodes)
         {
+            if (hashCodes == null)
+            {
+                throw new ArgumentNullException("hashCodes");
+            }
+
             int hash = InitialPrime;
 
             unchecked
