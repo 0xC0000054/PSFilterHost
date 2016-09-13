@@ -29,12 +29,12 @@ namespace PSFilterHostDll
     public sealed class PluginData : IEquatable<PluginData>
     {
         private readonly string fileName;
-        private string entryPoint;
-        private string category;
-        private string title;
+        private readonly string entryPoint;
+        private readonly string category;
+        private readonly string title;
         private FilterCaseInfo[] filterInfo;
-        private PluginAETE aete;
-        private string enableInfo;
+        private readonly PluginAETE aete;
+        private readonly string enableInfo;
         private ushort? supportedModes;
         private string[] moduleEntryPoints;
         [OptionalField(VersionAdded = 2)]
@@ -50,6 +50,7 @@ namespace PSFilterHostDll
                 return this.fileName; 
             }
         }
+
         /// <summary>
         /// Gets the entry point of the filter.
         /// </summary>
@@ -59,11 +60,8 @@ namespace PSFilterHostDll
             {
                 return this.entryPoint; 
             }
-            internal set 
-            {
-                this.entryPoint = value;
-            }
         }
+
         /// <summary>
         /// Gets the category of the filter.
         /// </summary>
@@ -72,10 +70,6 @@ namespace PSFilterHostDll
             get 
             {
                 return this.category;
-            }
-            internal set 
-            {
-                this.category = value;
             }
         }
 
@@ -88,14 +82,10 @@ namespace PSFilterHostDll
             {
                 return this.title;
             }
-            internal set 
-            {
-                this.title = value; 
-            }
         }
 
         /// <summary>
-        /// Gets or sets the filter information that describes how images with transparency should be processed.
+        /// Gets the filter information that describes how images with transparency should be processed.
         /// </summary>
         internal FilterCaseInfo[] FilterInfo
         {
@@ -103,46 +93,16 @@ namespace PSFilterHostDll
             {
                 return this.filterInfo; 
             }
-            set 
-            {
-                this.filterInfo = value;
-            }
         }
 
         /// <summary>
-        /// Gets or sets the scripting information used by the plug-in.
+        /// Gets the scripting information used by the plug-in.
         /// </summary>
         internal PluginAETE Aete
         {
             get 
             {
                 return this.aete; 
-            }
-            set 
-            {
-                this.aete = value; 
-            }
-        }
-
-        /// <summary>
-        /// Sets the information describing the conditions that the plug-in requires to execute.
-        /// </summary>
-        internal string EnableInfo
-        {
-            set
-            {
-                this.enableInfo = value;
-            }
-        }
-
-        /// <summary>
-        /// Sets the bit field describing the image modes supported by the plug-in.
-        /// </summary>
-        internal ushort? SupportedModes
-        {
-            set
-            {
-                this.supportedModes = value;
             }
         }
 
@@ -172,10 +132,6 @@ namespace PSFilterHostDll
             get 
             { 
                 return this.hasAboutBox; 
-            }
-            internal set 
-            {
-                this.hasAboutBox = value; 
             }
         }
 
@@ -258,18 +214,40 @@ namespace PSFilterHostDll
         /// Initializes a new instance of the <see cref="PluginData"/> class.
         /// </summary>
         /// <param name="fileName">The file name of the filter.</param>
-        internal PluginData(string fileName)
+        /// <param name="entryPoint">The entry point of the filter.</param>
+        /// <param name="category">The category of the filter.</param>
+        /// <param name="title">The title of the filter.</param>
+        /// <param name="supportedModes">The bit field describing the image modes supported by the filter.</param>
+        internal PluginData(string fileName, string entryPoint, string category, string title, ushort supportedModes) :
+            this(fileName, entryPoint, category, title, null, null, null, supportedModes, true)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PluginData" /> class.
+        /// </summary>
+        /// <param name="fileName">The file name of the filter.</param>
+        /// <param name="entryPoint">The entry point of the filter.</param>
+        /// <param name="category">The category of the filter.</param>
+        /// <param name="title">The title of the filter.</param>
+        /// <param name="filterInfo">The filter information that describes how images with transparency should be processed.</param>
+        /// <param name="aete">The scripting data of the filter.</param>
+        /// <param name="enableInfo">The information describing the conditions that the filter requires to execute.</param>
+        /// <param name="supportedModes">The bit field describing the image modes supported by the filter.</param>
+        /// <param name="hasAboutBox">Indicates if the filter has an about box.</param>
+        internal PluginData(string fileName, string entryPoint, string category, string title, FilterCaseInfo[] filterInfo, PluginAETE aete,
+            string enableInfo, ushort? supportedModes, bool hasAboutBox)
         {
             this.fileName = fileName;
-            this.category = string.Empty;
-            this.entryPoint = string.Empty;
-            this.title = string.Empty;
-            this.filterInfo = null;
-            this.aete = null;
-            this.enableInfo = string.Empty;
-            this.supportedModes = null;
+            this.entryPoint = entryPoint;
+            this.category = category;
+            this.title = title;
+            this.filterInfo = filterInfo;
+            this.aete = aete;
+            this.enableInfo = enableInfo;
+            this.supportedModes = supportedModes;
             this.moduleEntryPoints = null;
-            this.hasAboutBox = true;
+            this.hasAboutBox = hasAboutBox;
         }
 
         [OnDeserializing]
