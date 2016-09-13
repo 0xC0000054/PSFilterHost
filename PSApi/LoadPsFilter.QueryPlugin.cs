@@ -43,6 +43,101 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
+		private sealed class PluginDataBuilder
+		{
+			private string fileName;
+			private string entryPoint;
+			private string category;
+			private string title;
+			private FilterCaseInfo[] filterInfo;
+			private PluginAETE aete;
+			private string enableInfo;
+			private ushort? supportedModes;
+			private bool hasAboutBox;
+
+			public string EntryPoint
+			{
+				set
+				{
+					this.entryPoint = value;
+				}
+			}
+
+			public string Category
+			{
+				set
+				{
+					this.category = value;
+				}
+			}
+
+			public string Title
+			{
+				set
+				{
+					this.title = value;
+				}
+			}
+
+			public FilterCaseInfo[] FilterInfo
+			{
+				set
+				{
+					this.filterInfo = value;
+				}
+			}
+
+			public PluginAETE Aete
+			{
+				set
+				{
+					this.aete = value;
+				}
+			}
+
+			public string EnableInfo
+			{
+				set
+				{
+					this.enableInfo = value;
+				}
+			}
+
+			public ushort? SupportedModes
+			{
+				set
+				{
+					this.supportedModes = value;
+				}
+			}
+
+			public bool HasAboutBox
+			{
+				set
+				{
+					this.hasAboutBox = value;
+				}
+			}
+
+			public PluginDataBuilder(string fileName)
+			{
+				this.fileName = fileName;
+				this.entryPoint = null;
+				this.category = null;
+				this.title = null;
+				this.filterInfo = null;
+				this.aete = null;
+				this.enableInfo = null;
+				this.supportedModes = null;
+				this.hasAboutBox = true;
+			}
+
+			public PluginData Create()
+			{
+				return new PluginData(fileName, entryPoint, category, title, filterInfo, aete, enableInfo, supportedModes, hasAboutBox);
+			}
+		}
+
 		private static unsafe bool EnumAETE(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, IntPtr lParam)
 		{
 			GCHandle handle = GCHandle.FromIntPtr(lParam);
@@ -277,7 +372,7 @@ namespace PSFilterHostDll.PSApi
 
 			byte* propPtr = (byte*)lockRes.ToPointer() + 10L;
 
-			PluginData enumData = new PluginData(query.fileName);
+			PluginDataBuilder pluginDataBuilder = new PluginDataBuilder(query.fileName);
 
 			uint platformEntryPoint = IntPtr.Size == 8 ? PIPropertyID.PIWin64X86CodeProperty : PIPropertyID.PIWin32X86CodeProperty;
 
@@ -301,7 +396,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == platformEntryPoint)
 				{
-					enumData.EntryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
+					pluginDataBuilder.EntryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIVersionProperty)
 				{
@@ -337,16 +432,16 @@ namespace PSFilterHostDll.PSApi
 #endif
 						return true;
 					}
-					enumData.SupportedModes = *(ushort*)dataPtr;
 #endif
+					pluginDataBuilder.SupportedModes = *(ushort*)dataPtr;
 				}
 				else if (propKey == PIPropertyID.PICategoryProperty)
 				{
-					enumData.Category = StringUtil.FromPascalString(dataPtr);
+					pluginDataBuilder.Category = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PINameProperty)
 				{
-					enumData.Title = StringUtil.FromPascalString(dataPtr);
+					pluginDataBuilder.Title = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PIFilterCaseInfoProperty)
 				{
@@ -356,7 +451,7 @@ namespace PSFilterHostDll.PSApi
 						filterInfo[j] = *(FilterCaseInfo*)dataPtr;
 						dataPtr += FilterCaseInfo.SizeOf;
 					}
-					enumData.FilterInfo = filterInfo;
+					pluginDataBuilder.FilterInfo = filterInfo;
 				}
 				else if (propKey == PIPropertyID.PIHasTerminologyProperty)
 				{
@@ -387,13 +482,13 @@ namespace PSFilterHostDll.PSApi
 
 						if (queryAETE.enumAETE != null)
 						{
-							enumData.Aete = queryAETE.enumAETE;
+							pluginDataBuilder.Aete = queryAETE.enumAETE;
 						}
 					}
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
 				{
-					enumData.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
+					pluginDataBuilder.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIRequiredHostProperty)
 				{
@@ -408,7 +503,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == PIPropertyID.NoAboutBox)
 				{
-					enumData.HasAboutBox = false;
+					pluginDataBuilder.HasAboutBox = false;
 				}
 
 				// The property data is padded to a 4 byte boundary.
@@ -416,9 +511,11 @@ namespace PSFilterHostDll.PSApi
 				propPtr += (PIProperty.SizeOf + propertyDataPaddedLength);
 			}
 
-			if (enumData.IsValid())
+			PluginData pluginData = pluginDataBuilder.Create();
+
+			if (pluginData.IsValid())
 			{
-				query.plugins.Add(enumData);
+				query.plugins.Add(pluginData);
 				handle.Target = query;
 				lParam = GCHandle.ToIntPtr(handle);
 			}
@@ -460,15 +557,13 @@ namespace PSFilterHostDll.PSApi
 			int length = 0;
 			byte* ptr = (byte*)lockRes.ToPointer() + 2L;
 
-			PluginData enumData = new PluginData(query.fileName);
-
-			enumData.Category = StringUtil.FromCString((IntPtr)ptr, out length);
+			string category = StringUtil.FromCString((IntPtr)ptr, out length);
 
 			ptr += length;
 
-			if (string.IsNullOrEmpty(enumData.Category))
+			if (string.IsNullOrEmpty(category))
 			{
-				enumData.Category = PSFilterHostDll.Properties.Resources.PiMIDefaultCategoryName;
+				category = PSFilterHostDll.Properties.Resources.PiMIDefaultCategoryName;
 			}
 
 			PlugInInfo* info = (PlugInInfo*)ptr;
@@ -499,7 +594,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 				return true;
 			}
-
+#endif
 			// Add the supported modes to the plug-in data as it can be used later to disable filters that do not support the image type.
 			ushort supportedModes = 0;
 			if ((info->supportsMode & PSConstants.supportsGrayScale) == PSConstants.supportsGrayScale)
@@ -511,8 +606,6 @@ namespace PSFilterHostDll.PSApi
 			{
 				supportedModes |= PSConstants.flagSupportsRGBColor;
 			}
-			enumData.SupportedModes = supportedModes;
-#endif
 
 			if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.AnyHostSignature)
 			{
@@ -560,15 +653,16 @@ namespace PSFilterHostDll.PSApi
 
 			IntPtr resPtr = new IntPtr(filterLock.ToInt64() + 2L);
 
-			enumData.Title = StringUtil.FromCString(resPtr);
+			string title = StringUtil.FromCString(resPtr);
 
 			// The entry point number is the same as the resource number.
-			enumData.EntryPoint = "ENTRYPOINT" + lpszName.ToInt32().ToString(CultureInfo.InvariantCulture);
-			enumData.FilterInfo = null;
+			string entryPoint = "ENTRYPOINT" + lpszName.ToInt32().ToString(CultureInfo.InvariantCulture);
 
-			if (enumData.IsValid())
+			PluginData pluginData = new PluginData(query.fileName, entryPoint, category, title, supportedModes);
+
+			if (pluginData.IsValid())
 			{
-				query.plugins.Add(enumData);
+				query.plugins.Add(pluginData);
 				handle.Target = query;
 				lParam = GCHandle.ToIntPtr(handle);
 			}
