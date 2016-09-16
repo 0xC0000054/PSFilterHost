@@ -380,9 +380,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				PIProperty* pipp = (PIProperty*)propPtr;
 				uint propKey = pipp->propertyKey;
-#if DEBUG
-				DebugUtils.Ping(DebugFlags.PiPL, string.Format("prop {0}: {1}", i, DebugUtils.PropToString(propKey)));
-#endif
+
 				byte* dataPtr = propPtr + PIProperty.SizeOf;
 				if (propKey == PIPropertyID.PIKindProperty)
 				{
@@ -505,6 +503,12 @@ namespace PSFilterHostDll.PSApi
 				{
 					pluginDataBuilder.HasAboutBox = false;
 				}
+#if DEBUG
+				else
+				{
+					DebugUtils.Ping(DebugFlags.PiPL, string.Format("Unsupported property '{0}' in {1}", DebugUtils.PropToString(propKey), query.fileName));
+				}
+#endif
 
 				// The property data is padded to a 4 byte boundary.
 				int propertyDataPaddedLength = (pipp->propertyLength + 3) & ~3;
