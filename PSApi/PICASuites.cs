@@ -11,14 +11,27 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using PSFilterHostDll.PSApi.PICA;
+using System;
 
 namespace PSFilterHostDll.PSApi
 {
-	internal static class PICASuites
+	internal sealed class PICASuites : IDisposable
 	{
-		public static PSBufferSuite1 CreateBufferSuite1()
+		private PICABufferSuite bufferSuite;
+
+		public PICASuites()
 		{
-			return PICABufferSuite.CreateBufferSuite1();
+			this.bufferSuite = null;
+		}
+
+		public PSBufferSuite1 CreateBufferSuite1()
+		{
+			if (bufferSuite == null)
+			{
+				this.bufferSuite = new PICABufferSuite();
+			}
+
+			return this.bufferSuite.CreateBufferSuite1();
 		}
 
 #if PICASUITEDEBUG
@@ -61,6 +74,13 @@ namespace PSFilterHostDll.PSApi
 		} 
 #endif
 
-
+		public void Dispose()
+		{
+			if (bufferSuite != null)
+			{
+				this.bufferSuite.Dispose();
+				this.bufferSuite = null;
+			}
+		}
 	}
 }
