@@ -25,6 +25,23 @@ using System.Globalization;
 
 namespace PSFilterHostDll.PSApi
 {
+	[Flags()]
+	internal enum MemoryAllocationFlags
+	{
+		/// <summary>
+		/// The default memory allocation flags.
+		/// </summary>
+		Default = 0,
+		/// <summary>
+		/// Specifies that the memory should be zero filled.
+		/// </summary>
+		ZeroFill = 1,
+		/// <summary>
+		/// Specifies that IntPtr.Zero should be returned when out of memory.
+		/// </summary>
+		ReturnZeroOnOutOfMemory = 2
+	}
+
 	/// <summary>
 	/// Contains methods for allocating and freeing memory from the default process heap.
 	/// </summary>
@@ -55,29 +72,41 @@ namespace PSFilterHostDll.PSApi
 		/// <returns>A pointer to the allocated block of memory.</returns>
 		public static IntPtr Allocate(long size, bool zeroFill)
 		{
+			return Allocate((ulong)size, zeroFill ? MemoryAllocationFlags.ZeroFill : MemoryAllocationFlags.Default);
+		}
+
+		/// <summary>
+		/// Allocates a block of memory from the default process heap.
+		/// </summary>
+		/// <param name="size">The size of the memory to allocate.</param>
+		/// <param name="allocationFlags">The memory allocation flags.</param>
+		/// <returns>A pointer to the allocated block of memory.</returns>
+		public static IntPtr Allocate(ulong size, MemoryAllocationFlags allocationFlags)
+		{
 			if (hHeap == IntPtr.Zero)
 			{
 				InitializeHeap();
 			}
 
-			IntPtr block = IntPtr.Zero;
-			try
-			{
-				UIntPtr bytes = new UIntPtr((ulong)size);
-				block = SafeNativeMethods.HeapAlloc(hHeap, zeroFill ? NativeConstants.HEAP_ZERO_MEMORY : 0U, bytes);
-			}
-			catch (OverflowException ex)
-			{
-				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "Overflow while trying to allocate {0:N} bytes", size), ex);
-			}
+			bool zeroFill = (allocationFlags & MemoryAllocationFlags.ZeroFill) == MemoryAllocationFlags.ZeroFill;
+
+			IntPtr block = SafeNativeMethods.HeapAlloc(hHeap, zeroFill ? NativeConstants.HEAP_ZERO_MEMORY : 0U, new UIntPtr(size));
+
 			if (block == IntPtr.Zero)
 			{
-				throw new OutOfMemoryException(string.Format(CultureInfo.InvariantCulture, "HeapAlloc returned a null pointer while trying to allocate {0:N} bytes", size));
+				if ((allocationFlags & MemoryAllocationFlags.ReturnZeroOnOutOfMemory) == MemoryAllocationFlags.ReturnZeroOnOutOfMemory)
+				{
+					return IntPtr.Zero;
+				}
+				else
+				{
+					throw new OutOfMemoryException();
+				}
 			}
 
 			if (size > 0L)
 			{
-				GC.AddMemoryPressure(size);
+				GC.AddMemoryPressure((long)size);
 			}
 
 			return block;
