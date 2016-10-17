@@ -179,6 +179,7 @@ namespace PSFilterHostDll.PSApi
 		private bool useChannelPorts;
 		private bool usePICASuites;
 		private ActivePICASuites activePICASuites;
+		private PICASuites picaSuites;
 		private ColorProfileConverter colorProfileConverter;
 		private byte[] documentColorProfile;
 
@@ -367,6 +368,7 @@ namespace PSFilterHostDll.PSApi
 			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
 			this.usePICASuites = false;
 			this.activePICASuites = new ActivePICASuites();
+			this.picaSuites = new PICASuites();
 			this.hostInfo = new HostInformation();
 			this.colorProfileConverter = new ColorProfileConverter();
 			this.documentColorProfile = null;
@@ -4654,7 +4656,7 @@ namespace PSFilterHostDll.PSApi
 
 						suite = this.activePICASuites.AllocateSuite<PSBufferSuite1>(suiteKey);
 
-						PSBufferSuite1 bufferSuite = PICASuites.CreateBufferSuite1();
+						PSBufferSuite1 bufferSuite = this.picaSuites.CreateBufferSuite1();
 
 						Marshal.StructureToPtr(bufferSuite, suite, false);
 					}
@@ -5301,6 +5303,12 @@ namespace PSFilterHostDll.PSApi
 					{
 						activePICASuites.Dispose();
 						activePICASuites = null;
+					}
+
+					if (picaSuites != null)
+					{
+						picaSuites.Dispose();
+						picaSuites = null;
 					}
 
 					if (imageMetaData != null)
