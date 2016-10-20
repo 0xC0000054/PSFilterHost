@@ -88,9 +88,9 @@ namespace PSFilterHostDll.PSApi
         /// <param name="key">The string specifying the suite name and version.</param>
         public void RemoveRef(string key)
         {
-            if (this.activeSuites.ContainsKey(key))
+            PICASuite suite;
+            if (this.activeSuites.TryGetValue(key, out suite))
             {
-                PICASuite suite = this.activeSuites[key];
                 suite.refCount--;
 
                 if (suite.refCount == 0)
