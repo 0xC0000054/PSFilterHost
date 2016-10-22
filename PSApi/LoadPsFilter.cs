@@ -4752,7 +4752,7 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		private int SPBasicReleaseSuite(IntPtr name, int version)
@@ -4767,7 +4767,7 @@ namespace PSFilterHostDll.PSApi
 
 			this.activePICASuites.RemoveRef(suiteKey);
 
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		private unsafe int SPBasicIsEqual(IntPtr token1, IntPtr token2)
@@ -4820,7 +4820,7 @@ namespace PSFilterHostDll.PSApi
 				return PSError.memFullErr;
 			}
 
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		private int SPBasicFreeBlock(IntPtr block)
@@ -4829,7 +4829,7 @@ namespace PSFilterHostDll.PSApi
 			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("block: 0x{0}", block.ToHexString()));
 #endif
 			Memory.Free(block);
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		private int SPBasicReallocateBlock(IntPtr block, int newSize, ref IntPtr newblock)
@@ -4846,7 +4846,7 @@ namespace PSFilterHostDll.PSApi
 				return PSError.memFullErr;
 			}
 
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		private int SPBasicUndefined()
@@ -4855,7 +4855,7 @@ namespace PSFilterHostDll.PSApi
 			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Empty);
 #endif
 
-			return PSError.kSPNoErr;
+			return PSError.kSPNoError;
 		}
 
 		/// <summary>
