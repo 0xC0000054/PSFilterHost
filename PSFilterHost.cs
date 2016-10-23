@@ -51,7 +51,7 @@ namespace PSFilterHostDll
 		private Region selectedRegion;
 		private IntPtr owner;
 		private AbortFunc abortFunc;
-		private List<PSResource> pseudoResources;
+		private PseudoResourceCollection pseudoResources;
 		private HostInformation hostInfo;
 		private PickColor pickColor;
 		private HostColorManagement hostColorProfiles;
@@ -186,7 +186,7 @@ namespace PSFilterHostDll
 				this.selectedRegion = null;
 			}
 			this.owner = parentWindowHandle;
-			this.pseudoResources = new List<PSResource>();
+			this.pseudoResources = null;
 			this.abortFunc = null;
 			this.hostInfo = null;
 			this.hostColorProfiles = null;
@@ -274,14 +274,11 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return new PseudoResourceCollection(this.pseudoResources);
+				return this.pseudoResources;
 			}
 			set
 			{
-				if ((value != null) && value.Count > 0)
-				{
-					this.pseudoResources = new List<PSResource>(value);
-				}
+				this.pseudoResources = value;
 			}
 		}
 
@@ -594,7 +591,7 @@ namespace PSFilterHostDll
 					lps.ShowUI = showUI;
 				}
 
-				if (pseudoResources.Count > 0)
+				if (pseudoResources != null)
 				{
 					lps.PseudoResources = pseudoResources;
 				}
