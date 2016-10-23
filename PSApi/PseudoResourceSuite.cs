@@ -33,11 +33,11 @@ namespace PSFilterHostDll.PSApi
 			this.pseudoResources = new List<PSResource>();
 		}
 
-		public List<PSResource> PseudoResources
+		public PseudoResourceCollection PseudoResources
 		{
 			get
 			{
-				return this.pseudoResources;
+				return new PseudoResourceCollection(this.pseudoResources);
 			}
 			set
 			{
@@ -46,7 +46,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.pseudoResources = value;
+				this.pseudoResources = new List<PSResource>(value);
 			}
 		}
 
