@@ -113,6 +113,7 @@ namespace PSFilterHostDll.PSApi
 		private IntPtr basicSuitePtr;
 
 		private GlobalParameters globalParameters;
+		private Dictionary<uint, AETEValue> scriptingData;
 		private bool showUI;
 		private bool parameterDataRestored;
 		private bool pluginDataRestored;
@@ -259,7 +260,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return new ParameterData(this.globalParameters, this.descriptorSuite.ScriptingData);
+				return new ParameterData(this.globalParameters, this.scriptingData);
 			}
 			set
 			{
@@ -271,7 +272,7 @@ namespace PSFilterHostDll.PSApi
 				this.globalParameters = value.GlobalParameters;
 				if (value.ScriptingData != null)
 				{
-					this.descriptorSuite.ScriptingData = value.ScriptingData;
+					this.scriptingData = value.ScriptingData;
 				}
 			}
 		}
@@ -352,6 +353,7 @@ namespace PSFilterHostDll.PSApi
 			this.parameterDataRestored = false;
 			this.pluginDataRestored = false;
 			this.globalParameters = new GlobalParameters();
+			this.scriptingData = null;
 			this.errorMessage = string.Empty;
 			this.filterParametersHandle = IntPtr.Zero;
 			this.pluginDataHandle = IntPtr.Zero;
@@ -608,6 +610,25 @@ namespace PSFilterHostDll.PSApi
 			new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, pdata.FileName).Demand();
 
 			module = new PluginModule(pdata.FileName, pdata.EntryPoint);
+		}
+
+		/// <summary>
+		/// Saves the filter scripting parameters for repeat runs.
+		/// </summary>
+		private unsafe void SaveScriptingParameters()
+		{
+			PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
+			if (descriptorParameters->descriptor != IntPtr.Zero)
+			{
+				Dictionary<uint, AETEValue> data;
+				if (descriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
+				{
+					this.scriptingData = data;
+				}
+				HandleSuite.Instance.UnlockHandle(descriptorParameters->descriptor);
+				HandleSuite.Instance.DisposeHandle(descriptorParameters->descriptor);
+				descriptorParameters->descriptor = IntPtr.Zero;
+			}
 		}
 
 		/// <summary>
@@ -1049,6 +1070,7 @@ namespace PSFilterHostDll.PSApi
 			if (showUI && result == PSError.noErr)
 			{
 				SaveParameterHandles();
+				SaveScriptingParameters();
 			}
 
 			PostProcessOutputData();
@@ -5026,9 +5048,10 @@ namespace PSFilterHostDll.PSApi
 			}
 
 
-			if (descriptorSuite.HasScriptingData)
+			if (scriptingData != null)
 			{
 				descriptorParameters->descriptor = HandleSuite.Instance.NewHandle(0);
+				descriptorSuite.SetScriptingData(descriptorParameters->descriptor, scriptingData);
 				if (showUI)
 				{
 					descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
