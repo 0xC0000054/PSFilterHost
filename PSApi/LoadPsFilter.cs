@@ -611,9 +611,9 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Save the filter parameters for repeat runs.
+		/// Save the filter parameter handles for repeat runs.
 		/// </summary>
-		private unsafe void SaveParameters()
+		private unsafe void SaveParameterHandles()
 		{
 			FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 
@@ -751,9 +751,9 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Restore the filter parameters for repeat runs.
+		/// Restore the filter parameter handles for repeat runs.
 		/// </summary>
-		private unsafe void RestoreParameters()
+		private unsafe void RestoreParameterHandles()
 		{
 			if (phase == PluginPhase.Parameters)
 			{
@@ -1048,7 +1048,7 @@ namespace PSFilterHostDll.PSApi
 
 			if (showUI && result == PSError.noErr)
 			{
-				SaveParameters();
+				SaveParameterHandles();
 			}
 
 			PostProcessOutputData();
@@ -1070,7 +1070,7 @@ namespace PSFilterHostDll.PSApi
 			// Photoshop sets the size info before the filterSelectorParameters call even though the documentation says it does not.
 			SetupSizes();
 			SetFilterRecordValues();
-			RestoreParameters();
+			RestoreParameterHandles();
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.Call, "Before filterSelectorParameters");
 #endif
@@ -1242,7 +1242,7 @@ namespace PSFilterHostDll.PSApi
 		private bool PluginPrepare()
 		{
 			SetupSizes();
-			RestoreParameters();
+			RestoreParameterHandles();
 			SetFilterRecordValues();
 
 
