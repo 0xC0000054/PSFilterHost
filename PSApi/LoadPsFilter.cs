@@ -5037,6 +5037,10 @@ namespace PSFilterHostDll.PSApi
 			if (scriptingData != null)
 			{
 				descriptorParameters->descriptor = HandleSuite.Instance.NewHandle(0);
+				if (descriptorParameters->descriptor == IntPtr.Zero)
+				{
+					throw new OutOfMemoryException(Resources.OutOfMemoryError);
+				}
 				descriptorSuite.SetScriptingData(descriptorParameters->descriptor, scriptingData);
 				if (showUI)
 				{
