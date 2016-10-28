@@ -86,17 +86,21 @@ namespace PSFilterHostDll.PSApi
         public const int supportsRGBColor = 8;
         public const int supportsGrayScale = 2;
 
-        public const string PICABufferSuite = "Photoshop Buffer Suite for Plug-ins";
-        public const string PICAHandleSuite = "Photoshop Handle Suite for Plug-ins";
-        public const string PICAPropertySuite = "Photoshop Property Suite for Plug-ins";
-        public const string PICAUIHooksSuite = "Photoshop UIHooks Suite for Plug-ins";        
+        internal static class PICA
+        {
+            public const string BufferSuite = "Photoshop Buffer Suite for Plug-ins";
+            public const string HandleSuite = "Photoshop Handle Suite for Plug-ins";
+            public const string PropertySuite = "Photoshop Property Suite for Plug-ins";
+            public const string UIHooksSuite = "Photoshop UIHooks Suite for Plug-ins";
 
-#if PICASUITEDEBUG       
-        public const string PICAColorSpaceSuite = "Photoshop ColorSpace Suite for Plug-ins";
-        public const string PICAZStringSuite = "AS ZString Suite";
-        public const string PICAZStringDictonarySuite = "AS ZString Dictionary Suite";
-        public const string PICAPluginsSuite = "SP Plug-ins Suite";
+#if PICASUITEDEBUG
+            public const string ColorSpaceSuite = "Photoshop ColorSpace Suite for Plug-ins";
+            public const string ASZStringSuite = "AS ZString Suite";
+            public const string ASZStringDictonarySuite = "AS ZString Dictionary Suite";
+            public const string SPPluginsSuite = "SP Plug-ins Suite";
 #endif
+        }
+
         public const int LatestTerminologyVersion = 0;
         public const int AETEMajorVersion = 1;
         public const int AETEMinorVersion = 0;
