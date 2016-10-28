@@ -4673,7 +4673,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				try
 				{
-					if (suiteName == PSConstants.PICABufferSuite)
+					if (suiteName.Equals(PSConstants.PICA.BufferSuite, StringComparison.Ordinal))
 					{
 						if (version != 1)
 						{
@@ -4684,7 +4684,7 @@ namespace PSFilterHostDll.PSApi
 
 						suite = this.activePICASuites.AllocateSuite(suiteKey, bufferSuite);
 					}
-					else if (suiteName == PSConstants.PICAHandleSuite)
+					else if (suiteName.Equals(PSConstants.PICA.HandleSuite, StringComparison.Ordinal))
 					{
 						if (version == 1)
 						{
@@ -4703,7 +4703,7 @@ namespace PSFilterHostDll.PSApi
 							return PSError.kSPSuiteNotFoundError;
 						}
 					}
-					else if (suiteName == PSConstants.PICAPropertySuite)
+					else if (suiteName.Equals(PSConstants.PICA.PropertySuite, StringComparison.Ordinal))
 					{
 						if (version != PSConstants.kCurrentPropertyProcsVersion)
 						{
@@ -4714,7 +4714,7 @@ namespace PSFilterHostDll.PSApi
 
 						suite = this.activePICASuites.AllocateSuite(suiteKey, propertySuite);
 					}
-					else if (suiteName == PSConstants.PICAUIHooksSuite)
+					else if (suiteName.Equals(PSConstants.PICA.UIHooksSuite, StringComparison.Ordinal))
 					{
 						if (version != 1)
 						{
@@ -4726,7 +4726,7 @@ namespace PSFilterHostDll.PSApi
 						suite = this.activePICASuites.AllocateSuite(suiteKey, uiHooks);
 					}
 #if PICASUITEDEBUG
-					else if (suiteName == PSConstants.PICAColorSpaceSuite)
+					else if (suiteName.Equals(PSConstants.PICA.ColorSpaceSuite, StringComparison.Ordinal))
 					{
 						if (version != 1)
 						{
@@ -4737,7 +4737,7 @@ namespace PSFilterHostDll.PSApi
 
 						suite = this.activePICASuites.AllocateSuite(suiteKey, csSuite);
 					}
-					else if (suiteName == PSConstants.PICAPluginsSuite)
+					else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
 					{
 						if (version != 4)
 						{
