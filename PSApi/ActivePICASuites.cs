@@ -18,15 +18,65 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class ActivePICASuites : IDisposable
     {
-        private sealed class PICASuite
+        private sealed class PICASuite : IDisposable
         {
-            public readonly IntPtr suitePointer;
-            public int refCount;
+            private IntPtr suitePointer;
+            private int refCount;
+            private bool disposed;
+
+            public IntPtr SuitePointer
+            {
+                get
+                {
+                    return this.suitePointer;
+                }
+            }
+
+            public int RefCount
+            {
+                get
+                {
+                    return this.refCount;
+                }
+                set
+                {
+                    this.refCount = value;
+                }
+            }
 
             public PICASuite(IntPtr suite)
             {
                 this.suitePointer = suite;
                 this.refCount = 1;
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            ~PICASuite()
+            {
+                Dispose(false);
+            }
+
+            private void Dispose(bool disposing)
+            {
+                if (!disposed)
+                {
+                    if (disposing)
+                    {
+                    }
+
+                    if (this.suitePointer != IntPtr.Zero)
+                    {
+                        Memory.Free(this.suitePointer);
+                        this.suitePointer = IntPtr.Zero;
+                    }
+
+                    disposed = true;
+                }
             }
         }
         
@@ -51,6 +101,11 @@ namespace PSFilterHostDll.PSApi
         /// <returns>The pointer to the allocated suite.</returns>
         public IntPtr AllocateSuite<TSuite>(string key, TSuite suite)
         {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException("ActivePICASuites");
+            }
+
             IntPtr suitePointer = Memory.Allocate(Marshal.SizeOf(typeof(TSuite)), false);
             Marshal.StructureToPtr(suite, suitePointer, false);
 
@@ -68,6 +123,11 @@ namespace PSFilterHostDll.PSApi
         /// </returns>
         public bool IsLoaded(string key)
         {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException("ActivePICASuites");
+            }
+
             return this.activeSuites.ContainsKey(key);
         }
 
@@ -78,11 +138,16 @@ namespace PSFilterHostDll.PSApi
         /// <returns>The pointer to the suite instance.</returns>
         public IntPtr AddRef(string key)
         {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException("ActivePICASuites");
+            }
+
             PICASuite suite = this.activeSuites[key];
-            suite.refCount++;
+            suite.RefCount += 1;
             this.activeSuites[key] = suite;
 
-            return suite.suitePointer;
+            return suite.SuitePointer;
         }
 
         /// <summary>
@@ -91,14 +156,19 @@ namespace PSFilterHostDll.PSApi
         /// <param name="key">The string specifying the suite name and version.</param>
         public void RemoveRef(string key)
         {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException("ActivePICASuites");
+            }
+
             PICASuite suite;
             if (this.activeSuites.TryGetValue(key, out suite))
             {
-                suite.refCount--;
+                suite.RefCount -= 1;
 
-                if (suite.refCount == 0)
+                if (suite.RefCount == 0)
                 {
-                    Memory.Free(suite.suitePointer);
+                    suite.Dispose();
                     this.activeSuites.Remove(key);
                 }
                 else
@@ -113,29 +183,15 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        ~ActivePICASuites()
-        {
-            Dispose(false);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!disposed)
+            if (!this.disposed)
             {
-                disposed = true;
-
-                if (disposing)
-                {
-                }
+                this.disposed = true;
 
                 foreach (PICASuite item in this.activeSuites.Values)
                 {
-                    Memory.Free(item.suitePointer);
+                    item.Dispose();
                 }
+                this.activeSuites = null;
             }
         }
     }
