@@ -25,15 +25,68 @@ namespace PSFilterHostDll.PSApi
 			public static readonly int SizeOf = Marshal.SizeOf(typeof(PSHandle));
 		}
 
-		private sealed class HandleEntry
+		private sealed class HandleEntry : IDisposable
 		{
-			public readonly IntPtr pointer;
-			public readonly int size;
+			private IntPtr handle;
+			private IntPtr pointer;
+			private readonly int size;
+			private bool disposed;
 
-			public HandleEntry(IntPtr pointer, int size)
+			public IntPtr Pointer
 			{
+				get
+				{
+					return this.pointer;
+				}
+			}
+
+			public int Size
+			{
+				get
+				{
+					return this.size;
+				}
+			}
+
+			public HandleEntry(IntPtr handle, IntPtr pointer, int size)
+			{
+				this.handle = handle;
 				this.pointer = pointer;
 				this.size = size;
+			}
+
+			public void Dispose()
+			{
+				Dispose(true);
+				GC.SuppressFinalize(this);
+			}
+
+			~HandleEntry()
+			{
+				Dispose(false);
+			}
+
+			private void Dispose(bool disposing)
+			{
+				if (!disposed)
+				{
+					if (disposing)
+					{
+					}
+
+					if (handle != IntPtr.Zero)
+					{
+						Memory.Free(this.handle);
+						this.handle = IntPtr.Zero;
+					}
+
+					if (pointer != IntPtr.Zero)
+					{
+						Memory.Free(this.pointer);
+						this.pointer = IntPtr.Zero;
+					}
+					disposed = true;
+				}
 			}
 		}
 
@@ -108,8 +161,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			foreach (var item in this.handles)
 			{
-				Memory.Free(item.Value.pointer);
-				Memory.Free(item.Key);
+				item.Value.Dispose();
 			}
 			this.handles.Clear();
 		}
@@ -193,7 +245,7 @@ namespace PSFilterHostDll.PSApi
 
 				hand->pointer = Memory.Allocate(size, true);
 
-				this.handles.Add(handle, new HandleEntry(hand->pointer, size));
+				this.handles.Add(handle, new HandleEntry(handle, hand->pointer, size));
 #if DEBUG
 				string message = string.Format("Handle: 0x{0}, pointer: 0x{1}, size: {2}", handle.ToHexString(), hand->pointer.ToHexString(), size);
 				DebugUtils.Ping(DebugFlags.HandleSuite, message);
@@ -220,7 +272,13 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 				DebugUtils.Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
-				if (!AllocatedBySuite(h))
+				HandleEntry item;
+				if (this.handles.TryGetValue(h, out item))
+				{
+					item.Dispose();
+					this.handles.Remove(h);
+				}
+				else
 				{
 					if (SafeNativeMethods.GlobalSize(h).ToInt64() > 0L)
 					{
@@ -236,13 +294,6 @@ namespace PSFilterHostDll.PSApi
 
 					return;
 				}
-
-				PSHandle* handle = (PSHandle*)h.ToPointer();
-
-				Memory.Free(handle->pointer);
-				Memory.Free(h);
-
-				this.handles.Remove(h);
 			}
 		}
 
@@ -276,7 +327,7 @@ namespace PSFilterHostDll.PSApi
 			HandleEntry item;
 			if (this.handles.TryGetValue(h, out item))
 			{
-				return item.pointer;
+				return item.Pointer;
 			}
 			else
 			{
@@ -307,7 +358,7 @@ namespace PSFilterHostDll.PSApi
 			HandleEntry item;
 			if (this.handles.TryGetValue(h, out item))
 			{
-				return item.size;
+				return item.Size;
 			}
 			else
 			{
@@ -375,7 +426,7 @@ namespace PSFilterHostDll.PSApi
 
 				handle->pointer = ptr;
 
-				this.handles.AddOrUpdate(h, new HandleEntry(ptr, newSize));
+				this.handles.AddOrUpdate(h, new HandleEntry(h, ptr, newSize));
 			}
 			catch (OutOfMemoryException)
 			{
