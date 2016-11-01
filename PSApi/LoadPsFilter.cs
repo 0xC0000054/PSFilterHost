@@ -5395,7 +5395,7 @@ namespace PSFilterHostDll.PSApi
 					readDocumentPtr = IntPtr.Zero;
 				}
 
-				if (channelReadDescPtrs.Count > 0)
+				if (channelReadDescPtrs != null)
 				{
 					foreach (var item in channelReadDescPtrs)
 					{
