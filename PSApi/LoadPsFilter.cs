@@ -3456,13 +3456,19 @@ namespace PSFilterHostDll.PSApi
 			try
 			{
 				namePtr = Marshal.StringToHGlobalAnsi(name);
+
+				channelReadDescPtrs.Add(new ChannelDescPtrs(addressPtr, namePtr));
 			}
 			catch (Exception)
 			{
 				Memory.Free(addressPtr);
+				if (namePtr != IntPtr.Zero)
+				{
+					Marshal.FreeHGlobal(namePtr);
+					namePtr = IntPtr.Zero;
+				}
 				throw;
 			}
-			channelReadDescPtrs.Add(new ChannelDescPtrs(addressPtr, namePtr));
 
 			ReadChannelDesc* desc = (ReadChannelDesc*)addressPtr.ToPointer();
 			desc->minVersion = PSConstants.kCurrentMinVersReadChannelDesc;
