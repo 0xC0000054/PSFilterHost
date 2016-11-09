@@ -740,46 +740,28 @@ namespace PSFilterHostDll
 		/// </summary>
 		public void Dispose()
 		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		/// Releases unmanaged resources and performs other cleanup operations before the
-		/// <see cref="PSFilterHost"/> is reclaimed by garbage collection.
-		/// </summary>
-		~PSFilterHost()
-		{
-			Dispose(false);
-		}
-
-		private void Dispose(bool disposing)
-		{
 			if (!disposed)
 			{
 				disposed = true;
 
-				if (disposing)
-				{
 #if GDIPLUS
-					if (source != null)
-					{
-						source.Dispose();
-						source = null;
-					}
+				if (source != null)
+				{
+					source.Dispose();
+					source = null;
+				}
 
-					if (dest != null)
-					{
-						dest.Dispose();
-						dest = null;
-					}
+				if (dest != null)
+				{
+					dest.Dispose();
+					dest = null;
+				}
 #endif
 
-					if (selectedRegion != null)
-					{
-						selectedRegion.Dispose();
-						selectedRegion = null;
-					}
+				if (selectedRegion != null)
+				{
+					selectedRegion.Dispose();
+					selectedRegion = null;
 				}
 			}
 		}
