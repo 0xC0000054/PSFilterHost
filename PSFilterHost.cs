@@ -781,8 +781,6 @@ namespace PSFilterHostDll
 						selectedRegion = null;
 					}
 				}
-
-				PSFilterHostDll.BGRASurface.BGRASurfaceMemory.DestroyHeap();
 			}
 		}
 	}
