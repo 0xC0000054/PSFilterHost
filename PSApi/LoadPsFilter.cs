@@ -5548,6 +5548,7 @@ namespace PSFilterHostDll.PSApi
 
 				BufferSuite.Instance.FreeRemainingBuffers();
 				HandleSuite.Instance.FreeRemainingHandles();
+				BGRASurfaceMemory.DestroyHeap();
 			}
 		}
 
