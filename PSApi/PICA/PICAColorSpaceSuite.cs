@@ -138,9 +138,9 @@ namespace PSFilterHostDll.PSApi.PICA
 
             return PSError.kSPNotImplmented;
         }
-        private static int CSIsBookColor(IntPtr colorID, ref byte isBookColor)
+        private static int CSIsBookColor(IntPtr colorID, ref bool isBookColor)
         {
-            isBookColor = 0;
+            isBookColor = false;
 
             return PSError.kSPNotImplmented;
         }
