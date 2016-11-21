@@ -110,10 +110,14 @@ namespace PSFilterHostDll.PSApi
 						colorComponents[2] = (short)(result.component2 * 255.0);
 						break;
 					case ColorSpace.LabSpace:
+						colorComponents[0] = (short)((result.component0 / 116) * 255.0);
+						colorComponents[1] = (short)((result.component1 / 500) * 255.0);
+						colorComponents[2] = (short)((result.component2 / 200) * 255.0);
+						break;
 					case ColorSpace.XYZSpace:
-						colorComponents[0] = (short)(result.component0 * 255.0);
-						colorComponents[1] = (short)(result.component1 * 255.0);
-						colorComponents[2] = (short)(result.component2 * 255.0);
+						colorComponents[0] = (short)((result.component0 / CIEXYZ.D65.X) * 255.0);
+						colorComponents[1] = (short)((result.component1 / CIEXYZ.D65.Y) * 255.0);
+						colorComponents[2] = (short)((result.component2 / CIEXYZ.D65.Z) * 255.0);
 						break;
 					case ColorSpace.CMYKSpace:
 						colorComponents[0] = (short)(result.component0 * 255.0);
