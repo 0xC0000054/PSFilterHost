@@ -18,10 +18,12 @@ namespace PSFilterHostDll.PSApi
 	internal sealed class PICASuites : IDisposable
 	{
 		private PICABufferSuite bufferSuite;
+		private PICAUIHooksSuite uiHooksSuite;
 
 		public PICASuites()
 		{
 			this.bufferSuite = null;
+			this.uiHooksSuite = null;
 		}
 
 		public static ASZStringSuite1 CreateASZStringSuite1()
@@ -67,9 +69,14 @@ namespace PSFilterHostDll.PSApi
 			return suite;
 		}
 
-		public static unsafe PSUIHooksSuite1 CreateUIHooksSuite1(FilterRecord* filterRecord)
+		public unsafe PSUIHooksSuite1 CreateUIHooksSuite1(FilterRecord* filterRecord)
 		{
-			return PICAUIHooksSuite.CreateUIHooksSuite1(filterRecord);
+			if (uiHooksSuite == null)
+			{
+				this.uiHooksSuite = new PICAUIHooksSuite(filterRecord);
+			}
+
+			return this.uiHooksSuite.CreateUIHooksSuite1(filterRecord);
 		}
 
 #if PICASUITEDEBUG
