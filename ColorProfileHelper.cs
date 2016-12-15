@@ -81,7 +81,7 @@ namespace PSFilterHostDll
 
                 if (SafeNativeMethods.GetMonitorInfoW(hMonitor, ref monitorInfo))
                 {
-                    name = monitorInfo.szDeviceName;
+                    name = monitorInfo.szDeviceName.TrimEnd('\0');
                 }
             }
 
