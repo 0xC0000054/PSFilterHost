@@ -19,11 +19,28 @@ namespace PSFilterHostDll.PSApi
 	{
 		private PICABufferSuite bufferSuite;
 		private PICAUIHooksSuite uiHooksSuite;
+		private string pluginName;
 
 		public PICASuites()
 		{
 			this.bufferSuite = null;
 			this.uiHooksSuite = null;
+			this.pluginName = string.Empty;
+		}
+
+		/// <summary>
+		/// Sets the name of the plugin used by the <see cref="PSUIHooksSuite1.GetPluginName"/> callback.
+		/// </summary>
+		/// <param name="name">The name of the plugin.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
+		public void SetPluginName(string name)
+		{
+			if (name == null)
+			{
+				throw new ArgumentNullException("name");
+			}
+
+			this.pluginName = name;
 		}
 
 		public static ASZStringSuite1 CreateASZStringSuite1()
@@ -73,7 +90,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (uiHooksSuite == null)
 			{
-				this.uiHooksSuite = new PICAUIHooksSuite(filterRecord);
+				this.uiHooksSuite = new PICAUIHooksSuite(filterRecord, this.pluginName);
 			}
 
 			return this.uiHooksSuite.CreateUIHooksSuite1(filterRecord);
