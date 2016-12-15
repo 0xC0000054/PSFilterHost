@@ -4740,7 +4740,7 @@ namespace PSFilterHostDll.PSApi
 						return PSError.kSPSuiteNotFoundError;
 					}
 
-					PSUIHooksSuite1 uiHooks = PICASuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
+					PSUIHooksSuite1 uiHooks = this.picaSuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
 
 					suite = this.activePICASuites.AllocateSuite(suiteKey, uiHooks);
 				}
