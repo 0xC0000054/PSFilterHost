@@ -1508,6 +1508,7 @@ namespace PSFilterHostDll.PSApi
 
 			this.useChannelPorts = EnableChannelPorts(pdata);
 			this.usePICASuites = EnablePICASuites(pdata);
+			this.picaSuites.SetPluginName(pdata.Title.TrimEnd('.'));
 
 			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
 
