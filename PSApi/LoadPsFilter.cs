@@ -27,7 +27,6 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
-using System.Windows.Forms;
 using PSFilterHostDll.BGRASurface;
 using PSFilterHostDll.Properties;
 
@@ -120,7 +119,6 @@ namespace PSFilterHostDll.PSApi
 
 		private AbortFunc abortFunc;
 		private ProgressProc progressFunc;
-		private PickColor pickColor;
 
 		private SurfaceBase source;
 		private SurfaceBase dest;
@@ -234,7 +232,7 @@ namespace PSFilterHostDll.PSApi
 				throw new ArgumentNullException("value");
 			}
 
-			pickColor = value;
+			ColorPickerManager.SetPickColorCallback(value);
 		}
 
 		internal void SetColorProfiles(HostColorManagement colorProfiles)
@@ -363,7 +361,7 @@ namespace PSFilterHostDll.PSApi
 
 			abortFunc = null;
 			progressFunc = null;
-			pickColor = null;
+			ColorPickerManager.SetPickColorCallback(null);
 			this.descriptorSuite = new DescriptorSuite();
 			this.pseudoResourceSuite = new PseudoResourceSuite();
 
@@ -2827,42 +2825,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private bool ShowColorPickerDialog(string prompt, ref short[] rgb)
-		{
-			bool colorPicked = false;
-
-			if (pickColor != null)
-			{
-				ColorPickerResult color = pickColor(prompt, (byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
-
-				if (color != null)
-				{
-					rgb[0] = color.R;
-					rgb[1] = color.G;
-					rgb[2] = color.B;
-					colorPicked = true;
-				}
-			}
-			else
-			{
-				using (ColorPicker picker = new ColorPicker(prompt))
-				{
-					picker.Color = Color.FromArgb(rgb[0], rgb[1], rgb[2]);
-
-					if (picker.ShowDialog() == DialogResult.OK)
-					{
-						Color color = picker.Color;
-						rgb[0] = color.R;
-						rgb[1] = color.G;
-						rgb[2] = color.B;
-						colorPicked = true;
-					}
-				}
-			}
-
-			return colorPicked;
-		}
-
 		private unsafe short ColorServicesProc(ref ColorServicesInfo info)
 		{
 #if DEBUG
@@ -2885,8 +2847,16 @@ namespace PSFilterHostDll.PSApi
 						}
 					}
 
-					if (ShowColorPickerDialog(prompt, ref info.colorComponents))
+					byte red = (byte)info.colorComponents[0];
+					byte green = (byte)info.colorComponents[1];
+					byte blue = (byte)info.colorComponents[2];
+
+					if (ColorPickerManager.ShowColorPickerDialog(prompt, ref red, ref green, ref blue))
 					{
+						info.colorComponents[0] = red;
+						info.colorComponents[1] = green;
+						info.colorComponents[2] = blue;
+
 						if (info.resultSpace == ColorSpace.ChosenSpace)
 						{
 							info.resultSpace = ColorSpace.RGBSpace;
