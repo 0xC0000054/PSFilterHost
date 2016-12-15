@@ -10,7 +10,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#if PICASUITEDEBUG
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -405,4 +404,3 @@ namespace PSFilterHostDll.PSApi.PICA
         }
     }
 }
-#endif
