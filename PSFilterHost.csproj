@@ -148,6 +148,7 @@
     <Compile Include="PSApi\ActionDescriptorSuite.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
     <Compile Include="PSApi\BufferSuite.cs" />
+    <Compile Include="PSApi\ColorPickerManager.cs" />
     <Compile Include="PSApi\ColorProfileConverter.cs" />
     <Compile Include="PSApi\DebugUtils.cs" />
     <Compile Include="PSApi\DescriptorSuite.cs" />
