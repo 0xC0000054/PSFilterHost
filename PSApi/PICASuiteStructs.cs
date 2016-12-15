@@ -27,7 +27,7 @@ namespace PSFilterHostDll.PSApi
 		public IntPtr GetSpace;
 	}
 
-
+#pragma warning disable 649
 	internal struct CS_XYZ
 	{
 		public ushort x; // all clamped to between 0 and 255, why is a ushort used instead of a byte?
@@ -50,6 +50,7 @@ namespace PSFilterHostDll.PSApi
 		public ushort c2;
 		public ushort c3;
 	}
+#pragma warning restore 649
 
 	internal struct PSColorSpaceSuite1
 	{
