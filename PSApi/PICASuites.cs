@@ -24,6 +24,11 @@ namespace PSFilterHostDll.PSApi
 			this.bufferSuite = null;
 		}
 
+		public static ASZStringSuite1 CreateASZStringSuite1()
+		{
+			return ASZStringSuite.Instance.CreateASZStringSuite1();
+		}
+
 		public PSBufferSuite1 CreateBufferSuite1()
 		{
 			if (bufferSuite == null)

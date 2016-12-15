@@ -131,4 +131,32 @@ namespace PSFilterHostDll
 		}
 	}
   
+	[Serializable]
+	internal sealed class EnumeratedValue
+	{
+		private readonly uint type;
+		private readonly uint value;
+
+		public uint Type
+		{
+			get
+			{
+				return this.type;
+			}
+		}
+
+		public uint Value
+		{
+			get
+			{
+				return this.value;
+			}
+		}
+
+		public EnumeratedValue(uint type, uint value)
+		{
+			this.type = type;
+			this.value = value;
+		}
+	}
 }

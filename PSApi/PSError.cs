@@ -57,6 +57,17 @@ namespace PSFilterHostDll.PSApi
         public const int kSPBadParameterError = 0x5061726d;
         public const int kSPNotImplmented = 0x21494d50;
         public const int kSPSuiteNotFoundError = 0x53214664;
+        public const int kSPUserCanceledError = 0x73746f70;
+
+        // ASZString suite error codes
+        public const int kASNoError = 0;
+        public const int kASBadParameter = 0x5041524d;
+        public const int kASBufferTooSmallErr = 0x42554646;
+        public const int kASNotImplmented = 0x21494d50;
+        public const int kASOutOfMemory = 0x214d454d;
+
+        // Scripting error codes
+        public const short errMissingParameter = -1715;
     }
 
 }

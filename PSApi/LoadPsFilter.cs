@@ -186,6 +186,7 @@ namespace PSFilterHostDll.PSApi
 
 		private DescriptorSuite descriptorSuite;
 		private PseudoResourceSuite pseudoResourceSuite;
+		private ActionDescriptorSuite actionDescriptorSuite;
 
 		/// <summary>
 		/// The host signature of this library - '.NET'
@@ -621,7 +622,11 @@ namespace PSFilterHostDll.PSApi
 			if (descriptorParameters->descriptor != IntPtr.Zero)
 			{
 				Dictionary<uint, AETEValue> data;
-				if (descriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
+				if (actionDescriptorSuite != null && actionDescriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
+				{
+					this.scriptingData = data;
+				}
+				else if (descriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
 				{
 					this.scriptingData = data;
 				}
@@ -4738,6 +4743,36 @@ namespace PSFilterHostDll.PSApi
 					PSUIHooksSuite1 uiHooks = PICASuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
 
 					suite = this.activePICASuites.AllocateSuite(suiteKey, uiHooks);
+				}
+				else if (suiteName.Equals(PSConstants.PICA.ActionDescriptorSuite, StringComparison.Ordinal))
+				{
+					if (version != 2)
+					{
+						return PSError.kSPSuiteNotFoundError;
+					}
+					if (actionDescriptorSuite == null)
+					{
+						this.actionDescriptorSuite = new ActionDescriptorSuite();
+						this.actionDescriptorSuite.Aete = descriptorSuite.Aete;
+						if (scriptingData != null)
+						{
+							PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
+							this.actionDescriptorSuite.SetScriptingData(descriptorParameters->descriptor, scriptingData);
+						}
+					}
+
+					PSActionDescriptorProc actionDescriptor = this.actionDescriptorSuite.CreateActionDescriptorSuite2();
+					suite = this.activePICASuites.AllocateSuite(suiteKey, actionDescriptor);
+				}
+				else if (suiteName.Equals(PSConstants.PICA.ASZStringSuite, StringComparison.Ordinal))
+				{
+					if (version != 1)
+					{
+						return PSError.kSPSuiteNotFoundError;
+					}
+
+					ASZStringSuite1 stringSuite = PICASuites.CreateASZStringSuite1();
+					suite = this.activePICASuites.AllocateSuite(suiteKey, stringSuite);
 				}
 #if PICASUITEDEBUG
 				else if (suiteName.Equals(PSConstants.PICA.ColorSpaceSuite, StringComparison.Ordinal))
