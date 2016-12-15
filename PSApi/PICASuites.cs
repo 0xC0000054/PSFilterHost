@@ -18,12 +18,18 @@ namespace PSFilterHostDll.PSApi
 	internal sealed class PICASuites : IDisposable
 	{
 		private PICABufferSuite bufferSuite;
+#if PICASUITEDEBUG
+		private PICAColorSpaceSuite colorSpaceSuite;
+#endif
 		private PICAUIHooksSuite uiHooksSuite;
 		private string pluginName;
 
 		public PICASuites()
 		{
 			this.bufferSuite = null;
+#if PICASUITEDEBUG
+			this.colorSpaceSuite = null;
+#endif
 			this.uiHooksSuite = null;
 			this.pluginName = string.Empty;
 		}
@@ -59,9 +65,14 @@ namespace PSFilterHostDll.PSApi
 		}
 
 #if PICASUITEDEBUG
-		public static PSColorSpaceSuite1 CreateColorSpaceSuite1()
+		public PSColorSpaceSuite1 CreateColorSpaceSuite1()
 		{
-			return PICAColorSpaceSuite.CreateColorSpaceSuite1();
+			if (colorSpaceSuite == null)
+			{
+				this.colorSpaceSuite = new PICAColorSpaceSuite();
+			}
+
+			return this.colorSpaceSuite.CreateColorSpaceSuite1();
 		} 
 #endif
 
