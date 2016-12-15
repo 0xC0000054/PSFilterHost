@@ -106,6 +106,13 @@ namespace PSFilterHostDll.PSApi
 			}
 			catch (OutOfMemoryException)
 			{
+				// Free the buffer memory if the framework throws an OutOfMemoryException when adding to the bufferIDs list.
+				if (bufferID != IntPtr.Zero)
+				{
+					Memory.Free(bufferID);
+					bufferID = IntPtr.Zero;
+				}
+
 				err = PSError.memFullErr;
 			}
 
