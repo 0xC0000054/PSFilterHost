@@ -4745,7 +4745,6 @@ namespace PSFilterHostDll.PSApi
 					ASZStringSuite1 stringSuite = PICASuites.CreateASZStringSuite1();
 					suite = this.activePICASuites.AllocateSuite(suiteKey, stringSuite);
 				}
-#if PICASUITEDEBUG
 				else if (suiteName.Equals(PSConstants.PICA.ColorSpaceSuite, StringComparison.Ordinal))
 				{
 					if (version != 1)
@@ -4757,6 +4756,7 @@ namespace PSFilterHostDll.PSApi
 
 					suite = this.activePICASuites.AllocateSuite(suiteKey, csSuite);
 				}
+#if PICASUITEDEBUG
 				else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
 				{
 					if (version != 4)
