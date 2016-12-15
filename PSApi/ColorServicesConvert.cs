@@ -126,7 +126,7 @@ namespace PSFilterHostDll.PSApi
 						colorComponents[3] = (short)(result.component3 * 255.0);
 						break;
 					default:
-						throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 				}
 			}
 
@@ -237,12 +237,13 @@ namespace PSFilterHostDll.PSApi
 					case ColorSpace.CMYKSpace:
 					case ColorSpace.LabSpace:
 					case ColorSpace.XYZSpace:
-					default:
 						c0 = (byte)(result.component0 * 255.0);
 						c1 = (byte)(result.component1 * 255.0);
 						c2 = (byte)(result.component2 * 255.0);
 						c3 = (byte)(result.component3 * 255.0);
 						break;
+					default:
+						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 				}
 			}
 
@@ -277,7 +278,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(xyz.X, xyz.Y, xyz.Z);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -315,7 +316,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(0.299 * rgb.Red + 0.587 * rgb.Green + 0.114 * rgb.Blue);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -353,7 +354,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(0.299 * rgb.Red + 0.587 * rgb.Green + 0.114 * rgb.Blue);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -390,7 +391,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(0.299 * rgb.Red + 0.587 * rgb.Green + 0.114 * rgb.Blue);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -428,7 +429,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(0.299 * rgb.Red + 0.587 * rgb.Green + 0.114 * rgb.Blue);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -466,7 +467,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(0.299 * rgb.Red + 0.587 * rgb.Green + 0.114 * rgb.Blue);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
@@ -498,7 +499,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(xyz.X, xyz.Y, xyz.Z);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("Unsupported color space conversion", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
 		}
 
