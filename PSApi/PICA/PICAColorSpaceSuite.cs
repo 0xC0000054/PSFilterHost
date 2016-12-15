@@ -12,12 +12,59 @@
 
 #if PICASUITEDEBUG
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi.PICA
 {
     internal sealed class PICAColorSpaceSuite
     {
+        private sealed class Color
+        {
+            public ColorSpace ColorSpace
+            {
+                get;
+                private set;
+            }
+
+            public byte Component0
+            {
+                get;
+                private set;
+            }
+
+            public byte Component1
+            {
+                get;
+                private set;
+            }
+
+            public byte Component2
+            {
+                get;
+                private set;
+            }
+
+            public byte Component3
+            {
+                get;
+                private set;
+            }
+
+            public Color() : this(ColorSpace.RGBSpace, 0, 0, 0, 0)
+            {
+            }
+
+            public Color(ColorSpace colorSpace, byte component0, byte component1, byte component2, byte component3)
+            {
+                this.ColorSpace = colorSpace;
+                this.Component0 = component0;
+                this.Component1 = component1;
+                this.Component2 = component2;
+                this.Component3 = component3;
+            }
+        }
+
         private readonly CSMake csMake;
         private readonly CSDelete csDelete;
         private readonly CSStuffComponents csStuffComponent;
@@ -32,6 +79,10 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly CSPickColor csPickColor;
         private readonly CSConvert csConvert8to16;
         private readonly CSConvert csConvert16to8;
+
+        private Dictionary<IntPtr, Color> colors;
+        private byte[] lookup16To8;
+        private ushort[] lookup8To16;
 
         public PICAColorSpaceSuite()
         {
@@ -49,26 +100,73 @@ namespace PSFilterHostDll.PSApi.PICA
             this.csPickColor = new CSPickColor(PickColor);
             this.csConvert8to16 = new CSConvert(Convert8to16);
             this.csConvert16to8 = new CSConvert(Convert16to8);
+
+            this.colors = new Dictionary<IntPtr, Color>(IntPtrEqualityComparer.Instance);
+            this.lookup16To8 = null;
+            this.lookup8To16 = null;
+        }
+
+        private static bool IsValidColorSpace(ColorSpace colorSpace)
+        {
+            return (colorSpace >= ColorSpace.RGBSpace && colorSpace <= ColorSpace.XYZSpace);
         }
 
         private int Make(ref IntPtr colorID)
         {
-            return PSError.kSPNotImplmented;
+            try
+            {
+                colorID = new IntPtr(this.colors.Count + 1);
+                this.colors.Add(colorID, new Color());
+            }
+            catch (OutOfMemoryException)
+            {
+                return PSError.memFullErr;
+            }
+
+            return PSError.kSPNoError;
         }
 
         private int Delete(ref IntPtr colorID)
         {
-            return PSError.kSPNotImplmented;
+            this.colors.Remove(colorID);
+
+            return PSError.kSPNoError;
         }
 
         private int StuffComponents(IntPtr colorID, ColorSpace colorSpace, byte c0, byte c1, byte c2, byte c3)
         {
-            return PSError.kSPNotImplmented;
+            if (!IsValidColorSpace(colorSpace))
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            this.colors[colorID] = new Color(colorSpace, c0, c1, c2, c3);
+
+            return PSError.kSPNoError;
         }
 
         private int ExtractComponents(IntPtr colorID, ColorSpace colorSpace, ref byte c0, ref byte c1, ref byte c2, ref byte c3, ref byte gamutFlag)
         {
-            return PSError.kSPNotImplmented;
+            if (!IsValidColorSpace(colorSpace))
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            Color item = this.colors[colorID];
+
+            c0 = item.Component0;
+            c1 = item.Component1;
+            c2 = item.Component2;
+            c3 = item.Component3;
+
+            int error = PSError.kSPNoError;
+
+            if (item.ColorSpace != colorSpace)
+            {
+                error = ColorServicesConvert.Convert(item.ColorSpace, colorSpace, ref c0, ref c1, ref c2, ref c3);
+            }
+
+            return error;
         }
 
         private int StuffXYZ(IntPtr colorID, CS_XYZ xyz)
@@ -160,36 +258,121 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int GetNativeSpace(IntPtr colorID, ref ColorSpace nativeSpace)
         {
-            nativeSpace = 0;
+            nativeSpace = this.colors[colorID].ColorSpace;
 
-            return PSError.kSPNotImplmented;
+            return PSError.kSPNoError;
         }
 
         private int IsBookColor(IntPtr colorID, ref bool isBookColor)
         {
             isBookColor = false;
 
-            return PSError.kSPNotImplmented;
+            return PSError.kSPNoError;
         }
 
         private int ExtractColorName(IntPtr colorID, ref IntPtr colorName)
         {
-            return PSError.kSPNotImplmented;
+            colorName = ASZStringSuite.Instance.CreateFromString(string.Empty);
+
+            return PSError.kSPNoError;
         }
 
         private int PickColor(ref IntPtr colorID, IntPtr promptString)
         {
-            return PSError.kSPNotImplmented;
+            int error = PSError.kSPNoError;
+
+            string prompt;
+            if (ASZStringSuite.Instance.ConvertToString(promptString, out prompt))
+            {
+                byte red = 0;
+                byte green = 0;
+                byte blue = 0;
+
+                if (ColorPickerManager.ShowColorPickerDialog(prompt, ref red, ref green, ref blue))
+                {
+                    error = Make(ref colorID);
+                    if (error == PSError.kSPNoError)
+                    {
+                        this.colors[colorID] = new Color(ColorSpace.RGBSpace, red, green, blue, 0);
+                    }
+                }
+                else
+                {
+                    error = PSError.kSPUserCanceledError;
+                }
+            }
+            else
+            {
+                error = PSError.kSPBadParameterError;
+            }
+
+            return error;
         }
 
-        private int Convert8to16(IntPtr inputData, IntPtr outputData, short count)
+        private unsafe int Convert8to16(IntPtr inputData, IntPtr outputData, short count)
         {
-            return PSError.kSPNotImplmented;
+            if (inputData == IntPtr.Zero || outputData == IntPtr.Zero || count < 0)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            if (count > 0)
+            {
+                if (this.lookup8To16 == null)
+                {
+                    // This function is documented to use the Photoshop internal 16-bit range [0, 32768].
+                    this.lookup8To16 = new ushort[256];
+
+                    for (int i = 0; i < this.lookup8To16.Length; i++)
+                    {
+                        this.lookup8To16[i] = (ushort)(((i * 32768) + 127) / 255);
+                    }
+                }
+
+                byte* input = (byte*)inputData.ToPointer();
+                ushort* output = (ushort*)outputData.ToPointer();
+
+                for (int i = 0; i < count; i++)
+                {
+                    int index = input[i];
+                    output[i] = this.lookup8To16[index];
+                }
+            }
+
+            return PSError.kSPNoError;
         }
 
-        private int Convert16to8(IntPtr inputData, IntPtr outputData, short count)
+        private unsafe int Convert16to8(IntPtr inputData, IntPtr outputData, short count)
         {
-            return PSError.kSPNotImplmented;
+            if (inputData == IntPtr.Zero || outputData == IntPtr.Zero || count < 0)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            if (count > 0)
+            {
+                if (this.lookup16To8 == null)
+                {
+                    // This function is documented to use the Photoshop internal 16-bit range [0, 32768].
+                    this.lookup16To8 = new byte[32769];
+
+                    for (int i = 0; i < this.lookup16To8.Length; i++)
+                    {
+                        this.lookup16To8[i] = (byte)(((i * 255) + 16384) / 32768);
+                    }
+                }
+
+                ushort* input = (ushort*)inputData.ToPointer();
+                byte* output = (byte*)outputData.ToPointer();
+
+                for (int i = 0; i < count; i++)
+                {
+                    int index = input[i];
+                    output[i] = this.lookup16To8[index];
+                }
+            }
+
+            return PSError.kSPNoError;
         }
 
         public PSColorSpaceSuite1 CreateColorSpaceSuite1()
