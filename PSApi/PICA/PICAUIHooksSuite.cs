@@ -18,14 +18,16 @@ namespace PSFilterHostDll.PSApi.PICA
     internal sealed class PICAUIHooksSuite
     {
         private readonly IntPtr hwnd;
+        private readonly string pluginName;
         private readonly UISuiteMainWindowHandle uiWindowHandle;
         private readonly UISuiteHostSetCursor uiSetCursor;
         private readonly UISuiteHostTickCount uiTickCount;
         private readonly UISuiteGetPluginName uiPluginName;
 
-        public unsafe PICAUIHooksSuite(FilterRecord* filterRecord)
+        public unsafe PICAUIHooksSuite(FilterRecord* filterRecord, string name)
         {
             this.hwnd = ((PlatformData*)filterRecord->platformData.ToPointer())->hwnd;
+            this.pluginName = name ?? string.Empty;
             this.uiWindowHandle = new UISuiteMainWindowHandle(MainWindowHandle);
             this.uiSetCursor = new UISuiteHostSetCursor(HostSetCursor);
             this.uiTickCount = new UISuiteHostTickCount(HostTickCount);
@@ -49,7 +51,9 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int GetPluginName(IntPtr pluginRef, ref IntPtr name)
         {
-            return PSError.kSPNotImplmented;
+            name = ASZStringSuite.Instance.CreateFromString(this.pluginName);
+
+            return PSError.kSPNoError;
         }
 
         public unsafe PSUIHooksSuite1 CreateUIHooksSuite1(FilterRecord* filterRecord)
