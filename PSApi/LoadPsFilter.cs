@@ -1149,18 +1149,18 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->haveMask = 0;
 			filterRecord->autoMask = 0;
 
-			if (selectedRegion != null)
-			{
-				DrawMask();
-				filterRecord->haveMask = 1;
-				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
-			}
-			else if (filterCase == FilterCase.FloatingSelection)
+			if (filterCase == FilterCase.FloatingSelection)
 			{
 				DrawFloatingSelectionMask();
 				filterRecord->isFloating = 1;
 				filterRecord->haveMask = 1;
 				filterRecord->autoMask = 0;
+			}
+			else if (selectedRegion != null)
+			{
+				DrawMask();
+				filterRecord->haveMask = 1;
+				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
 			}
 			filterRecord->maskRect = Rect16.Empty;
 			filterRecord->maskData = IntPtr.Zero;
