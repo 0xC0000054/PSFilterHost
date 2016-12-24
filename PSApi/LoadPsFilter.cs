@@ -1159,6 +1159,7 @@ namespace PSFilterHostDll.PSApi
 			else if (selectedRegion != null)
 			{
 				DrawMask();
+				filterRecord->isFloating = 0;
 				filterRecord->haveMask = 1;
 				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
 			}
