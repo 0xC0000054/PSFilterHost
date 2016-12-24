@@ -1145,10 +1145,6 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->outData = IntPtr.Zero;
 			filterRecord->outRowBytes = 0;
 
-			filterRecord->isFloating = 0;
-			filterRecord->haveMask = 0;
-			filterRecord->autoMask = 0;
-
 			if (filterCase == FilterCase.FloatingSelection)
 			{
 				DrawFloatingSelectionMask();
@@ -1162,6 +1158,12 @@ namespace PSFilterHostDll.PSApi
 				filterRecord->isFloating = 0;
 				filterRecord->haveMask = 1;
 				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
+			}
+			else
+			{
+				filterRecord->isFloating = 0;
+				filterRecord->haveMask = 0;
+				filterRecord->autoMask = 0;
 			}
 			filterRecord->maskRect = Rect16.Empty;
 			filterRecord->maskData = IntPtr.Zero;
