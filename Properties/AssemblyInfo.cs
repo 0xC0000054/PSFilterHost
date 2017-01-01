@@ -4,7 +4,7 @@
 // http://psfilterhost.codeplex.com/
 //
 // This software is provided under the Microsoft Public License:
-//   Copyright (C) 2012-2016 Nicholas Hayes
+//   Copyright (C) 2012-2017 Nicholas Hayes
 // 
 // See LICENSE.txt for complete licensing and attribution information.
 //
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PSFilterHost Team")]
 [assembly: AssemblyProduct("PSFilterHost Library")]
-[assembly: AssemblyCopyright("Copyright © 2012-2016 Nicholas Hayes")]
+[assembly: AssemblyCopyright("Copyright © 2012-2017 Nicholas Hayes")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
