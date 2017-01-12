@@ -36,6 +36,12 @@ namespace PSFilterHostDll.PSApi
                 this.keys = new List<uint>(items.Keys);
             }
 
+            private ScriptingParameters(ScriptingParameters cloneMe)
+            {
+                this.parameters = new Dictionary<uint, AETEValue>(cloneMe.parameters);
+                this.keys = new List<uint>(cloneMe.keys);
+            }
+
             public int Count
             {
                 get
@@ -66,6 +72,11 @@ namespace PSFilterHostDll.PSApi
             {
                 this.parameters.Clear();
                 this.keys.Clear();
+            }
+
+            public ScriptingParameters Clone()
+            {
+                return new ScriptingParameters(this);
             }
 
             public uint GetKeyAtIndex(int index)
@@ -657,7 +668,7 @@ namespace PSFilterHostDll.PSApi
             {
                 try
                 {
-                    this.actionDescriptors[descriptor].Add(key, new AETEValue(type, GetAETEParamFlags(key), 0, subKeys));
+                    this.actionDescriptors[descriptor].Add(key, new AETEValue(type, GetAETEParamFlags(key), 0, subKeys.Clone()));
                 }
                 catch (OutOfMemoryException)
                 {
