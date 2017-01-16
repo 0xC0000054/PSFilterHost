@@ -4726,8 +4726,7 @@ namespace PSFilterHostDll.PSApi
 					}
 					if (actionDescriptorSuite == null)
 					{
-						this.actionDescriptorSuite = new ActionDescriptorSuite();
-						this.actionDescriptorSuite.Aete = descriptorSuite.Aete;
+						this.actionDescriptorSuite = new ActionDescriptorSuite(this.descriptorSuite.Aete);
 						if (scriptingData != null)
 						{
 							PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
