@@ -101,7 +101,7 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        private PluginAETE aete;
+        private readonly PluginAETE aete;
 
         private Dictionary<IntPtr, ScriptingParameters> actionDescriptors;
         private Dictionary<IntPtr, ScriptingParameters> descriptorHandles;
@@ -156,23 +156,10 @@ namespace PSFilterHostDll.PSApi
         #endregion
 
         /// <summary>
-        /// Sets the AETE scripting information.
-        /// </summary>
-        /// <value>
-        /// The AETE scripting information.
-        /// </value>
-        public PluginAETE Aete
-        {
-            set
-            {
-                this.aete = value;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ActionDescriptorSuite"/> class.
         /// </summary>
-        public ActionDescriptorSuite()
+        /// <param name="aete">The AETE scripting information.</param>
+        public ActionDescriptorSuite(PluginAETE aete)
         {
             this.make = new ActionDescriptorMake(Make);
             this.free = new ActionDescriptorFree(Free);
@@ -221,7 +208,7 @@ namespace PSFilterHostDll.PSApi
             this.getDataLength = new ActionDescriptorGetDataLength(GetDataLength);
             this.getData = new ActionDescriptorGetData(GetData);
 
-            this.aete = null;
+            this.aete = aete;
             this.actionDescriptors = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.descriptorHandles = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
         }
