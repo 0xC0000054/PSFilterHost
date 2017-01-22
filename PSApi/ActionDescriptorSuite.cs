@@ -384,7 +384,7 @@ namespace PSFilterHostDll.PSApi
             }
             try
             {
-                this.descriptorHandles.Add(handle, this.actionDescriptors[descriptor]);
+                this.descriptorHandles.Add(handle, this.actionDescriptors[descriptor].Clone());
             }
             catch (OutOfMemoryException)
             {
