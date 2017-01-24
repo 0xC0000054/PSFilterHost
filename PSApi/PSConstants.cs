@@ -92,6 +92,7 @@ namespace PSFilterHostDll.PSApi
             public const string ASZStringSuite = "AS ZString Suite";
             public const string BufferSuite = "Photoshop Buffer Suite for Plug-ins";
             public const string ColorSpaceSuite = "Photoshop ColorSpace Suite for Plug-ins";
+            public const string ErrorSuite = "Photoshop Error Suite for Plug-ins";
             public const string HandleSuite = "Photoshop Handle Suite for Plug-ins";
             public const string PropertySuite = "Photoshop Property Suite for Plug-ins";
             public const string UIHooksSuite = "Photoshop UIHooks Suite for Plug-ins";

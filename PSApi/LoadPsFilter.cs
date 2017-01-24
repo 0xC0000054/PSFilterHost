@@ -183,6 +183,7 @@ namespace PSFilterHostDll.PSApi
 		private byte[] documentColorProfile;
 
 		private DescriptorSuite descriptorSuite;
+		private ErrorSuite errorSuite;
 		private PseudoResourceSuite pseudoResourceSuite;
 		private ActionDescriptorSuite actionDescriptorSuite;
 
@@ -1663,38 +1664,49 @@ namespace PSFilterHostDll.PSApi
 			// Any positive integer is a plug-in handled error message.
 			if (error < 0 && error != PSError.userCanceledErr)
 			{
-				switch (error)
+				if (error == PSError.errReportString)
 				{
-					case PSError.filterBadMode:
-						message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
-						break;
-					case PSError.filterBadParameters:
-						message = Resources.FilterBadParameters;
-						break;
-					case PSError.errPlugInPropertyUndefined:
-						message = Resources.PlugInPropertyUndefined;
-						break;
-					case PSError.errHostDoesNotSupportColStep:
-						message = Resources.HostDoesNotSupportColStep;
-						break;
-					case PSError.errInvalidSamplePoint:
-						message = Resources.InvalidSamplePoint;
-						break;
-					case PSError.errPlugInHostInsufficient:
-					case PSError.errUnknownPort:
-					case PSError.errUnsupportedBitOffset:
-					case PSError.errUnsupportedColBits:
-					case PSError.errUnsupportedDepth:
-					case PSError.errUnsupportedDepthConversion:
-					case PSError.errUnsupportedRowBits:
-						message = Resources.PlugInHostInsufficient;
-						break;
-					case PSError.errReportString:
+					if (errorSuite != null && errorSuite.HasErrorMessage)
+					{
+						message = this.errorSuite.ErrorMessage;
+					}
+					else
+					{
 						message = StringUtil.FromPascalString(this.errorStringPtr, string.Empty);
-						break;
-					default:
-						message = GetMacOSErrorMessage(error);
-						break;
+					}
+				}
+				else
+				{
+					switch (error)
+					{
+						case PSError.filterBadMode:
+							message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
+							break;
+						case PSError.filterBadParameters:
+							message = Resources.FilterBadParameters;
+							break;
+						case PSError.errPlugInPropertyUndefined:
+							message = Resources.PlugInPropertyUndefined;
+							break;
+						case PSError.errHostDoesNotSupportColStep:
+							message = Resources.HostDoesNotSupportColStep;
+							break;
+						case PSError.errInvalidSamplePoint:
+							message = Resources.InvalidSamplePoint;
+							break;
+						case PSError.errPlugInHostInsufficient:
+						case PSError.errUnknownPort:
+						case PSError.errUnsupportedBitOffset:
+						case PSError.errUnsupportedColBits:
+						case PSError.errUnsupportedDepth:
+						case PSError.errUnsupportedDepthConversion:
+						case PSError.errUnsupportedRowBits:
+							message = Resources.PlugInHostInsufficient;
+							break;
+						default:
+							message = GetMacOSErrorMessage(error);
+							break;
+					} 
 				}
 			}
 
@@ -4757,6 +4769,20 @@ namespace PSFilterHostDll.PSApi
 					PSColorSpaceSuite1 csSuite = this.picaSuites.CreateColorSpaceSuite1();
 
 					suite = this.activePICASuites.AllocateSuite(suiteKey, csSuite);
+				}
+				else if (suiteName.Equals(PSConstants.PICA.ErrorSuite, StringComparison.Ordinal))
+				{
+					if (version != 1)
+					{
+						return PSError.kSPSuiteNotFoundError;
+					}
+					if (errorSuite == null)
+					{
+						this.errorSuite = new ErrorSuite();
+					}
+
+					PSErrorSuite1 errorProcs = this.errorSuite.CreateErrorSuite1();
+					suite = this.activePICASuites.AllocateSuite(suiteKey, errorProcs);
 				}
 #if PICASUITEDEBUG
 				else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
