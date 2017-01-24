@@ -107,9 +107,17 @@ namespace PSFilterHostDll.PSApi
             }
 
             IntPtr suitePointer = Memory.Allocate(Marshal.SizeOf(typeof(TSuite)), false);
-            Marshal.StructureToPtr(suite, suitePointer, false);
+            try
+            {
+                Marshal.StructureToPtr(suite, suitePointer, false);
 
-            this.activeSuites.Add(key, new PICASuite(suitePointer));
+                this.activeSuites.Add(key, new PICASuite(suitePointer));
+            }
+            catch (Exception)
+            {
+                Memory.Free(suitePointer);
+                throw;
+            }
 
             return suitePointer;
         }
