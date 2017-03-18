@@ -173,6 +173,7 @@
     <Compile Include="PSApi\PSActionDescriptor.cs" />
     <Compile Include="PSApi\PSErrorSuite.cs" />
     <Compile Include="PSApi\PseudoResourceSuite.cs" />
+    <Compile Include="PSApi\ReadOnlyDictionary.cs" />
     <Compile Include="PSApi\SafeProfileHandle.cs" />
     <Compile Include="PSApi\SafeTransformHandle.cs" />
     <Compile Include="PSApi\StringUtil.cs" />
