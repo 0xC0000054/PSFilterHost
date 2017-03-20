@@ -305,10 +305,10 @@ namespace PSFilterHostDll.PSApi
 				state.keyArrayIndex++;
 
 
-				AETEValue value = state.items[key];
+				AETEValue item = state.items[key];
 				try
 				{
-					type = value.Type;
+					type = item.Type;
 				}
 				catch (NullReferenceException)
 				{
@@ -316,7 +316,7 @@ namespace PSFilterHostDll.PSApi
 
 				try
 				{
-					flags = value.Flags;
+					flags = item.Flags;
 				}
 				catch (NullReferenceException)
 				{
