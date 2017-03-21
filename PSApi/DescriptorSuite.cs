@@ -286,7 +286,7 @@ namespace PSFilterHostDll.PSApi
 			return error;
 		}
 
-		private byte GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags)
+		private bool GetKeyProc(IntPtr descriptor, ref uint key, ref uint type, ref int flags)
 		{
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Empty);
@@ -298,7 +298,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (state.keyArrayIndex >= state.keyArrayCount)
 				{
-					return 0;
+					return false;
 				}
 
 				state.currentKey = key = state.keys[state.keyArrayIndex];
@@ -330,10 +330,10 @@ namespace PSFilterHostDll.PSApi
 				{
 				}
 
-				return 1;
+				return true;
 			}
 
-			return 0;
+			return false;
 		}
 
 		private short GetIntegerProc(IntPtr descriptor, ref int data)
