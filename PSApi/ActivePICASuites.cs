@@ -18,6 +18,121 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class ActivePICASuites : IDisposable
     {
+        internal sealed class PICASuiteKey : IEquatable<PICASuiteKey>
+        {
+            private readonly string name;
+            private readonly int version;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="PICASuiteKey"/> class.
+            /// </summary>
+            /// <param name="name">The suite name.</param>
+            /// <param name="version">The suite version.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
+            public PICASuiteKey(string name, int version)
+            {
+                if (name == null)
+                {
+                    throw new ArgumentNullException("name");
+                }
+
+                this.name = name;
+                this.version = version;
+            }
+
+            /// <summary>
+            /// Gets the suite name.
+            /// </summary>
+            /// <value>
+            /// The suite name.
+            /// </value>
+            public string Name
+            {
+                get
+                {
+                    return this.name;
+                }
+            }
+
+            /// <summary>
+            /// Gets the suite version.
+            /// </summary>
+            /// <value>
+            /// The suite version.
+            /// </value>
+            public int Version
+            {
+                get
+                {
+                    return this.version;
+                }
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null)
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(this, obj))
+                {
+                    return true;
+                }
+
+                PICASuiteKey key = obj as PICASuiteKey;
+                if (key == null)
+                {
+                    return false;
+                }
+
+                return Equals(key);
+            }
+
+            public override int GetHashCode()
+            {
+                int hash = 23;
+
+                unchecked
+                {
+                    hash = (hash * 127) + this.name.GetHashCode();
+                    hash = (hash * 127) + this.version.GetHashCode();
+                }
+
+                return hash;
+            }
+
+            public bool Equals(PICASuiteKey other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+
+                return (this.name.Equals(other.name, StringComparison.Ordinal) && this.version == other.version);
+            }
+
+            public static bool operator ==(PICASuiteKey left, PICASuiteKey right)
+            {
+                if (ReferenceEquals(left, right))
+                {
+                    return true;
+                }
+
+                if (((object)left) == null || ((object)right) == null)
+                {
+                    return false;
+                }
+
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(PICASuiteKey left, PICASuiteKey right)
+            {
+                return !(left == right);
+            }
+        }
+
         private sealed class PICASuite : IDisposable
         {
             private IntPtr suitePointer;
@@ -80,7 +195,7 @@ namespace PSFilterHostDll.PSApi
             }
         }
         
-        private Dictionary<string, PICASuite> activeSuites;
+        private Dictionary<PICASuiteKey, PICASuite> activeSuites;
         private bool disposed;
 
         /// <summary>
@@ -88,7 +203,7 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public ActivePICASuites()
         {
-            this.activeSuites = new Dictionary<string, PICASuite>(StringComparer.Ordinal);
+            this.activeSuites = new Dictionary<PICASuiteKey, PICASuite>();
             this.disposed = false;
         }
 
@@ -96,10 +211,10 @@ namespace PSFilterHostDll.PSApi
         /// Allocates a new PICA suite.
         /// </summary>
         /// <typeparam name="TSuite">The type of the suite.</typeparam>
-        /// <param name="key">The string specifying the suite name and version.</param>
+        /// <param name="key">The <see cref="PICASuiteKey"/> specifying the suite name and version.</param>
         /// <param name="suite">The suite to be marshaled to unmanaged memory.</param>
         /// <returns>The pointer to the allocated suite.</returns>
-        public IntPtr AllocateSuite<TSuite>(string key, TSuite suite)
+        public IntPtr AllocateSuite<TSuite>(PICASuiteKey key, TSuite suite)
         {
             if (this.disposed)
             {
@@ -125,11 +240,11 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// Determines whether the specified suite is loaded.
         /// </summary>
-        /// <param name="key">The string specifying the suite name and version.</param>
+        /// <param name="key">The <see cref="PICASuiteKey"/> specifying the suite name and version.</param>
         /// <returns>
         ///   <c>true</c> if the specified suite is loaded; otherwise, <c>false</c>.
         /// </returns>
-        public bool IsLoaded(string key)
+        public bool IsLoaded(PICASuiteKey key)
         {
             if (this.disposed)
             {
@@ -142,9 +257,9 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// Increments the reference count on the specified suite.
         /// </summary>
-        /// <param name="key">The string specifying the suite name and version.</param>
+        /// <param name="key">The <see cref="PICASuiteKey"/> specifying the suite name and version.</param>
         /// <returns>The pointer to the suite instance.</returns>
-        public IntPtr AddRef(string key)
+        public IntPtr AddRef(PICASuiteKey key)
         {
             if (this.disposed)
             {
@@ -161,8 +276,8 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// Decrements the reference count and removes the specified suite if it is zero.
         /// </summary>
-        /// <param name="key">The string specifying the suite name and version.</param>
-        public void RemoveRef(string key)
+        /// <param name="key">The <see cref="PICASuiteKey"/> specifying the suite name and version.</param>
+        public void RemoveRef(PICASuiteKey key)
         {
             if (this.disposed)
             {
