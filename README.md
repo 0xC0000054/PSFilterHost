@@ -1,4 +1,4 @@
-# PSFilterHost
+# 8bf filter host for .NET
 
  A library that enables applications built with .NET 2.0 or later to run 3rd party 8bf filters. 
 
