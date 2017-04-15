@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
 // 8bf filter host for .NET
-// http://psfilterhost.codeplex.com/
+// https://github.com/0xC0000054/PSFilterHost
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes

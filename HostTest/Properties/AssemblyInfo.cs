@@ -1,7 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////////////////////
 //
 // 8bf filter host for .NET
-// http://psfilterhost.codeplex.com/
+// https://github.com/0xC0000054/PSFilterHost
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("HostTest")]
-[assembly: AssemblyDescription("Example application using the PSFilterHost library. \r\n\r\n http://psfilterhost.codeplex.com/ ")]
+[assembly: AssemblyDescription("Example application using the PSFilterHost library. \r\n\r\n https://github.com/0xC0000054/PSFilterHost ")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PSFilterHost Team")]
 [assembly: AssemblyProduct("HostTest")]

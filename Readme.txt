@@ -11,7 +11,7 @@ For 32-bit hosts the C# compiler enables Data Execution Prevention for the proce
 (see http://blogs.msdn.com/b/ed_maurer/archive/2007/12/14/nxcompat-and-the-c-compiler.aspx for more details).
 
 For more details, or to report bugs, please refer to the website:
-http://psfilterhost.codeplex.com
+https://github.com/0xC0000054/PSFilterHost
 
 Library Versions
 -----------------
