@@ -4823,7 +4823,7 @@ namespace PSFilterHostDll.PSApi
 
 			ActivePICASuites.PICASuiteKey suiteKey = new ActivePICASuites.PICASuiteKey(suiteName, version);
 
-			this.activePICASuites.RemoveRef(suiteKey);
+			this.activePICASuites.Release(suiteKey);
 
 			return PSError.kSPNoError;
 		}
