@@ -307,7 +307,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>IF $(PlatformName) == x86 (
-call "$(DevEnvDir)..\tools\vsvars32.bat"
+call "$(DevEnvDir)..\tools\VsDevCmd.bat"
 editbin.exe /NXCOMPAT:NO /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
