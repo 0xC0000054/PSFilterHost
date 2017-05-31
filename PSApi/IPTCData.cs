@@ -38,6 +38,16 @@ namespace PSFilterHostDll.PSApi
             /// The length of the following data.
             /// </summary>
             public ushort length;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="IPTCTag"/> structure.
+            /// </summary>
+            public IPTCTag(byte type, ushort length)
+            {
+                this.signature = IPTCTagSignature;
+                this.type = type;
+                this.length = length;
+            }
         }
  
         /// <summary>
@@ -97,11 +107,11 @@ namespace PSFilterHostDll.PSApi
 
         private static unsafe IPTCRecordVersion CreateVersionRecord()
         {
-            IPTCRecordVersion record = new IPTCRecordVersion();
-            record.tag.signature = IPTCTagSignature;
-            record.tag.type = RecordVersionType;
-            record.tag.length = sizeof(ushort);
-            record.version = IPTCVersion2;
+            IPTCRecordVersion record = new IPTCRecordVersion
+            {
+                tag = new IPTCTag(RecordVersionType, sizeof(ushort)),
+                version = IPTCVersion2
+            };
 
             return record;
         }
@@ -112,12 +122,11 @@ namespace PSFilterHostDll.PSApi
         /// <param name="captionLength">Length of the caption data in bytes.</param>
         internal static IPTCCaption CreateCaptionRecord(int captionLength)
         {
-            IPTCCaption caption = new IPTCCaption();
-
-            caption.version = IPTCData.CreateVersionRecord();
-            caption.tag.signature = IPTCTagSignature;
-            caption.tag.type = CaptionType;
-            caption.tag.length = (ushort)captionLength;
+            IPTCCaption caption = new IPTCCaption
+            {
+                version = CreateVersionRecord(),
+                tag = new IPTCTag(CaptionType, (ushort)captionLength)
+            };
 
             return caption;
         }
