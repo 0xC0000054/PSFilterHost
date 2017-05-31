@@ -76,8 +76,10 @@ namespace PSFilterHostDll
 
                 IntPtr hMonitor = SafeNativeMethods.MonitorFromPoint(point, NativeConstants.MONITOR_DEFAULTTOPRIMARY);
 
-                NativeStructs.MONITORINFOEX monitorInfo = new NativeStructs.MONITORINFOEX();
-                monitorInfo.cbSize = (uint)Marshal.SizeOf(typeof(NativeStructs.MONITORINFOEX));
+                NativeStructs.MONITORINFOEX monitorInfo = new NativeStructs.MONITORINFOEX
+                {
+                    cbSize = (uint)Marshal.SizeOf(typeof(NativeStructs.MONITORINFOEX))
+                };
 
                 if (SafeNativeMethods.GetMonitorInfoW(hMonitor, ref monitorInfo))
                 {

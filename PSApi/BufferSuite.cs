@@ -150,8 +150,10 @@ namespace PSFilterHostDll.PSApi
 			// Assume that we have 1 GB of available space.
 			int space = 1024 * 1024 * 1024;
 
-			NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX();
-			buffer.dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX));
+			NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX
+			{
+				dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX))
+			};
 
 			if (SafeNativeMethods.GlobalMemoryStatusEx(ref buffer))
 			{

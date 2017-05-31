@@ -67,10 +67,12 @@ namespace PSFilterHostDll.PSApi
         /// <returns>A <see cref="PSErrorSuite1"/> structure.</returns>
         public PSErrorSuite1 CreateErrorSuite1()
         {
-            PSErrorSuite1 suite = new PSErrorSuite1();
-            suite.SetErrorFromPString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromPString);
-            suite.SetErrorFromCString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromCString);
-            suite.SetErrorFromZString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromZString);
+            PSErrorSuite1 suite = new PSErrorSuite1
+            {
+                SetErrorFromPString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromPString),
+                SetErrorFromCString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromCString),
+                SetErrorFromZString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromZString)
+            };
 
             return suite;
         }

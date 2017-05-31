@@ -144,8 +144,10 @@ namespace PSFilterHostDll.PSApi.PICA
             // Assume that we have 1 GB of available space.
             uint space = 1024 * 1024 * 1024;
 
-            NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX();
-            buffer.dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX));
+            NativeStructs.MEMORYSTATUSEX buffer = new NativeStructs.MEMORYSTATUSEX
+            {
+                dwLength = (uint)Marshal.SizeOf(typeof(NativeStructs.MEMORYSTATUSEX))
+            };
 
             if (SafeNativeMethods.GlobalMemoryStatusEx(ref buffer))
             {
@@ -165,11 +167,13 @@ namespace PSFilterHostDll.PSApi.PICA
                 throw new ObjectDisposedException("PICABufferSuite");
             }
 
-            PSBufferSuite1 suite = new PSBufferSuite1();
-            suite.New = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteNew);
-            suite.Dispose = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteDispose);
-            suite.GetSize = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteGetSize);
-            suite.GetSpace = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteGetSpace);
+            PSBufferSuite1 suite = new PSBufferSuite1
+            {
+                New = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteNew),
+                Dispose = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteDispose),
+                GetSize = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteGetSize),
+                GetSpace = Marshal.GetFunctionPointerForDelegate(this.bufferSuiteGetSpace)
+            };
 
             return suite;
         }

@@ -55,9 +55,10 @@ namespace HostTest.Tools
             {
                 this.tracking = true;
 
-                this.selectPoints = new List<Point>();
-                this.selectPoints.Add(new Point(e.X, e.Y));
-
+                this.selectPoints = new List<Point>
+                {
+                    new Point(e.X, e.Y)
+                };
                 this.OnCursorChanged(Cursors.Cross);
             }
         }

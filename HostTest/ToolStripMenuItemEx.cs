@@ -27,9 +27,11 @@ namespace HostTest
 		
 		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text)
 		{
-			this.items = new SubMenuItemCollection(this);
-			this.items.Add(dropDownItem);
-		}
+            this.items = new SubMenuItemCollection(this)
+            {
+                dropDownItem
+            };
+        }
 
 		protected override void OnEnabledChanged(System.EventArgs e)
 		{

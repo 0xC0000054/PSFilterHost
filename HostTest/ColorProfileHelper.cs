@@ -34,8 +34,10 @@ namespace HostTest
 
             IntPtr hMonitor = SafeNativeMethods.MonitorFromWindow(hwnd, NativeConstants.MONITOR_DEFAULTTONEAREST);
 
-            NativeStructs.MONITORINFOEX monitorInfo = new NativeStructs.MONITORINFOEX();
-            monitorInfo.cbSize = (uint)Marshal.SizeOf(typeof(NativeStructs.MONITORINFOEX));
+            NativeStructs.MONITORINFOEX monitorInfo = new NativeStructs.MONITORINFOEX
+            {
+                cbSize = (uint)Marshal.SizeOf(typeof(NativeStructs.MONITORINFOEX))
+            };
 
             if (SafeNativeMethods.GetMonitorInfo(hMonitor, ref monitorInfo))
             {

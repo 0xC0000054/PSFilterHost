@@ -349,23 +349,27 @@ namespace HostTest
 
 					if (this.outlinePen1 == null)
 					{
-						this.outlinePen1 = new Pen(Color.FromArgb(160, Color.Black), 1.0f);
-						this.outlinePen1.Alignment = PenAlignment.Outset;
-						this.outlinePen1.LineJoin = LineJoin.Bevel;
-						this.outlinePen1.Width = -1;
+						this.outlinePen1 = new Pen(Color.FromArgb(160, Color.Black), 1.0f)
+						{
+							Alignment = PenAlignment.Outset,
+							LineJoin = LineJoin.Bevel,
+							Width = -1
+						};
 					}
 
 					if (this.outlinePen2 == null)
 					{
-						this.outlinePen2 = new Pen(Color.White, 1.0f);
-						this.outlinePen2.Alignment = PenAlignment.Outset;
-						this.outlinePen2.LineJoin = LineJoin.Bevel;
-						this.outlinePen2.MiterLimit = 2;
-						this.outlinePen2.Width = -1;
-						this.outlinePen2.DashStyle = DashStyle.Dash;
-						this.outlinePen2.DashPattern = new float[] { 4, 4 };
-						this.outlinePen2.Color = Color.White;
-						this.outlinePen2.DashOffset = 4.0f;
+						this.outlinePen2 = new Pen(Color.White, 1.0f)
+						{
+							Alignment = PenAlignment.Outset,
+							LineJoin = LineJoin.Bevel,
+							MiterLimit = 2,
+							Width = -1,
+							DashStyle = DashStyle.Dash,
+							DashPattern = new float[] { 4, 4 },
+							Color = Color.White,
+							DashOffset = 4.0f
+						};
 					}			
 					
 					Graphics g = pe.Graphics;

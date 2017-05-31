@@ -32,8 +32,10 @@ namespace HostTest
             uint size = method(0, null);
             if (size > 0)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Length = (int)size;
+                StringBuilder sb = new StringBuilder
+                {
+                    Length = (int)size
+                };
                 method(size, sb);
 
                 return sb.ToString();
@@ -139,8 +141,10 @@ namespace HostTest
                 }
                 else
                 {
-                    List<string> exts = new List<string>();
-                    exts.Add(fileExtension);
+                    List<string> exts = new List<string>
+                    {
+                        fileExtension
+                    };
                     extDict.Add(friendlyName, exts);
                 }
             }

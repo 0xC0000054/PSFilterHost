@@ -384,9 +384,11 @@ namespace HostTest
 			{
 				this.Cursor = Cursors.WaitCursor;
 
-				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, showUI));
-				this.filterThread.IsBackground = true;
-				this.filterThread.Priority = ThreadPriority.AboveNormal;
+				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, showUI))
+				{
+					IsBackground = true,
+					Priority = ThreadPriority.AboveNormal
+				};
 				this.filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
 				this.filterThread.Start();
 			}
