@@ -17,9 +17,9 @@ namespace PSFilterHostDll.PSApi
 {
     internal static class IPTCData
     {
-        private const ushort IPTCTagSignature = 0x1c02;
-        private const byte RecordVersionType = 0;
-        private const byte CaptionType = 120;
+        private const byte IPTCTagSignature = 0x1c;
+        private const ushort RecordVersionType = 0x0200;
+        private const ushort CaptionType = 0x0278;
         private const ushort IPTCVersion = 2;
         internal const int MaxCaptionLength = 2000;
 
@@ -29,11 +29,11 @@ namespace PSFilterHostDll.PSApi
             /// <summary>
             /// The signature of an IPTC tag.
             /// </summary>
-            public ushort signature;
+            public byte signature;
             /// <summary>
             /// The type of an IPTC tag.
             /// </summary>
-            public byte type;
+            public ushort type;
             /// <summary>
             /// The length of the following data.
             /// </summary>
@@ -42,7 +42,7 @@ namespace PSFilterHostDll.PSApi
             /// <summary>
             /// Initializes a new instance of the <see cref="IPTCTag"/> structure.
             /// </summary>
-            public IPTCTag(byte type, ushort length)
+            public IPTCTag(ushort type, ushort length)
             {
                 this.signature = IPTCTagSignature;
                 this.type = type;
@@ -84,20 +84,20 @@ namespace PSFilterHostDll.PSApi
                 byte* ptr = (byte*)data.ToPointer();
 
                 // Swap the version structure to little-endian.
-                this.version.tag.signature = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                this.version.tag.type = *ptr;
+                this.version.tag.signature = *ptr;
                 ptr += 1;
+                this.version.tag.type = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
                 this.version.tag.length = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
                 this.version.version = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
 
                 // Swap the tag structure to little-endian.
-                this.tag.signature = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                this.tag.type = *ptr;
+                this.tag.signature = *ptr;
                 ptr += 1;
+                this.tag.type = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
                 this.tag.length = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
             }
@@ -115,20 +115,20 @@ namespace PSFilterHostDll.PSApi
                     byte* ptr = pinData;
 
                     // Swap the version structure to big-endian.
-                    *((ushort*)ptr) = SwapUInt16(this.version.tag.signature);
-                    ptr += 2;
-                    *ptr = this.version.tag.type;
+                    *ptr = this.version.tag.signature;
                     ptr += 1;
+                    *((ushort*)ptr) = SwapUInt16(this.version.tag.type);
+                    ptr += 2;
                     *((ushort*)ptr) = SwapUInt16(this.version.tag.length);
                     ptr += 2;
                     *((ushort*)ptr) = SwapUInt16(this.version.version);
                     ptr += 2;
                     
                     // Swap the tag structure to big-endian.
-                    *((ushort*)ptr) = SwapUInt16(this.tag.signature);
-                    ptr += 2;
-                    *ptr = this.tag.type;
+                    *ptr = this.tag.signature;
                     ptr += 1;
+                    *((ushort*)ptr) = SwapUInt16(this.tag.type);
+                    ptr += 2;
                     *((ushort*)ptr) = SwapUInt16(this.tag.length);
                     ptr += 2;
                 }
