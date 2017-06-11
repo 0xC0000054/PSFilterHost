@@ -70,6 +70,39 @@ namespace PSFilterHostDll.PSApi
             public IPTCTag tag;
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="IPTCCaption"/> structure.
+            /// </summary>
+            /// <param name="data">The pointer to the unmanaged caption header.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="data"/> is null.</exception>
+            public unsafe IPTCCaption(IntPtr data)
+            {
+                if (data == IntPtr.Zero)
+                {
+                    throw new ArgumentNullException("data");
+                }
+
+                byte* ptr = (byte*)data.ToPointer();
+
+                // Swap the version structure to little-endian.
+                this.version.tag.signature = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
+                this.version.tag.type = *ptr;
+                ptr += 1;
+                this.version.tag.length = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
+                this.version.version = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
+
+                // Swap the tag structure to little-endian.
+                this.tag.signature = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
+                this.tag.type = *ptr;
+                ptr += 1;
+                this.tag.length = SwapUInt16(*(ushort*)ptr);
+                ptr += 2;
+            }
+
+            /// <summary>
             /// Converts the structure to a byte array in big-endian format.
             /// </summary>
             internal unsafe byte[] ToByteArray()
@@ -137,30 +170,8 @@ namespace PSFilterHostDll.PSApi
         /// <param name="data">The data.</param>
         internal static IPTCCaption CaptionFromMemory(IntPtr data)
         {
-            IPTCCaption caption = new IPTCCaption();
-            unsafe
-            {
-                byte* ptr = (byte*)data.ToPointer();
-
-                // Swap the version structure to little-endian.
-                caption.version.tag.signature = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                caption.version.tag.type = *ptr;
-                ptr += 1;
-                caption.version.tag.length = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                caption.version.version = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                
-                // Swap the tag structure to little-endian.
-                caption.tag.signature = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                caption.tag.type = *ptr;
-                ptr += 1;
-                caption.tag.length = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-            }
-
+            IPTCCaption caption = new IPTCCaption(data);
+            
             return caption;
         }
 
