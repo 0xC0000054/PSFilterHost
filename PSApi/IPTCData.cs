@@ -20,7 +20,7 @@ namespace PSFilterHostDll.PSApi
         private const ushort IPTCTagSignature = 0x1c02;
         private const byte RecordVersionType = 0;
         private const byte CaptionType = 120;
-        private const ushort IPTCVersion2 = 2;
+        private const ushort IPTCVersion = 2;
         internal const int MaxCaptionLength = 2000;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -110,7 +110,7 @@ namespace PSFilterHostDll.PSApi
             IPTCRecordVersion record = new IPTCRecordVersion
             {
                 tag = new IPTCTag(RecordVersionType, sizeof(ushort)),
-                version = IPTCVersion2
+                version = IPTCVersion
             };
 
             return record;
