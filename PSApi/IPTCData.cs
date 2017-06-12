@@ -12,6 +12,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace PSFilterHostDll.PSApi
 {
@@ -162,16 +163,34 @@ namespace PSFilterHostDll.PSApi
         /// <summary>
         /// Creates the IPTC-NAA caption record.
         /// </summary>
-        /// <param name="captionLength">Length of the caption data in bytes.</param>
-        internal static IPTCCaption CreateCaptionRecord(int captionLength)
+        /// <param name="value">A string containing the caption.</param>
+        /// <param name="captionRecord">The byte array containing the caption data.</param>
+        /// <returns><c>true</c> if the <paramref name="value"/> was converted successfully; otherwise, <c>false</c></returns>
+        internal static bool TryCreateCaptionRecord(string value, out byte[] captionRecord)
         {
-            IPTCCaption caption = new IPTCCaption
+            if (!string.IsNullOrEmpty(value))
             {
-                version = CreateVersionRecord(),
-                tag = new IPTCTag(CaptionType, (ushort)captionLength)
-            };
+                int captionLength = Encoding.ASCII.GetByteCount(value);
 
-            return caption;
+                if (captionLength < MaxCaptionLength)
+                {
+                    IPTCCaption captionHeader = new IPTCCaption
+                    {
+                        version = CreateVersionRecord(),
+                        tag = new IPTCTag(CaptionType, (ushort)captionLength)
+                    };
+
+                    captionRecord = new byte[IPTCCaption.SizeOf + captionLength];
+
+                    captionHeader.Write(captionRecord);
+                    Encoding.ASCII.GetBytes(value, 0, value.Length, captionRecord, IPTCCaption.SizeOf);
+
+                    return true;
+                }
+            }
+
+            captionRecord = null;
+            return false;
         }
 
         /// <summary>
