@@ -105,14 +105,24 @@ namespace PSFilterHostDll.PSApi
             }
 
             /// <summary>
-            /// Converts the structure to a byte array in big-endian format.
+            /// Writes the structure to the specified byte array in big-endian format.
             /// </summary>
-            internal unsafe byte[] ToByteArray()
+            /// <param name="buffer">The output buffer.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is null.</exception>
+            /// <exception cref="ArgumentException"><paramref name="buffer"/> is less than the <see cref="IPTCCaption"/> size.</exception>
+            internal unsafe void Write(byte[] buffer)
             {
-                int size = Marshal.SizeOf(typeof(IPTCCaption));
-                byte[] bytes = new byte[size];
+                if (buffer == null)
+                {
+                    throw new ArgumentNullException("buffer");
+                }
 
-                fixed (byte* pinData = bytes)
+                if (buffer.Length < SizeOf)
+                {
+                    throw new ArgumentException("The buffer must be >= IPTCCaption.SizeOf.");
+                }
+
+                fixed (byte* pinData = buffer)
                 {
                     byte* ptr = pinData;
 
@@ -134,8 +144,6 @@ namespace PSFilterHostDll.PSApi
                     *((ushort*)ptr) = SwapUInt16(this.tag.length);
                     ptr += 2;
                 }
-
-                return bytes;
             }
         }
 
