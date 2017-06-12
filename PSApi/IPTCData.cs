@@ -69,6 +69,8 @@ namespace PSFilterHostDll.PSApi
             public IPTCRecordVersion version;
             public IPTCTag tag;
 
+            public static readonly int SizeOf = Marshal.SizeOf(typeof(IPTCCaption));
+
             /// <summary>
             /// Initializes a new instance of the <see cref="IPTCCaption"/> structure.
             /// </summary>
