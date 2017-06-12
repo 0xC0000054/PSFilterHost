@@ -197,11 +197,26 @@ namespace PSFilterHostDll.PSApi
         /// Converts the caption from unmanaged memory.
         /// </summary>
         /// <param name="data">The data.</param>
-        internal static IPTCCaption CaptionFromMemory(IntPtr data)
+        internal static string CaptionFromMemory(IntPtr data)
         {
-            IPTCCaption caption = new IPTCCaption(data);
+            if (data != IntPtr.Zero)
+            {
+                IPTCCaption captionHeader = new IPTCCaption(data);
+                string caption = string.Empty;
+
+                if (captionHeader.tag.length > 0)
+                {
+                    byte[] bytes = new byte[captionHeader.tag.length];
+
+                    Marshal.Copy(new IntPtr(data.ToInt64() + IPTCCaption.SizeOf), bytes, 0, bytes.Length);
+
+                    caption = Encoding.ASCII.GetString(bytes);
+                }
+
+                return caption;
+            }
             
-            return caption;
+            return null;
         }
 
         private static ushort SwapUInt16(ushort value)
