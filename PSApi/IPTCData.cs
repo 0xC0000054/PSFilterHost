@@ -22,10 +22,10 @@ namespace PSFilterHostDll.PSApi
         private const ushort RecordVersionType = 0x0200;
         private const ushort CaptionType = 0x0278;
         private const ushort IPTCVersion = 2;
-        internal const int MaxCaptionLength = 2000;
+        private const int MaxCaptionLength = 2000;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        internal struct IPTCTag
+        private struct IPTCTag
         {
             /// <summary>
             /// The signature of an IPTC tag.
@@ -55,7 +55,7 @@ namespace PSFilterHostDll.PSApi
         /// The record containing the IPTC-NAA specification version.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        internal struct IPTCRecordVersion
+        private struct IPTCRecordVersion
         {
             public IPTCTag tag;
             public ushort version;
@@ -65,7 +65,7 @@ namespace PSFilterHostDll.PSApi
         /// The record containing the IPTC-NAA caption tag.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        internal struct IPTCCaption
+        private struct IPTCCaption
         {
             public IPTCRecordVersion version;
             public IPTCTag tag;
