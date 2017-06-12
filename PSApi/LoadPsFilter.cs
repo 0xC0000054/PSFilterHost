@@ -4329,23 +4329,13 @@ namespace PSFilterHostDll.PSApi
 					simpleProperty = new IntPtr(Int32ToFixed(PSConstants.Properties.BigNudgeDistance));
 					break;
 				case PSProperties.Caption:
-					if ((!string.IsNullOrEmpty(hostInfo.Caption)) && hostInfo.Caption.Length < IPTCData.MaxCaptionLength)
+					if (IPTCData.TryCreateCaptionRecord(hostInfo.Caption, out bytes))
 					{
-						bytes = Encoding.ASCII.GetBytes(hostInfo.Caption);
-
-						IPTCData.IPTCCaption caption = IPTCData.CreateCaptionRecord(bytes.Length);
-
-						int captionSize = Marshal.SizeOf(typeof(IPTCData.IPTCCaption));
-
-						complexProperty = HandleSuite.Instance.NewHandle(captionSize + bytes.Length);
+						complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
 
 						if (complexProperty != IntPtr.Zero)
 						{
-							IntPtr ptr = HandleSuite.Instance.LockHandle(complexProperty, 0);
-
-							Marshal.Copy(caption.ToByteArray(), 0, ptr, captionSize); // Prefix the caption string with the IPTC-NAA record.
-
-							Marshal.Copy(bytes, 0, new IntPtr(ptr.ToInt64() + (long)captionSize), bytes.Length);
+							Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
 							HandleSuite.Instance.UnlockHandle(complexProperty);
 						}
 						else
@@ -4593,17 +4583,13 @@ namespace PSFilterHostDll.PSApi
 					size = HandleSuite.Instance.GetHandleSize(complexProperty);
 					if (size > 0)
 					{
-						IntPtr ptr = HandleSuite.Instance.LockHandle(complexProperty, 0);
-
-						IPTCData.IPTCCaption caption = IPTCData.CaptionFromMemory(ptr);
-
-						if (caption.tag.length > 0)
-						{
-							bytes = new byte[caption.tag.length];
-							Marshal.Copy(new IntPtr(ptr.ToInt64() + (long)Marshal.SizeOf(typeof(IPTCData.IPTCCaption))), bytes, 0, bytes.Length);
-							hostInfo.Caption = Encoding.ASCII.GetString(bytes, 0, bytes.Length);
-						}
+						string caption = IPTCData.CaptionFromMemory(HandleSuite.Instance.LockHandle(complexProperty, 0));
 						HandleSuite.Instance.UnlockHandle(complexProperty);
+
+						if (!string.IsNullOrEmpty(caption))
+						{
+							hostInfo.Caption = caption;
+						}
 					}
 					break;
 				case PSProperties.Copyright:
