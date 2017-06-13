@@ -4550,6 +4550,9 @@ namespace PSFilterHostDll.PSApi
 				case PSProperties.ToolTips:
 					simpleProperty = new IntPtr(1);
 					break;
+				case PSProperties.HighDPI:
+					simpleProperty = new IntPtr(hostInfo.HighDpi ? 1 : 0);
+					break;
 
 				default:
 					return PSError.errPlugInPropertyUndefined;

@@ -142,5 +142,9 @@ namespace PSFilterHostDll.PSApi
         /// Tool tip display - 'tltp'
         /// </summary>
         public const uint ToolTips = 0x746c7470U;
+        /// <summary>
+        /// Indicates whether the host is running in high DPI mode - 'HDPI'
+        /// </summary>
+        public const uint HighDPI = 0x48445049U;
     }
 }

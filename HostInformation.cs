@@ -27,6 +27,7 @@ namespace PSFilterHostDll
         private bool copyRight;
         private bool waterMark;
         private HostRulerUnit rulerUnit;
+        private bool highDpi;
 
         /// <summary>
         /// Gets or sets the title of the document.
@@ -157,6 +158,24 @@ namespace PSFilterHostDll
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the host is running in high DPI mode.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the host is running in high DPI mode; otherwise, <c>false</c>.
+        /// </value>
+        public bool HighDpi
+        {
+            get
+            {
+                return highDpi;
+            }
+            set
+            {
+                highDpi = value;
+            }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HostInformation"/> class.
         /// </summary>
         public HostInformation()
@@ -167,6 +186,7 @@ namespace PSFilterHostDll
             this.copyRight = false;
             this.waterMark = false;
             this.rulerUnit = HostRulerUnit.Pixels;
+            this.highDpi = false;
         }
     }
 }

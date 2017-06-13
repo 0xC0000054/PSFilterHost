@@ -514,6 +514,7 @@ namespace HostTest
 			{
 				image = BitmapFrame.Create(dstImage, null, srcMetaData, null); // Create a new BitmapFrame so the source image's meta-data is available to the filters.
 			}
+			hostInfo.HighDpi = this.highDPIMode;
 
 			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
 			bool setRepeatFilter = false;
