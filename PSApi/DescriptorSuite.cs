@@ -36,7 +36,7 @@ namespace PSFilterHostDll.PSApi
 			public ReadDescriptorState(Dictionary<uint, AETEValue> dictionary, IList<uint> keys)
 			{
 				this.currentKey = 0;
-				this.lastReadError = 0;
+				this.lastReadError = PSError.noErr;
 				this.keyIndex = 0;
 				this.keyCount = keys.Count;
 				this.keys = new ReadOnlyCollection<uint>(keys);
