@@ -31,16 +31,16 @@ namespace PSFilterHostDll.PSApi
 			/// <summary>
 			/// Initializes a new instance of the <see cref="ReadDescriptorState"/> class.
 			/// </summary>
-			/// <param name="items">The dictionary containing the descriptor values.</param>
+			/// <param name="dictionary">The dictionary containing the descriptor values.</param>
 			/// <param name="keys">The keys required by the plug-in.</param>
-			public ReadDescriptorState(Dictionary<uint, AETEValue> items, IList<uint> keys)
+			public ReadDescriptorState(Dictionary<uint, AETEValue> dictionary, IList<uint> keys)
 			{
 				this.currentKey = 0;
 				this.lastReadError = 0;
 				this.keyIndex = 0;
 				this.keyCount = keys.Count;
 				this.keys = new ReadOnlyCollection<uint>(keys);
-				this.items = new ReadOnlyDictionary<uint, AETEValue>(items);
+				this.items = new ReadOnlyDictionary<uint, AETEValue>(dictionary);
 			}
 		}
 
