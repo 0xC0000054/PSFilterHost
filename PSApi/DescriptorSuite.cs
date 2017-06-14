@@ -27,20 +27,44 @@ namespace PSFilterHostDll.PSApi
 			public readonly int keyCount;
 			public readonly ReadOnlyCollection<uint> keys;
 			public readonly ReadOnlyDictionary<uint, AETEValue> items;
+			public readonly IntPtr expectedKeys;
+			public readonly ReadOnlyDictionary<uint, int> expectedKeyOffsets;
+
+			private static unsafe ReadOnlyDictionary<uint, int> GetKeyArrayOffsets(IntPtr keyArray)
+			{
+				Dictionary<uint, int> offsets = new Dictionary<uint, int>();
+
+				if (keyArray != IntPtr.Zero)
+				{
+					int offset = 0;
+					uint* ptr = (uint*)keyArray.ToPointer();
+					while (*ptr != 0U)
+					{
+						offsets.Add(*ptr, offset);
+
+						offset += sizeof(uint);
+						ptr++;
+					}
+				}
+
+				return new ReadOnlyDictionary<uint, int>(offsets);
+			}
 
 			/// <summary>
 			/// Initializes a new instance of the <see cref="ReadDescriptorState"/> class.
 			/// </summary>
 			/// <param name="dictionary">The dictionary containing the descriptor values.</param>
-			/// <param name="keys">The keys required by the plug-in.</param>
-			public ReadDescriptorState(Dictionary<uint, AETEValue> dictionary, IList<uint> keys)
+			/// <param name="keyArray">The pointer to an array containing the descriptor keys the plug-in expects.</param>
+			public ReadDescriptorState(Dictionary<uint, AETEValue> dictionary, IntPtr keyArray)
 			{
 				this.currentKey = 0;
 				this.lastReadError = PSError.noErr;
 				this.keyIndex = 0;
-				this.keyCount = keys.Count;
-				this.keys = new ReadOnlyCollection<uint>(keys);
+				this.keyCount = dictionary.Count;
+				this.keys = new ReadOnlyCollection<uint>(new List<uint>(dictionary.Keys));
 				this.items = new ReadOnlyDictionary<uint, AETEValue>(dictionary);
+				this.expectedKeys = keyArray;
+				this.expectedKeyOffsets = GetKeyArrayOffsets(keyArray);
 			}
 		}
 
@@ -230,34 +254,10 @@ namespace PSFilterHostDll.PSApi
 			{
 				Dictionary<uint, AETEValue> dictionary = this.descriptorHandles[descriptorHandle];
 
-				List<uint> keys = new List<uint>();
-				if (keyArray != IntPtr.Zero)
-				{
-					uint* ptr = (uint*)keyArray.ToPointer();
-					while (*ptr != 0U)
-					{
-#if DEBUG
-						DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key = {0}", DebugUtils.PropToString(*ptr)));
-#endif
-
-						if (dictionary.ContainsKey(*ptr))
-						{
-							keys.Add(*ptr); 
-						}
-						ptr++;
-					}
-				}
-
-				if (keys.Count == 0)
-				{
-					// If the keyArray is a null pointer or if it does not contain any valid keys, add all of the keys in the dictionary.
-					keys.AddRange(dictionary.Keys);
-				}
-
 				IntPtr handle = new IntPtr(this.readDescriptors.Count + 1);
 				try
 				{
-					this.readDescriptors.Add(handle, new ReadDescriptorState(dictionary, keys));
+					this.readDescriptors.Add(handle, new ReadDescriptorState(dictionary, keyArray));
 				}
 				catch (OutOfMemoryException)
 				{
@@ -304,6 +304,17 @@ namespace PSFilterHostDll.PSApi
 				state.currentKey = key = state.keys[state.keyIndex];
 				state.keyIndex++;
 
+				// When a plug-in expects specific keys to be returned this method is documented
+				// to set each key it finds to typeNull before returning it to the plug-in.
+				// The plug-in can use this information to determine if any required keys are missing.
+				if (state.expectedKeys != IntPtr.Zero)
+				{
+					int offset;
+					if (state.expectedKeyOffsets.TryGetValue(key, out offset))
+					{
+						Marshal.WriteInt32(state.expectedKeys, offset, unchecked((int)DescriptorTypes.typeNull));
+					}
+				}
 
 				AETEValue item = state.items[key];
 				try
