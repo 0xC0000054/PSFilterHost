@@ -23,8 +23,8 @@ namespace PSFilterHostDll.PSApi
 		{
 			public uint currentKey;
 			public short lastReadError;
-			public int keyArrayIndex;
-			public readonly int keyArrayCount;
+			public int keyIndex;
+			public readonly int keyCount;
 			public readonly ReadOnlyCollection<uint> keys;
 			public readonly ReadOnlyDictionary<uint, AETEValue> items;
 
@@ -37,8 +37,8 @@ namespace PSFilterHostDll.PSApi
 			{
 				this.currentKey = 0;
 				this.lastReadError = 0;
-				this.keyArrayIndex = 0;
-				this.keyArrayCount = keys.Count;
+				this.keyIndex = 0;
+				this.keyCount = keys.Count;
 				this.keys = new ReadOnlyCollection<uint>(keys);
 				this.items = new ReadOnlyDictionary<uint, AETEValue>(items);
 			}
@@ -296,13 +296,13 @@ namespace PSFilterHostDll.PSApi
 			{
 				ReadDescriptorState state = this.readDescriptors[descriptor];
 
-				if (state.keyArrayIndex >= state.keyArrayCount)
+				if (state.keyIndex >= state.keyCount)
 				{
 					return false;
 				}
 
-				state.currentKey = key = state.keys[state.keyArrayIndex];
-				state.keyArrayIndex++;
+				state.currentKey = key = state.keys[state.keyIndex];
+				state.keyIndex++;
 
 
 				AETEValue item = state.items[key];
