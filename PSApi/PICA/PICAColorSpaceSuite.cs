@@ -81,6 +81,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly CSConvertToMonitorRGB csConvertToMonitorRGB;
 
         private Dictionary<IntPtr, Color> colors;
+        private int colorsIndex;
         private byte[] lookup16To8;
         private ushort[] lookup8To16;
 
@@ -103,6 +104,7 @@ namespace PSFilterHostDll.PSApi.PICA
             this.csConvertToMonitorRGB = new CSConvertToMonitorRGB(ConvertToMonitorRGB);
 
             this.colors = new Dictionary<IntPtr, Color>(IntPtrEqualityComparer.Instance);
+            this.colorsIndex = 0;
             this.lookup16To8 = null;
             this.lookup8To16 = null;
         }
@@ -116,7 +118,8 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                colorID = new IntPtr(this.colors.Count + 1);
+                this.colorsIndex++;
+                colorID = new IntPtr(this.colorsIndex);
                 this.colors.Add(colorID, new Color());
             }
             catch (OutOfMemoryException)
@@ -130,6 +133,10 @@ namespace PSFilterHostDll.PSApi.PICA
         private int Delete(ref IntPtr colorID)
         {
             this.colors.Remove(colorID);
+            if (this.colorsIndex == colorID.ToInt32())
+            {
+                this.colorsIndex--;
+            }
 
             return PSError.kSPNoError;
         }

@@ -178,6 +178,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly ASZStringAsPascalString asPascalString;
 
         private Dictionary<IntPtr, ZString> strings;
+        private int stringsIndex;
 
         private static readonly ASZStringSuite instance = new ASZStringSuite();
         private static readonly IntPtr Empty = IntPtr.Zero;
@@ -209,6 +210,7 @@ namespace PSFilterHostDll.PSApi.PICA
             this.asPascalString = new ASZStringAsPascalString(AsPascalString);
 
             this.strings = new Dictionary<IntPtr, ZString>(IntPtrEqualityComparer.Instance);
+            this.stringsIndex = 0;
         }
 
         public static ASZStringSuite Instance
@@ -361,7 +363,9 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private IntPtr GenerateDictionaryKey()
         {
-            return new IntPtr(this.strings.Count + 1);
+            this.stringsIndex++;
+
+            return new IntPtr(this.stringsIndex);
         }
 
         private int MakeString(IntPtr src, UIntPtr byteCount, ref IntPtr newZString, ZStringFormat format)
@@ -621,6 +625,10 @@ namespace PSFilterHostDll.PSApi.PICA
                     if (item.RefCount == 0)
                     {
                         this.strings.Remove(zstr);
+                        if (this.stringsIndex == zstr.ToInt32())
+                        {
+                            this.stringsIndex--;
+                        }
                     }
                     else
                     {
