@@ -19,6 +19,7 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class ActionDescriptorSuite
     {
+        [Serializable]
         private sealed class ScriptingParameters
         {
             private Dictionary<uint, AETEValue> parameters;
