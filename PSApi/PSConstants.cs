@@ -89,6 +89,8 @@ namespace PSFilterHostDll.PSApi
         internal static class PICA
         {
             public const string ActionDescriptorSuite = "df135115-c769-11d0-8079-00c04fd7ec47";
+            public const string ActionListSuite = "df135116-c769-11d0-8079-00c04fd7ec47";
+            public const string ActionReferenceSuite = "df135117-c769-11d0-8079-00c04fd7ec47";
             public const string ASZStringSuite = "AS ZString Suite";
             public const string BufferSuite = "Photoshop Buffer Suite for Plug-ins";
             public const string ColorSpaceSuite = "Photoshop ColorSpace Suite for Plug-ins";

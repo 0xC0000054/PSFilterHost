@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
-    internal sealed class ActionDescriptorSuite
+    internal sealed class ActionDescriptorSuite : IActionDescriptorSuite
     {
         [Serializable]
         private sealed class ScriptingParameters
@@ -103,6 +103,8 @@ namespace PSFilterHostDll.PSApi
         }
 
         private readonly PluginAETE aete;
+        private readonly IActionListSuite actionListSuite;
+        private readonly IActionReferenceSuite actionReferenceSuite;
 
         private Dictionary<IntPtr, ScriptingParameters> actionDescriptors;
         private Dictionary<IntPtr, ScriptingParameters> descriptorHandles;
@@ -161,8 +163,24 @@ namespace PSFilterHostDll.PSApi
         /// Initializes a new instance of the <see cref="ActionDescriptorSuite"/> class.
         /// </summary>
         /// <param name="aete">The AETE scripting information.</param>
-        public ActionDescriptorSuite(PluginAETE aete)
+        /// <param name="actionListSuite">The action list suite instance.</param>
+        /// <param name="actionReferenceSuite">The action reference suite instance.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="actionListSuite"/> is null.
+        /// or
+        /// <paramref name="actionReferenceSuite"/> is null.
+        /// </exception>
+        public ActionDescriptorSuite(PluginAETE aete, IActionListSuite actionListSuite, IActionReferenceSuite actionReferenceSuite)
         {
+            if (actionListSuite == null)
+            {
+                throw new ArgumentNullException("actionListSuite");
+            }
+            if (actionReferenceSuite == null)
+            {
+                throw new ArgumentNullException("actionReferenceSuite");
+            }
+
             this.make = new ActionDescriptorMake(Make);
             this.free = new ActionDescriptorFree(Free);
             this.handleToDescriptor = new ActionDescriptorHandleToDescriptor(HandleToDescriptor);
@@ -211,9 +229,37 @@ namespace PSFilterHostDll.PSApi
             this.getData = new ActionDescriptorGetData(GetData);
 
             this.aete = aete;
+            this.actionListSuite = actionListSuite;
+            this.actionReferenceSuite = actionReferenceSuite;
             this.actionDescriptors = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.descriptorHandles = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.actionDescriptorsIndex = 0;
+        }
+
+        bool IActionDescriptorSuite.TryGetDescriptorValues(IntPtr descriptor, out Dictionary<uint, AETEValue> values)
+        {
+            values = null;
+            ScriptingParameters scriptingData;
+            if (this.actionDescriptors.TryGetValue(descriptor, out scriptingData))
+            {
+                values = scriptingData.ToDictionary();
+                return true;
+            }
+
+            return false;
+        }
+
+        IntPtr IActionDescriptorSuite.CreateDescriptor(Dictionary<uint, AETEValue> values)
+        {
+            if (values == null)
+            {
+                throw new ArgumentNullException(nameof(values));
+            }
+
+            IntPtr descriptor = GenerateDictionaryKey();
+            this.actionDescriptors.Add(descriptor, new ScriptingParameters(values));
+
+            return descriptor;
         }
 
         /// <summary>
@@ -653,7 +699,24 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
             DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-            return PSError.kSPNotImplmented;
+            try
+            {
+                ActionDescriptorList value;
+                if (this.actionListSuite.ConvertToActionDescriptor(data, out value))
+                {
+                    this.actionDescriptors[descriptor].Add(key, new AETEValue(DescriptorTypes.typeValueList, GetAETEParamFlags(key), 0, value));
+                }
+                else
+                {
+                    return PSError.kSPBadParameterError;
+                }
+            }
+            catch (OutOfMemoryException)
+            {
+                return PSError.memFullErr;
+            }
+
+            return PSError.kSPNoError;
         }
 
         private int PutObject(IntPtr descriptor, uint key, uint type, IntPtr descriptorHandle)
@@ -710,7 +773,24 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
             DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-            return PSError.kSPNotImplmented;
+            try
+            {
+                ActionDescriptorReference value;
+                if (this.actionReferenceSuite.ConvertToActionDescriptor(reference, out value))
+                {
+                    this.actionDescriptors[descriptor].Add(key, new AETEValue(DescriptorTypes.typeObjectReference, GetAETEParamFlags(key), 0, value));
+                }
+                else
+                {
+                    return PSError.kSPBadParameterError;
+                }
+            }
+            catch (OutOfMemoryException)
+            {
+                return PSError.memFullErr;
+            }
+
+            return PSError.kSPNoError;
         }
 
         private int PutClass(IntPtr descriptor, uint key, uint data)
@@ -990,7 +1070,24 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
             DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-            return PSError.kSPNotImplmented;
+            AETEValue item;
+            if (this.actionDescriptors[descriptor].TryGetValue(key, out item))
+            {
+                ActionDescriptorList value = (ActionDescriptorList)item.Value;
+
+                try
+                {
+                    data = this.actionListSuite.CreateFromActionDescriptor(value);
+                }
+                catch (OutOfMemoryException)
+                {
+                    return PSError.memFullErr;
+                }
+
+                return PSError.kSPNoError;
+            }
+
+            return PSError.errMissingParameter;
         }
 
         private int GetObject(IntPtr descriptor, uint key, ref uint retType, ref IntPtr outputDescriptor)
@@ -1067,7 +1164,24 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
             DebugUtils.Ping(DebugFlags.DescriptorParameters, string.Format("key: 0x{0:X4}({1})", key, DebugUtils.PropToString(key)));
 #endif
-            return PSError.kSPNotImplmented;
+            AETEValue item;
+            if (this.actionDescriptors[descriptor].TryGetValue(key, out item))
+            {
+                ActionDescriptorReference value = (ActionDescriptorReference)item.Value;
+
+                try
+                {
+                    reference = this.actionReferenceSuite.CreateFromActionDescriptor(value);
+                }
+                catch (OutOfMemoryException)
+                {
+                    return PSError.memFullErr;
+                }
+
+                return PSError.kSPNoError;
+            }
+
+            return PSError.errMissingParameter;
         }
 
         private int GetClass(IntPtr descriptor, uint key, ref uint data)
