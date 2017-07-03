@@ -176,7 +176,6 @@ namespace PSFilterHostDll.PSApi
 		private bool copyToDest;
 		private bool writesOutsideSelection;
 		private bool useChannelPorts;
-		private bool usePICASuites;
 		private ActivePICASuites activePICASuites;
 		private PICASuites picaSuites;
 		private ColorProfileConverter colorProfileConverter;
@@ -370,7 +369,6 @@ namespace PSFilterHostDll.PSApi
 
 			this.useChannelPorts = false;
 			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
-			this.usePICASuites = false;
 			this.activePICASuites = new ActivePICASuites();
 			this.picaSuites = new PICASuites();
 			this.hostInfo = new HostInformation();
@@ -1492,15 +1490,6 @@ namespace PSFilterHostDll.PSApi
 			return data.Category.Equals("Amico Perry", StringComparison.Ordinal);
 		}
 
-		private static bool EnablePICASuites(PluginData data)
-		{
-#if PICASUITEDEBUG
-			return true;
-#else
-			return data.Category.Equals("Nik Collection", StringComparison.Ordinal);
-#endif
-		}
-
 		/// <summary>
 		/// Runs a filter from the specified PluginData
 		/// </summary>
@@ -1511,7 +1500,6 @@ namespace PSFilterHostDll.PSApi
 			LoadFilter(pdata);
 
 			this.useChannelPorts = EnableChannelPorts(pdata);
-			this.usePICASuites = EnablePICASuites(pdata);
 			this.picaSuites.SetPluginName(pdata.Title.TrimEnd('.'));
 
 			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
@@ -5138,22 +5126,15 @@ namespace PSFilterHostDll.PSApi
 				descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
 			}
 
-			if (usePICASuites)
-			{
-				basicSuitePtr = Memory.Allocate(Marshal.SizeOf(typeof(SPBasicSuite)), true);
-				SPBasicSuite* basicSuite = (SPBasicSuite*)basicSuitePtr.ToPointer();
-				basicSuite->acquireSuite = Marshal.GetFunctionPointerForDelegate(spAcquireSuite);
-				basicSuite->releaseSuite = Marshal.GetFunctionPointerForDelegate(spReleaseSuite);
-				basicSuite->isEqual = Marshal.GetFunctionPointerForDelegate(spIsEqual);
-				basicSuite->allocateBlock = Marshal.GetFunctionPointerForDelegate(spAllocateBlock);
-				basicSuite->freeBlock = Marshal.GetFunctionPointerForDelegate(spFreeBlock);
-				basicSuite->reallocateBlock = Marshal.GetFunctionPointerForDelegate(spReallocateBlock);
-				basicSuite->undefined = Marshal.GetFunctionPointerForDelegate(spUndefined);
-			}
-			else
-			{
-				basicSuitePtr = IntPtr.Zero;
-			}
+			basicSuitePtr = Memory.Allocate(Marshal.SizeOf(typeof(SPBasicSuite)), true);
+			SPBasicSuite* basicSuite = (SPBasicSuite*)basicSuitePtr.ToPointer();
+			basicSuite->acquireSuite = Marshal.GetFunctionPointerForDelegate(spAcquireSuite);
+			basicSuite->releaseSuite = Marshal.GetFunctionPointerForDelegate(spReleaseSuite);
+			basicSuite->isEqual = Marshal.GetFunctionPointerForDelegate(spIsEqual);
+			basicSuite->allocateBlock = Marshal.GetFunctionPointerForDelegate(spAllocateBlock);
+			basicSuite->freeBlock = Marshal.GetFunctionPointerForDelegate(spFreeBlock);
+			basicSuite->reallocateBlock = Marshal.GetFunctionPointerForDelegate(spReallocateBlock);
+			basicSuite->undefined = Marshal.GetFunctionPointerForDelegate(spUndefined);
 		}
 
 		/// <summary>
