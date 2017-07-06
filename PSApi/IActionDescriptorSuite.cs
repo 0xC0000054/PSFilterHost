@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 
 namespace PSFilterHostDll.PSApi
 {
@@ -23,13 +22,13 @@ namespace PSFilterHostDll.PSApi
         /// <param name="descriptor">The descriptor.</param>
         /// <param name="values">The values contained within the descriptor.</param>
         /// <returns><c>true</c> if the descriptor is valid; otherwise, <c>false</c>.</returns>
-        bool TryGetDescriptorValues(IntPtr descriptor, out Dictionary<uint, AETEValue> values);
+        bool TryGetDescriptorValues(IntPtr descriptor, out ReadOnlyDictionary<uint, AETEValue> values);
 
         /// <summary>
         /// Creates a descriptor that contains the specified values.
         /// </summary>
         /// <param name="values">The values to place in the descriptor.</param>
         /// <returns>The new descriptor.</returns>
-        IntPtr CreateDescriptor(Dictionary<uint, AETEValue> values);
+        IntPtr CreateDescriptor(ReadOnlyDictionary<uint, AETEValue> values);
     }
 }

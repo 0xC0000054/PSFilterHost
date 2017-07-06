@@ -72,7 +72,7 @@ namespace PSFilterHostDll.PSApi
         private sealed class ActionListDescriptor
         {
             private readonly uint type;
-            private readonly Dictionary<uint, AETEValue> descriptorValues;
+            private readonly ReadOnlyDictionary<uint, AETEValue> descriptorValues;
 
             public uint Type
             {
@@ -82,7 +82,7 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            public Dictionary<uint, AETEValue> DescriptorValues
+            public ReadOnlyDictionary<uint, AETEValue> DescriptorValues
             {
                 get
                 {
@@ -90,7 +90,7 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            public ActionListDescriptor(uint type, Dictionary<uint, AETEValue> descriptorValues)
+            public ActionListDescriptor(uint type, ReadOnlyDictionary<uint, AETEValue> descriptorValues)
             {
                 this.type = type;
                 this.descriptorValues = descriptorValues;
@@ -491,7 +491,7 @@ namespace PSFilterHostDll.PSApi
 
             try
             {
-                Dictionary<uint, AETEValue> descriptorValues;
+                ReadOnlyDictionary<uint, AETEValue> descriptorValues;
                 if (this.actionDescriptorSuite.TryGetDescriptorValues(descriptor, out descriptorValues))
                 {
                     ActionListDescriptor item = new ActionListDescriptor(type, descriptorValues);
