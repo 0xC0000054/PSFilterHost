@@ -534,11 +534,7 @@ namespace HostTest
 						host.FilterParameters = filterParameters[pluginData];
 					}
 
-					if ((pseudoResources != null) && pseudoResources.Count > 0)
-					{
-						host.PseudoResources = pseudoResources;
-					}
-
+					host.PseudoResources = pseudoResources;
 					host.HostInfo = this.hostInfo;
 					if (hostColorProfiles != null)
 					{
