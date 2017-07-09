@@ -180,11 +180,11 @@
     <Compile Include="PSApi\PSActionReference.cs" />
     <Compile Include="PSApi\PSErrorSuite.cs" />
     <Compile Include="PSApi\PseudoResourceSuite.cs" />
-    <Compile Include="PSApi\ReadOnlyDictionary.cs" />
     <Compile Include="PSApi\SafeProfileHandle.cs" />
     <Compile Include="PSApi\SafeTransformHandle.cs" />
     <Compile Include="PSApi\StringUtil.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
+    <Compile Include="ReadOnlyDictionary.cs" />
     <Compile Include="ShortcutHelper.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterProgressEventArgs.cs" />

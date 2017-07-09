@@ -15,7 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll
 {
     /// <summary>
     /// Represents a read-only collection of keys and values.
