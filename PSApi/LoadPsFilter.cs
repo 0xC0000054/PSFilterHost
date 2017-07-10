@@ -202,8 +202,10 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// The filter progress callback.
+		/// Sets the filter progress callback.
 		/// </summary>
+		/// <param name="value">The progress callback delegate.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
 		internal void SetProgressFunc(ProgressProc value)
 		{
 			if (value == null)
@@ -215,8 +217,10 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// The filter abort callback.
+		/// Sets the filter abort callback.
 		/// </summary>
+		/// <param name="value">The abort callback delegate.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
 		internal void SetAbortFunc(AbortFunc value)
 		{
 			if (value == null)
@@ -227,6 +231,11 @@ namespace PSFilterHostDll.PSApi
 			abortFunc = value;
 		}
 
+		/// <summary>
+		/// Sets the filter color picker callback.
+		/// </summary>
+		/// <param name="value">The color picker callback delegate.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
 		internal void SetPickColor(PickColor value)
 		{
 			if (value == null)
@@ -237,6 +246,11 @@ namespace PSFilterHostDll.PSApi
 			ColorPickerManager.SetPickColorCallback(value);
 		}
 
+		/// <summary>
+		/// Sets the color profiles.
+		/// </summary>
+		/// <param name="colorProfiles">The color profiles.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="colorProfiles"/> is null.</exception>
 		internal void SetColorProfiles(HostColorManagement colorProfiles)
 		{
 			if (colorProfiles == null)
