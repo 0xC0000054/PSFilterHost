@@ -419,7 +419,7 @@ namespace PSFilterHostDll
 			{
 				while (enumerator.MoveNext())
 				{
-					foreach (var item in LoadPsFilter.QueryPlugin(enumerator.Current))
+					foreach (var item in PluginLoader.LoadFiltersFromFile(enumerator.Current))
 					{
 						yield return item;
 					}

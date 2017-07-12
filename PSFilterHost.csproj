@@ -163,7 +163,6 @@
     <Compile Include="PSApi\IntPtrEqualityComparer.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
-    <Compile Include="PSApi\LoadPsFilter.QueryPlugin.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
     <Compile Include="PSApi\NativeEnums.cs" />
     <Compile Include="PSApi\PEFile.cs" />
@@ -174,6 +173,7 @@
     <Compile Include="PSApi\PICA\PICASPPluginsSuite.cs" />
     <Compile Include="PSApi\PICA\PICASuiteDelegates.cs" />
     <Compile Include="PSApi\PICA\PICAUIHooksSuite.cs" />
+    <Compile Include="PSApi\PluginLoader.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
     <Compile Include="PSApi\PSActionDescriptor.cs" />
     <Compile Include="PSApi\PSActionList.cs" />

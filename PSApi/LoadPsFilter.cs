@@ -36,7 +36,7 @@ using System.Windows.Media.Imaging;
 
 namespace PSFilterHostDll.PSApi
 {
-	internal sealed partial class LoadPsFilter : IDisposable
+	internal sealed class LoadPsFilter : IDisposable
 	{
 		static bool RectNonEmpty(Rect16 rect)
 		{

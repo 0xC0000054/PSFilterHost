@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
-	internal partial class LoadPsFilter
+	internal static class PluginLoader
 	{
 		private sealed class QueryAETE
 		{
@@ -675,20 +675,20 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Queries an 8bf plug-in
+		/// Loads the 8bf filters from the specified file.
 		/// </summary>
-		/// <param name="pluginFileName">The fileName to query.</param>
+		/// <param name="path">The path of the plug-in.</param>
 		/// <returns>
-		/// An enumerable collection containing the filters within the plug-in.
+		/// An enumerable collection containing the filters within the specified file.
 		/// </returns>
-		internal static IEnumerable<PluginData> QueryPlugin(string pluginFileName)
+		internal static IEnumerable<PluginData> LoadFiltersFromFile(string path)
 		{
-			if (pluginFileName == null)
+			if (path == null)
 			{
-				throw new ArgumentNullException("pluginFileName");
+				throw new ArgumentNullException("path");
 			}
 
-			if (!PEFile.CheckProcessorArchitecture(pluginFileName))
+			if (!PEFile.CheckProcessorArchitecture(path))
 			{
 				return System.Linq.Enumerable.Empty<PluginData>();
 			}
@@ -698,12 +698,12 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.GlobalDebugFlags |= DebugFlags.PiPL;
 #endif
-			SafeLibraryHandle dll = UnsafeNativeMethods.LoadLibraryExW(pluginFileName, IntPtr.Zero, NativeConstants.LOAD_LIBRARY_AS_DATAFILE);
+			SafeLibraryHandle dll = UnsafeNativeMethods.LoadLibraryExW(path, IntPtr.Zero, NativeConstants.LOAD_LIBRARY_AS_DATAFILE);
 			try
 			{
 				if (!dll.IsInvalid)
 				{
-					QueryFilter queryFilter = new QueryFilter(pluginFileName);
+					QueryFilter queryFilter = new QueryFilter(path);
 
 					GCHandle handle = GCHandle.Alloc(queryFilter, GCHandleType.Normal);
 					bool needsRelease = false;
@@ -729,7 +729,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 						else
 						{
-							DebugUtils.Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", pluginFileName));
+							DebugUtils.Ping(DebugFlags.Error, string.Format("EnumResourceNames(PiPL, PiMI) failed for {0}", path));
 						}
 #endif
 
