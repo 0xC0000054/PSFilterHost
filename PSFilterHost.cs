@@ -511,7 +511,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		/// <remarks>
 		/// <para>
-		/// <paramref name="showUI"/> allows the host to control weather a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
 		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
 		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
 		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
@@ -535,7 +535,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		/// <remarks>
 		/// <para>
-		/// <paramref name="showUI"/> allows the host to control weather a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
 		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
 		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
 		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.

@@ -293,7 +293,7 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Determines weather the filter should show its user interface.
+		/// Determines whether the filter should show its user interface.
 		/// </summary>
 		internal bool ShowUI
 		{
