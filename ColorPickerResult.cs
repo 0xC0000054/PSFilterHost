@@ -13,7 +13,7 @@
 namespace PSFilterHostDll
 {
 	/// <summary>
-	/// The class that holds the color selected from the host application.
+	/// Represents the color selected from the host application.
 	/// </summary>
 	/// <threadsafety static="true" instance="false" />
 	public sealed class ColorPickerResult

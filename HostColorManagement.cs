@@ -16,7 +16,7 @@ using System.IO;
 namespace PSFilterHostDll
 {
 	/// <summary>
-	/// The class that encapsulates the International Color Consortium (ICC) color profiles used by the host application.
+	/// Encapsulates the International Color Consortium (ICC) color profiles used by the host application.
 	/// </summary>
 	/// <threadsafety static="true" instance="false"/>
 	public sealed class HostColorManagement

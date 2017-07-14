@@ -18,7 +18,7 @@ namespace PSFilterHostDll
 {
 
 	/// <summary>
-	/// The class encapsulates the Pseudo–Resources used by the filters. 
+	/// Encapsulates the Pseudo–Resources used by the filters. 
 	/// </summary>
 	/// <threadsafety static="true" instance="false" />
 	[Serializable]

@@ -16,7 +16,7 @@ using System.ComponentModel;
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// The class that encapsulates the host information used by the filters.
+    /// Represents the host information used by the filters.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
     public sealed class HostInformation

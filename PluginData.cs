@@ -22,7 +22,7 @@ using System.Windows.Media;
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// The class that encapsulates a Photoshop-compatible filter plug-in.
+    /// Represents the information used to load and execute a Photoshop-compatible filter plug-in.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
     [Serializable]

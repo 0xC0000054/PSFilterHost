@@ -18,7 +18,7 @@ using System.Security.Permissions;
 namespace PSFilterHostDll
 {
     /// <summary>
-    /// The class that encapsulates the parameters used to reapply a filter with the same settings.
+    /// Represents the parameters used to reapply a filter with the same settings.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
     [Serializable]
