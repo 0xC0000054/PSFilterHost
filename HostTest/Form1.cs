@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
 using System.Threading;
 using System.Windows.Forms;
@@ -53,6 +54,7 @@ namespace HostTest
 		private ColorContext monitorColorContext;
 		private string monitorColorProfilePath;
 		private HostColorManagement hostColorProfiles;
+		private PluginSettingsRegistry sessionSettings;
 
 		private static readonly ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
 		private static readonly ColorContext SrgbColorContext = ColorProfileHelper.GetSrgbColorContext();
@@ -82,6 +84,7 @@ namespace HostTest
 			this.monitorColorContext = null;
 			this.monitorColorProfilePath = null;
 			this.hostColorProfiles = null;
+			this.sessionSettings = null;
 
 			if (IntPtr.Size == 8)
 			{
@@ -201,6 +204,62 @@ namespace HostTest
 			}
 		}
 
+		private void LoadPluginSessionSettings()
+		{
+			try
+			{
+				string path = Path.Combine(Application.StartupPath, "PluginRegistry.dat");
+
+				using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+				{
+					BinaryFormatter bf = new BinaryFormatter();
+					this.sessionSettings = (PluginSettingsRegistry)bf.Deserialize(fs);
+					this.sessionSettings.Dirty = false;
+				}
+			}
+			catch (FileNotFoundException)
+			{
+				// This file will only exist if a plug-in has persisted settings from a previous session.
+			}
+			catch (IOException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (UnauthorizedAccessException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+		}
+
+		private void SavePluginSessionSettings()
+		{
+			if (this.sessionSettings != null)
+			{
+				if (this.sessionSettings.Dirty)
+				{
+					try
+					{
+						string path = Path.Combine(Application.StartupPath, "PluginRegistry.dat");
+
+						using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+						{
+							BinaryFormatter bf = new BinaryFormatter();
+							bf.Serialize(fs, this.sessionSettings);
+						}
+						this.sessionSettings.Dirty = false;
+					}
+					catch (IOException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+					catch (UnauthorizedAccessException ex)
+					{
+						ShowErrorMessage(ex.Message);
+					}
+				}
+			}
+		}
+
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -234,6 +293,7 @@ namespace HostTest
 			}
 
 			UpdateMonitorColorProfile();
+			LoadPluginSessionSettings();
 
 			ProcessCommandLine();
 		}
@@ -536,6 +596,7 @@ namespace HostTest
 
 					host.PseudoResources = pseudoResources;
 					host.HostInfo = this.hostInfo;
+					host.SessionSettings = this.sessionSettings;
 					if (hostColorProfiles != null)
 					{
 						host.SetColorProfiles(hostColorProfiles);
@@ -580,6 +641,7 @@ namespace HostTest
 
 							this.pseudoResources = host.PseudoResources;
 							this.hostInfo = host.HostInfo;
+							this.sessionSettings = host.SessionSettings;
 							setRepeatFilter = true;
 						}
 
@@ -1172,6 +1234,11 @@ namespace HostTest
 						e.Cancel = true;
 					}
 				}
+			}
+
+			if (!e.Cancel)
+			{
+				SavePluginSessionSettings();
 			}
 
 			base.OnFormClosing(e);

@@ -55,6 +55,7 @@ namespace PSFilterHostDll
 		private HostInformation hostInfo;
 		private PickColor pickColor;
 		private HostColorManagement hostColorProfiles;
+		private PluginSettingsRegistry sessionSettings;
 
 		/// <summary>
 		/// The event fired when the filter updates it's progress. 
@@ -190,6 +191,7 @@ namespace PSFilterHostDll
 			this.abortFunc = null;
 			this.hostInfo = null;
 			this.hostColorProfiles = null;
+			this.sessionSettings = null;
 		}
 
 #if GDIPLUS
@@ -279,6 +281,24 @@ namespace PSFilterHostDll
 			set
 			{
 				this.pseudoResources = value;
+			}
+		}
+
+		/// <summary>
+		/// Gets or sets plug-in settings for the current session.
+		/// </summary>
+		/// <value>
+		/// The plug-in settings for the current session.
+		/// </value>
+		public PluginSettingsRegistry SessionSettings
+		{
+			get
+			{
+				return this.sessionSettings;
+			}
+			set
+			{
+				this.sessionSettings = value;
 			}
 		}
 
@@ -606,6 +626,11 @@ namespace PSFilterHostDll
 					lps.SetColorProfiles(hostColorProfiles);
 				}
 
+				if (sessionSettings != null)
+				{
+					lps.SetPluginSettings(sessionSettings);
+				}
+
 				try
 				{
 					result = lps.RunPlugin(pluginData);
@@ -640,6 +665,7 @@ namespace PSFilterHostDll
 					this.filterParameters = lps.ParameterData;
 					this.pseudoResources = lps.PseudoResources;
 					this.hostInfo = lps.HostInformation;
+					this.sessionSettings = lps.GetPluginSettings();
 				}
 				else if (!string.IsNullOrEmpty(lps.ErrorMessage))
 				{

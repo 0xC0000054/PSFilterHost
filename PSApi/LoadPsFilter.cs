@@ -187,6 +187,7 @@ namespace PSFilterHostDll.PSApi
 		private ActionDescriptorSuite actionDescriptorSuite;
 		private ActionListSuite actionListSuite;
 		private ActionReferenceSuite actionReferenceSuite;
+		private DescriptorRegistrySuite descriptorRegistrySuite;
 
 		/// <summary>
 		/// The host signature of this library - '.NET'
@@ -260,6 +261,27 @@ namespace PSFilterHostDll.PSApi
 
 			this.colorProfileConverter.Initialize(colorProfiles);
 			this.documentColorProfile = colorProfiles.GetDocumentColorProfile();
+		}
+
+		/// <summary>
+		/// Gets the plug-in settings for the current session.
+		/// </summary>
+		/// <returns>
+		/// The plug-in settings for the current session, or <c>null</c> if the current session does not contain any plug-in settings.
+		/// </returns>
+		internal PluginSettingsRegistry GetPluginSettings()
+		{
+			return this.descriptorRegistrySuite.GetPluginSettings();
+		}
+
+		/// <summary>
+		/// Sets the plug-in settings for the current session.
+		/// </summary>
+		/// <param name="settings">The plug-in settings.</param>
+		/// <exception cref="ArgumentNullException"><paramref name="settings"/> is null.</exception>
+		internal void SetPluginSettings(PluginSettingsRegistry settings)
+		{
+			this.descriptorRegistrySuite.SetPluginSettings(settings);
 		}
 
 		public string ErrorMessage
@@ -388,6 +410,7 @@ namespace PSFilterHostDll.PSApi
 			this.hostInfo = new HostInformation();
 			this.colorProfileConverter = new ColorProfileConverter();
 			this.documentColorProfile = null;
+			this.descriptorRegistrySuite = new DescriptorRegistrySuite();
 
 			this.lastInRect = Rect16.Empty;
 			this.lastOutRect = Rect16.Empty;
@@ -4744,6 +4767,7 @@ namespace PSFilterHostDll.PSApi
 						}
 						this.actionDescriptorSuite = new ActionDescriptorSuite(this.descriptorSuite.Aete, this.actionListSuite, this.actionReferenceSuite);
 						this.actionListSuite.ActionDescriptorSuite = this.actionDescriptorSuite;
+						this.descriptorRegistrySuite.ActionDescriptorSuite = this.actionDescriptorSuite;
 						if (scriptingData != null)
 						{
 							PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
@@ -4806,6 +4830,17 @@ namespace PSFilterHostDll.PSApi
 					PSColorSpaceSuite1 csSuite = this.picaSuites.CreateColorSpaceSuite1();
 
 					suite = this.activePICASuites.AllocateSuite(suiteKey, csSuite);
+				}
+				else if (suiteName.Equals(PSConstants.PICA.DescriptorRegistrySuite, StringComparison.Ordinal))
+				{
+					if (version != 1)
+					{
+						return PSError.kSPSuiteNotFoundError;
+					}
+
+					PSDescriptorRegistryProcs registrySuite = this.descriptorRegistrySuite.CreateDescriptorRegistrySuite1();
+
+					suite = this.activePICASuites.AllocateSuite(suiteKey, registrySuite);
 				}
 				else if (suiteName.Equals(PSConstants.PICA.ErrorSuite, StringComparison.Ordinal))
 				{
