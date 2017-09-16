@@ -521,7 +521,7 @@ namespace PSFilterHostDll.PSApi
 #endif
             equal = false;
 
-            return PSError.kSPNotImplmented;
+            return PSError.kSPUnimplementedError;
         }
 
         private int Erase(IntPtr descriptor, uint key)

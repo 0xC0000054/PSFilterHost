@@ -302,7 +302,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int Convert16(ColorSpace inputCSpace, ColorSpace outputCSpace, IntPtr colorArray, short count)
         {
-            return PSError.kSPNotImplmented;
+            return PSError.kSPUnimplementedError;
         }
 
         private int GetNativeSpace(IntPtr colorID, ref ColorSpace nativeSpace)
@@ -426,7 +426,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int ConvertToMonitorRGB(ColorSpace inputCSpace, IntPtr inputData, IntPtr outputData, short count)
         {
-            return PSError.kSPNotImplmented;
+            return PSError.kSPUnimplementedError;
         }
 
         public PSColorSpaceSuite1 CreateColorSpaceSuite1()
