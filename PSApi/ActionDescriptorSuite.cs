@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
-    internal sealed class ActionDescriptorSuite : IActionDescriptorSuite
+    internal sealed class ActionDescriptorSuite : IActionDescriptorSuite, IDisposable
     {
         [Serializable]
         private sealed class ScriptingParameters
@@ -109,6 +109,7 @@ namespace PSFilterHostDll.PSApi
         private Dictionary<IntPtr, ScriptingParameters> actionDescriptors;
         private Dictionary<IntPtr, ScriptingParameters> descriptorHandles;
         private int actionDescriptorsIndex;
+        private bool disposed;
 
         #region Callbacks
         private readonly ActionDescriptorMake make;
@@ -234,6 +235,8 @@ namespace PSFilterHostDll.PSApi
             this.actionDescriptors = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.descriptorHandles = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.actionDescriptorsIndex = 0;
+            HandleSuite.Instance.SuiteHandleDisposed += SuiteHandleDisposed;
+            this.disposed = false;
         }
 
         bool IActionDescriptorSuite.TryGetDescriptorValues(IntPtr descriptor, out ReadOnlyDictionary<uint, AETEValue> values)
@@ -322,6 +325,19 @@ namespace PSFilterHostDll.PSApi
         }
 
         /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (!this.disposed)
+            {
+                this.disposed = true;
+
+                HandleSuite.Instance.SuiteHandleDisposed -= SuiteHandleDisposed;
+            }
+        }
+
+        /// <summary>
         /// Tries to the get the scripting data from the specified descriptor handle.
         /// </summary>
         /// <param name="descriptorHandle">The descriptor handle.</param>
@@ -364,6 +380,11 @@ namespace PSFilterHostDll.PSApi
             }
 
             this.descriptorHandles.Add(descriptorHandle, new ScriptingParameters(scriptingData));
+        }
+
+        private void SuiteHandleDisposed(object sender, HandleDisposedEventArgs e)
+        {
+            this.descriptorHandles.Remove(e.Handle);
         }
 
         private IntPtr GenerateDictionaryKey()

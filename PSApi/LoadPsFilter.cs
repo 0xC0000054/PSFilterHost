@@ -5456,6 +5456,18 @@ namespace PSFilterHostDll.PSApi
 						colorProfileConverter.Dispose();
 						colorProfileConverter = null;
 					}
+
+					if (descriptorSuite != null)
+					{
+						descriptorSuite.Dispose();
+						descriptorSuite = null;
+					}
+
+					if (actionDescriptorSuite != null)
+					{
+						actionDescriptorSuite.Dispose();
+						actionDescriptorSuite = null;
+					}
 				}
 
 				if (platFormDataPtr != IntPtr.Zero)
