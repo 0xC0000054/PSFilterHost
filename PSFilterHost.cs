@@ -628,7 +628,7 @@ namespace PSFilterHostDll
 
 				if (sessionSettings != null)
 				{
-					lps.SetPluginSettings(sessionSettings);
+					lps.PluginSettings = sessionSettings;
 				}
 
 				try
@@ -665,7 +665,7 @@ namespace PSFilterHostDll
 					this.filterParameters = lps.ParameterData;
 					this.pseudoResources = lps.PseudoResources;
 					this.hostInfo = lps.HostInformation;
-					this.sessionSettings = lps.GetPluginSettings();
+					this.sessionSettings = lps.PluginSettings;
 				}
 				else if (!string.IsNullOrEmpty(lps.ErrorMessage))
 				{

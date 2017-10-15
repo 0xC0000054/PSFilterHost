@@ -265,23 +265,21 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Gets the plug-in settings for the current session.
+		/// Gets or sets the plug-in settings for the current session.
 		/// </summary>
 		/// <returns>
-		/// The plug-in settings for the current session, or <c>null</c> if the current session does not contain any plug-in settings.
+		/// The plug-in settings for the current session.
 		/// </returns>
-		internal PluginSettingsRegistry GetPluginSettings()
+		internal PluginSettingsRegistry PluginSettings
 		{
-			return this.pluginSettings;
-		}
-
-		/// <summary>
-		/// Sets the plug-in settings for the current session.
-		/// </summary>
-		/// <param name="settings">The plug-in settings.</param>
-		internal void SetPluginSettings(PluginSettingsRegistry settings)
-		{
-			this.pluginSettings = settings;
+			get
+			{
+				return this.pluginSettings;
+			}
+			set
+			{
+				this.pluginSettings = value;
+			}
 		}
 
 		public string ErrorMessage
