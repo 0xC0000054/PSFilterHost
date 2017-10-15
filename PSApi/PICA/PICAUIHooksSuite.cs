@@ -23,15 +23,29 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly UISuiteHostSetCursor uiSetCursor;
         private readonly UISuiteHostTickCount uiTickCount;
         private readonly UISuiteGetPluginName uiPluginName;
+        private readonly IASZStringSuite zstringSuite;
 
-        public unsafe PICAUIHooksSuite(FilterRecord* filterRecord, string name)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PICAUIHooksSuite"/> class.
+        /// </summary>
+        /// <param name="filterRecord">The filter record.</param>
+        /// <param name="name">The plug-in name.</param>
+        /// <param name="zstringSuite">The ASZString suite.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="zstringSuite"/> is null.</exception>
+        public unsafe PICAUIHooksSuite(FilterRecord* filterRecord, string name, IASZStringSuite zstringSuite)
         {
+            if (zstringSuite == null)
+            {
+                throw new ArgumentNullException("zstringSuite");
+            }
+
             this.hwnd = ((PlatformData*)filterRecord->platformData.ToPointer())->hwnd;
             this.pluginName = name ?? string.Empty;
             this.uiWindowHandle = new UISuiteMainWindowHandle(MainWindowHandle);
             this.uiSetCursor = new UISuiteHostSetCursor(HostSetCursor);
             this.uiTickCount = new UISuiteHostTickCount(HostTickCount);
             this.uiPluginName = new UISuiteGetPluginName(GetPluginName);
+            this.zstringSuite = zstringSuite;
         }
 
         private IntPtr MainWindowHandle()
@@ -51,7 +65,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int GetPluginName(IntPtr pluginRef, ref IntPtr name)
         {
-            name = ASZStringSuite.Instance.CreateFromString(this.pluginName);
+            name = zstringSuite.CreateFromString(this.pluginName);
 
             return PSError.kSPNoError;
         }

@@ -79,14 +79,25 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly CSConvert csConvert8to16;
         private readonly CSConvert csConvert16to8;
         private readonly CSConvertToMonitorRGB csConvertToMonitorRGB;
+        private readonly IASZStringSuite zstringSuite;
 
         private Dictionary<IntPtr, Color> colors;
         private int colorsIndex;
         private byte[] lookup16To8;
         private ushort[] lookup8To16;
 
-        public PICAColorSpaceSuite()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PICAColorSpaceSuite"/> class.
+        /// </summary>
+        /// <param name="zstringSuite">The ASZString suite.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="zstringSuite"/> is null.</exception>
+        public PICAColorSpaceSuite(IASZStringSuite zstringSuite)
         {
+            if (zstringSuite == null)
+            {
+                throw new ArgumentNullException("zstringSuite");
+            }
+
             this.csMake = new CSMake(Make);
             this.csDelete = new CSDelete(Delete);
             this.csStuffComponent = new CSStuffComponents(StuffComponents);
@@ -107,6 +118,7 @@ namespace PSFilterHostDll.PSApi.PICA
             this.colorsIndex = 0;
             this.lookup16To8 = null;
             this.lookup8To16 = null;
+            this.zstringSuite = zstringSuite;
         }
 
         private static bool IsValidColorSpace(ColorSpace colorSpace)
@@ -321,7 +333,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int ExtractColorName(IntPtr colorID, ref IntPtr colorName)
         {
-            colorName = ASZStringSuite.Instance.CreateFromString(string.Empty);
+            colorName = zstringSuite.CreateFromString(string.Empty);
 
             return PSError.kSPNoError;
         }
@@ -331,7 +343,7 @@ namespace PSFilterHostDll.PSApi.PICA
             int error = PSError.kSPNoError;
 
             string prompt;
-            if (ASZStringSuite.Instance.ConvertToString(promptString, out prompt))
+            if (zstringSuite.ConvertToString(promptString, out prompt))
             {
                 byte red = 0;
                 byte green = 0;

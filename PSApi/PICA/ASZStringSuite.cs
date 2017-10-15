@@ -37,7 +37,7 @@ namespace PSFilterHostDll.PSApi.PICA
         }
     }
 
-    internal sealed class ASZStringSuite
+    internal sealed class ASZStringSuite : IASZStringSuite
     {
         private enum ZStringFormat
         {
@@ -180,10 +180,12 @@ namespace PSFilterHostDll.PSApi.PICA
         private Dictionary<IntPtr, ZString> strings;
         private int stringsIndex;
 
-        private static readonly ASZStringSuite instance = new ASZStringSuite();
         private static readonly IntPtr Empty = IntPtr.Zero;
 
-        private ASZStringSuite()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ASZStringSuite"/> class.
+        /// </summary>
+        public ASZStringSuite()
         {
             this.makeFromUnicode = new ASZStringMakeFromUnicode(MakeFromUnicode);
             this.makeFromCString = new ASZStringMakeFromCString(MakeFromCString);
@@ -211,14 +213,6 @@ namespace PSFilterHostDll.PSApi.PICA
 
             this.strings = new Dictionary<IntPtr, ZString>(IntPtrEqualityComparer.Instance);
             this.stringsIndex = 0;
-        }
-
-        public static ASZStringSuite Instance
-        {
-            get
-            {
-                return instance;
-            }
         }
 
         /// <summary>
@@ -257,13 +251,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return suite;
         }
 
-        /// <summary>
-        /// Converts a ZString to a format that can be placed in an action descriptor.
-        /// </summary>
-        /// <param name="zstring">The ZString to convert.</param>
-        /// <param name="descriptor">The <see cref="ActionDescriptorZString"/> that contains the value of the specified ZString.</param>
-        /// <returns><c>true</c> if the ZString was converted to an action descriptor; otherwise, <c>false</c> if the ZString is invalid.</returns>
-        public bool ConvertToActionDescriptor(IntPtr zstring, out ActionDescriptorZString descriptor)
+        bool IASZStringSuite.ConvertToActionDescriptor(IntPtr zstring, out ActionDescriptorZString descriptor)
         {
             descriptor = null;
                 
@@ -283,12 +271,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return true;
         }
 
-        /// <summary>
-        /// Creates a ZString from an action descriptor.
-        /// </summary>
-        /// <param name="descriptor">The descriptor.</param>
-        /// <returns>The new ZString value.</returns>
-        public IntPtr CreateFromActionDescriptor(ActionDescriptorZString descriptor)
+        IntPtr IASZStringSuite.CreateFromActionDescriptor(ActionDescriptorZString descriptor)
         {
             IntPtr newZString = Empty;
 
@@ -302,13 +285,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return newZString;
         }
 
-        /// <summary>
-        /// Gets the value of the specified ZString.
-        /// </summary>
-        /// <param name="zstring">The ZString to convert.</param>
-        /// <param name="value">The <see cref="string"/> that contains the value of the specified ZString.</param>
-        /// <returns><c>true</c> if the ZString was converted to a string; otherwise, <c>false</c> if the ZString is invalid.</returns>
-        public bool ConvertToString(IntPtr zstring, out string value)
+        bool IASZStringSuite.ConvertToString(IntPtr zstring, out string value)
         {
             value = null;
 
@@ -332,13 +309,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return true;
         }
 
-        /// <summary>
-        /// Creates a ZString from the specified string.
-        /// </summary>
-        /// <param name="value">The string to use.</param>
-        /// <returns>The new ZString value.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="value"/> is null.</exception>
-        public IntPtr CreateFromString(string value)
+        IntPtr IASZStringSuite.CreateFromString(string value)
         {
             if (value == null)
             {

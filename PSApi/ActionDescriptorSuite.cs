@@ -105,6 +105,7 @@ namespace PSFilterHostDll.PSApi
         private readonly PluginAETE aete;
         private readonly IActionListSuite actionListSuite;
         private readonly IActionReferenceSuite actionReferenceSuite;
+        private readonly IASZStringSuite zstringSuite;
 
         private Dictionary<IntPtr, ScriptingParameters> actionDescriptors;
         private Dictionary<IntPtr, ScriptingParameters> descriptorHandles;
@@ -166,12 +167,16 @@ namespace PSFilterHostDll.PSApi
         /// <param name="aete">The AETE scripting information.</param>
         /// <param name="actionListSuite">The action list suite instance.</param>
         /// <param name="actionReferenceSuite">The action reference suite instance.</param>
+        /// <param name="zstringSuite">The ASZString suite instance.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="actionListSuite"/> is null.
         /// or
         /// <paramref name="actionReferenceSuite"/> is null.
+        /// or
+        /// <paramref name="zstringSuite"/> is null.
         /// </exception>
-        public ActionDescriptorSuite(PluginAETE aete, IActionListSuite actionListSuite, IActionReferenceSuite actionReferenceSuite)
+        public ActionDescriptorSuite(PluginAETE aete, IActionListSuite actionListSuite, IActionReferenceSuite actionReferenceSuite, 
+            IASZStringSuite zstringSuite)
         {
             if (actionListSuite == null)
             {
@@ -180,6 +185,10 @@ namespace PSFilterHostDll.PSApi
             if (actionReferenceSuite == null)
             {
                 throw new ArgumentNullException("actionReferenceSuite");
+            }
+            if (zstringSuite == null)
+            {
+                throw new ArgumentNullException("zstringSuite");
             }
 
             this.make = new ActionDescriptorMake(Make);
@@ -232,6 +241,7 @@ namespace PSFilterHostDll.PSApi
             this.aete = aete;
             this.actionListSuite = actionListSuite;
             this.actionReferenceSuite = actionReferenceSuite;
+            this.zstringSuite = zstringSuite;
             this.actionDescriptors = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.descriptorHandles = new Dictionary<IntPtr, ScriptingParameters>(IntPtrEqualityComparer.Instance);
             this.actionDescriptorsIndex = 0;
@@ -921,7 +931,7 @@ namespace PSFilterHostDll.PSApi
             try
             {
                 ActionDescriptorZString value;
-                if (ASZStringSuite.Instance.ConvertToActionDescriptor(zstring, out value))
+                if (zstringSuite.ConvertToActionDescriptor(zstring, out value))
                 {
                     this.actionDescriptors[descriptor].Add(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), 0, value));
 
@@ -1292,7 +1302,7 @@ namespace PSFilterHostDll.PSApi
 
                 try
                 {
-                    zstring = ASZStringSuite.Instance.CreateFromActionDescriptor(value);
+                    zstring = zstringSuite.CreateFromActionDescriptor(value);
                 }
                 catch (OutOfMemoryException)
                 {

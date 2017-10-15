@@ -21,6 +21,7 @@ namespace PSFilterHostDll.PSApi
 		private PICAColorSpaceSuite colorSpaceSuite;
 		private PICAUIHooksSuite uiHooksSuite;
 		private string pluginName;
+		private ASZStringSuite zstringSuite;
 
 		public PICASuites()
 		{
@@ -28,6 +29,7 @@ namespace PSFilterHostDll.PSApi
 			this.colorSpaceSuite = null;
 			this.uiHooksSuite = null;
 			this.pluginName = string.Empty;
+			this.zstringSuite = null;
 		}
 
 		/// <summary>
@@ -45,9 +47,17 @@ namespace PSFilterHostDll.PSApi
 			this.pluginName = name;
 		}
 
-		public static ASZStringSuite1 CreateASZStringSuite1()
+		public ASZStringSuite ASZStringSuite
 		{
-			return ASZStringSuite.Instance.CreateASZStringSuite1();
+			get
+			{
+				if (zstringSuite == null)
+				{
+					zstringSuite = new ASZStringSuite();
+				}
+
+				return zstringSuite;
+			}
 		}
 
 		public PSBufferSuite1 CreateBufferSuite1()
@@ -64,7 +74,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (colorSpaceSuite == null)
 			{
-				this.colorSpaceSuite = new PICAColorSpaceSuite();
+				this.colorSpaceSuite = new PICAColorSpaceSuite(this.ASZStringSuite);
 			}
 
 			return this.colorSpaceSuite.CreateColorSpaceSuite1();
@@ -97,7 +107,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (uiHooksSuite == null)
 			{
-				this.uiHooksSuite = new PICAUIHooksSuite(filterRecord, this.pluginName);
+				this.uiHooksSuite = new PICAUIHooksSuite(filterRecord, this.pluginName, this.ASZStringSuite);
 			}
 
 			return this.uiHooksSuite.CreateUIHooksSuite1(filterRecord);

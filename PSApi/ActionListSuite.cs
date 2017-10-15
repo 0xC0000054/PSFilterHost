@@ -164,6 +164,7 @@ namespace PSFilterHostDll.PSApi
         private readonly ActionListGetZString getZString;
 
         private readonly IActionReferenceSuite actionReferenceSuite;
+        private readonly IASZStringSuite zstringSuite;
 
         private Dictionary<IntPtr, ActionListItemCollection> actionLists;
         private int actionListsIndex;
@@ -173,12 +174,21 @@ namespace PSFilterHostDll.PSApi
         /// Initializes a new instance of the <see cref="ActionListSuite"/> class.
         /// </summary>
         /// <param name="actionReferenceSuite">The action reference suite instance.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="actionReferenceSuite"/> is null.</exception>
-        public ActionListSuite(IActionReferenceSuite actionReferenceSuite)
+        /// <param name="zstringSuite">The ASZString suite instance.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="actionReferenceSuite"/> is null.
+        /// or
+        /// <paramref name="zstringSuite"/> is null.
+        /// </exception>
+        public ActionListSuite(IActionReferenceSuite actionReferenceSuite, IASZStringSuite zstringSuite)
         {
             if (actionReferenceSuite == null)
             {
                 throw new ArgumentNullException("actionReferenceSuite");
+            }
+            if (zstringSuite == null)
+            {
+                throw new ArgumentNullException("zstringSuite");
             }
 
             this.make = new ActionListMake(Make);
@@ -222,6 +232,8 @@ namespace PSFilterHostDll.PSApi
 
             this.actionDescriptorSuite = null;
             this.actionReferenceSuite = actionReferenceSuite;
+            this.zstringSuite = zstringSuite;
+
             this.actionLists = new Dictionary<IntPtr, ActionListItemCollection>(IntPtrEqualityComparer.Instance);
             this.actionListsIndex = 0;
         }
@@ -664,7 +676,7 @@ namespace PSFilterHostDll.PSApi
             try
             {
                 ActionDescriptorZString value;
-                if (ASZStringSuite.Instance.ConvertToActionDescriptor(zstring, out value))
+                if (zstringSuite.ConvertToActionDescriptor(zstring, out value))
                 {
                     this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeChar, value));
                 }
@@ -1016,7 +1028,7 @@ namespace PSFilterHostDll.PSApi
 
                 try
                 {
-                    zstring = ASZStringSuite.Instance.CreateFromActionDescriptor(value);
+                    zstring = zstringSuite.CreateFromActionDescriptor(value);
                 }
                 catch (OutOfMemoryException)
                 {
