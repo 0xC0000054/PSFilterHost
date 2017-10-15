@@ -113,6 +113,7 @@ namespace PSFilterHostDll.PSApi
 
 		private GlobalParameters globalParameters;
 		private Dictionary<uint, AETEValue> scriptingData;
+		private PluginSettingsRegistry pluginSettings;
 		private bool showUI;
 		private bool parameterDataRestored;
 		private bool pluginDataRestored;
@@ -271,17 +272,16 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		internal PluginSettingsRegistry GetPluginSettings()
 		{
-			return this.descriptorRegistrySuite.GetPluginSettings();
+			return this.pluginSettings;
 		}
 
 		/// <summary>
 		/// Sets the plug-in settings for the current session.
 		/// </summary>
 		/// <param name="settings">The plug-in settings.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="settings"/> is null.</exception>
 		internal void SetPluginSettings(PluginSettingsRegistry settings)
 		{
-			this.descriptorRegistrySuite.SetPluginSettings(settings);
+			this.pluginSettings = settings;
 		}
 
 		public string ErrorMessage
@@ -410,7 +410,6 @@ namespace PSFilterHostDll.PSApi
 			this.hostInfo = new HostInformation();
 			this.colorProfileConverter = new ColorProfileConverter();
 			this.documentColorProfile = null;
-			this.descriptorRegistrySuite = new DescriptorRegistrySuite();
 
 			this.lastInRect = Rect16.Empty;
 			this.lastOutRect = Rect16.Empty;
@@ -647,6 +646,17 @@ namespace PSFilterHostDll.PSApi
 			new FileIOPermission(FileIOPermissionAccess.PathDiscovery | FileIOPermissionAccess.Read, pdata.FileName).Demand();
 
 			module = new PluginModule(pdata.FileName, pdata.EntryPoint);
+		}
+
+		/// <summary>
+		/// Saves the plug-in settings from the descriptor registry suite.
+		/// </summary>
+		private void SavePluginSettings()
+		{
+			if (descriptorRegistrySuite != null)
+			{
+				this.pluginSettings = this.descriptorRegistrySuite.GetPluginSettings();
+			}
 		}
 
 		/// <summary>
@@ -1112,6 +1122,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				SaveParameterHandles();
 				SaveScriptingParameters();
+				SavePluginSettings();
 			}
 
 			PostProcessOutputData();
@@ -4837,6 +4848,15 @@ namespace PSFilterHostDll.PSApi
 					if (version != 1)
 					{
 						return PSError.kSPSuiteNotFoundError;
+					}
+
+					if (descriptorRegistrySuite == null)
+					{
+						this.descriptorRegistrySuite = new DescriptorRegistrySuite();
+						if (pluginSettings != null)
+						{
+							this.descriptorRegistrySuite.SetPluginSettings(pluginSettings);
+						}
 					}
 
 					PSDescriptorRegistryProcs registrySuite = this.descriptorRegistrySuite.CreateDescriptorRegistrySuite1();
