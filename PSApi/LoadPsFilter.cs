@@ -4699,6 +4699,14 @@ namespace PSFilterHostDll.PSApi
 			return error;
 		}
 
+		private unsafe void CreateActionDescriptorSuite()
+		{
+			PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
+
+			this.actionSuites.CreateDescriptorSuite(this.descriptorSuite.Aete, descriptorParameters->descriptor,
+				 this.scriptingData, this.picaSuites.ASZStringSuite);
+		}
+
 		private unsafe int AllocatePICASuite(ActivePICASuites.PICASuiteKey suiteKey, ref IntPtr suite)
 		{
 			try
@@ -4766,11 +4774,7 @@ namespace PSFilterHostDll.PSApi
 					}
 					if (!actionSuites.DescriptorSuiteCreated)
 					{
-						PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
-
-						this.actionSuites.CreateDescriptorSuite(this.descriptorSuite.Aete, descriptorParameters->descriptor,
-							this.scriptingData, this.picaSuites.ASZStringSuite);
-						this.descriptorRegistrySuite.ActionDescriptorSuite = this.actionSuites.DescriptorSuite;
+						CreateActionDescriptorSuite();
 					}
 
 					PSActionDescriptorProc actionDescriptor = this.actionSuites.DescriptorSuite.CreateActionDescriptorSuite2();
@@ -4834,7 +4838,12 @@ namespace PSFilterHostDll.PSApi
 
 					if (descriptorRegistrySuite == null)
 					{
-						this.descriptorRegistrySuite = new DescriptorRegistrySuite();
+						if (!actionSuites.DescriptorSuiteCreated)
+						{
+							CreateActionDescriptorSuite();
+						}
+
+						this.descriptorRegistrySuite = new DescriptorRegistrySuite(this.actionSuites.DescriptorSuite);
 						if (pluginSettings != null)
 						{
 							this.descriptorRegistrySuite.SetPluginSettings(pluginSettings);
