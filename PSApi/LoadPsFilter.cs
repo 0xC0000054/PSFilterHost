@@ -185,9 +185,7 @@ namespace PSFilterHostDll.PSApi
 		private DescriptorSuite descriptorSuite;
 		private ErrorSuite errorSuite;
 		private PseudoResourceSuite pseudoResourceSuite;
-		private ActionDescriptorSuite actionDescriptorSuite;
-		private ActionListSuite actionListSuite;
-		private ActionReferenceSuite actionReferenceSuite;
+		private ActionSuiteProvider actionSuites;
 		private DescriptorRegistrySuite descriptorRegistrySuite;
 
 		/// <summary>
@@ -400,6 +398,7 @@ namespace PSFilterHostDll.PSApi
 			ColorPickerManager.SetPickColorCallback(null);
 			this.descriptorSuite = new DescriptorSuite();
 			this.pseudoResourceSuite = new PseudoResourceSuite();
+			this.actionSuites = new ActionSuiteProvider();
 
 			this.useChannelPorts = false;
 			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
@@ -666,7 +665,8 @@ namespace PSFilterHostDll.PSApi
 			if (descriptorParameters->descriptor != IntPtr.Zero)
 			{
 				Dictionary<uint, AETEValue> data;
-				if (actionDescriptorSuite != null && actionDescriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
+				if (actionSuites.DescriptorSuiteCreated &&
+					actionSuites.DescriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
 				{
 					this.scriptingData = data;
 				}
@@ -4764,28 +4764,16 @@ namespace PSFilterHostDll.PSApi
 					{
 						return PSError.kSPSuiteNotFoundError;
 					}
-					if (actionDescriptorSuite == null)
+					if (!actionSuites.DescriptorSuiteCreated)
 					{
-						if (actionReferenceSuite == null)
-						{
-							this.actionReferenceSuite = new ActionReferenceSuite();
-						}
-						if (actionListSuite == null)
-						{
-							this.actionListSuite = new ActionListSuite(this.actionReferenceSuite, this.picaSuites.ASZStringSuite);
-						}
-						this.actionDescriptorSuite = new ActionDescriptorSuite(this.descriptorSuite.Aete, this.actionListSuite,
-							this.actionReferenceSuite, this.picaSuites.ASZStringSuite);
-						this.actionListSuite.ActionDescriptorSuite = this.actionDescriptorSuite;
-						this.descriptorRegistrySuite.ActionDescriptorSuite = this.actionDescriptorSuite;
-						if (scriptingData != null)
-						{
-							PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
-							this.actionDescriptorSuite.SetScriptingData(descriptorParameters->descriptor, scriptingData);
-						}
+						PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
+
+						this.actionSuites.CreateDescriptorSuite(this.descriptorSuite.Aete, descriptorParameters->descriptor,
+							this.scriptingData, this.picaSuites.ASZStringSuite);
+						this.descriptorRegistrySuite.ActionDescriptorSuite = this.actionSuites.DescriptorSuite;
 					}
 
-					PSActionDescriptorProc actionDescriptor = this.actionDescriptorSuite.CreateActionDescriptorSuite2();
+					PSActionDescriptorProc actionDescriptor = this.actionSuites.DescriptorSuite.CreateActionDescriptorSuite2();
 					suite = this.activePICASuites.AllocateSuite(suiteKey, actionDescriptor);
 				}
 				else if (suiteName.Equals(PSConstants.PICA.ActionListSuite, StringComparison.Ordinal))
@@ -4794,16 +4782,12 @@ namespace PSFilterHostDll.PSApi
 					{
 						return PSError.kSPSuiteNotFoundError;
 					}
-					if (actionListSuite == null)
+					if (!actionSuites.ListSuiteCreated)
 					{
-						if (actionReferenceSuite == null)
-						{
-							this.actionReferenceSuite = new ActionReferenceSuite();
-						}
-						this.actionListSuite = new ActionListSuite(this.actionReferenceSuite, this.picaSuites.ASZStringSuite);
+						this.actionSuites.CreateListSuite(this.picaSuites.ASZStringSuite);
 					}
 
-					PSActionListProcs listSuite = this.actionListSuite.CreateActionListSuite1();
+					PSActionListProcs listSuite = this.actionSuites.ListSuite.CreateActionListSuite1();
 					suite = this.activePICASuites.AllocateSuite(suiteKey, listSuite);
 				}
 				else if (suiteName.Equals(PSConstants.PICA.ActionReferenceSuite, StringComparison.Ordinal))
@@ -4812,12 +4796,12 @@ namespace PSFilterHostDll.PSApi
 					{
 						return PSError.kSPSuiteNotFoundError;
 					}
-					if (actionReferenceSuite == null)
+					if (!actionSuites.ReferenceSuiteCreated)
 					{
-						this.actionReferenceSuite = new ActionReferenceSuite();
+						this.actionSuites.CreateReferenceSuite();
 					}
 
-					PSActionReferenceProcs referenceSuite = this.actionReferenceSuite.CreateActionReferenceSuite2();
+					PSActionReferenceProcs referenceSuite = this.actionSuites.ReferenceSuite.CreateActionReferenceSuite2();
 					suite = this.activePICASuites.AllocateSuite(suiteKey, referenceSuite);
 				}
 				else if (suiteName.Equals(PSConstants.PICA.ASZStringSuite, StringComparison.Ordinal))
@@ -5482,10 +5466,10 @@ namespace PSFilterHostDll.PSApi
 						descriptorSuite = null;
 					}
 
-					if (actionDescriptorSuite != null)
+					if (actionSuites != null)
 					{
-						actionDescriptorSuite.Dispose();
-						actionDescriptorSuite = null;
+						actionSuites.Dispose();
+						actionSuites = null;
 					}
 				}
 
