@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ namespace PSFilterHostDll.PSApi
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short AllocateBufferProc(int size, ref IntPtr bufferID);
-    
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr LockBufferProc(IntPtr bufferID, byte moveHigh);
 

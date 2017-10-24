@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ namespace PSFilterHostDll.PSApi
             using (MemoryStream stream = new MemoryStream())
             {
                 // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
-                // so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+                // so we have to save it to a dummy tiff and grab the XMP meta-data on load.
                 BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 
                 tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));

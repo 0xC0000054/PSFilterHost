@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ namespace PSFilterHostDll.BGRASurface
 		protected static ushort Fix16BitRange(ushort x)
 		{
 			int value = x * 2; // double the value and clamp between 0 and 65535.
-			
+
 			if (value < 0)
 			{
 				return 0;
@@ -163,7 +163,7 @@ namespace PSFilterHostDll.BGRASurface
 
 			return (ushort)value;
 		}
-		
+
 		public unsafe abstract Bitmap CreateAliasedBitmap();
 #if !GDIPLUS
 		public unsafe abstract System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource();
@@ -193,7 +193,7 @@ namespace PSFilterHostDll.BGRASurface
 		/// </summary>
 		/// <param name="source">The Surface to read pixels from.</param>
 		/// <remarks>
-		/// This method was implemented with correctness, not performance, in mind. 
+		/// This method was implemented with correctness, not performance, in mind.
 		/// Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
 		///           http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
 		/// </remarks>
@@ -254,7 +254,7 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			return (CubeClamped(x + 2) - (4 * CubeClamped(x + 1)) + (6 * CubeClamped(x)) - (4 * CubeClamped(x - 1))) / 6;
 		}
-		
+
 		protected unsafe abstract void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
 		protected unsafe abstract void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
 

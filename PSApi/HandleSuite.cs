@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +310,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
-			DisposeHandleImpl(h); 
+			DisposeHandleImpl(h);
 		}
 
 		private unsafe void DisposeHandleImpl(IntPtr handle)

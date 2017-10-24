@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ namespace HostTest
 	internal sealed class ToolStripMenuItemEx : ToolStripMenuItem
 	{
 		private SubMenuItemCollection items;
-		
+
 		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text)
 		{
             this.items = new SubMenuItemCollection(this)
@@ -71,12 +71,12 @@ namespace HostTest
 			if ((this.items != null) && !base.Enabled)
 			{
 				bool rightToLeft = base.RightToLeft == System.Windows.Forms.RightToLeft.Yes;
-				
+
 				int arrowWidth = 10;
 				ArrowDirection direction = rightToLeft ? ArrowDirection.Left : ArrowDirection.Right;
- 
+
 				int textPadding = direction == ArrowDirection.Right ? 8 : 9; // See the TextPadding field in the System.Windows.Forms.ToolStripDropDownMenu static constructor.
- 
+
 				int arrowX = 0;
 
 				if (rightToLeft)

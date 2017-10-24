@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +100,7 @@ namespace PSFilterHostDll.PSApi
         [Serializable]
         private sealed class ActionListItemCollection : Collection<ActionListItem>
         {
-            public ActionListItemCollection() : base() 
+            public ActionListItemCollection() : base()
             {
             }
 
@@ -241,7 +241,7 @@ namespace PSFilterHostDll.PSApi
         bool IActionListSuite.ConvertToActionDescriptor(IntPtr list, out ActionDescriptorList descriptor)
         {
             descriptor = null;
-            
+
             ActionListItemCollection items;
             if (this.actionLists.TryGetValue(list, out items))
             {
@@ -966,7 +966,7 @@ namespace PSFilterHostDll.PSApi
                     for (int i = 0; i < valueCount; i++)
                     {
                         ActionListItem item = items[i];
-                                                
+
                         // The first through valueCount items in the list are required to be integers.
                         if (item.Type != DescriptorTypes.typeInteger)
                         {
@@ -1039,7 +1039,7 @@ namespace PSFilterHostDll.PSApi
             }
 
             return PSError.kSPBadParameterError;
-        } 
+        }
         #endregion
     }
 }

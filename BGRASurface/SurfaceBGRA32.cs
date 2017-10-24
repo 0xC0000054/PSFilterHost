@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ using System.Drawing;
 
 #if !GDIPLUS
 using System.Windows.Media;
-using System.Windows.Media.Imaging; 
+using System.Windows.Media.Imaging;
 #endif
 
 namespace PSFilterHostDll.BGRASurface
@@ -103,7 +103,7 @@ namespace PSFilterHostDll.BGRASurface
                     (int)this.stride
                     );
             }
-        } 
+        }
 #endif
 
 

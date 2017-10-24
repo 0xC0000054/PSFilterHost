@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +195,7 @@ namespace PSFilterHostDll.PSApi
 				readDescriptor->getSimpleReferenceProc = Marshal.GetFunctionPointerForDelegate(this.getSimpleReferenceProc);
 				readDescriptor->getStringProc = Marshal.GetFunctionPointerForDelegate(this.getStringProc);
 				readDescriptor->getTextProc = Marshal.GetFunctionPointerForDelegate(this.getTextProc);
-				readDescriptor->getUnitFloatProc = Marshal.GetFunctionPointerForDelegate(this.getUnitFloatProc); 
+				readDescriptor->getUnitFloatProc = Marshal.GetFunctionPointerForDelegate(this.getUnitFloatProc);
 			}
 
 			return readDescriptorPtr;
@@ -557,7 +557,7 @@ namespace PSFilterHostDll.PSApi
 			Dictionary<uint, AETEValue> value = item.Value as Dictionary<uint, AETEValue>;
 			if (value != null)
 			{
-				descriptorHandle = HandleSuite.Instance.NewHandle(0); // assign a zero byte handle to allow it to work correctly in the OpenReadDescriptorProc(). 
+				descriptorHandle = HandleSuite.Instance.NewHandle(0); // assign a zero byte handle to allow it to work correctly in the OpenReadDescriptorProc().
 				if (descriptorHandle == IntPtr.Zero)
 				{
 					state.lastReadError = PSError.memFullErr;

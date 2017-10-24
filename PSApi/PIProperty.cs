@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ using System;
 namespace PSFilterHostDll.PSApi
 {
 // Disable CS0649, Field 'field' is never assigned to, and will always have its default value 'value'
-#pragma warning disable 0649 
+#pragma warning disable 0649
 
 	internal struct PIProperty
 	{
@@ -29,7 +29,7 @@ namespace PSFilterHostDll.PSApi
 		public int propertyID;		/* Index within this property type. Must be unique for properties of a given type in a PiPL. */
 		public int propertyLength;	/* Length of following data array. Will be rounded to a multiple of 4. */
 
-		public const int SizeOf = 16; 
+		public const int SizeOf = 16;
 	}
 
 	internal struct PITerminology
@@ -62,7 +62,7 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		public const uint PIVersionProperty = 0x76657273U;
 		/// <summary>
-		/// Image modes supported flags - 'mode' 
+		/// Image modes supported flags - 'mode'
 		/// </summary>
 		public const uint PIImageModesProperty = 0x6d6f6465U;
 		/// <summary>
@@ -70,7 +70,7 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		public const uint PICategoryProperty = 0x63617467U;
 		/// <summary>
-		/// Menu name - 'name' 
+		/// Menu name - 'name'
 		/// </summary>
 		public const uint PINameProperty = 0x6e616d65U;
 		/// <summary>
@@ -86,7 +86,7 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		public const uint EnableInfo = 0x656e626cU;
 		/// <summary>
-		/// Creator code of required host, such as '8BIM' for Adobe Photoshop. - 'host' 
+		/// Creator code of required host, such as '8BIM' for Adobe Photoshop. - 'host'
 		/// </summary>
 		public const uint PIRequiredHostProperty = 0x686f7374U;
 		/// <summary>
@@ -94,5 +94,5 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		public const uint NoAboutBox = 0x6e61626fU;
 	}
-	
+
 }

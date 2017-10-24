@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace PSFilterHostDll.PSApi
         public uint hostSig;
         public IntPtr hostProcs;
 
-        public ImageModes imageMode; 
+        public ImageModes imageMode;
         public int imageHRes;
         public int imageVRes;
         public Point16 floatCoord;
@@ -75,7 +75,7 @@ namespace PSFilterHostDll.PSApi
         public IntPtr resourceProcs;
         public IntPtr processEvent;
         public IntPtr displayPixels;
-        public IntPtr handleProcs; 
+        public IntPtr handleProcs;
 
         // New in 3.0
         public byte supportsDummyChannels;
@@ -169,6 +169,6 @@ namespace PSFilterHostDll.PSApi
         public int iCCprofileSize;
         public int canUseICCProfiles;
 
-        public fixed byte reserved[54]; 
+        public fixed byte reserved[54];
     }
 }

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -60,10 +60,10 @@ namespace PSFilterHostDll
                 StringBuilder sb = new StringBuilder(260);
 
                 if (shellLink.GetPath(sb, sb.Capacity, IntPtr.Zero, 0U) != S_OK)
-                {    
+                {
                     return string.Empty;
                 }
-                
+
                 return sb.ToString();
             }
         }

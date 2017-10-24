@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -387,9 +387,9 @@ namespace HostTest
             ((System.ComponentModel.ISupportInitialize)(this.saturationUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.hueUpDown)).BeginInit();
             this.SuspendLayout();
-            // 
+            //
             // redUpDown
-            // 
+            //
             this.redUpDown.Location = new System.Drawing.Point(317, 34);
             this.redUpDown.Maximum = new decimal(new int[] {
             255,
@@ -404,9 +404,9 @@ namespace HostTest
             this.redUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.redUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.redUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // greenUpDown
-            // 
+            //
             this.greenUpDown.Location = new System.Drawing.Point(317, 58);
             this.greenUpDown.Maximum = new decimal(new int[] {
             255,
@@ -421,9 +421,9 @@ namespace HostTest
             this.greenUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.greenUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.greenUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // blueUpDown
-            // 
+            //
             this.blueUpDown.Location = new System.Drawing.Point(317, 82);
             this.blueUpDown.Maximum = new decimal(new int[] {
             255,
@@ -438,9 +438,9 @@ namespace HostTest
             this.blueUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.blueUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.blueUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // redLabel
-            // 
+            //
             this.redLabel.AutoSize = true;
             this.redLabel.Location = new System.Drawing.Point(219, 38);
             this.redLabel.Name = "redLabel";
@@ -448,9 +448,9 @@ namespace HostTest
             this.redLabel.TabIndex = 7;
             this.redLabel.Text = "R";
             this.redLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
+            //
             // blueLabel
-            // 
+            //
             this.blueLabel.AutoSize = true;
             this.blueLabel.Location = new System.Drawing.Point(219, 86);
             this.blueLabel.Name = "blueLabel";
@@ -458,9 +458,9 @@ namespace HostTest
             this.blueLabel.TabIndex = 8;
             this.blueLabel.Text = "B";
             this.blueLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // greenLabel
-            // 
+            //
             this.greenLabel.AutoSize = true;
             this.greenLabel.Location = new System.Drawing.Point(219, 62);
             this.greenLabel.Name = "greenLabel";
@@ -468,9 +468,9 @@ namespace HostTest
             this.greenLabel.TabIndex = 9;
             this.greenLabel.Text = "G";
             this.greenLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
+            //
             // saturationLabel
-            // 
+            //
             this.saturationLabel.AutoSize = true;
             this.saturationLabel.Location = new System.Drawing.Point(219, 174);
             this.saturationLabel.Name = "saturationLabel";
@@ -478,9 +478,9 @@ namespace HostTest
             this.saturationLabel.TabIndex = 16;
             this.saturationLabel.Text = "S:";
             this.saturationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // valueLabel
-            // 
+            //
             this.valueLabel.AutoSize = true;
             this.valueLabel.Location = new System.Drawing.Point(219, 198);
             this.valueLabel.Name = "valueLabel";
@@ -488,9 +488,9 @@ namespace HostTest
             this.valueLabel.TabIndex = 15;
             this.valueLabel.Text = "V:";
             this.valueLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // hueLabel
-            // 
+            //
             this.hueLabel.AutoSize = true;
             this.hueLabel.Location = new System.Drawing.Point(219, 150);
             this.hueLabel.Name = "hueLabel";
@@ -498,9 +498,9 @@ namespace HostTest
             this.hueLabel.TabIndex = 14;
             this.hueLabel.Text = "H:";
             this.hueLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
+            //
             // valueUpDown
-            // 
+            //
             this.valueUpDown.Location = new System.Drawing.Point(317, 194);
             this.valueUpDown.Name = "valueUpDown";
             this.valueUpDown.Size = new System.Drawing.Size(56, 20);
@@ -510,9 +510,9 @@ namespace HostTest
             this.valueUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.valueUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.valueUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // saturationUpDown
-            // 
+            //
             this.saturationUpDown.Location = new System.Drawing.Point(317, 170);
             this.saturationUpDown.Name = "saturationUpDown";
             this.saturationUpDown.Size = new System.Drawing.Size(56, 20);
@@ -522,9 +522,9 @@ namespace HostTest
             this.saturationUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.saturationUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.saturationUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // hueUpDown
-            // 
+            //
             this.hueUpDown.Location = new System.Drawing.Point(317, 146);
             this.hueUpDown.Maximum = new decimal(new int[] {
             360,
@@ -539,9 +539,9 @@ namespace HostTest
             this.hueUpDown.Enter += new System.EventHandler(this.UpDown_Enter);
             this.hueUpDown.KeyUp += new System.Windows.Forms.KeyEventHandler(this.UpDown_KeyUp);
             this.hueUpDown.Leave += new System.EventHandler(this.UpDown_Leave);
-            // 
+            //
             // hexBox
-            // 
+            //
             this.hexBox.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.hexBox.Location = new System.Drawing.Point(317, 106);
             this.hexBox.Name = "hexBox";
@@ -552,9 +552,9 @@ namespace HostTest
             this.hexBox.Enter += new System.EventHandler(this.HexUpDown_Enter);
             this.hexBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.hexBox_KeyDown);
             this.hexBox.Leave += new System.EventHandler(this.HexUpDown_Leave);
-            // 
+            //
             // hexLabel
-            // 
+            //
             this.hexLabel.AutoSize = true;
             this.hexLabel.Location = new System.Drawing.Point(219, 109);
             this.hexLabel.Name = "hexLabel";
@@ -562,9 +562,9 @@ namespace HostTest
             this.hexLabel.TabIndex = 13;
             this.hexLabel.Text = "Hex";
             this.hexLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            // 
+            //
             // okBtn
-            // 
+            //
             this.okBtn.Location = new System.Drawing.Point(217, 252);
             this.okBtn.Name = "okBtn";
             this.okBtn.Size = new System.Drawing.Size(75, 23);
@@ -572,9 +572,9 @@ namespace HostTest
             this.okBtn.Text = "Ok";
             this.okBtn.UseVisualStyleBackColor = true;
             this.okBtn.Click += new System.EventHandler(this.okBtn_Click);
-            // 
+            //
             // cancelBtn
-            // 
+            //
             this.cancelBtn.Location = new System.Drawing.Point(298, 252);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(75, 23);
@@ -582,9 +582,9 @@ namespace HostTest
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
-            // 
+            //
             // blueGradientControl
-            // 
+            //
             this.blueGradientControl.Count = 1;
             this.blueGradientControl.CustomGradient = null;
             this.blueGradientControl.DrawFarNub = true;
@@ -599,9 +599,9 @@ namespace HostTest
             this.blueGradientControl.TabStop = false;
             this.blueGradientControl.Value = 0;
             this.blueGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.RgbGradientControl_ValueChanged);
-            // 
+            //
             // greenGradientControl
-            // 
+            //
             this.greenGradientControl.Count = 1;
             this.greenGradientControl.CustomGradient = null;
             this.greenGradientControl.DrawFarNub = true;
@@ -616,9 +616,9 @@ namespace HostTest
             this.greenGradientControl.TabStop = false;
             this.greenGradientControl.Value = 0;
             this.greenGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.RgbGradientControl_ValueChanged);
-            // 
+            //
             // redGradientControl
-            // 
+            //
             this.redGradientControl.Count = 1;
             this.redGradientControl.CustomGradient = null;
             this.redGradientControl.DrawFarNub = true;
@@ -633,9 +633,9 @@ namespace HostTest
             this.redGradientControl.TabStop = false;
             this.redGradientControl.Value = 0;
             this.redGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.RgbGradientControl_ValueChanged);
-            // 
+            //
             // saturationGradientControl
-            // 
+            //
             this.saturationGradientControl.Count = 1;
             this.saturationGradientControl.CustomGradient = null;
             this.saturationGradientControl.DrawFarNub = true;
@@ -650,9 +650,9 @@ namespace HostTest
             this.saturationGradientControl.TabStop = false;
             this.saturationGradientControl.Value = 0;
             this.saturationGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.HsvGradientControl_ValueChanged);
-            // 
+            //
             // hueGradientControl
-            // 
+            //
             this.hueGradientControl.Count = 1;
             this.hueGradientControl.CustomGradient = null;
             this.hueGradientControl.DrawFarNub = true;
@@ -667,18 +667,18 @@ namespace HostTest
             this.hueGradientControl.TabStop = false;
             this.hueGradientControl.Value = 0;
             this.hueGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.HsvGradientControl_ValueChanged);
-            // 
+            //
             // colorWheel
-            // 
+            //
             this.colorWheel.Location = new System.Drawing.Point(53, 41);
             this.colorWheel.Name = "colorWheel";
             this.colorWheel.Size = new System.Drawing.Size(146, 147);
             this.colorWheel.TabIndex = 3;
             this.colorWheel.TabStop = false;
             this.colorWheel.ColorChanged += new System.EventHandler(this.ColorWheel_ColorChanged);
-            // 
+            //
             // hsvHeader
-            // 
+            //
             this.hsvHeader.ForeColor = System.Drawing.SystemColors.Highlight;
             this.hsvHeader.Location = new System.Drawing.Point(219, 130);
             this.hsvHeader.Name = "hsvHeader";
@@ -686,9 +686,9 @@ namespace HostTest
             this.hsvHeader.Size = new System.Drawing.Size(154, 14);
             this.hsvHeader.TabIndex = 28;
             this.hsvHeader.TabStop = false;
-            // 
+            //
             // rgbHeader
-            // 
+            //
             this.rgbHeader.ForeColor = System.Drawing.SystemColors.Highlight;
             this.rgbHeader.Location = new System.Drawing.Point(219, 18);
             this.rgbHeader.Name = "rgbHeader";
@@ -696,9 +696,9 @@ namespace HostTest
             this.rgbHeader.Size = new System.Drawing.Size(154, 14);
             this.rgbHeader.TabIndex = 27;
             this.rgbHeader.TabStop = false;
-            // 
+            //
             // valueGradientControl
-            // 
+            //
             this.valueGradientControl.Count = 1;
             this.valueGradientControl.CustomGradient = null;
             this.valueGradientControl.DrawFarNub = true;
@@ -713,17 +713,17 @@ namespace HostTest
             this.valueGradientControl.TabStop = false;
             this.valueGradientControl.Value = 0;
             this.valueGradientControl.ValueChanged += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.HsvGradientControl_ValueChanged);
-            // 
+            //
             // colorDisplayWidget
-            // 
+            //
             this.colorDisplayWidget.Location = new System.Drawing.Point(6, 33);
             this.colorDisplayWidget.Name = "colorDisplayWidget";
             this.colorDisplayWidget.RectangleColor = System.Drawing.Color.Empty;
             this.colorDisplayWidget.Size = new System.Drawing.Size(42, 42);
             this.colorDisplayWidget.TabIndex = 32;
-            // 
+            //
             // swatchHeader
-            // 
+            //
             this.swatchHeader.ForeColor = System.Drawing.SystemColors.Highlight;
             this.swatchHeader.Location = new System.Drawing.Point(7, 194);
             this.swatchHeader.Name = "swatchHeader";
@@ -731,9 +731,9 @@ namespace HostTest
             this.swatchHeader.Size = new System.Drawing.Size(193, 14);
             this.swatchHeader.TabIndex = 30;
             this.swatchHeader.TabStop = false;
-            // 
+            //
             // swatchControl
-            // 
+            //
             this.swatchControl.BlinkHighlight = false;
             this.swatchControl.Colors = new System.Drawing.Color[0];
             this.swatchControl.Location = new System.Drawing.Point(7, 206);
@@ -742,18 +742,18 @@ namespace HostTest
             this.swatchControl.TabIndex = 31;
             this.swatchControl.Text = "swatchControl1";
             this.swatchControl.ColorClicked += new System.EventHandler<PaintDotNet.IndexEventArgs>(this.swatchControl_ColorClicked);
-            // 
+            //
             // promptLbl
-            // 
+            //
             this.promptLbl.AutoSize = true;
             this.promptLbl.Location = new System.Drawing.Point(4, 9);
             this.promptLbl.Name = "promptLbl";
             this.promptLbl.Size = new System.Drawing.Size(81, 13);
             this.promptLbl.TabIndex = 42;
             this.promptLbl.Text = "Choose a color:";
-            // 
+            //
             // ColorPickerForm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(386, 284);

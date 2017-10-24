@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ namespace PSFilterHostDll.PSApi
                 this.length = length;
             }
         }
- 
+
         /// <summary>
         /// The record containing the IPTC-NAA specification version.
         /// </summary>
@@ -136,7 +136,7 @@ namespace PSFilterHostDll.PSApi
                     ptr += 2;
                     *((ushort*)ptr) = SwapUInt16(this.version.version);
                     ptr += 2;
-                    
+
                     // Swap the tag structure to big-endian.
                     *ptr = this.tag.signature;
                     ptr += 1;
@@ -215,7 +215,7 @@ namespace PSFilterHostDll.PSApi
 
                 return caption;
             }
-            
+
             return null;
         }
 
@@ -223,5 +223,5 @@ namespace PSFilterHostDll.PSApi
         {
             return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
         }
-    } 
+    }
 }

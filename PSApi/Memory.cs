@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ namespace PSFilterHostDll.PSApi
 	/// <summary>
 	/// Contains methods for allocating and freeing memory from the default process heap.
 	/// </summary>
-	internal static class Memory 
+	internal static class Memory
 	{
 		private static IntPtr hHeap;
 

@@ -12,7 +12,7 @@ using System.Drawing;
 namespace PaintDotNet
 {
     /// <summary>
-    /// Adapted from: 
+    /// Adapted from:
     /// "A Primer on Building a Color Picker User Control with GDI+ in Visual Basic .NET or C#"
     /// http://www.msdnaa.net/Resources/display.aspx?ResID=2460
     /// </summary>
@@ -132,7 +132,7 @@ namespace PaintDotNet
                 fractionalSector = sectorPos - sectorNumber;
 
                 // Calculate values for the three axes
-                // of the color. 
+                // of the color.
                 p = v * (1 - s);
                 q = v * (1 - (s * fractionalSector));
                 t = v * (1 - (s * (1 - fractionalSector)));

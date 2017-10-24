@@ -16,10 +16,10 @@ using System.Windows.Forms;
 
 namespace PaintDotNet
 {
-    internal class ColorWheel 
+    internal class ColorWheel
         : UserControl
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.Container components = null;
@@ -30,7 +30,7 @@ namespace PaintDotNet
         // this number controls what you might call the tesselation of the color wheel. higher #'s = slower, lower #'s = looks worse
         private const int colorTesselation = 60;
 
-        private PictureBox wheelPictureBox; 
+        private PictureBox wheelPictureBox;
 
         private HsvColor hsvColor;
         public HsvColor HsvColor
@@ -51,7 +51,7 @@ namespace PaintDotNet
                 }
             }
         }
-                
+
         public ColorWheel()
         {
             // This call is required by the Windows.Forms Form Designer.
@@ -75,7 +75,7 @@ namespace PaintDotNet
         private static PointF[] GetCirclePoints(float r, PointF center)
         {
             PointF[] points = new PointF[colorTesselation];
-            
+
             for (int i = 0; i < colorTesselation; i++)
             {
                 float theta = ((float)i / (float)colorTesselation) * 2 * (float)Math.PI;
@@ -83,7 +83,7 @@ namespace PaintDotNet
                 points[i].X += center.X;
                 points[i].Y += center.Y;
             }
-            
+
             return points;
         }
 
@@ -152,7 +152,7 @@ namespace PaintDotNet
 
             int wheelDiameter = (int)ComputeDiameter(Size);
 
-            renderBitmap = new Bitmap(Math.Max(1, (wheelDiameter * 4) / 3), 
+            renderBitmap = new Bitmap(Math.Max(1, (wheelDiameter * 4) / 3),
                                       Math.Max(1, (wheelDiameter * 4) / 3), PixelFormat.Format24bppRgb);
 
             using (Graphics g1 = Graphics.FromImage(renderBitmap))
@@ -166,7 +166,7 @@ namespace PaintDotNet
         {
             float radius = ComputeRadius(new Size(width, height));
             PointF[] points = GetCirclePoints(Math.Max(1.0f, (float)radius - 1), new PointF(radius, radius));
-            
+
             using (PathGradientBrush pgb = new PathGradientBrush(points))
             {
                 pgb.CenterColor = new HsvColor(0, 0, 100).ToColor();
@@ -184,7 +184,7 @@ namespace PaintDotNet
 
         private static float ComputeDiameter(Size size)
         {
-            return Math.Min((float)size.Width, (float)size.Height);       
+            return Math.Min((float)size.Width, (float)size.Height);
         }
 
         protected override void OnResize(EventArgs e)
@@ -267,7 +267,7 @@ namespace PaintDotNet
             }
         }
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         protected override void Dispose(bool disposing)
@@ -285,17 +285,17 @@ namespace PaintDotNet
         }
 
         #region Component Designer generated code
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
         {
             this.wheelPictureBox = new System.Windows.Forms.PictureBox();
             this.SuspendLayout();
-            // 
+            //
             // wheelPictureBox
-            // 
+            //
             this.wheelPictureBox.Location = new System.Drawing.Point(0, 0);
             this.wheelPictureBox.Name = "wheelPictureBox";
             this.wheelPictureBox.TabIndex = 0;
@@ -305,9 +305,9 @@ namespace PaintDotNet
             this.wheelPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.wheelPictureBox_MouseUp);
             this.wheelPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.wheelPictureBox_MouseMove);
             this.wheelPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.wheelPictureBox_MouseDown);
-            // 
+            //
             // ColorWheel
-            // 
+            //
             this.Controls.Add(this.wheelPictureBox);
             this.Name = "ColorWheel";
             this.ResumeLayout(false);

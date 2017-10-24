@@ -30,8 +30,8 @@ namespace Devcorp.Controls.Design
 		public static bool operator ==(CIELab item1, CIELab item2)
 		{
 			return (
-				item1.L == item2.L 
-				&& item1.A == item2.A 
+				item1.L == item2.L
+				&& item1.A == item2.A
 				&& item1.B == item2.B
 				);
 		}
@@ -39,8 +39,8 @@ namespace Devcorp.Controls.Design
 		public static bool operator !=(CIELab item1, CIELab item2)
 		{
 			return (
-				item1.L != item2.L 
-				|| item1.A != item2.A 
+				item1.L != item2.L
+				|| item1.A != item2.A
 				|| item1.B != item2.B
 				);
 		}
@@ -96,18 +96,18 @@ namespace Devcorp.Controls.Design
 		#endregion
 
 		#region Methods
-		public override bool Equals(Object obj) 
+		public override bool Equals(Object obj)
 		{
 			if(obj==null || GetType()!=obj.GetType()) return false;
 
 			return (this == (CIELab)obj);
 		}
 
-		public override int GetHashCode() 
+		public override int GetHashCode()
 		{
 			return L.GetHashCode() ^ a.GetHashCode() ^ b.GetHashCode();
 		}
 
 		#endregion
-	} 
+	}
 }

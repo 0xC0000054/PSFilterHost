@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi 
+namespace PSFilterHostDll.PSApi
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate IntPtr OpenWriteDescriptorProc();
@@ -29,7 +29,7 @@ namespace PSFilterHostDll.PSApi
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short PutIntegerProc([In()] IntPtr descriptor, [In()] uint key, [In()] int data);
-   
+
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate short PutFloatProc([In()] IntPtr descriptor, [In()] uint key, [In()] ref double data);
 
@@ -170,7 +170,7 @@ namespace PSFilterHostDll.PSApi
     {
         public short readDescriptorProcsVersion;
         public short numReadDescriptorProcs;
-        
+
         public IntPtr openReadDescriptorProc;
         public IntPtr closeReadDescriptorProc;
         public IntPtr getKeyProc;

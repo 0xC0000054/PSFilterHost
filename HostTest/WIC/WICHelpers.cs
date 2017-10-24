@@ -5,8 +5,8 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
-// Portions Copyright (C) Microsoft Corporation. All Rights Reserved. 
+//
+// Portions Copyright (C) Microsoft Corporation. All Rights Reserved.
 //
 // See LICENSE.txt for complete licensing and attribution information.
 //
@@ -81,7 +81,7 @@ namespace HostTest
                 if (eu != null)
                 {
                     Marshal.ReleaseComObject(eu);
-                } 
+                }
                 Marshal.ReleaseComObject(factory);
             }
         }
@@ -211,7 +211,7 @@ namespace HostTest
                 formats.Append(";");
                 description.Append(", ");
             }
-            // Remove the last separator. 
+            // Remove the last separator.
             formats.Remove(formats.Length - 1, 1);
             description.Remove(description.Length - 2, 2);
             description.Append(")");
@@ -234,7 +234,7 @@ namespace HostTest
             foreach (IWICBitmapCodecInfo info in GetComponentInfos(WICComponentType.WICDecoder))
             {
                 string extString = GetString(info.GetFileExtensions).ToLowerInvariant();
-                
+
                 extensions.UnionWith(extString.Split(SplitChars, StringSplitOptions.RemoveEmptyEntries));
             }
 

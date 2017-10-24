@@ -5,14 +5,14 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms; 
+using System.Windows.Forms;
 
 namespace HostTest
 {
@@ -89,7 +89,7 @@ namespace HostTest
                     DrawImage();
                 }
             }
-        } 
+        }
 
         private void DrawImage()
         {
@@ -100,7 +100,7 @@ namespace HostTest
                     image.Dispose();
                     image = null;
                 }
-                image = new Bitmap(imageWidth, imageHeight); 
+                image = new Bitmap(imageWidth, imageHeight);
             }
 
             using (Graphics gr = Graphics.FromImage(image))
@@ -108,7 +108,7 @@ namespace HostTest
                 using (Pen borderPen = new Pen(Color.Black))
                 {
                     gr.DrawRectangle(borderPen, 0, 0, imageWidth - 1, imageHeight - 1);
-                } 
+                }
 
                 using (SolidBrush brush = new SolidBrush(color))
                 {

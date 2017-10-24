@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ namespace HostTest
 		private BitmapSource dstImage;
 		private PseudoResourceCollection pseudoResources;
 		private Dictionary<PluginData, ParameterData> filterParameters;
-		private HistoryStack historyStack;   
+		private HistoryStack historyStack;
 		private Thread filterThread;
 		private ToolStripItem currentFilterMenuItem;
 		private bool setFilterApplyText;
@@ -44,7 +44,7 @@ namespace HostTest
 		private string imageType;
 		private string dropImageFileName;
 		private Size panelClientSize;
-		private AbortMessageFilter messageFilter;  
+		private AbortMessageFilter messageFilter;
 		private string srcImageTempFileName;
 		private string currentPluginDirectory;
 		private HostInformation hostInfo;
@@ -58,7 +58,7 @@ namespace HostTest
 
 		private static readonly ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
 		private static readonly ColorContext SrgbColorContext = ColorProfileHelper.GetSrgbColorContext();
-		
+
 		public Form1()
 		{
 			InitializeComponent();
@@ -68,7 +68,7 @@ namespace HostTest
 			this.filterParameters = new Dictionary<PluginData, ParameterData>();
 			this.historyStack = new HistoryStack();
 			this.historyStack.HistoryChanged += new EventHandler(historyStack_HistoryChanged);
-			this.currentFilterMenuItem = null;          
+			this.currentFilterMenuItem = null;
 			this.setFilterApplyText = false;
 			this.filterName = string.Empty;
 			this.imageFileName = string.Empty;
@@ -92,7 +92,7 @@ namespace HostTest
 			}
 
 			this.applicationName = this.Text;
-			
+
 			this.messageFilter = new AbortMessageFilter();
 			Application.AddMessageFilter(this.messageFilter);
 
@@ -135,7 +135,7 @@ namespace HostTest
 			{
 				// Temporarily disable the AutoSize property so the new ImageScalingSize will be used during layout,
 				// see http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstrip.imagescalingsize.aspx.
-				toolStrip.AutoSize = false;  
+				toolStrip.AutoSize = false;
 				toolStrip.ImageScalingSize = scaledImageSize;
 				toolStrip.PerformLayout();
 				toolStrip.AutoSize = true;
@@ -192,7 +192,7 @@ namespace HostTest
 			string newMonitorProfile = ColorProfileHelper.GetMonitorColorProfilePath(this.Handle);
 			if (string.IsNullOrEmpty(newMonitorProfile))
 			{
-				// If the current monitor does not have a color profile use the default sRGB profile. 
+				// If the current monitor does not have a color profile use the default sRGB profile.
 				this.monitorColorProfilePath = SrgbColorContext.ProfileUri.LocalPath;
 				this.monitorColorContext = SrgbColorContext;
 			}
@@ -273,7 +273,7 @@ namespace HostTest
 				}
 				catch (EntryPointNotFoundException)
 				{
-					// This method is only present on Vista SP1 or XP SP3 and later. 
+					// This method is only present on Vista SP1 or XP SP3 and later.
 				}
 			}
 
@@ -353,7 +353,7 @@ namespace HostTest
 
 				WorkerArgs args = new WorkerArgs(path);
 
-				this.backgroundWorker1.RunWorkerAsync(args); 
+				this.backgroundWorker1.RunWorkerAsync(args);
 			}
 		}
 
@@ -393,11 +393,11 @@ namespace HostTest
 						{
 							PluginData data = (PluginData)repeatMenuItem.Tag;
 
-							repeatMenuItem.Enabled = data.SupportsImageMode(format); 
+							repeatMenuItem.Enabled = data.SupportsImageMode(format);
 						}
 					}
 				}
-					
+
 			}
 			else
 			{
@@ -407,7 +407,7 @@ namespace HostTest
 					items[i].Enabled = false;
 				}
 			}
-				
+
 		}
 
 		private void RunPhotoshopFilter_Click(object sender, EventArgs e)
@@ -415,7 +415,7 @@ namespace HostTest
 			ToolStripItem item = (ToolStripItem)sender;
 			PluginData pluginData = (PluginData)item.Tag;
 			this.currentFilterMenuItem = item;
-			
+
 			RunPhotoshopFilterThread(pluginData, true);
 		}
 
@@ -492,7 +492,7 @@ namespace HostTest
 				catch (NotSupportedException)
 				{
 				}
-					
+
 				this.srcMetaData = null;
 				if (metaData != null)
 				{
@@ -534,7 +534,7 @@ namespace HostTest
 					TiffBitmapEncoder encoder = new TiffBitmapEncoder();
 					encoder.Frames.Add(BitmapFrame.Create(this.srcImage, null, metaData, null));
 					encoder.Save(stream);
-				}  
+				}
 			}
 		}
 
@@ -551,7 +551,7 @@ namespace HostTest
 			{
 				selection = new Region(canvas.ClipPath);
 			}
-			
+
 			BitmapSource image = null;
 
 			if (dstImage == null)
@@ -559,7 +559,7 @@ namespace HostTest
 				// save the srcImage to a temporary file on the UI thread and load it on this thread to fix the cross threading issues.
 				if (string.IsNullOrEmpty(srcImageTempFileName))
 				{
-					base.Invoke(new Action(SaveImageOnUIThread)); 
+					base.Invoke(new Action(SaveImageOnUIThread));
 				}
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Open, FileAccess.Read))
@@ -708,7 +708,7 @@ namespace HostTest
 					ToolStripMenuItem repeatItem = (ToolStripMenuItem)filtersToolStripMenuItem.DropDownItems[0];
 					repeatItem.Text = this.currentFilterMenuItem.Text.TrimEnd('.');
 					repeatItem.Tag = this.currentFilterMenuItem.Tag;
-				} 
+				}
 			}
 		}
 
@@ -830,7 +830,7 @@ namespace HostTest
 				}
 				else
 				{
-					this.canvas.Surface = new Bitmap(stream); 
+					this.canvas.Surface = new Bitmap(stream);
 				}
 			}
 		}
@@ -1054,7 +1054,7 @@ namespace HostTest
 				}
 			}
 		}
-			
+
 		private void pointerSelectBtn_Click(object sender, EventArgs e)
 		{
 			if (!pointerSelectBtn.Checked)
@@ -1111,8 +1111,8 @@ namespace HostTest
 		private void zoomOutBtn_Click(object sender, EventArgs e)
 		{
 			this.canvas.ZoomOut();
-		} 
-			
+		}
+
 		private void zoomToWindowBtn_Click(object sender, EventArgs e)
 		{
 			if (!panelClientSize.IsEmpty)
@@ -1270,7 +1270,7 @@ namespace HostTest
 
 		private void canvas_DirtyChanged(object sender, CanvasDirtyChangedEventArgs e)
 		{
-			this.saveToolStripMenuItem.Enabled = e.Dirty; 
+			this.saveToolStripMenuItem.Enabled = e.Dirty;
 		}
 
 		private static bool FileDropIsImage(string file)
@@ -1314,7 +1314,7 @@ namespace HostTest
 					this.dropImageFileName = files[0];
 				}
 			}
-			
+
 			base.OnDragEnter(drgevent);
 		}
 
@@ -1354,8 +1354,8 @@ namespace HostTest
 				{
 					ShowErrorMessage(ex.Message);
 				}
-			}			
-			
+			}
+
 			base.OnDragDrop(drgevent);
 		}
 
@@ -1437,7 +1437,7 @@ namespace HostTest
 						{
 							aboutList.Add(aboutItem);
 						}
-					} 
+					}
 				}
 			}
 
@@ -1461,7 +1461,7 @@ namespace HostTest
 				args.Filters = filters;
 				args.AboutFilters = aboutList.ToArray();
 			}
-			
+
 			e.Result = args;
 		}
 
@@ -1485,7 +1485,7 @@ namespace HostTest
 						{
 							this.aboutMenuToolStripSeparator.Available = true;
 							this.aboutPluginsMenuItem.Available = true;
-						} 
+						}
 					}
 					else
 					{

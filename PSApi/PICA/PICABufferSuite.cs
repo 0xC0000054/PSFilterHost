@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ namespace PSFilterHostDll.PSApi.PICA
             this.bufferSuiteGetSize = new PSBufferSuiteGetSize(PSBufferGetSize);
             this.bufferSuiteGetSpace = new PSBufferSuiteGetSpace(PSBufferGetSpace);
             this.buffers = new List<IntPtr>();
-            this.disposed = false; 
+            this.disposed = false;
         }
 
         private IntPtr PSBufferNew(ref uint requestedSizePtr, uint minimumSize)
@@ -82,7 +82,7 @@ namespace PSFilterHostDll.PSApi.PICA
                             allocatedSize = minimumSize;
                         }
                     }
-                
+
                     // The requested size pointer is used as an output parameter to return the actual number of bytes allocated.
                     requestedSizePtr = allocatedSize;
                 }

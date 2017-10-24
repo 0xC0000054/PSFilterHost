@@ -10,8 +10,8 @@
 
 namespace PSFilterHostDll.Properties {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace PSFilterHostDll.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace PSFilterHostDll.Properties {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace PSFilterHostDll.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Access to &apos;{0}&apos; is denied.
         /// </summary>
@@ -68,7 +68,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("AccessDeniedWithPath", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Alpha.
         /// </summary>
@@ -77,7 +77,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("AlphaChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The filter does not support processing completely transparent images..
         /// </summary>
@@ -86,7 +86,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("BlankDataNotSupported", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Blue.
         /// </summary>
@@ -95,7 +95,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("BlueChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to create the color transform..
         /// </summary>
@@ -104,7 +104,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("CreateTransformError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find a part of the path &apos;{0}&apos;..
         /// </summary>
@@ -113,7 +113,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("DirectoryNotFoundWithPath", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to There is not enough space on the disk..
         /// </summary>
@@ -122,7 +122,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("DiskFullError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Reached the end of the file..
         /// </summary>
@@ -131,7 +131,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("EndOfFileError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to A file I/O error occurred..
         /// </summary>
@@ -140,7 +140,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("FileIOError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The file is in use or locked by another process..
         /// </summary>
@@ -149,7 +149,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("FileLockedError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The system cannot find the file specified..
         /// </summary>
@@ -158,7 +158,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("FileNotFoundError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The filter does not support {0} images..
         /// </summary>
@@ -167,7 +167,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("FilterBadModeFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to An unknown error has occurred..
         /// </summary>
@@ -176,7 +176,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("FilterBadParameters", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to 16-bit Grayscale.
         /// </summary>
@@ -185,7 +185,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("Gray16Mode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Gray.
         /// </summary>
@@ -194,7 +194,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("GrayChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to 8-bit Grayscale.
         /// </summary>
@@ -203,7 +203,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("GrayScaleMode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Green.
         /// </summary>
@@ -212,7 +212,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("GreenChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to This host does not support colBytes other than 1..
         /// </summary>
@@ -221,7 +221,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("HostDoesNotSupportColStep", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Image height must be less than or equal to 32000 pixels..
         /// </summary>
@@ -230,7 +230,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("ImageHeightTooLarge", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Image size must be less than or equal to 32000x32000 pixels..
         /// </summary>
@@ -239,7 +239,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("ImageSizeTooLarge", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Image width must be less than or equal to 32000 pixels..
         /// </summary>
@@ -248,7 +248,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("ImageWidthTooLarge", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The image sample point is not valid..
         /// </summary>
@@ -257,7 +257,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("InvalidSamplePoint", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Selection Mask.
         /// </summary>
@@ -266,7 +266,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("MaskChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to open the document color profile..
         /// </summary>
@@ -275,7 +275,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("OpenDocumentColorProfileError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to open the monitor color profile..
         /// </summary>
@@ -284,7 +284,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("OpenMonitorColorProfileError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Insufficient memory to continue the execution of the plugin..
         /// </summary>
@@ -293,7 +293,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("OutOfMemoryError", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The FilterParameters property must be set before running a filter without its UI..
         /// </summary>
@@ -302,7 +302,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("ParametersNotSet", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Other.
         /// </summary>
@@ -311,7 +311,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("PiMIDefaultCategoryName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to find an entry point named &apos;{0}&apos; in  &apos;{1}&apos;.
         /// </summary>
@@ -320,7 +320,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("PluginEntryPointNotFound", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The filter requires services not provided by this host..
         /// </summary>
@@ -329,7 +329,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("PlugInHostInsufficient", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The filter requested a property that could not be found..
         /// </summary>
@@ -338,7 +338,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("PlugInPropertyUndefined", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Red.
         /// </summary>
@@ -347,7 +347,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("RedChannelName", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to 48-bit RGB.
         /// </summary>
@@ -356,7 +356,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("RGB48Mode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to 24-bit RGB.
         /// </summary>
@@ -365,7 +365,7 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("RGBMode", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to The disk is in use or locked by another process..
         /// </summary>

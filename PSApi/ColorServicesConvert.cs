@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +58,7 @@ namespace PSFilterHostDll.PSApi
 					resultSpace = sourceSpace;
 					return PSError.noErr;
 				}
-				
+
 				if (resultSpace < ColorSpace.RGBSpace || resultSpace > ColorSpace.XYZSpace)
 				{
 					return PSError.paramErr;
@@ -528,7 +528,7 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		private static CIELab HSBToLab(double h, double s, double b)
-		{ 
+		{
 			CIEXYZ xyz = HSBtoXYZ(h, s, b);
 			return ColorSpaceHelper.XYZtoLab(xyz);
 		}
@@ -575,6 +575,6 @@ namespace PSFilterHostDll.PSApi
 			return ColorSpaceHelper.RGBtoHSL(rgb);
 		}
 	}
-	
-	
+
+
 }

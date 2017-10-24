@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -19,7 +19,7 @@ using System.Drawing.Imaging;
 #else
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging; 
+using System.Windows.Media.Imaging;
 #endif
 
 namespace PSFilterHostDll.BGRASurface
@@ -30,7 +30,7 @@ namespace PSFilterHostDll.BGRASurface
 	internal static class SurfaceFactory
 	{
 
-#if GDIPLUS 
+#if GDIPLUS
 		/// <summary>
 		/// Creates a new surface based on the PixelFormat of the Bitmap.
 		/// </summary>
@@ -63,9 +63,9 @@ namespace PSFilterHostDll.BGRASurface
 				finally
 				{
 					temp.UnlockBits(data);
-				}  
+				}
 			}
-			
+
 
 			return surface;
 		}
@@ -205,7 +205,7 @@ namespace PSFilterHostDll.BGRASurface
 				return surface;
 			}
 
-		} 
+		}
 #endif
 
 		/// <summary>

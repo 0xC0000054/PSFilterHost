@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace PSFilterHostDll.PSApi
 		private List<ChannelDescPtrs> channelReadDescPtrs;
 
 		#region CallbackDelegates
-		// MiscCallbacks		
+		// MiscCallbacks
 		private AdvanceStateProc advanceProc;
 		private ColorServicesProc colorProc;
 		private DisplayPixelsProc displayPixelsProc;
@@ -495,7 +495,7 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
-			if (data.FilterInfo == null || 
+			if (data.FilterInfo == null ||
 				data.Category.Equals("Axion", StringComparison.Ordinal) ||
 				data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
 			{
@@ -1742,7 +1742,7 @@ namespace PSFilterHostDll.PSApi
 						default:
 							message = GetMacOSErrorMessage(error);
 							break;
-					} 
+					}
 				}
 			}
 
@@ -3212,7 +3212,7 @@ namespace PSFilterHostDll.PSApi
 				return PSError.errUnsupportedDepth;
 			}
 
-			if ((destination.bitOffset % 8) != 0)  // the offsets must be aligned to a System.Byte. 
+			if ((destination.bitOffset % 8) != 0)  // the offsets must be aligned to a System.Byte.
 			{
 				return PSError.errUnsupportedBitOffset;
 			}
@@ -3948,7 +3948,7 @@ namespace PSFilterHostDll.PSApi
 				}
 
 				// As some plug-ins may use planar order RGB data and the Windows Color System APIs do not support that format
-				// we first have to convert the data to interleaved BGR(A) and then use a second surface for color correction. 
+				// we first have to convert the data to interleaved BGR(A) and then use a second surface for color correction.
 				if (displayImageMode == PSConstants.plugInModeRGBColor && colorProfileConverter.ColorCorrectionRequired)
 				{
 					if (colorCorrectedDisplaySurface != null)
@@ -5219,7 +5219,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->foreground.green = (ushort)((foregroundColor[1] * 65535) / 255);
 			filterRecord->foreground.blue = (ushort)((foregroundColor[2] * 65535) / 255);
 
-			// The backColor and foreColor fields are always in the native color space of the image. 
+			// The backColor and foreColor fields are always in the native color space of the image.
 			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
 				const int redLuma = 19595;
@@ -5298,7 +5298,7 @@ namespace PSFilterHostDll.PSApi
 			// New in 4.0
 			filterRecord->descriptorParameters = descriptorParametersPtr;
 
-			// The errorStringPtr value is used so the filters cannot corrupt the pointer that we release when the class is disposed. 
+			// The errorStringPtr value is used so the filters cannot corrupt the pointer that we release when the class is disposed.
 			this.errorStringPtr = Memory.Allocate(256L, true);
 			filterRecord->errorString = this.errorStringPtr;
 

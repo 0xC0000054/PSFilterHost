@@ -29,8 +29,8 @@ namespace Devcorp.Controls.Design
 		public static bool operator ==(HSB item1, HSB item2)
 		{
 			return (
-				item1.Hue == item2.Hue 
-				&& item1.Saturation == item2.Saturation 
+				item1.Hue == item2.Hue
+				&& item1.Saturation == item2.Saturation
 				&& item1.Brightness == item2.Brightness
 				);
 		}
@@ -38,8 +38,8 @@ namespace Devcorp.Controls.Design
 		public static bool operator !=(HSB item1, HSB item2)
 		{
 			return (
-				item1.Hue != item2.Hue 
-				|| item1.Saturation != item2.Saturation 
+				item1.Hue != item2.Hue
+				|| item1.Saturation != item2.Saturation
 				|| item1.Brightness != item2.Brightness
 				);
 		}
@@ -48,31 +48,31 @@ namespace Devcorp.Controls.Design
 
 		#region Accessors
 		[Description("Hue component"),]
-		public double Hue 
-		{ 
+		public double Hue
+		{
 			get
 			{
 				return hue;
-			} 
-		} 
+			}
+		}
 
 		[Description("Saturation component"),]
-		public double Saturation 
-		{ 
+		public double Saturation
+		{
 			get
 			{
 				return saturation;
-			} 
-		} 
+			}
+		}
 
 		[Description("Brightness component"),]
-		public double Brightness 
-		{ 
+		public double Brightness
+		{
 			get
 			{
 				return brightness;
-			} 
-		} 
+			}
+		}
 		#endregion
 
 		/// <summary>
@@ -81,22 +81,22 @@ namespace Devcorp.Controls.Design
 		/// <param name="h">Hue value.</param>
 		/// <param name="s">Saturation value.</param>
 		/// <param name="b">Brightness value.</param>
-		public HSB(double h, double s, double b) 
+		public HSB(double h, double s, double b)
 		{
-			hue = (h>360)? 360 : ((h<0)?0:h); 
+			hue = (h>360)? 360 : ((h<0)?0:h);
 			saturation = (s>1)? 1 : ((s<0)?0:s);
 			brightness = (b>1)? 1 : ((b<0)?0:b);
 		}
 
 		#region Methods
-		public override bool Equals(Object obj) 
+		public override bool Equals(Object obj)
 		{
 			if(obj==null || GetType()!=obj.GetType()) return false;
 
 			return (this == (HSB)obj);
 		}
 
-		public override int GetHashCode() 
+		public override int GetHashCode()
 		{
 			return Hue.GetHashCode() ^ Saturation.GetHashCode() ^ Brightness.GetHashCode();
 		}

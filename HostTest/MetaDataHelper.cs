@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ namespace HostTest
 						BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 						tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
-						tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data)); // The XMP specification requires TIFF XMP meta-data to be UTF8 encoded.      
+						tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data)); // The XMP specification requires TIFF XMP meta-data to be UTF8 encoded.
 
 						return tiffMetaData;
 					}
@@ -270,8 +270,8 @@ namespace HostTest
 
 			return null;
 		}
-		
-		#endregion        
+
+		#endregion
 		/// <summary>
 		/// Converts the meta-data to TIFF format.
 		/// </summary>
@@ -296,7 +296,7 @@ namespace HostTest
 			catch (NotSupportedException)
 			{
 			}
-			
+
 			if (format != "tiff")
 			{
 				if (format == "gif")
@@ -389,7 +389,7 @@ namespace HostTest
 				catch (IOException)
 				{
 					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				} 
+				}
 			}
 
 			return exif;
@@ -407,7 +407,7 @@ namespace HostTest
 			using (MemoryStream stream = new MemoryStream())
 			{
 				// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
-				// so we have to save it to a dummy tiff and grab the XMP meta-data on load. 
+				// so we have to save it to a dummy tiff and grab the XMP meta-data on load.
 				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 				tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
@@ -457,7 +457,7 @@ namespace HostTest
 								{
 									xmp = LoadPNGMetaData(data);
 								}
-							} 
+							}
 						}
 					}
 					else if (format == "jpg")
@@ -573,7 +573,7 @@ namespace HostTest
 			}
 
 			byte[] xmpBytes = null;
-			
+
 			using (MemoryStream stream = new MemoryStream())
 			{
 				// Create a dummy tiff to extract the XMP packet from.
@@ -694,10 +694,10 @@ namespace HostTest
 			}
 			catch (NotSupportedException)
 			{
-			}            
-			
+			}
+
 			Type encoderType = encoder.GetType();
-			
+
 			if (encoderType == typeof(TiffBitmapEncoder))
 			{
 				if (format == "tiff")
@@ -706,7 +706,7 @@ namespace HostTest
 				}
 				else
 				{
-					return ConvertMetaDataToTIFF(metaData); 
+					return ConvertMetaDataToTIFF(metaData);
 				}
 			}
 			else if (encoderType == typeof(JpegBitmapEncoder))

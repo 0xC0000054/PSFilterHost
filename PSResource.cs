@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ namespace PSFilterHostDll
 {
 
 	/// <summary>
-	/// Encapsulates the Pseudo–Resources used by the filters. 
+	/// Encapsulates the Pseudo–Resources used by the filters.
 	/// </summary>
 	/// <threadsafety static="true" instance="false" />
 	[Serializable]
@@ -143,7 +143,7 @@ namespace PSFilterHostDll
 		/// Returns a hash code for this instance.
 		/// </summary>
 		/// <returns>
-		/// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+		/// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
 		/// </returns>
 		public override int GetHashCode()
 		{

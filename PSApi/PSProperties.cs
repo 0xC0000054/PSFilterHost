@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -46,15 +46,15 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public const uint Copyright2 = 0x63707952U;
         /// <summary>
-        /// The document EXIF data - 'EXIF' 
+        /// The document EXIF data - 'EXIF'
         /// </summary>
         public const uint EXIFData = 0x45584946U;
         /// <summary>
-        /// The document XMP data - 'xmpd' 
+        /// The document XMP data - 'xmpd'
         /// </summary>
         public const uint XMPData = 0x786d7064U;
         /// <summary>
-        /// Major grid size, 16.16 fixed point value - 'grmj'      
+        /// Major grid size, 16.16 fixed point value - 'grmj'
         /// </summary>
         /// <remarks>Measured in inches unless <see cref="RulerUnits"/> is pixels, and then in pixels.</remarks>
         public const uint GridMajor = 0x67726d6aU;
@@ -107,7 +107,7 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public const uint RulerOriginV = 0x726f7256U;
         /// <summary>
-        /// The host's serial number string - 'sstr' 
+        /// The host's serial number string - 'sstr'
         /// </summary>
         public const uint SerialString = 0x73737472U;
         /// <summary>
@@ -131,11 +131,11 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public const uint WatchSuspension = 0x77746368U;
         /// <summary>
-        /// The width of the current document in pixels - 'docW'  
+        /// The width of the current document in pixels - 'docW'
         /// </summary>
         public const uint DocumentWidth = 0x646f6357U;
         /// <summary>
-        /// The height of the current document in pixels - 'docH'  
+        /// The height of the current document in pixels - 'docH'
         /// </summary>
         public const uint DocumentHeight = 0x646f6348U;
         /// <summary>

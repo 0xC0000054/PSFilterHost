@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ namespace PSFilterHostDll.BGRASurface
         public override unsafe Bitmap CreateAliasedBitmap()
         {
             Bitmap image = null;
-            
+
             using (Bitmap temp = new Bitmap(this.width, this.height, PixelFormat.Format8bppIndexed))
             {
                 ColorPalette pal = temp.Palette;
@@ -64,7 +64,7 @@ namespace PSFilterHostDll.BGRASurface
 
                 temp.Palette = pal;
 
-                BitmapData bd = temp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, temp.PixelFormat); 
+                BitmapData bd = temp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, temp.PixelFormat);
 
                 try
                 {
@@ -76,7 +76,7 @@ namespace PSFilterHostDll.BGRASurface
                     {
                         byte* src = pixels + (y * this.stride);
                         byte* dst = scan0 + (y * bmpStride);
-                        
+
                         for (int x = 0; x < width; x++)
                         {
                             *dst = *src;
@@ -112,7 +112,7 @@ namespace PSFilterHostDll.BGRASurface
                 (int)this.scan0.Length,
                 (int)this.stride
                 );
-        } 
+        }
 #endif
 
         protected override unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi)
@@ -121,7 +121,7 @@ namespace PSFilterHostDll.BGRASurface
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
-            
+
             int srcWidth = source.Width;
             int srcHeight = source.Height;
             long srcStride = source.Stride;

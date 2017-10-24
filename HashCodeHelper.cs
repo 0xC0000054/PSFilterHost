@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace PSFilterHostDll
         /// <param name="arg1">The first object to use when generating the hash code.</param>
         /// <param name="arg2">The second object to use when generating the hash code.</param>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         internal static int GetHashCode<T1, T2>(T1 arg1, T2 arg2)
         {

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ namespace PSFilterHostDll.PSApi
         /// <param name="descriptor">The <see cref="ActionDescriptorReference"/> that contains the value of the specified reference.</param>
         /// <returns><c>true</c> if the reference was converted to an action descriptor; otherwise, <c>false</c> if the reference is invalid.</returns>
         bool ConvertToActionDescriptor(IntPtr reference, out ActionDescriptorReference descriptor);
-        
+
         /// <summary>
         /// Creates a reference from an action descriptor.
         /// </summary>

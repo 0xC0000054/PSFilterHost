@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ namespace HostTest
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetStandardColorSpaceProfile(
             string pMachineName,
-            uint dwProfileID, 
+            uint dwProfileID,
             [Out()] StringBuilder pProfileName,
             ref uint pdwSize
             );

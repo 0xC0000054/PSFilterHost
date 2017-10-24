@@ -5,13 +5,13 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
 
 /* Adapted from ASZStringSuite.h, PIBufferSuite.h, PIColorSpaceSuite.h, PIHandleSuite.h, PIUIHooskSuite.h, SPPlugs.h
-*  Copyright 1986 - 2000 Adobe Systems Incorporated              
+*  Copyright 1986 - 2000 Adobe Systems Incorporated
 *  All Rights Reserved
 */
 
@@ -69,7 +69,7 @@ namespace PSFilterHostDll.PSApi
 		public IntPtr Convert8to16;
 		public IntPtr Convert16to8;
 		public IntPtr ConvertToMonitorRGB;
-	} 
+	}
 
 	internal struct PSHandleSuite1
 	{
@@ -80,7 +80,7 @@ namespace PSFilterHostDll.PSApi
 		public IntPtr SetSize;
 		public IntPtr RecoverSpace;
 	}
-	
+
 	internal struct PSHandleSuite2
 	{
 		public IntPtr New;
@@ -139,7 +139,7 @@ namespace PSFilterHostDll.PSApi
 		public IntPtr GetNamedPlugin;
 
 		public IntPtr SetPluginPropertyList;
-	} 
+	}
 #endif
 
 	internal struct ASZStringSuite1

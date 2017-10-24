@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ namespace PSFilterHostDll
 
 #if NET_40_OR_GREATER
     [SecurityCritical]
-#else    
+#else
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
     internal static class ShortcutHelper
@@ -62,7 +62,7 @@ namespace PSFilterHostDll
                             return isWow64;
                         }
                     }
-                } 
+                }
             }
 
             return false;
@@ -82,7 +82,7 @@ namespace PSFilterHostDll
 
             if (IsWoW64Process())
             {
-                // WoW64 changes the 64-bit Program Files path to the 32-bit Program Files path. 
+                // WoW64 changes the 64-bit Program Files path to the 32-bit Program Files path.
                 if (path.StartsWith(ProgramFilesX86, StringComparison.OrdinalIgnoreCase))
                 {
                     string filePath = string.Empty;

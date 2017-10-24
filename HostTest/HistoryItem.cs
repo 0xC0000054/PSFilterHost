@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -42,7 +42,7 @@ namespace HostTest
                 return chunk.image;
             }
         }
-       
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItem"/> class.
         /// </summary>
@@ -68,7 +68,7 @@ namespace HostTest
                     bf.Serialize(fs, this.chunk);
                     this.state = HistoryItemState.Disk;
                     this.chunk.Dispose();
-                } 
+                }
             }
         }
 
@@ -84,7 +84,7 @@ namespace HostTest
                     BinaryFormatter bf = new BinaryFormatter();
                     this.chunk = (HistoryChunk)bf.Deserialize(fs);
                     this.state = HistoryItemState.Memory;
-                } 
+                }
             }
         }
 
@@ -101,11 +101,11 @@ namespace HostTest
                 File.Delete(this.backingFile);
                 this.chunk.Dispose();
                 this.state = HistoryItemState.Disposed;
-                this.disposed = true; 
+                this.disposed = true;
             }
         }
         #endregion
-        
+
         [Serializable]
         private sealed class HistoryChunk : IDisposable, ISerializable
         {
@@ -152,7 +152,7 @@ namespace HostTest
                     }
 
                     PngBitmapEncoder enc = new PngBitmapEncoder();
-                    enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null)); 
+                    enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
                     enc.Save(stream);
 
                     info.AddValue("image", stream.GetBuffer(), typeof(byte[]));
@@ -172,7 +172,7 @@ namespace HostTest
                     {
                         this.canvas.Dispose();
                         this.canvas = null;
-                    } 
+                    }
                 }
             }
         }

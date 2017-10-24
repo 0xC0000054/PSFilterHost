@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -31,6 +31,6 @@ namespace PSFilterHostDll.PSApi
 
             return pointer.ToString("X8");
         }
-    } 
+    }
 #endif
 }

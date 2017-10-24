@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +20,7 @@ namespace HostTest
 	/// This class stores the undo / redo history.
 	/// </summary>
 	internal sealed class HistoryStack : IDisposable
-	{		
+	{
 		private List<HistoryItem> historyList;
 		private int index;
 		private bool disposed;

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +50,7 @@ namespace PSFilterHostDll.PSApi
                     return this.parameters.Count;
                 }
             }
-            
+
             public void Add(uint key, AETEValue value)
             {
                 if (this.parameters.ContainsKey(key))
@@ -175,7 +175,7 @@ namespace PSFilterHostDll.PSApi
         /// or
         /// <paramref name="zstringSuite"/> is null.
         /// </exception>
-        public ActionDescriptorSuite(PluginAETE aete, IActionListSuite actionListSuite, IActionReferenceSuite actionReferenceSuite, 
+        public ActionDescriptorSuite(PluginAETE aete, IActionListSuite actionListSuite, IActionReferenceSuite actionReferenceSuite,
             IASZStringSuite zstringSuite)
         {
             if (actionListSuite == null)
@@ -606,7 +606,7 @@ namespace PSFilterHostDll.PSApi
             {
                 return PSError.kSPBadParameterError;
             }
-           
+
             return PSError.kSPNoError;
         }
 
@@ -697,7 +697,7 @@ namespace PSFilterHostDll.PSApi
                 int length = SafeNativeMethods.lstrlenA(cstrValue);
                 byte[] data = new byte[length];
                 Marshal.Copy(cstrValue, data, 0, length);
-                
+
                 this.actionDescriptors[descriptor].Add(key, new AETEValue(DescriptorTypes.typeChar, GetAETEParamFlags(key), length, data));
             }
             catch (OutOfMemoryException)
@@ -1066,12 +1066,12 @@ namespace PSFilterHostDll.PSApi
                 if (maxLength > 0)
                 {
                     byte[] bytes = (byte[])item.Value;
-                    
+
                     // Ensure that the buffer has room for the null terminator.
                     int length = (int)Math.Min(bytes.Length, maxLength - 1);
 
                     Marshal.Copy(bytes, 0, cstrValue, length);
-                    Marshal.WriteByte(cstrValue, length, 0); 
+                    Marshal.WriteByte(cstrValue, length, 0);
                 }
 
                 return PSError.kSPNoError;
@@ -1255,7 +1255,7 @@ namespace PSFilterHostDll.PSApi
                 Marshal.Copy((byte[])item.Value, 0, HandleSuite.Instance.LockHandle(data, 0), size);
                 HandleSuite.Instance.UnlockHandle(data);
 
-                return PSError.kSPNoError; 
+                return PSError.kSPNoError;
             }
 
             return PSError.errMissingParameter;
@@ -1308,7 +1308,7 @@ namespace PSFilterHostDll.PSApi
                 {
                     return PSError.memFullErr;
                 }
-                
+
                 return PSError.kSPNoError;
             }
 

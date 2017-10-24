@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -415,7 +415,7 @@ namespace PSFilterHostDll.PSApi
 				else if (propKey == PIPropertyID.PIImageModesProperty)
 				{
 #if GDIPLUS
-					// All GDI+ images are converted to 8-bit RGB(A) for processing.  
+					// All GDI+ images are converted to 8-bit RGB(A) for processing.
 					if ((dataPtr[0] & PSConstants.flagSupportsRGBColor) != PSConstants.flagSupportsRGBColor)
 					{
 						return true;
@@ -583,7 +583,7 @@ namespace PSFilterHostDll.PSApi
 			}
 
 #if GDIPLUS
-			// All GDI+ images are converted to 8-bit RGB(A) for processing.  
+			// All GDI+ images are converted to 8-bit RGB(A) for processing.
 			if ((info->supportsMode & PSConstants.supportsRGBColor) != PSConstants.supportsRGBColor)
 			{
 				return true;
@@ -767,8 +767,8 @@ namespace PSFilterHostDll.PSApi
 
 			if (pluginData.Count > 1)
 			{
-				// If the DLL contains more than one filter, add a list of all the entry points to each individual filter. 
-				// Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them. 
+				// If the DLL contains more than one filter, add a list of all the entry points to each individual filter.
+				// Per the SDK only one entry point in a module will display the about box the rest are dummy calls so we must call all of them.
 
 				string[] entryPoints = new string[pluginData.Count];
 

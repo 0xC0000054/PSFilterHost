@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -45,9 +45,9 @@ namespace PSFilterHostDll
         /// </summary>
         public string FileName
         {
-            get 
+            get
             {
-                return this.fileName; 
+                return this.fileName;
             }
         }
 
@@ -56,9 +56,9 @@ namespace PSFilterHostDll
         /// </summary>
         public string EntryPoint
         {
-            get 
+            get
             {
-                return this.entryPoint; 
+                return this.entryPoint;
             }
         }
 
@@ -67,7 +67,7 @@ namespace PSFilterHostDll
         /// </summary>
         public string Category
         {
-            get 
+            get
             {
                 return this.category;
             }
@@ -78,7 +78,7 @@ namespace PSFilterHostDll
         /// </summary>
         public string Title
         {
-            get 
+            get
             {
                 return this.title;
             }
@@ -89,9 +89,9 @@ namespace PSFilterHostDll
         /// </summary>
         internal FilterCaseInfo[] FilterInfo
         {
-            get 
+            get
             {
-                return this.filterInfo; 
+                return this.filterInfo;
             }
         }
 
@@ -100,9 +100,9 @@ namespace PSFilterHostDll
         /// </summary>
         internal PluginAETE Aete
         {
-            get 
+            get
             {
-                return this.aete; 
+                return this.aete;
             }
         }
 
@@ -129,9 +129,9 @@ namespace PSFilterHostDll
         /// </value>
         public bool HasAboutBox
         {
-            get 
-            { 
-                return this.hasAboutBox; 
+            get
+            {
+                return this.hasAboutBox;
             }
         }
 
@@ -276,7 +276,7 @@ namespace PSFilterHostDll
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {

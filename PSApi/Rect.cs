@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ namespace PSFilterHostDll.PSApi
                 Rect16 rect = (Rect16)obj;
                 return Equals(rect);
             }
-            
+
             return false;
         }
         public bool Equals(Rect16 rect)
@@ -60,7 +60,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
         public override string ToString()
         {
-            return ("Top=" + this.top.ToString() + ",Bottom=" + this.bottom.ToString() + ",Left=" + this.left.ToString() + ",Right=" + this.right.ToString()); 
+            return ("Top=" + this.top.ToString() + ",Bottom=" + this.bottom.ToString() + ",Left=" + this.left.ToString() + ",Right=" + this.right.ToString());
         }
 #endif
         public static readonly Rect16 Empty = new Rect16();

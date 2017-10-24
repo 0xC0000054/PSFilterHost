@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -32,12 +32,12 @@ namespace PSFilterHostDll
         /// </summary>
         internal GlobalParameters GlobalParameters
         {
-            get 
+            get
             {
                 return this.globalParameters;
             }
         }
-       
+
         /// <summary>
         /// Gets the filter's AETE scripting values.
         /// </summary>

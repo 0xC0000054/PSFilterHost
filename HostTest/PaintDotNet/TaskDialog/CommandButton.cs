@@ -18,7 +18,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
-namespace PaintDotNet 
+namespace PaintDotNet
 {
     internal sealed class CommandButton : ButtonBase
     {
@@ -174,7 +174,7 @@ namespace PaintDotNet
             }
             else
             {
-                actionImageRect = new Rectangle(offsetX + marginX, offsetY + marginYTop, 
+                actionImageRect = new Rectangle(offsetX + marginX, offsetY + marginYTop,
                     UI.ScaleWidth(this.actionImage.Width), UI.ScaleHeight(this.actionImage.Height));
 
                 Rectangle srcRect = new Rectangle(0, 0, this.actionImage.Width, this.actionImage.Height);
@@ -194,7 +194,7 @@ namespace PaintDotNet
 
                     actionImageRect.Y += 2;
                     g.DrawImage(drawMe, actionImageRect, srcRect, GraphicsUnit.Pixel);
-                    actionImageRect.Y -= 2;                    
+                    actionImageRect.Y -= 2;
                 }
             }
 
@@ -207,7 +207,7 @@ namespace PaintDotNet
 
             SizeF actionTextSize = g.MeasureString(this.actionText, this.actionTextFont, actionTextWidth, stringFormat);
 
-            Rectangle actionTextRect = new Rectangle(actionTextX, actionTextY, 
+            Rectangle actionTextRect = new Rectangle(actionTextX, actionTextY,
                 actionTextWidth, (int)Math.Ceiling(actionTextSize.Height));
 
             if (enableDrawing)
@@ -226,10 +226,10 @@ namespace PaintDotNet
             int descriptionTextY = actionTextRect.Bottom + paddingY;
             int descriptionTextWidth = actionTextWidth;
 
-            SizeF descriptionTextSize = g.MeasureString(this.explanationText, this.explanationTextFont, 
+            SizeF descriptionTextSize = g.MeasureString(this.explanationText, this.explanationTextFont,
                 descriptionTextWidth, stringFormat);
 
-            Rectangle descriptionTextRect = new Rectangle(descriptionTextX, descriptionTextY, 
+            Rectangle descriptionTextRect = new Rectangle(descriptionTextX, descriptionTextY,
                 descriptionTextWidth, (int)Math.Ceiling(descriptionTextSize.Height));
 
             if (enableDrawing)
@@ -282,8 +282,8 @@ namespace PaintDotNet
             base.OnLayout(levent);
         }
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()

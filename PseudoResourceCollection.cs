@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ using System.Collections.ObjectModel;
 
 namespace PSFilterHostDll
 {
-   
+
     /// <summary>
     /// The collection of Pseudo-Resources used by the filters.
     /// </summary>

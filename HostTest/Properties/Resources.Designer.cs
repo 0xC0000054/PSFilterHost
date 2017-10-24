@@ -10,8 +10,8 @@
 
 namespace HostTest.Properties {
     using System;
-    
-    
+
+
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,15 +23,15 @@ namespace HostTest.Properties {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
-        
+
         private static global::System.Resources.ResourceManager resourceMan;
-        
+
         private static global::System.Globalization.CultureInfo resourceCulture;
-        
+
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Resources() {
         }
-        
+
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
@@ -45,7 +45,7 @@ namespace HostTest.Properties {
                 return resourceMan;
             }
         }
-        
+
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
@@ -59,7 +59,7 @@ namespace HostTest.Properties {
                 resourceCulture = value;
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to About Plugins.
         /// </summary>
@@ -68,7 +68,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("AboutPluginsText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -78,7 +78,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -88,7 +88,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Applying {0}.
         /// </summary>
@@ -97,7 +97,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("ApplyFilterStatusFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Return to HostTest.
         /// </summary>
@@ -106,7 +106,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("CancelDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -116,7 +116,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
@@ -125,7 +125,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("CancelText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Choose a primary color:.
         /// </summary>
@@ -134,7 +134,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("ChoosePrimaryColor", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Choose a secondary color:.
         /// </summary>
@@ -143,7 +143,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("ChooseSecondaryColor", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Discard the unsaved changes to the image..
         /// </summary>
@@ -152,7 +152,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("DontSaveChangesDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Don&apos;t Save.
         /// </summary>
@@ -161,7 +161,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("DontSaveChangesText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Click and drag to draw a elliptical selection on the canvas..
         /// </summary>
@@ -170,7 +170,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("EllipseSelectionToolStatusText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -180,7 +180,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -190,7 +190,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to No filters loaded..
         /// </summary>
@@ -199,7 +199,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("NoFiltersStatusText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -209,7 +209,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -219,7 +219,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -229,7 +229,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Click and drag to draw a rectangle selection on the canvas..
         /// </summary>
@@ -238,7 +238,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("RectangleSelectionToolStatusText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -248,7 +248,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -258,7 +258,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -268,7 +268,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Unsaved Changes.
         /// </summary>
@@ -277,7 +277,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("SaveChangesCaption", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Save changes to the image..
         /// </summary>
@@ -286,7 +286,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("SaveChangesDescription", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
@@ -295,7 +295,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("SaveChangesText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -305,7 +305,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0} - {1} @{2}% ({3}).
         /// </summary>
@@ -314,7 +314,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("TitleStringFormat", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -324,7 +324,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to {0} has unsaved changes. Would you like to save changes to the image?.
         /// </summary>
@@ -333,7 +333,7 @@ namespace HostTest.Properties {
                 return ResourceManager.GetString("UnsavedChangesText", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
@@ -343,7 +343,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -353,7 +353,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
@@ -363,7 +363,7 @@ namespace HostTest.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>

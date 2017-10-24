@@ -43,7 +43,7 @@ namespace HostTest
             TaskButton acceptTaskButton,
             TaskButton cancelTaskButton)
         {
-            return Show(owner, formIcon, formTitle, taskImage, scaleTaskImageWithDpi, introText, 
+            return Show(owner, formIcon, formTitle, taskImage, scaleTaskImageWithDpi, introText,
                 taskButtons, acceptTaskButton, cancelTaskButton, DefaultPixelWidth96Dpi);
         }
 
@@ -59,7 +59,7 @@ namespace HostTest
             TaskButton cancelTaskButton,
             int pixelWidth96Dpi)
         {
-            return Show(owner, formIcon, formTitle, taskImage, scaleTaskImageWithDpi, introText, 
+            return Show(owner, formIcon, formTitle, taskImage, scaleTaskImageWithDpi, introText,
                 taskButtons, acceptTaskButton, cancelTaskButton, pixelWidth96Dpi, null, null);
         }
 
@@ -107,7 +107,7 @@ namespace HostTest
                 return result;
             }
         }
-        
+
         private sealed class TaskDialogForm : Form
         {
             private PictureBox taskImagePB;

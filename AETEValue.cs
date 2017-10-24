@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ namespace PSFilterHostDll
 		private int flags;
 		private int size;
 		private object value;
-	   
+
 		/// <summary>
 		/// Gets the type of data.
 		/// </summary>
@@ -130,7 +130,7 @@ namespace PSFilterHostDll
 			info.AddValue("value", this.value);
 		}
 	}
-  
+
 	[Serializable]
 	internal sealed class EnumeratedValue
 	{

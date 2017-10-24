@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ namespace HostTest
         public DialogResult ShowDialog(IWin32Window owner)
         {
             DialogResult result = DialogResult.Cancel;
-             
+
             if (VistaDialogSupported())
             {
                 if (vistaFolderBrowserDialog == null)

@@ -82,10 +82,10 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
     {
         [PreserveSig]
         int Next(
-            uint celt, 
+            uint celt,
             [Out]
             [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)]
-            object[] rgelt, 
+            object[] rgelt,
             ref uint celtFetched
             );
 
@@ -164,8 +164,8 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
     {
         void AddError(
             [MarshalAs(UnmanagedType.LPWStr)]
-            string pszPropName, 
-            [In] 
+            string pszPropName,
+            [In]
             ref EXCEPINFO pExcepInfo
             );
     }
@@ -979,7 +979,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             uint cbBuffer,
             [In]
             [Out]
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] 
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)]
             byte[] pbBuffer
             );
 
@@ -1047,22 +1047,22 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
         #region IStream
         new void Read(
             [Out]
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] 
-            byte[] pv, 
-            int cb, 
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]
+            byte[] pv,
+            int cb,
             IntPtr pcbRead
             );
 
         new void Write(
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] 
-            byte[] pv, 
-            int cb, 
+            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)]
+            byte[] pv,
+            int cb,
             IntPtr pcbWritten
             );
 
         new void Seek(
-            long dlibMove, 
-            int dwOrigin, 
+            long dlibMove,
+            int dwOrigin,
             IntPtr plibNewPosition
             );
 
@@ -1071,9 +1071,9 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             );
 
         new void CopyTo(
-            IStream pstm, 
-            long cb, 
-            IntPtr pcbRead, 
+            IStream pstm,
+            long cb,
+            IntPtr pcbRead,
             IntPtr pcbWritten
             );
 
@@ -1084,19 +1084,19 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
         new void Revert();
 
         new void LockRegion(
-            long libOffset, 
-            long cb, 
+            long libOffset,
+            long cb,
             int dwLockType
             );
 
         new void UnlockRegion(
-            long libOffset, 
-            long cb, 
+            long libOffset,
+            long cb,
             int dwLockType
             );
 
         new void Stat(
-            out STATSTG pstatstg, 
+            out STATSTG pstatstg,
             int grfStatFlag
             );
 
@@ -1260,7 +1260,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
 
         void CreateNewFrame(
             out IWICBitmapFrameEncode ppIFrameEncode,
-            [In] 
+            [In]
             [Out]
             [MarshalAs(UnmanagedType.LPArray, SizeConst = 1)]
             IPropertyBag2[] encoderOptions
@@ -2287,14 +2287,14 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
         double GetExposureCompensation();
 
         void SetWhitePointRGB(
-            uint Red, 
-            uint Green, 
+            uint Red,
+            uint Green,
             uint Blue
             );
 
         void GetWhitePointRGB(
-            out uint pRed, 
-            out uint pGreen, 
+            out uint pRed,
+            out uint pGreen,
             out uint pBlue
             );
 
@@ -2312,7 +2312,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
 
         void GetKelvinRangeInfo(
             out uint pMinKelvinTemp,
-            out uint pMaxKelvinTemp, 
+            out uint pMaxKelvinTemp,
             out uint pKelvinTempStepValue
             );
 
@@ -2357,12 +2357,12 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             );
 
         void SetToneCurve(
-            uint cbToneCurveSize, 
+            uint cbToneCurveSize,
             IntPtr pToneCurve
             );
 
         uint GetToneCurve(
-            uint cbToneCurveBufferSize, 
+            uint cbToneCurveBufferSize,
             IntPtr pToneCurve
             );
 

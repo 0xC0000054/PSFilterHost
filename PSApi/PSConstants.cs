@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,8 @@ namespace PSFilterHostDll.PSApi
         public const int latestPIPLVersion = 0;
 
         public const short kCurrentBufferProcsVersion = 2;
-        public const short kCurrentBufferProcsCount = 5; 
-        
+        public const short kCurrentBufferProcsCount = 5;
+
         public const short kCurrentHandleProcsVersion = 1;
         public const short kCurrentHandleProcsCount = 8;
 
@@ -67,7 +67,7 @@ namespace PSFilterHostDll.PSApi
         public const short kCurrentMaxVersWriteChannelDesc = 0;
 
         public const short kCurrentMinVersReadImageDocDesc = 0;
-        public const short kCurrentMaxVersReadImageDocDesc = 0;  
+        public const short kCurrentMaxVersReadImageDocDesc = 0;
 
         public const short kCurrentResourceProcsVersion = 3;
         public const short kCurrentResourceProcsCount = 4;
@@ -82,7 +82,7 @@ namespace PSFilterHostDll.PSApi
         public const int flagSupportsGrayScale = 64;
         public const int flagSupportsRGB48 = 4096;
         public const int flagSupportsGray16 = 8192;
-       
+
         public const int supportsRGBColor = 8;
         public const int supportsGrayScale = 2;
 
@@ -141,7 +141,7 @@ namespace PSFilterHostDll.PSApi
         }
 
         /// <summary>
-        /// The host sampling support constants 
+        /// The host sampling support constants
         /// </summary>
         internal static class SamplingSupport
         {

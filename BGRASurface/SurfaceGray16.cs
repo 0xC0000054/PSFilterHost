@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ using System.Drawing;
 
 namespace PSFilterHostDll.BGRASurface
 {
- 
+
     /// <summary>
     /// Surface class for 16 bits per pixel gray scale image data.
     /// </summary>
@@ -111,7 +111,7 @@ namespace PSFilterHostDll.BGRASurface
                 (int)this.scan0.Length,
                 (int)this.stride
                 );
-        } 
+        }
 #endif
 
         protected override unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi)
@@ -120,7 +120,7 @@ namespace PSFilterHostDll.BGRASurface
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
-            
+
             int srcWidth = source.Width;
             int srcHeight = source.Height;
             long srcStride = source.Stride;

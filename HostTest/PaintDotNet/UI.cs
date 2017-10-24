@@ -107,15 +107,15 @@ namespace PaintDotNet.SystemLayer
         }
 
         public static void DrawCommandButton(
-            Graphics g, 
-            PushButtonState state, 
-            Rectangle rect, 
+            Graphics g,
+            PushButtonState state,
+            Rectangle rect,
             Color backColor,
             Control childControl)
         {
             VisualStyleElement element = null;
             int alpha = 255;
-            
+
             if (Environment.OSVersion.Version.Major >= 6)
             {
                 const string className = "BUTTON";
@@ -131,7 +131,7 @@ namespace PaintDotNet.SystemLayer
                     case PushButtonState.Disabled:
                         stateID = NativeConstants.CMDLS_DISABLED;
                         break;
-                        
+
                     case PushButtonState.Hot:
                         stateID = NativeConstants.CMDLS_HOT;
                         break;
@@ -242,7 +242,7 @@ namespace PaintDotNet.SystemLayer
             }
             catch (Exception)
             {
-                
+
                 throw;
             }
         }
@@ -293,6 +293,6 @@ namespace PaintDotNet.SystemLayer
                 return DetermineVisualStyleClass();
             }
         }
-        
+
     }
 }

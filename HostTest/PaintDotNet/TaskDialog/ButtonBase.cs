@@ -162,7 +162,7 @@ namespace PaintDotNet
             Invalidate(true);
             base.OnEnabledChanged(e);
         }
-        
+
         protected override void OnMouseEnter(EventArgs e)
         {
             this.drawHover = true;

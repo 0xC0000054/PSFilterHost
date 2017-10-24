@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ namespace HostTest.Tools
         internal void MouseUp(object sender, MouseEventArgs e)
         {
             this.tracking = false;
-            this.OnCursorChanged(Cursors.Default);    
+            this.OnCursorChanged(Cursors.Default);
             this.RenderSelection();
         }
 
@@ -88,12 +88,12 @@ namespace HostTest.Tools
             if ((e.KeyCode == Keys.Escape) || (e.Modifiers == Keys.Control && e.KeyCode == Keys.D))
             {
                 e.Handled = true;
-                
+
                 // Clear the selection if Escape or Ctrl + D is pressed.
                 if (selectPoints != null)
                 {
                     this.selectPoints.Clear();
-                    this.RenderSelection(); 
+                    this.RenderSelection();
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace HostTest.Tools
 
             return new Rectangle(x, y, width, height);
         }
-       
+
         protected virtual GraphicsPath RenderShape(List<PointF> shapePoints)
         {
             // the PointF structure is used by the ElipseSelectTool.
@@ -149,7 +149,7 @@ namespace HostTest.Tools
 
                 EventHandler<SelectionPathChangedEventArgs> handler = SelectedPathChanged;
                 if (handler != null)
-                { 
+                {
                     GraphicsPath path = null;
 
                     try
@@ -170,8 +170,8 @@ namespace HostTest.Tools
                         {
                             path.Dispose();
                         }
-                    } 
-                } 
+                    }
+                }
             }
 
         }
@@ -199,7 +199,7 @@ namespace HostTest.Tools
                     if (selectPoints != null)
                     {
                         this.selectPoints.Clear();
-                    } 
+                    }
 
                     this.disposed = true;
                 }

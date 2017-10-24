@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -28,9 +28,9 @@ namespace PSFilterHostDll.PSApi
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool EnumResourceNamesW(
-            [In()] IntPtr hModule, 
+            [In()] IntPtr hModule,
             [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszType,
-            [In()] EnumResNameDelegate lpEnumFunc, 
+            [In()] EnumResNameDelegate lpEnumFunc,
             [In()] IntPtr lParam
             );
 
@@ -42,7 +42,7 @@ namespace PSFilterHostDll.PSApi
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
         internal static extern IntPtr LockResource([In()] IntPtr hGlobal);
-        
+
         [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         [DllImport("kernel32.dll", ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

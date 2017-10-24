@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
- 
+
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -132,7 +132,7 @@ namespace HostTest
 				{
 					this.RenderSelection(null, true);
 				}
-				
+
 				if (value != null)
 				{
 					this.selectionClass = value;
@@ -146,7 +146,7 @@ namespace HostTest
 
 			}
 		}
-	
+
 		protected override void Dispose(bool disposing)
 		{
 			if (disposing)
@@ -212,14 +212,14 @@ namespace HostTest
 			{
 				this.RenderSelection(null, true);
 			}
-			
+
 		}
 
 		private void OnCursorChanged(object sender, CursorChangedEventArgs e)
 		{
 			this.Cursor = e.NewCursor;
 		}
-		
+
 		/// <summary>
 		/// Renders the selection.
 		/// </summary>
@@ -267,7 +267,7 @@ namespace HostTest
 			if (this.suspendPaintCounter == 0)
 			{
 				this.Invalidate();
-				this.Update(); 
+				this.Update();
 			}
 		}
 
@@ -293,13 +293,13 @@ namespace HostTest
 					base.BeginInvoke(new Action(delegate()
 						{
 							this.Invalidate();
-							this.Update(); 
+							this.Update();
 						}));
 				}
 				else
 				{
 					this.Invalidate();
-					this.Update(); 
+					this.Update();
 				}
 			}
 		}
@@ -313,7 +313,7 @@ namespace HostTest
 			if (this.resetClip)
 			{
 				if (this.imageBounds.Width < pe.ClipRectangle.Width && this.imageBounds.Height < pe.ClipRectangle.Height)
-				{				
+				{
 					pe.Graphics.ResetClip();
 					pe.Graphics.SetClip(this.imageBounds);
 				}
@@ -370,8 +370,8 @@ namespace HostTest
 							Color = Color.White,
 							DashOffset = 4.0f
 						};
-					}			
-					
+					}
+
 					Graphics g = pe.Graphics;
 
 					PixelOffsetMode oldPOM = g.PixelOffsetMode;
@@ -401,7 +401,7 @@ namespace HostTest
 					else
 					{
 						g.DrawPath(outlinePen1, this.path);
-						g.DrawPath(outlinePen2, this.path); 
+						g.DrawPath(outlinePen2, this.path);
 					}
 
 					g.PixelOffsetMode = oldPOM;
@@ -409,7 +409,7 @@ namespace HostTest
 				}
 
 			}
-			
+
 			base.OnPaint(pe);
 		}
 
@@ -468,7 +468,7 @@ namespace HostTest
 					{
 						byte* ptr = scan0 + (y * stride);
 						byte* ptrEnd = ptr + width;
-						
+
 						while (ptr < ptrEnd)
 						{
 							if (ptr[3] < 255)
@@ -548,7 +548,7 @@ namespace HostTest
 						this.ResetZoom(false);
 						this.IsDirty = false;
 
-						this.Invalidate(); 
+						this.Invalidate();
 					}
 					else
 					{
@@ -565,7 +565,7 @@ namespace HostTest
 		/// </summary>
 		public GraphicsPath ClipPath
 		{
-			get 
+			get
 			{
 				if (this.selectionFactor == 1f)
 				{
@@ -576,7 +576,7 @@ namespace HostTest
 					if (this.normalizedPath == null && this.path != null)
 					{
 						this.normalizedPath = (GraphicsPath)this.path.Clone();
-						float factor = 1f / this.selectionFactor; // scale the selection up to 100%.  
+						float factor = 1f / this.selectionFactor; // scale the selection up to 100%.
 
 						using (Matrix matrix = new Matrix())
 						{
@@ -589,7 +589,7 @@ namespace HostTest
 					return this.normalizedPath;
 				}
 
-				
+
 			}
 		}
 
@@ -600,7 +600,7 @@ namespace HostTest
 		/// <param name="bounds">The area of the bitmap to copy.</param>
 		[SecurityPermissionAttribute(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 		private unsafe void CopyFromBitmap(Bitmap source, Rectangle bounds)
-		{			
+		{
 			bool hasAlpha = HasTransparency(source);
 
 			if (hasAlpha && this.image.PixelFormat != PixelFormat.Format32bppArgb)
@@ -613,7 +613,7 @@ namespace HostTest
 				this.image.Dispose();
 				this.image = new Bitmap(source.Width, source.Height, PixelFormat.Format24bppRgb);
 			}
-			
+
 			if ((this.checkerBoardBitmap == null) && hasAlpha)
 			{
 				this.DrawCheckerBoardBitmap(source.Width, source.Height);
@@ -662,7 +662,7 @@ namespace HostTest
 				this.image.UnlockBits(dstData);
 			}
 
-		} 
+		}
 
 		public CanvasHistoryState ToCanvasHistoryState()
 		{
@@ -732,7 +732,7 @@ namespace HostTest
 
 				float factor = zoomFactors[index];
 
-				return ((this.image.Width * factor) >= 1f && (this.image.Height * factor) >= 1f); 
+				return ((this.image.Width * factor) >= 1f && (this.image.Height * factor) >= 1f);
 			}
 
 			return false;
@@ -745,7 +745,7 @@ namespace HostTest
 		///   <c>true</c> if the image can zoom in; otherwise, <c>false</c>.
 		/// </returns>
 		public bool CanZoomIn()
-		{ 
+		{
 			return (this.zoomFactor < maxZoom);
 		}
 
@@ -870,15 +870,15 @@ namespace HostTest
 				{
 					this.scaledImage = new Bitmap(scaledWidth, scaledHeight, this.image.PixelFormat);
 					this.imageBounds = new Rectangle(0, 0, scaledWidth, scaledHeight);
-					
+
 					using (Graphics gr = Graphics.FromImage(scaledImage))
-					{                       
+					{
 						gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
 						gr.SmoothingMode = SmoothingMode.HighQuality;
 						gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
 						gr.CompositingQuality = CompositingQuality.HighQuality;
 
-						gr.DrawImage(this.image, this.imageBounds, new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);                        
+						gr.DrawImage(this.image, this.imageBounds, new Rectangle(0, 0, imageWidth, imageHeight), GraphicsUnit.Pixel);
 					}
 					this.Size = new Size(scaledWidth, scaledHeight);
 				}
@@ -992,13 +992,13 @@ namespace HostTest
 			}
 
 		}
-	   
+
 		private void InitializeComponent()
 		{
 			this.SuspendLayout();
-			// 
+			//
 			// Canvas
-			// 
+			//
 			this.Name = "Canvas";
 			this.ResumeLayout(false);
 

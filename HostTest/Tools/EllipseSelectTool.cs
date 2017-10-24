@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ namespace HostTest.Tools
         {
             // The following code is from Paint.NET.
             List<Point> array = new List<Point>();
-            
+
             if (trimPoints.Count > 0)
             {
                 array.Add(trimPoints[0]);
@@ -57,7 +57,7 @@ namespace HostTest.Tools
 
             return array;
         }
-     
+
         protected override GraphicsPath RenderShape(List<PointF> shapePoints)
         {
             GraphicsPath path = new GraphicsPath();

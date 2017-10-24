@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -37,9 +37,9 @@ namespace PSFilterHostDll
 	{
 #if GDIPLUS
 		private Bitmap source;
-		private Bitmap dest;		
+		private Bitmap dest;
 		private Color primaryColor;
-		private Color secondaryColor;		
+		private Color secondaryColor;
 #else
 		private BitmapSource source;
 		private BitmapSource dest;
@@ -47,7 +47,7 @@ namespace PSFilterHostDll
 		private System.Windows.Media.Color secondaryColor;
 #endif
 		private bool disposed;
-		private ParameterData filterParameters;      
+		private ParameterData filterParameters;
 		private Region selectedRegion;
 		private IntPtr owner;
 		private AbortFunc abortFunc;
@@ -58,7 +58,7 @@ namespace PSFilterHostDll
 		private PluginSettingsRegistry sessionSettings;
 
 		/// <summary>
-		/// The event fired when the filter updates it's progress. 
+		/// The event fired when the filter updates it's progress.
 		/// </summary>
 		public event EventHandler<FilterProgressEventArgs> UpdateProgress;
 
@@ -210,7 +210,7 @@ namespace PSFilterHostDll
 
 				return this.dest;
 			}
-		} 
+		}
 #else
 		/// <summary>
 		/// Gets the destination image.
@@ -227,7 +227,7 @@ namespace PSFilterHostDll
 
 				return this.dest;
 			}
-		} 
+		}
 #endif
 
 		/// <summary>
@@ -377,7 +377,7 @@ namespace PSFilterHostDll
 		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
 		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 		public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
@@ -425,7 +425,7 @@ namespace PSFilterHostDll
 		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
 		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
@@ -479,7 +479,7 @@ namespace PSFilterHostDll
 		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
 		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
 		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>  
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 		public static IEnumerable<PluginData> EnumerateFilters(string path, SearchOption searchOption)
@@ -531,7 +531,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		/// <remarks>
 		/// <para>
-		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
 		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
 		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
 		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
@@ -555,7 +555,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		/// <remarks>
 		/// <para>
-		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session. 
+		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
 		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
 		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
 		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
@@ -566,7 +566,7 @@ namespace PSFilterHostDll
 		/// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
 		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
 		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission> 
+		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
 		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 		public bool RunFilter(PluginData pluginData, bool showUI)
@@ -684,7 +684,7 @@ namespace PSFilterHostDll
 		/// <param name="parentWindowHandle">The parent window handle.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
+		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
 		[SecurityCritical()]
 #else
@@ -695,9 +695,9 @@ namespace PSFilterHostDll
 		/// <param name="parentWindowHandle">The parent window handle.</param>
 		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
 		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception> 
+		/// <exception cref="FilterRunException">The filter returns an error.</exception>
 		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]        
+		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 		public static void ShowAboutDialog(PluginData pluginData, IntPtr parentWindowHandle)
 		{
@@ -737,7 +737,7 @@ namespace PSFilterHostDll
 				if (!result && !string.IsNullOrEmpty(errorMessage))
 				{
 					throw new FilterRunException(errorMessage);
-				} 
+				}
 			}
 		}
 

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@ namespace PSFilterHostDll
     /// <seealso cref="System.Collections.Generic.IDictionary{TKey, TValue}"/>
     [DebuggerDisplay("Count = {Count}")]
     [Serializable]
-    internal sealed class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>  
+    internal sealed class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         private readonly IDictionary<TKey, TValue> dictionary;
         [NonSerialized]
@@ -132,7 +132,7 @@ namespace PSFilterHostDll
         /// <param name="key">The key whose value to get.</param>
         /// <param name="value">
         /// When this method returns, the value associated with the specified key, if the key is found;
-        /// otherwise, the default value for the type of the <paramref name="value" /> parameter. 
+        /// otherwise, the default value for the type of the <paramref name="value" /> parameter.
         /// This parameter is passed uninitialized.
         /// </param>
         /// <returns>
@@ -181,7 +181,7 @@ namespace PSFilterHostDll
         {
             ThrowNotSupportedException();
             return false;
-        } 
+        }
         #endregion
 
         #region IDictionary<TKey, TValue> Methods
@@ -240,14 +240,14 @@ namespace PSFilterHostDll
         bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)
         {
             return this.dictionary.TryGetValue(key, out value);
-        } 
+        }
         #endregion
 
         #region IEnumerator Methods
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.dictionary.GetEnumerator();
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace PSFilterHostDll
             /// Copies the elements of the collection to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
             /// </summary>
             /// <param name="array">
-            /// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from collection. 
+            /// The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from collection.
             /// The <see cref="T:System.Array" /> must have zero-based indexing.
             /// </param>
             /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 set
                 {
                     this.refCount = value;
-                } 
+                }
             }
 
             /// <summary>
@@ -254,13 +254,13 @@ namespace PSFilterHostDll.PSApi.PICA
         bool IASZStringSuite.ConvertToActionDescriptor(IntPtr zstring, out ActionDescriptorZString descriptor)
         {
             descriptor = null;
-                
+
             if (zstring != Empty)
             {
                 ZString value;
                 if (this.strings.TryGetValue(zstring, out value))
                 {
-                    descriptor = new ActionDescriptorZString(value.Data); 
+                    descriptor = new ActionDescriptorZString(value.Data);
                 }
                 else
                 {
@@ -366,7 +366,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     catch (OutOfMemoryException)
                     {
                         return PSError.kASOutOfMemory;
-                    } 
+                    }
                 }
 
                 return PSError.kASNoError;
@@ -470,7 +470,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     {
                         item.Data = value.Substring(0, value.Length - 3);
                         this.strings[zstr] = item;
-                    } 
+                    }
                 }
                 else
                 {
@@ -494,7 +494,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     {
                         item.Data = value.Trim(' ');
                         this.strings[zstr] = item;
-                    } 
+                    }
                 }
                 else
                 {
@@ -604,7 +604,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     else
                     {
                         this.strings[zstr] = item;
-                    } 
+                    }
                 }
                 else
                 {
@@ -633,7 +633,7 @@ namespace PSFilterHostDll.PSApi.PICA
                                 return false;
                             }
                         }
-                    } 
+                    }
                 }
             }
 
@@ -670,7 +670,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
                         // Add the null terminator to the total length.
                         return (uint)(charLength + 1);
-                    } 
+                    }
                 }
             }
 

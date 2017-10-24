@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ namespace HostTest.Tools
 
         public Cursor NewCursor
         {
-            get 
+            get
             {
                 return cursor;
             }
@@ -39,7 +39,7 @@ namespace HostTest.Tools
             GC.SuppressFinalize(this);
         }
         private void Dispose(bool disposing)
-        { 
+        {
             if (!disposed)
             {
                 if (disposing)

@@ -5,7 +5,7 @@
 //
 // This software is provided under the Microsoft Public License:
 //   Copyright (C) 2012-2017 Nicholas Hayes
-// 
+//
 // See LICENSE.txt for complete licensing and attribution information.
 //
 /////////////////////////////////////////////////////////////////////////////////
@@ -22,12 +22,12 @@ namespace PSFilterHostDll
 		{
 			None,
 			Function,
-			Constant, 
+			Constant,
 			Keyword,
 			Or,
 			Equals,
 			Number,
-			LParen, 
+			LParen,
 			RParen
 		}
 
@@ -94,7 +94,7 @@ namespace PSFilterHostDll
 				switch (exp.type)
 				{
 					case TokenTypes.Function: // parse the in() function
-						supports16Bit = ParseFunction(); 
+						supports16Bit = ParseFunction();
 						break;
 					case TokenTypes.Constant: // enable all modes
 						supports16Bit = (exp.value == "true" && length == 4);
@@ -103,7 +103,7 @@ namespace PSFilterHostDll
 						supports16Bit = ParseOr();
 						break;
 
-				} 
+				}
 			}
 
 			return supports16Bit;
@@ -173,7 +173,7 @@ namespace PSFilterHostDll
 				if (index == length)
 				{
 					break;
-				} 
+				}
 			}
 		}
 
@@ -270,7 +270,7 @@ namespace PSFilterHostDll
 							index++;
 							break;
 					}
-				} 
+				}
 			}
 
 			return exp;
@@ -287,7 +287,7 @@ namespace PSFilterHostDll
 			}
 
 			int startIndex = index;
-			
+
 			while (chars[index] != ')')
 			{
 				if (chars[index] == ',')
@@ -298,7 +298,7 @@ namespace PSFilterHostDll
 			}
 
 			string args = new string(chars, startIndex, index - startIndex);
-			
+
 			if (index < length)
 			{
 				index++; // Skip the closing parentheses.
@@ -333,7 +333,7 @@ namespace PSFilterHostDll
 				{
 					Expression depth = this.NextToken();
 
-					return depth.intValue == 16;  
+					return depth.intValue == 16;
 				}
 			}
 
