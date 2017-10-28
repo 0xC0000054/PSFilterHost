@@ -17,7 +17,7 @@ namespace PSFilterHostDll.PSApi
 {
 	internal static class ColorServicesConvert
 	{
-		private struct ColorResult
+		private sealed class ColorResult
 		{
 			public readonly double component0;
 			public readonly double component1;
