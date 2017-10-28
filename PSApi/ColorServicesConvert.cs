@@ -68,25 +68,25 @@ namespace PSFilterHostDll.PSApi
 				switch (sourceSpace)
 				{
 					case ColorSpace.RGBSpace:
-						ConvertRGB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], out result);
+						result = ConvertRGB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2]);
 						break;
 					case ColorSpace.HSBSpace:
-						ConvertHSB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], out result);
+						result = ConvertHSB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2]);
 						break;
 					case ColorSpace.CMYKSpace:
-						ConvertCMYK(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], colorComponents[3], out result);
+						result = ConvertCMYK(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], colorComponents[3]);
 						break;
 					case ColorSpace.LabSpace:
-						ConvertLAB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], out result);
+						result = ConvertLAB(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2]);
 						break;
 					case ColorSpace.GraySpace:
-						ConvertGray(resultSpace, colorComponents[0], out result);
+						result = ConvertGray(resultSpace, colorComponents[0]);
 						break;
 					case ColorSpace.HSLSpace:
-						ConvertHSL(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], out result);
+						result = ConvertHSL(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2]);
 						break;
 					case ColorSpace.XYZSpace:
-						ConvertXYZ(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2], out result);
+						result = ConvertXYZ(resultSpace, colorComponents[0], colorComponents[1], colorComponents[2]);
 						break;
 					default:
 						return PSError.paramErr;
@@ -194,25 +194,25 @@ namespace PSFilterHostDll.PSApi
 				switch (sourceSpace)
 				{
 					case ColorSpace.RGBSpace:
-						ConvertRGB(resultSpace, component0, component1, component2, out result);
+						result = ConvertRGB(resultSpace, component0, component1, component2);
 						break;
 					case ColorSpace.HSBSpace:
-						ConvertHSB(resultSpace, component0, component1, component2, out result);
+						result = ConvertHSB(resultSpace, component0, component1, component2);
 						break;
 					case ColorSpace.CMYKSpace:
-						ConvertCMYK(resultSpace, component0, component1, component2, component3, out result);
+						result = ConvertCMYK(resultSpace, component0, component1, component2, component3);
 						break;
 					case ColorSpace.LabSpace:
-						ConvertLAB(resultSpace, component0, component1, component2, out result);
+						result = ConvertLAB(resultSpace, component0, component1, component2);
 						break;
 					case ColorSpace.GraySpace:
-						ConvertGray(resultSpace, component0, out result);
+						result = ConvertGray(resultSpace, component0);
 						break;
 					case ColorSpace.HSLSpace:
-						ConvertHSL(resultSpace, component0, component1, component2, out result);
+						result = ConvertHSL(resultSpace, component0, component1, component2);
 						break;
 					case ColorSpace.XYZSpace:
-						ConvertXYZ(resultSpace, component0, component1, component2, out result);
+						result = ConvertXYZ(resultSpace, component0, component1, component2);
 						break;
 					default:
 						return PSError.kSPBadParameterError;
@@ -250,8 +250,10 @@ namespace PSFilterHostDll.PSApi
 			return PSError.kSPNoError;
 		}
 
-		private static void ConvertRGB(ColorSpace resultSpace, short red, short green, short blue, out ColorResult color)
+		private static ColorResult ConvertRGB(ColorSpace resultSpace, short red, short green, short blue)
 		{
+			ColorResult color;
+
 			switch (resultSpace)
 			{
 				case ColorSpace.CMYKSpace:
@@ -280,10 +282,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertCMYK(ColorSpace resultSpace, short cyan, short magenta, short yellow, short black, out ColorResult color)
+		private static ColorResult ConvertCMYK(ColorSpace resultSpace, short cyan, short magenta, short yellow, short black)
 		{
+			ColorResult color;
+
 			double c = cyan / 255.0;
 			double m = magenta / 255.0;
 			double y = yellow / 255.0;
@@ -318,10 +324,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertHSB(ColorSpace resultSpace, short hue, short saturation, short brightness, out ColorResult color)
+		private static ColorResult ConvertHSB(ColorSpace resultSpace, short hue, short saturation, short brightness)
 		{
+			ColorResult color;
+
 			double h = hue;
 			double s = saturation / 255.0; // scale to the range of [0, 1].
 			double b = brightness / 255.0;
@@ -356,10 +366,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertHSL(ColorSpace resultSpace, short hue, short saturation, short luminance, out ColorResult color)
+		private static ColorResult ConvertHSL(ColorSpace resultSpace, short hue, short saturation, short luminance)
 		{
+			ColorResult color;
+
 			double h = hue;
 			double s = saturation / 255.0;
 			double l = luminance / 255.0;
@@ -393,10 +407,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertLAB(ColorSpace resultSpace, short lComponent, short aComponent, short bComponent, out ColorResult color)
+		private static ColorResult ConvertLAB(ColorSpace resultSpace, short lComponent, short aComponent, short bComponent)
 		{
+			ColorResult color;
+
 			double l = lComponent / 255.0;
 			double a = aComponent / 255.0;
 			double b = bComponent / 255.0;
@@ -431,10 +449,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertXYZ(ColorSpace resultSpace, short xComponent, short yComponent, short zComponent, out ColorResult color)
+		private static ColorResult ConvertXYZ(ColorSpace resultSpace, short xComponent, short yComponent, short zComponent)
 		{
+			ColorResult color;
+
 			double x = xComponent / 255.0;
 			double y = yComponent / 255.0;
 			double z = zComponent / 255.0;
@@ -469,10 +491,14 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
-		private static void ConvertGray(ColorSpace resultSpace, short gray, out ColorResult color)
+		private static ColorResult ConvertGray(ColorSpace resultSpace, short gray)
 		{
+			ColorResult color;
+
 			switch (resultSpace)
 			{
 				case ColorSpace.RGBSpace:
@@ -501,6 +527,8 @@ namespace PSFilterHostDll.PSApi
 				default:
 					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
 			}
+
+			return color;
 		}
 
 		private static CIELab CMYKtoLab(double c, double m, double y, double k)
