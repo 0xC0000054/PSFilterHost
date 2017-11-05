@@ -158,6 +158,7 @@
     <Compile Include="PSApi\DebugUtils.cs" />
     <Compile Include="PSApi\DescriptorRegistrySuite.cs" />
     <Compile Include="PSApi\DescriptorSuite.cs" />
+    <Compile Include="PSApi\DoubleExtensions.cs" />
     <Compile Include="PSApi\ErrorSuite.cs" />
     <Compile Include="PSApi\HandleSuite.cs" />
     <Compile Include="PSApi\IActionDescriptorSuite.cs" />

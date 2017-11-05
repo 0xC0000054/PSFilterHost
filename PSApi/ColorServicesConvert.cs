@@ -182,12 +182,12 @@ namespace PSFilterHostDll.PSApi
 				{
 					case ColorSpace.RGBSpace:
 					case ColorSpace.XYZSpace:
-						colorComponents[0] = (short)Math.Round(result.component0 * 255.0);
-						colorComponents[1] = (short)Math.Round(result.component1 * 255.0);
-						colorComponents[2] = (short)Math.Round(result.component2 * 255.0);
+						colorComponents[0] = (short)Math.Round(result.component0 * 255.0).Clamp(0, 255);
+						colorComponents[1] = (short)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						colorComponents[2] = (short)Math.Round(result.component2 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.GraySpace:
-						colorComponents[0] = (short)Math.Round(result.component0 * 255.0);
+						colorComponents[0] = (short)Math.Round(result.component0 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.HSBSpace:
 					case ColorSpace.HSLSpace:
@@ -195,20 +195,20 @@ namespace PSFilterHostDll.PSApi
 						// Wrap the hue to 0 if the value is 360.
 						int hue = (int)Math.Round(result.component0 * 360.0);
 						colorComponents[0] = (short)(hue == 360 ? 0 : hue);
-						colorComponents[1] = (short)Math.Round(result.component1 * 255.0);
-						colorComponents[2] = (short)Math.Round(result.component2 * 255.0);
+						colorComponents[1] = (short)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						colorComponents[2] = (short)Math.Round(result.component2 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.LabSpace:
 						// The Lab values have already been scaled to the appropriate range.
-						colorComponents[0] = (short)Math.Round(result.component0);
-						colorComponents[1] = (short)Math.Round(result.component1);
-						colorComponents[2] = (short)Math.Round(result.component2);
+						colorComponents[0] = (short)Math.Round(result.component0).Clamp(0, 255);
+						colorComponents[1] = (short)Math.Round(result.component1).Clamp(0, 255);
+						colorComponents[2] = (short)Math.Round(result.component2).Clamp(0, 255);
 						break;
 					case ColorSpace.CMYKSpace:
-						colorComponents[0] = (short)Math.Round(result.component0 * 255.0);
-						colorComponents[1] = (short)Math.Round(result.component1 * 255.0);
-						colorComponents[2] = (short)Math.Round(result.component2 * 255.0);
-						colorComponents[3] = (short)Math.Round(result.component3 * 255.0);
+						colorComponents[0] = (short)Math.Round(result.component0 * 255.0).Clamp(0, 255);
+						colorComponents[1] = (short)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						colorComponents[2] = (short)Math.Round(result.component2 * 255.0).Clamp(0, 255);
+						colorComponents[3] = (short)Math.Round(result.component3 * 255.0).Clamp(0, 255);
 						break;
 					default:
 						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
@@ -319,30 +319,30 @@ namespace PSFilterHostDll.PSApi
 				{
 					case ColorSpace.HSBSpace:
 					case ColorSpace.HSLSpace:
-						c0 = (byte)Math.Round(result.component0 * 255.0);
-						c1 = (byte)Math.Round(result.component1 * 255.0);
-						c2 = (byte)Math.Round(result.component2 * 255.0);
+						c0 = (byte)Math.Round(result.component0 * 255.0).Clamp(0, 255);
+						c1 = (byte)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						c2 = (byte)Math.Round(result.component2 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.LabSpace:
 						// The Lab values have already been scaled to the appropriate range.
-						c0 = (byte)Math.Round(result.component0);
-						c1 = (byte)Math.Round(result.component1);
-						c2 = (byte)Math.Round(result.component2);
+						c0 = (byte)Math.Round(result.component0).Clamp(0, 255);
+						c1 = (byte)Math.Round(result.component1).Clamp(0, 255);
+						c2 = (byte)Math.Round(result.component2).Clamp(0, 255);
 						break;
 					case ColorSpace.RGBSpace:
 					case ColorSpace.XYZSpace:
-						c0 = (byte)Math.Round(result.component0 * 255.0);
-						c1 = (byte)Math.Round(result.component1 * 255.0);
-						c2 = (byte)Math.Round(result.component2 * 255.0);
+						c0 = (byte)Math.Round(result.component0 * 255.0).Clamp(0, 255);
+						c1 = (byte)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						c2 = (byte)Math.Round(result.component2 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.GraySpace:
-						c0 = (byte)Math.Round(result.component0 * 255.0);
+						c0 = (byte)Math.Round(result.component0 * 255.0).Clamp(0, 255);
 						break;
 					case ColorSpace.CMYKSpace:
-						c0 = (byte)Math.Round(result.component0 * 255.0);
-						c1 = (byte)Math.Round(result.component1 * 255.0);
-						c2 = (byte)Math.Round(result.component2 * 255.0);
-						c3 = (byte)Math.Round(result.component3 * 255.0);
+						c0 = (byte)Math.Round(result.component0 * 255.0).Clamp(0, 255);
+						c1 = (byte)Math.Round(result.component1 * 255.0).Clamp(0, 255);
+						c2 = (byte)Math.Round(result.component2 * 255.0).Clamp(0, 255);
+						c3 = (byte)Math.Round(result.component3 * 255.0).Clamp(0, 255);
 						break;
 					default:
 						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
