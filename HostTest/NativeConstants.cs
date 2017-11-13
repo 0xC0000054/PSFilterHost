@@ -40,6 +40,5 @@ namespace HostTest
         internal const string IID_IShellItemArray = "B63EA76D-1F85-456F-A19C-48159EFA858B";
 
         internal const uint SEM_FAILCRITICALERRORS = 1;
-        internal const uint SEM_NOOPENFILEERRORBOX = 0x8000;
     }
 }

@@ -279,7 +279,7 @@ namespace HostTest
 
 			// Disable the error dialog that is shown when a filter cannot find a missing dependency.
 			uint oldMode = SafeNativeMethods.SetErrorMode(0U);
-			SafeNativeMethods.SetErrorMode(oldMode | NativeConstants.SEM_FAILCRITICALERRORS | NativeConstants.SEM_NOOPENFILEERRORBOX);
+			SafeNativeMethods.SetErrorMode(oldMode | NativeConstants.SEM_FAILCRITICALERRORS);
 		}
 
 		protected override void OnShown(EventArgs e)
