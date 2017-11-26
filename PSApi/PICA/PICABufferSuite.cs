@@ -233,28 +233,14 @@ namespace PSFilterHostDll.PSApi.PICA
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        ~PICABufferSuite()
-        {
-            Dispose(false);
-        }
-
-        private void Dispose(bool disposing)
-        {
             if (!disposed)
             {
-                if (disposing)
-                {
-                    foreach (var item in this.buffers)
-                    {
-                        item.Value.Dispose();
-                    }
-                }
-
                 disposed = true;
+
+                foreach (var item in this.buffers)
+                {
+                    item.Value.Dispose();
+                }
             }
         }
     }
