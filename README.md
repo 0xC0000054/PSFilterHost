@@ -1,4 +1,3 @@
-
 # 8bf filter host for .NET
  
  [![NuGet version](https://img.shields.io/nuget/v/PSFilterHost.svg?style=flat)](https://www.nuget.org/packages/PSFilterHost/)
