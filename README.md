@@ -1,4 +1,7 @@
+
 # 8bf filter host for .NET
+ 
+ [![NuGet version](https://img.shields.io/nuget/v/PSFilterHost.svg?style=flat)](https://www.nuget.org/packages/PSFilterHost/)
 
  A library that enables applications built with .NET 2.0 or later to run 3rd party 8bf filters. 
 
@@ -14,11 +17,6 @@
 The .NET 2.0 version uses GDIPlus (aka System.Drawing) it does not support 16-bit images, and converts all images to 32-bit BGRA internally.
 
 The .NET 3.0, 3.5 and 4.5.2 versions use Windows Imaging Component (aka System.Windows.Media.Imaging) to support 8-bit and 16-bit Grayscale and RGBA images, the image data will be converted into the appropriate mode for processing.
-
-## NuGet Package
-
-https://www.nuget.org/packages/PSFilterHost/
-
 
 ## License
 
