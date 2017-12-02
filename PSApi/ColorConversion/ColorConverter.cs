@@ -110,7 +110,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSB color to CMYK.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="brightness">The brightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -123,7 +123,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSB color to HSL.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="brightness">The brightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -136,7 +136,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSB color to Lab.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="brightness">The brightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -149,7 +149,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSB color to RGB.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="brightness">The brightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -223,7 +223,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSB color to XYZ.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="brightness">The brightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -236,7 +236,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSL color to RGB.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="lightness">The lightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -249,7 +249,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSL color to HSB.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="lightness">The lightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -262,7 +262,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSL color to Lab.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="lightness">The lightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -302,7 +302,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSL color to RGB.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 359].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="lightness">The lightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
@@ -320,7 +320,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
             }
             else
             {
-                double scaledHue = hue / 359.0;
+                double scaledHue = hue / 360.0;
                 double p = lightness < 0.5 ? lightness * (1.0 + saturation) : (lightness + saturation) - (saturation * lightness);
                 double q = 2.0 * lightness - p;
 
@@ -335,7 +335,7 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         /// <summary>
         /// Converts a HSL color to XYZ.
         /// </summary>
-        /// <param name="hue">The hue component in the range of [0, 1].</param>
+        /// <param name="hue">The hue component in the range of [0, 360].</param>
         /// <param name="saturation">The saturation component in the range of [0, 1].</param>
         /// <param name="lightness">The lightness component in the range of [0, 1].</param>
         /// <returns>The converted color.</returns>
