@@ -13,7 +13,7 @@
 
 ## Library Versions
 
-The .NET 2.0 version uses GDIPlus (aka System.Drawing) it does not support 16-bit images, and converts all images to 32-bit BGRA internally.
+The .NET 2.0 version uses GDIPlus (aka System.Drawing) it does not support processing 16-bits-per-channel images, and will convert the image data to the appropriate 8-bits-per-channel format.
 
 The .NET 3.0, 3.5 and 4.5.2 versions use Windows Imaging Component (aka System.Windows.Media.Imaging) to support 8-bit and 16-bit Grayscale and RGBA images, the image data will be converted into the appropriate mode for processing.
 
