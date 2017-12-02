@@ -7,7 +7,7 @@
 ## Features:
 
 * Runs 32-bit or 64-bit filters based on the processor architecture of the host process.
-*  Supports processing 8 and 16 bit per channel gray scale and RGB(A) images (16-bit processing is only supported with the BitmapSource class in .NET 3.0 or later). 
+*  Supports processing 8 and 16 bits per channel gray scale and RGB(A) images (16-bit processing is only supported with the BitmapSource class in .NET 3.0 or later). 
 *  Exposes the image EXIF and XMP metadata to the filters.
 *   Supports batch processing filters.
 
