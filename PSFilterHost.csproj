@@ -160,6 +160,7 @@
     <Compile Include="PSApi\DescriptorSuite.cs" />
     <Compile Include="PSApi\DoubleExtensions.cs" />
     <Compile Include="PSApi\ErrorSuite.cs" />
+    <Compile Include="PSApi\Fixed16.cs" />
     <Compile Include="PSApi\HandleSuite.cs" />
     <Compile Include="PSApi\IActionDescriptorSuite.cs" />
     <Compile Include="PSApi\IActionListSuite.cs" />
