@@ -51,7 +51,11 @@ namespace PSFilterHostDll.PSApi
 				throw new ArgumentNullException("image");
 			}
 
-			this.image = image;
+#if GDIPLUS
+			this.image = (Bitmap)image.Clone();
+#else
+			this.image = image.Clone();
+#endif
 			this.exifBytes = null;
 			this.xmpBytes = null;
 			this.extractedExif = false;
