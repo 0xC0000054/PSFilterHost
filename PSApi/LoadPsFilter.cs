@@ -78,9 +78,6 @@ namespace PSFilterHostDll.PSApi
 		private ReadPixelsProc readPixelsProc;
 		private WriteBasePixelsProc writeBasePixelsProc;
 		private ReadPortForWritePortProc readPortForWritePortProc;
-		// PropertyProcs
-		private GetPropertyProc getPropertyProc;
-		private SetPropertyProc setPropertyProc;
 		// SPBasic
 		private SPBasicAcquireSuite spAcquireSuite;
 		private SPBasicAllocateBlock spAllocateBlock;
@@ -136,13 +133,11 @@ namespace PSFilterHostDll.PSApi
 		private IntPtr dataPtr;
 		private short result;
 		private string errorMessage;
-		private HostInformation hostInfo;
 
 		private short filterCase;
 		private double dpiX;
 		private double dpiY;
 		private Region selectedRegion;
-		private ImageMetaData imageMetaData;
 
 		private ImageModes imageMode;
 		private byte[] backgroundColor;
@@ -184,6 +179,7 @@ namespace PSFilterHostDll.PSApi
 
 		private DescriptorSuite descriptorSuite;
 		private ErrorSuite errorSuite;
+		private PropertySuite propertySuite;
 		private PseudoResourceSuite pseudoResourceSuite;
 		private ActionSuiteProvider actionSuites;
 		private DescriptorRegistrySuite descriptorRegistrySuite;
@@ -342,7 +338,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.hostInfo;
+				return this.propertySuite.HostInformation;
 			}
 			set
 			{
@@ -351,7 +347,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.hostInfo = value;
+				this.propertySuite.HostInformation = value;
 			}
 		}
 
@@ -404,7 +400,6 @@ namespace PSFilterHostDll.PSApi
 			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
 			this.activePICASuites = new ActivePICASuites();
 			this.picaSuites = new PICASuites();
-			this.hostInfo = new HostInformation();
 			this.colorProfileConverter = new ColorProfileConverter();
 			this.documentColorProfile = null;
 
@@ -426,12 +421,12 @@ namespace PSFilterHostDll.PSApi
 #if GDIPLUS
 			this.dpiX = sourceImage.HorizontalResolution;
 			this.dpiY = sourceImage.VerticalResolution;
-			this.imageMetaData = new ImageMetaData((Bitmap)sourceImage.Clone());
 #else
 			this.dpiX = sourceImage.DpiX;
 			this.dpiY = sourceImage.DpiY;
-			this.imageMetaData = new ImageMetaData(sourceImage.Clone());
 #endif
+
+			this.propertySuite = new PropertySuite(sourceImage, this.imageMode);
 
 			this.selectedRegion = null;
 			this.filterCase = FilterCase.EditableTransparencyNoSelection;
@@ -4342,337 +4337,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private unsafe short PropertyGetProc(uint signature, uint key, int index, ref IntPtr simpleProperty, ref IntPtr complexProperty)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.PropertySuite, string.Format("Sig: {0}, Key: {1}, Index: {2}", DebugUtils.PropToString(signature), DebugUtils.PropToString(key), index));
-#endif
-			if (signature != PSConstants.kPhotoshopSignature)
-			{
-				return PSError.errPlugInPropertyUndefined;
-			}
-
-			byte[] bytes = null;
-
-			FilterRecord* filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
-
-			short err = PSError.noErr;
-
-			switch (key)
-			{
-				case PSProperties.BigNudgeH:
-				case PSProperties.BigNudgeV:
-					simpleProperty = new IntPtr(new Fixed16(PSConstants.Properties.BigNudgeDistance).Value);
-					break;
-				case PSProperties.Caption:
-					if (IPTCData.TryCreateCaptionRecord(hostInfo.Caption, out bytes))
-					{
-						complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-						if (complexProperty != IntPtr.Zero)
-						{
-							Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-							HandleSuite.Instance.UnlockHandle(complexProperty);
-						}
-						else
-						{
-							err = PSError.memFullErr;
-						}
-					}
-					else
-					{
-						if (complexProperty != IntPtr.Zero)
-						{
-							complexProperty = HandleSuite.Instance.NewHandle(0);
-						}
-					}
-					break;
-				case PSProperties.ChannelName:
-					if (index < 0 || index > (filterRecord->planes - 1))
-					{
-						return PSError.errPlugInPropertyUndefined;
-					}
-
-					string name = string.Empty;
-
-					if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
-					{
-						switch (index)
-						{
-							case 0:
-								name = Resources.GrayChannelName;
-								break;
-						}
-					}
-					else
-					{
-						switch (index)
-						{
-							case 0:
-								name = Resources.RedChannelName;
-								break;
-							case 1:
-								name = Resources.GreenChannelName;
-								break;
-							case 2:
-								name = Resources.BlueChannelName;
-								break;
-							case 3:
-								name = Resources.AlphaChannelName;
-								break;
-						}
-					}
-
-					bytes = Encoding.ASCII.GetBytes(name);
-
-					complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-					if (complexProperty != IntPtr.Zero)
-					{
-						Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-						HandleSuite.Instance.UnlockHandle(complexProperty);
-					}
-					else
-					{
-						err = PSError.memFullErr;
-					}
-					break;
-				case PSProperties.Copyright:
-				case PSProperties.Copyright2:
-					simpleProperty = new IntPtr(hostInfo.Copyright ? 1 : 0);
-					break;
-				case PSProperties.EXIFData:
-				case PSProperties.XMPData:
-					if (imageMetaData.Extract(out bytes, key == PSProperties.EXIFData))
-					{
-						complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-						if (complexProperty != IntPtr.Zero)
-						{
-							Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-							HandleSuite.Instance.UnlockHandle(complexProperty);
-						}
-						else
-						{
-							err = PSError.memFullErr;
-						}
-					}
-					else
-					{
-						if (complexProperty != IntPtr.Zero)
-						{
-							// If the complexProperty is not IntPtr.Zero we return a valid zero byte handle, otherwise some filters will crash with an access violation.
-							complexProperty = HandleSuite.Instance.NewHandle(0);
-						}
-					}
-					break;
-				case PSProperties.GridMajor:
-					simpleProperty = new IntPtr(new Fixed16(PSConstants.Properties.GridMajor).Value);
-					break;
-				case PSProperties.GridMinor:
-					simpleProperty = new IntPtr(PSConstants.Properties.GridMinor);
-					break;
-				case PSProperties.ImageMode:
-					simpleProperty = new IntPtr((int)filterRecord->imageMode);
-					break;
-				case PSProperties.InterpolationMethod:
-					simpleProperty = new IntPtr(PSConstants.Properties.InterpolationMethod.NearestNeghbor);
-					break;
-				case PSProperties.NumberOfChannels:
-					simpleProperty = new IntPtr(filterRecord->planes);
-					break;
-				case PSProperties.NumberOfPaths:
-					simpleProperty = new IntPtr(0);
-					break;
-				case PSProperties.PathName:
-					if (complexProperty != IntPtr.Zero)
-					{
-						complexProperty = HandleSuite.Instance.NewHandle(0);
-					}
-					break;
-				case PSProperties.WorkPathIndex:
-				case PSProperties.ClippingPathIndex:
-				case PSProperties.TargetPathIndex:
-					simpleProperty = new IntPtr(PSConstants.Properties.NoPathIndex);
-					break;
-				case PSProperties.RulerUnits:
-					simpleProperty = new IntPtr((int)hostInfo.RulerUnit);
-					break;
-				case PSProperties.RulerOriginH:
-				case PSProperties.RulerOriginV:
-					simpleProperty = new IntPtr(new Fixed16(0).Value);
-					break;
-				case PSProperties.Watermark:
-					simpleProperty = new IntPtr(hostInfo.Watermark ? 1 : 0);
-					break;
-				case PSProperties.SerialString:
-					bytes = Encoding.ASCII.GetBytes(filterRecord->serial.ToString(CultureInfo.InvariantCulture));
-					complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-					if (complexProperty != IntPtr.Zero)
-					{
-						Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-						HandleSuite.Instance.UnlockHandle(complexProperty);
-					}
-					else
-					{
-						err = PSError.memFullErr;
-					}
-					break;
-				case PSProperties.URL:
-					if (hostInfo.Url != null)
-					{
-						bytes = Encoding.ASCII.GetBytes(hostInfo.Url.ToString());
-						complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-						if (complexProperty != IntPtr.Zero)
-						{
-							Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-							HandleSuite.Instance.UnlockHandle(complexProperty);
-						}
-						else
-						{
-							err = PSError.memFullErr;
-						}
-					}
-					else
-					{
-						if (complexProperty != IntPtr.Zero)
-						{
-							complexProperty = HandleSuite.Instance.NewHandle(0);
-						}
-					}
-					break;
-				case PSProperties.Title:
-				case PSProperties.UnicodeTitle:
-					string title;
-					if (!string.IsNullOrEmpty(hostInfo.Title))
-					{
-						title = hostInfo.Title;
-					}
-					else
-					{
-						title = "temp.png";
-					}
-
-					if (key == PSProperties.UnicodeTitle)
-					{
-						bytes = Encoding.Unicode.GetBytes(title);
-					}
-					else
-					{
-						bytes = Encoding.ASCII.GetBytes(title);
-					}
-					complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-					if (complexProperty != IntPtr.Zero)
-					{
-						Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-						HandleSuite.Instance.UnlockHandle(complexProperty);
-					}
-					else
-					{
-						err = PSError.memFullErr;
-					}
-
-					break;
-				case PSProperties.WatchSuspension:
-					simpleProperty = new IntPtr(0);
-					break;
-				case PSProperties.DocumentWidth:
-					simpleProperty = new IntPtr(source.Width);
-					break;
-				case PSProperties.DocumentHeight:
-					simpleProperty = new IntPtr(source.Height);
-					break;
-				case PSProperties.ToolTips:
-					simpleProperty = new IntPtr(1);
-					break;
-				case PSProperties.HighDPI:
-					simpleProperty = new IntPtr(hostInfo.HighDpi ? 1 : 0);
-					break;
-
-				default:
-					return PSError.errPlugInPropertyUndefined;
-			}
-
-			return err;
-		}
-
-		private short PropertySetProc(uint signature, uint key, int index, IntPtr simpleProperty, IntPtr complexProperty)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.PropertySuite, string.Format("Sig: {0}, Key: {1}, Index: {2}", DebugUtils.PropToString(signature), DebugUtils.PropToString(key), index));
-#endif
-			if (signature != PSConstants.kPhotoshopSignature)
-			{
-				return PSError.errPlugInPropertyUndefined;
-			}
-
-			int size = 0;
-			byte[] bytes = null;
-
-			int simple = simpleProperty.ToInt32();
-
-			switch (key)
-			{
-				case PSProperties.BigNudgeH:
-					break;
-				case PSProperties.BigNudgeV:
-					break;
-				case PSProperties.Caption:
-					size = HandleSuite.Instance.GetHandleSize(complexProperty);
-					if (size > 0)
-					{
-						string caption = IPTCData.CaptionFromMemory(HandleSuite.Instance.LockHandle(complexProperty, 0));
-						HandleSuite.Instance.UnlockHandle(complexProperty);
-
-						if (!string.IsNullOrEmpty(caption))
-						{
-							hostInfo.Caption = caption;
-						}
-					}
-					break;
-				case PSProperties.Copyright:
-				case PSProperties.Copyright2:
-					hostInfo.Copyright = simple != 0;
-					break;
-				case PSProperties.EXIFData:
-				case PSProperties.XMPData:
-					break;
-				case PSProperties.GridMajor:
-					break;
-				case PSProperties.GridMinor:
-					break;
-				case PSProperties.RulerOriginH:
-					break;
-				case PSProperties.RulerOriginV:
-					break;
-				case PSProperties.URL:
-					size = HandleSuite.Instance.GetHandleSize(complexProperty);
-					if (size > 0)
-					{
-						bytes = new byte[size];
-						Marshal.Copy(HandleSuite.Instance.LockHandle(complexProperty, 0), bytes, 0, size);
-						HandleSuite.Instance.UnlockHandle(complexProperty);
-
-						Uri temp;
-						if (Uri.TryCreate(Encoding.ASCII.GetString(bytes, 0, size), UriKind.Absolute, out temp))
-						{
-							hostInfo.Url = temp;
-						}
-					}
-					break;
-				case PSProperties.WatchSuspension:
-					break;
-				case PSProperties.Watermark:
-					hostInfo.Watermark = simple != 0;
-					break;
-				default:
-					return PSError.errPlugInPropertyUndefined;
-			}
-
-			return PSError.noErr;
-		}
-
 		private int SPBasicAcquireSuite(IntPtr name, int version, ref IntPtr suite)
 		{
 
@@ -5029,7 +4693,7 @@ namespace PSFilterHostDll.PSApi
 					break;
 			}
 
-
+			propertySuite.NumberOfChannels = filterRecord->planes;
 			filterRecord->floatCoord.h = 0;
 			filterRecord->floatCoord.v = 0;
 			filterRecord->filterRect.left = 0;
@@ -5066,10 +4730,6 @@ namespace PSFilterHostDll.PSApi
 			readPixelsProc = new ReadPixelsProc(ReadPixelsProc);
 			writeBasePixelsProc = new WriteBasePixelsProc(WriteBasePixels);
 			readPortForWritePortProc = new ReadPortForWritePortProc(ReadPortForWritePort);
-
-			// PropertyProc
-			getPropertyProc = new GetPropertyProc(PropertyGetProc);
-			setPropertyProc = new SetPropertyProc(PropertySetProc);
 
 			// SPBasicSuite
 			spAcquireSuite = new SPBasicAcquireSuite(SPBasicAcquireSuite);
@@ -5117,13 +4777,7 @@ namespace PSFilterHostDll.PSApi
 				readDocumentPtr = IntPtr.Zero;
 			}
 
-			propertyProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(PropertyProcs)), true);
-			PropertyProcs* propertyProcs = (PropertyProcs*)propertyProcsPtr.ToPointer();
-			propertyProcs->propertyProcsVersion = PSConstants.kCurrentPropertyProcsVersion;
-			propertyProcs->numPropertyProcs = PSConstants.kCurrentPropertyProcsCount;
-			propertyProcs->getPropertyProc = Marshal.GetFunctionPointerForDelegate(getPropertyProc);
-			propertyProcs->setPropertyProc = Marshal.GetFunctionPointerForDelegate(setPropertyProc);
-
+			propertyProcsPtr = propertySuite.CreatePropertySuite();
 
 			resourceProcsPtr = pseudoResourceSuite.CreateResourceProcs();
 			readDescriptorPtr = descriptorSuite.CreateReadDescriptor();
@@ -5240,7 +4894,7 @@ namespace PSFilterHostDll.PSApi
 
 			filterRecord->supportsAbsolute = 1;
 			filterRecord->wantsAbsolute = 0;
-			filterRecord->getPropertyObsolete = Marshal.GetFunctionPointerForDelegate(getPropertyProc);
+			filterRecord->getPropertyObsolete = propertySuite.GetPropertyCallback;
 			filterRecord->cannotUndo = 0;
 			filterRecord->supportsPadding = 1;
 			filterRecord->inputPadding = PSConstants.Padding.plugInWantsErrorOnBoundsException; // default to the error case for filters that do not set the padding fields.
@@ -5431,10 +5085,10 @@ namespace PSFilterHostDll.PSApi
 						picaSuites = null;
 					}
 
-					if (imageMetaData != null)
+					if (propertySuite != null)
 					{
-						imageMetaData.Dispose();
-						imageMetaData = null;
+						propertySuite.Dispose();
+						propertySuite = null;
 					}
 
 					if (colorCorrectedDisplaySurface != null)

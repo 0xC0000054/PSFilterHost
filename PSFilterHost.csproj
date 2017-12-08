@@ -182,6 +182,7 @@
     <Compile Include="PSApi\PICA\PICAUIHooksSuite.cs" />
     <Compile Include="PSApi\PluginLoader.cs" />
     <Compile Include="PSApi\PluginModule.cs" />
+    <Compile Include="PSApi\PropertySuite.cs" />
     <Compile Include="PSApi\PSActionDescriptor.cs" />
     <Compile Include="PSApi\PSActionList.cs" />
     <Compile Include="PSApi\PSActionReference.cs" />
