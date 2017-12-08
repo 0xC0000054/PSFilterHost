@@ -70,10 +70,8 @@ namespace PSFilterHostDll.PSApi
 		private ProgressProc progressProc;
 		private TestAbortProc abortProc;
 		// ImageServicesProc
-#if USEIMAGESERVICES
-		private static PIResampleProc resample1DProc;
-		private static PIResampleProc resample2DProc;
-#endif
+		private PIResampleProc resample1DProc;
+		private PIResampleProc resample2DProc;
 		// ChannelPorts
 		private ReadPixelsProc readPixelsProc;
 		private WriteBasePixelsProc writeBasePixelsProc;
@@ -92,9 +90,7 @@ namespace PSFilterHostDll.PSApi
 		private IntPtr platFormDataPtr;
 		private IntPtr bufferProcsPtr;
 		private IntPtr handleProcsPtr;
-#if USEIMAGESERVICES
 		private IntPtr imageServicesProcsPtr;
-#endif
 		private IntPtr propertyProcsPtr;
 		private IntPtr resourceProcsPtr;
 
@@ -4299,7 +4295,6 @@ namespace PSFilterHostDll.PSApi
 #endif
 		}
 
-#if USEIMAGESERVICES
 		private short ImageServicesInterpolate1DProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method)
 		{
 #if DEBUG
@@ -4316,7 +4311,6 @@ namespace PSFilterHostDll.PSApi
 
 			return PSError.memFullErr;
 		}
-#endif
 
 		private void ProcessEvent(IntPtr @event)
 		{
@@ -4722,10 +4716,8 @@ namespace PSFilterHostDll.PSApi
 			progressProc = new ProgressProc(ProgressProc);
 			abortProc = new TestAbortProc(AbortProc);
 			// ImageServicesProc
-#if USEIMAGESERVICES
 			resample1DProc = new PIResampleProc(ImageServicesInterpolate1DProc);
 			resample2DProc = new PIResampleProc(ImageServicesInterpolate2DProc);
-#endif
 			// ChannelPorts
 			readPixelsProc = new ReadPixelsProc(ReadPixelsProc);
 			writeBasePixelsProc = new WriteBasePixelsProc(WriteBasePixels);
@@ -4749,7 +4741,6 @@ namespace PSFilterHostDll.PSApi
 			bufferProcsPtr = BufferSuite.Instance.CreateBufferProcs();
 			handleProcsPtr = HandleSuite.Instance.CreateHandleProcs();
 
-#if USEIMAGESERVICES
 			imageServicesProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(ImageServicesProcs)), true);
 			ImageServicesProcs* imageServices = (ImageServicesProcs*)imageServicesProcsPtr.ToPointer();
 
@@ -4757,7 +4748,6 @@ namespace PSFilterHostDll.PSApi
 			imageServices->numImageServicesProcs = PSConstants.kCurrentImageServicesProcsCount;
 			imageServices->interpolate1DProc = Marshal.GetFunctionPointerForDelegate(resample1DProc);
 			imageServices->interpolate2DProc = Marshal.GetFunctionPointerForDelegate(resample2DProc);
-#endif
 
 			if (useChannelPorts)
 			{
@@ -4906,11 +4896,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->maskRate = new Fixed16(1);
 			filterRecord->colorServices = Marshal.GetFunctionPointerForDelegate(colorProc);
 			// New in 3.0.4
-#if USEIMAGESERVICES
 			filterRecord->imageServicesProcs = imageServicesProcsPtr;
-#else
-			filterRecord->imageServicesProcs = IntPtr.Zero;
-#endif
 			filterRecord->propertyProcs = propertyProcsPtr;
 			filterRecord->inTileHeight = (short)source.Height;
 			filterRecord->inTileWidth = (short)source.Width;
@@ -5134,13 +5120,12 @@ namespace PSFilterHostDll.PSApi
 					handleProcsPtr = IntPtr.Zero;
 				}
 
-#if USEIMAGESERVICES
 				if (imageServicesProcsPtr != IntPtr.Zero)
 				{
 					Memory.Free(imageServicesProcsPtr);
 					imageServicesProcsPtr = IntPtr.Zero;
 				}
-#endif
+
 				if (propertyProcsPtr != IntPtr.Zero)
 				{
 					Memory.Free(propertyProcsPtr);

@@ -15,9 +15,9 @@
  * All rights reserved.
 */
 
-#if USEIMAGESERVICES
 using System;
 using System.Runtime.InteropServices;
+
 namespace PSFilterHostDll.PSApi
 {
 
@@ -43,4 +43,3 @@ namespace PSFilterHostDll.PSApi
 
 
 }
-#endif

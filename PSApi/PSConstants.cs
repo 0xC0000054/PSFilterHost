@@ -42,10 +42,9 @@ namespace PSFilterHostDll.PSApi
         public const short kCurrentHandleProcsVersion = 1;
         public const short kCurrentHandleProcsCount = 8;
 
-#if USEIMAGESERVICES
         public const short kCurrentImageServicesProcsVersion = 1;
         public const short kCurrentImageServicesProcsCount = 2;
-#endif
+
         public const short kCurrentPropertyProcsVersion = 1;
         public const short kCurrentPropertyProcsCount = 2;
 
