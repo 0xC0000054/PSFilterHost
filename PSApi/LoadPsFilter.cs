@@ -4738,8 +4738,8 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		private unsafe void SetupSuites()
 		{
-			bufferProcsPtr = BufferSuite.Instance.CreateBufferProcs();
-			handleProcsPtr = HandleSuite.Instance.CreateHandleProcs();
+			bufferProcsPtr = BufferSuite.Instance.CreateBufferProcsPointer();
+			handleProcsPtr = HandleSuite.Instance.CreateHandleProcsPointer();
 
 			imageServicesProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(ImageServicesProcs)), true);
 			ImageServicesProcs* imageServices = (ImageServicesProcs*)imageServicesProcsPtr.ToPointer();
@@ -4767,11 +4767,11 @@ namespace PSFilterHostDll.PSApi
 				readDocumentPtr = IntPtr.Zero;
 			}
 
-			propertyProcsPtr = propertySuite.CreatePropertySuite();
+			propertyProcsPtr = propertySuite.CreatePropertySuitePointer();
 
-			resourceProcsPtr = pseudoResourceSuite.CreateResourceProcs();
-			readDescriptorPtr = descriptorSuite.CreateReadDescriptor();
-			writeDescriptorPtr = descriptorSuite.CreateWriteDescriptor();
+			resourceProcsPtr = pseudoResourceSuite.CreateResourceProcsPointer();
+			readDescriptorPtr = descriptorSuite.CreateReadDescriptorPointer();
+			writeDescriptorPtr = descriptorSuite.CreateWriteDescriptorPointer();
 
 			descriptorParametersPtr = Memory.Allocate(Marshal.SizeOf(typeof(PIDescriptorParameters)), true);
 			PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();

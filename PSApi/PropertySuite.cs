@@ -126,7 +126,7 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        public unsafe IntPtr CreatePropertySuite()
+        public unsafe IntPtr CreatePropertySuitePointer()
         {
             if (this.disposed)
             {

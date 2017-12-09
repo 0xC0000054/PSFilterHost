@@ -169,7 +169,7 @@ namespace PSFilterHostDll.PSApi
 			this.disposed = false;
 		}
 
-		public IntPtr CreateReadDescriptor()
+		public IntPtr CreateReadDescriptorPointer()
 		{
 			IntPtr readDescriptorPtr = Memory.Allocate(Marshal.SizeOf(typeof(ReadDescriptorProcs)), true);
 
@@ -201,7 +201,7 @@ namespace PSFilterHostDll.PSApi
 			return readDescriptorPtr;
 		}
 
-		public IntPtr CreateWriteDescriptor()
+		public IntPtr CreateWriteDescriptorPointer()
 		{
 			IntPtr writeDescriptorPtr = Memory.Allocate(Marshal.SizeOf(typeof(WriteDescriptorProcs)), true);
 

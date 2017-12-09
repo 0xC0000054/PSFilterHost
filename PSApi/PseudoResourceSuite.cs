@@ -50,7 +50,7 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		public IntPtr CreateResourceProcs()
+		public IntPtr CreateResourceProcsPointer()
 		{
 			IntPtr resourceProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(ResourceProcs)), true);
 
