@@ -251,7 +251,6 @@
     <Compile Include="PSApi\PropertyProcs.cs" />
     <Compile Include="PSApi\PSConstants.cs" />
     <Compile Include="PSApi\PSError.cs" />
-    <Compile Include="PSApi\PSImagePlane.cs" />
     <Compile Include="PSApi\PSPixelMap.cs" />
     <Compile Include="PSApi\PSProperties.cs" />
     <Compile Include="PSApi\ReadImageDocumentDesc.cs" />

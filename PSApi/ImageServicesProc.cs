@@ -20,6 +20,14 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
 {
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct PSImagePlane
+    {
+        public IntPtr data;
+        public Rect16 bounds;
+        public int rowBytes;
+        public int colBytes;
+    }
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
     internal delegate short PIResampleProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method);
