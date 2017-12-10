@@ -174,7 +174,7 @@ namespace PSFilterHostDll.PSApi
 		private ErrorSuite errorSuite;
 		private ImageServicesSuite imageServicesSuite;
 		private PropertySuite propertySuite;
-		private PseudoResourceSuite pseudoResourceSuite;
+		private ResourceSuite resourceSuite;
 		private ActionSuiteProvider actionSuites;
 		private DescriptorRegistrySuite descriptorRegistrySuite;
 
@@ -315,7 +315,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.pseudoResourceSuite.PseudoResources;
+				return this.resourceSuite.PseudoResources;
 			}
 			set
 			{
@@ -324,7 +324,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.pseudoResourceSuite.PseudoResources = value;
+				this.resourceSuite.PseudoResources = value;
 			}
 		}
 
@@ -387,7 +387,7 @@ namespace PSFilterHostDll.PSApi
 			progressFunc = null;
 			ColorPickerManager.SetPickColorCallback(null);
 			this.descriptorSuite = new DescriptorSuite();
-			this.pseudoResourceSuite = new PseudoResourceSuite();
+			this.resourceSuite = new ResourceSuite();
 			this.actionSuites = new ActionSuiteProvider();
 
 			this.useChannelPorts = false;
@@ -4742,7 +4742,7 @@ namespace PSFilterHostDll.PSApi
 
 			propertyProcsPtr = propertySuite.CreatePropertySuitePointer();
 
-			resourceProcsPtr = pseudoResourceSuite.CreateResourceProcsPointer();
+			resourceProcsPtr = resourceSuite.CreateResourceProcsPointer();
 			readDescriptorPtr = descriptorSuite.CreateReadDescriptorPointer();
 			writeDescriptorPtr = descriptorSuite.CreateWriteDescriptorPointer();
 

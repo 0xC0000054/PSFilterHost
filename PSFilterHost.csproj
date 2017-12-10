@@ -189,7 +189,7 @@
     <Compile Include="PSApi\PSActionReference.cs" />
     <Compile Include="PSApi\PSDescriptorRegistry.cs" />
     <Compile Include="PSApi\PSErrorSuite.cs" />
-    <Compile Include="PSApi\PseudoResourceSuite.cs" />
+    <Compile Include="PSApi\ResourceSuite.cs" />
     <Compile Include="PSApi\SafeProfileHandle.cs" />
     <Compile Include="PSApi\SafeTransformHandle.cs" />
     <Compile Include="PSApi\StringUtil.cs" />
