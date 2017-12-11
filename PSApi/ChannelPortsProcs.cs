@@ -72,9 +72,9 @@ namespace PSFilterHostDll.PSApi
 		public VPoint tileSize;		// The size of the tiles.
 		public VPoint tileOrigin;		// The origin for the tiles.
 
-		public byte target; // Is this a target channel?
+		public PSBoolean target; // Is this a target channel?
 
-		public byte shown; // Is this channel shown?
+		public PSBoolean shown; // Is this channel shown?
 
 		public ChannelTypes channelType;		// The channel type.
 

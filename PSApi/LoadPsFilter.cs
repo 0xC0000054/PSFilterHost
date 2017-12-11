@@ -1117,7 +1117,7 @@ namespace PSFilterHostDll.PSApi
 
 			filterRecord = (FilterRecord*)filterRecordPtr.ToPointer();
 
-			if (filterRecord->autoMask != 0)
+			if (filterRecord->autoMask)
 			{
 				ClipToSelection(); // Clip the rendered image to the selection if the filter does not do it for us.
 			}
@@ -1185,22 +1185,22 @@ namespace PSFilterHostDll.PSApi
 			if (filterCase == FilterCase.FloatingSelection)
 			{
 				DrawFloatingSelectionMask();
-				filterRecord->isFloating = 1;
-				filterRecord->haveMask = 1;
-				filterRecord->autoMask = 0;
+				filterRecord->isFloating = true;
+				filterRecord->haveMask = true;
+				filterRecord->autoMask = false;
 			}
 			else if (selectedRegion != null)
 			{
 				DrawMask();
-				filterRecord->isFloating = 0;
-				filterRecord->haveMask = 1;
-				filterRecord->autoMask = writesOutsideSelection ? (byte)0 : (byte)1;
+				filterRecord->isFloating = false;
+				filterRecord->haveMask = true;
+				filterRecord->autoMask = !writesOutsideSelection;
 			}
 			else
 			{
-				filterRecord->isFloating = 0;
-				filterRecord->haveMask = 0;
-				filterRecord->autoMask = 0;
+				filterRecord->isFloating = false;
+				filterRecord->haveMask = false;
+				filterRecord->autoMask = false;
 			}
 			filterRecord->maskRect = Rect16.Empty;
 			filterRecord->maskData = IntPtr.Zero;
@@ -1802,7 +1802,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			short error;
 
-			if (filterRecord->haveMask == 1 && RectNonEmpty(filterRecord->maskRect))
+			if (filterRecord->haveMask && RectNonEmpty(filterRecord->maskRect))
 			{
 				if (!lastMaskRect.Equals(filterRecord->maskRect))
 				{
@@ -3493,8 +3493,8 @@ namespace PSFilterHostDll.PSApi
 			desc->depth = depth;
 			desc->bounds = bounds;
 
-			desc->target = (channel < 3) ? (byte)1 : (byte)0;
-			desc->shown = (channel < 4) ? (byte)1 : (byte)0;
+			desc->target = (channel < 3);
+			desc->shown = (channel < 4);
 
 			desc->tileOrigin.h = 0;
 			desc->tileOrigin.v = 0;
@@ -4847,19 +4847,19 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->displayPixels = Marshal.GetFunctionPointerForDelegate(displayPixelsProc);
 			filterRecord->handleProcs = handleProcsPtr;
 			// New in 3.0
-			filterRecord->supportsDummyChannels = 0;
-			filterRecord->supportsAlternateLayouts = 0;
+			filterRecord->supportsDummyChannels = false;
+			filterRecord->supportsAlternateLayouts = false;
 			filterRecord->wantLayout = PSConstants.Layout.Traditional;
 			filterRecord->filterCase = filterCase;
 			filterRecord->dummyPlaneValue = -1;
 			filterRecord->premiereHook = IntPtr.Zero;
 			filterRecord->advanceState = Marshal.GetFunctionPointerForDelegate(advanceProc);
 
-			filterRecord->supportsAbsolute = 1;
-			filterRecord->wantsAbsolute = 0;
+			filterRecord->supportsAbsolute = true;
+			filterRecord->wantsAbsolute = false;
 			filterRecord->getPropertyObsolete = propertySuite.GetPropertyCallback;
-			filterRecord->cannotUndo = 0;
-			filterRecord->supportsPadding = 1;
+			filterRecord->cannotUndo = false;
+			filterRecord->supportsPadding = true;
 			filterRecord->inputPadding = PSConstants.Padding.plugInWantsErrorOnBoundsException; // default to the error case for filters that do not set the padding fields.
 			filterRecord->outputPadding = PSConstants.Padding.plugInWantsErrorOnBoundsException;
 			filterRecord->maskPadding = PSConstants.Padding.plugInWantsErrorOnBoundsException;
