@@ -164,6 +164,44 @@ namespace HostTest
 			return xmp;
 		}
 
+		private static BitmapMetadata GetIPTCMetaData(BitmapMetadata metaData, string format)
+		{
+			BitmapMetadata iptc = null;
+			// GIF and PNG files do not contain IPTC meta data.
+			if (format != "gif" && format != "png")
+			{
+				try
+				{
+					if (format == "jpg")
+					{
+						iptc = metaData.GetQuery("/app13/irb/8bimiptc/iptc") as BitmapMetadata;
+					}
+					else
+					{
+						try
+						{
+							iptc = metaData.GetQuery("/ifd/iptc") as BitmapMetadata;
+						}
+						catch (IOException)
+						{
+							// WINCODEC_ERR_INVALIDQUERYREQUEST
+						}
+
+						if (iptc == null)
+						{
+							iptc = metaData.GetQuery("/ifd/irb/8bimiptc/iptc") as BitmapMetadata;
+						}
+					}
+				}
+				catch (IOException)
+				{
+					// WINCODEC_ERR_INVALIDQUERYREQUEST
+				}
+			}
+
+			return iptc;
+		}
+
 		/// <summary>
 		/// Converts the meta-data to TIFF format.
 		/// </summary>
@@ -193,8 +231,9 @@ namespace HostTest
 			{
 				BitmapMetadata exif = GetEXIFMetaData(metaData, format);
 				BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+				BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
 
-				if (exif == null && xmp == null)
+				if (exif == null && xmp == null && iptc == null)
 				{
 					return null;
 				}
@@ -242,6 +281,27 @@ namespace HostTest
 						else
 						{
 							tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
+						}
+					}
+				}
+
+				if (iptc != null)
+				{
+					tiffMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
+
+					foreach (var tag in iptc)
+					{
+						object value = iptc.GetQuery(tag);
+
+						BitmapMetadata iptcSub = value as BitmapMetadata;
+
+						if (iptcSub != null)
+						{
+							CopySubIFDRecursive(ref tiffMetaData, iptcSub, "/ifd/iptc" + tag);
+						}
+						else
+						{
+							tiffMetaData.SetQuery("/ifd/iptc" + tag, value);
 						}
 					}
 				}
@@ -306,8 +366,9 @@ namespace HostTest
 		{
 			BitmapMetadata exif = GetEXIFMetaData(metaData, format);
 			BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+			BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
 
-			if (exif == null && xmp == null)
+			if (exif == null && xmp == null && iptc == null)
 			{
 				return null;
 			}
@@ -355,6 +416,27 @@ namespace HostTest
 					else
 					{
 						jpegMetaData.SetQuery("/xmp" + tag, value);
+					}
+				}
+			}
+
+			if (iptc != null)
+			{
+				jpegMetaData.SetQuery("/app13/irb/8bimiptc/iptc", new BitmapMetadata("iptc"));
+
+				foreach (var tag in iptc)
+				{
+					object value = iptc.GetQuery(tag);
+
+					BitmapMetadata iptcSub = value as BitmapMetadata;
+
+					if (iptcSub != null)
+					{
+						CopySubIFDRecursive(ref jpegMetaData, iptcSub, "/app13/irb/8bimiptc/iptc" + tag);
+					}
+					else
+					{
+						jpegMetaData.SetQuery("/app13/irb/8bimiptc/iptc" + tag, value);
 					}
 				}
 			}
@@ -429,8 +511,9 @@ namespace HostTest
 		{
 			BitmapMetadata exif = GetEXIFMetaData(metaData, format);
 			BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+			BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
 
-			if (exif == null && xmp == null)
+			if (exif == null && xmp == null && iptc == null)
 			{
 				return null;
 			}
@@ -478,6 +561,27 @@ namespace HostTest
 					else
 					{
 						wmpMetaData.SetQuery("/ifd/xmp" + tag, value);
+					}
+				}
+			}
+
+			if (iptc != null)
+			{
+				wmpMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
+
+				foreach (var tag in iptc)
+				{
+					object value = iptc.GetQuery(tag);
+
+					BitmapMetadata iptcSub = value as BitmapMetadata;
+
+					if (iptcSub != null)
+					{
+						CopySubIFDRecursive(ref wmpMetaData, iptcSub, "/ifd/iptc" + tag);
+					}
+					else
+					{
+						wmpMetaData.SetQuery("/ifd/iptc" + tag, value);
 					}
 				}
 			}
