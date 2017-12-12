@@ -164,236 +164,6 @@ namespace HostTest
 			return xmp;
 		}
 
-		#region TIFF conversion
-		private static BitmapMetadata ConvertIFDMetadata(BitmapMetadata source)
-		{
-			BitmapMetadata ifd = null;
-			BitmapMetadata xmp = null;
-
-			try
-			{
-				ifd = source.GetQuery("/ifd") as BitmapMetadata;
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			try
-			{
-				xmp = source.GetQuery("/xmp") as BitmapMetadata; // Some codecs may store the XMP data outside the IFD block.
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			if (ifd == null && xmp == null)
-			{
-				return null;
-			}
-
-			BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-
-			if (ifd != null)
-			{
-				tiffMetaData.SetQuery("/ifd", new BitmapMetadata("ifd"));
-
-				foreach (var tag in ifd)
-				{
-					object value = ifd.GetQuery(tag);
-
-					BitmapMetadata ifdSub = value as BitmapMetadata;
-
-					if (ifdSub != null)
-					{
-						string baseQuery = "/ifd" + tag;
-
-						CopySubIFDRecursive(ref tiffMetaData, ifdSub, baseQuery);
-					}
-					else
-					{
-						tiffMetaData.SetQuery("/ifd" + tag, value);
-					}
-				}
-			}
-
-			if (xmp != null)
-			{
-				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-
-				foreach (var tag in xmp)
-				{
-					object value = xmp.GetQuery(tag);
-
-					BitmapMetadata xmpSub = value as BitmapMetadata;
-
-					if (xmpSub != null)
-					{
-						string baseQuery = "/ifd/xmp" + tag;
-
-						CopySubIFDRecursive(ref tiffMetaData, xmpSub, baseQuery);
-					}
-					else
-					{
-						tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
-					}
-				}
-			}
-
-			return tiffMetaData;
-		}
-
-		private static BitmapMetadata ConvertJPEGMetaData(BitmapMetadata jpegMetaData)
-		{
-			BitmapMetadata exif = null;
-			BitmapMetadata xmp = null;
-			BitmapMetadata iptc = null;
-
-			try
-			{
-				exif = jpegMetaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			try
-			{
-				xmp = jpegMetaData.GetQuery("/xmp") as BitmapMetadata;
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			try
-			{
-				iptc = jpegMetaData.GetQuery("/app13/irb/8bimiptc/iptc") as BitmapMetadata;
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			if (exif == null && xmp == null)
-			{
-				return null;
-			}
-
-			BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-
-			if (exif != null)
-			{
-				tiffMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
-
-				foreach (var tag in exif)
-				{
-					object value = exif.GetQuery(tag);
-
-					BitmapMetadata exifSub = value as BitmapMetadata;
-
-					if (exifSub != null)
-					{
-						string baseQuery = "/ifd/exif" + tag;
-
-						CopySubIFDRecursive(ref tiffMetaData, exifSub, baseQuery);
-					}
-					else
-					{
-						tiffMetaData.SetQuery("/ifd/exif" + tag, value);
-					}
-				}
-			}
-
-			if (xmp != null)
-			{
-				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-
-				foreach (var tag in xmp)
-				{
-					object value = xmp.GetQuery(tag);
-
-					BitmapMetadata xmpSub = value as BitmapMetadata;
-
-					if (xmpSub != null)
-					{
-						string baseQuery = "/ifd/xmp" + tag;
-
-						CopySubIFDRecursive(ref tiffMetaData, xmpSub, baseQuery);
-					}
-					else
-					{
-						tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
-					}
-				}
-			}
-
-			if (iptc != null)
-			{
-				tiffMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
-
-				foreach (var tag in iptc)
-				{
-					object value = iptc.GetQuery(tag);
-
-					BitmapMetadata iptcSub = value as BitmapMetadata;
-
-					if (iptcSub != null)
-					{
-						string baseQuery = "/ifd/iptc" + tag;
-
-						CopySubIFDRecursive(ref tiffMetaData, iptcSub, baseQuery);
-					}
-					else
-					{
-						tiffMetaData.SetQuery("/ifd/iptc" + tag, value);
-					}
-				}
-			}
-
-			return tiffMetaData;
-		}
-
-		private static BitmapMetadata ConvertPNGMetaData(BitmapMetadata metadata)
-		{
-			BitmapMetadata textChunk = null;
-
-			try
-			{
-				textChunk = metadata.GetQuery("/iTXt") as BitmapMetadata;
-			}
-			catch (IOException)
-			{
-				// WINCODEC_ERR_INVALIDQUERYREQUEST
-			}
-
-			if (textChunk != null)
-			{
-				string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-				if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
-				{
-					string data = textChunk.GetQuery("/TextEntry") as string;
-
-					if (data != null)
-					{
-						BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-						tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-
-						tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(data)); // The XMP specification requires TIFF XMP meta-data to be UTF8 encoded.
-
-						return tiffMetaData;
-					}
-				}
-
-			}
-
-			return null;
-		}
-
-		#endregion
 		/// <summary>
 		/// Converts the meta-data to TIFF format.
 		/// </summary>
@@ -421,22 +191,62 @@ namespace HostTest
 
 			if (format != "tiff")
 			{
-				if (format == "gif")
+				BitmapMetadata exif = GetEXIFMetaData(metaData, format);
+				BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+
+				if (exif == null && xmp == null)
 				{
-					return null; // GIF files do not contain frame level EXIF or XMP meta data.
+					return null;
 				}
-				else if (format == "jpg")
+
+				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+
+				if (exif != null)
 				{
-					return ConvertJPEGMetaData(metaData);
+					tiffMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
+
+					foreach (var tag in exif)
+					{
+						object value = exif.GetQuery(tag);
+
+						BitmapMetadata exifSub = value as BitmapMetadata;
+
+						if (exifSub != null)
+						{
+							string baseQuery = "/ifd/exif" + tag;
+
+							CopySubIFDRecursive(ref tiffMetaData, exifSub, baseQuery);
+						}
+						else
+						{
+							tiffMetaData.SetQuery("/ifd/exif" + tag, value);
+						}
+					}
+
 				}
-				else if (format == "png")
+
+				if (xmp != null)
 				{
-					return ConvertPNGMetaData(metaData);
+					tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+
+					foreach (var tag in xmp)
+					{
+						object value = xmp.GetQuery(tag);
+
+						BitmapMetadata xmpSub = value as BitmapMetadata;
+
+						if (xmpSub != null)
+						{
+							CopySubIFDRecursive(ref tiffMetaData, xmpSub, "/ifd/xmp" + tag);
+						}
+						else
+						{
+							tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
+						}
+					}
 				}
-				else
-				{
-					return ConvertIFDMetadata(metaData);
-				}
+
+				return tiffMetaData;
 			}
 
 			return metaData;
