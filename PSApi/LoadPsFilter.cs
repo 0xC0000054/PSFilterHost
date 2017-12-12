@@ -46,20 +46,6 @@ namespace PSFilterHostDll.PSApi
 		private static readonly int OTOFHandleSize = IntPtr.Size + 4;
 		private const int OTOFSignature = 0x464f544f;
 
-		private sealed class ChannelDescPtrs
-		{
-			public readonly IntPtr address;
-			public readonly IntPtr name;
-
-			public ChannelDescPtrs(IntPtr address, IntPtr name)
-			{
-				this.address = address;
-				this.name = name;
-			}
-		}
-
-		private List<ChannelDescPtrs> channelReadDescPtrs;
-
 		#region CallbackDelegates
 		// MiscCallbacks
 		private AdvanceStateProc advanceProc;
@@ -174,6 +160,7 @@ namespace PSFilterHostDll.PSApi
 		private ErrorSuite errorSuite;
 		private ImageServicesSuite imageServicesSuite;
 		private PropertySuite propertySuite;
+		private ReadImageDocument readImageDocument;
 		private ResourceSuite resourceSuite;
 		private ActionSuiteProvider actionSuites;
 		private DescriptorRegistrySuite descriptorRegistrySuite;
@@ -391,7 +378,6 @@ namespace PSFilterHostDll.PSApi
 			this.actionSuites = new ActionSuiteProvider();
 
 			this.useChannelPorts = false;
-			this.channelReadDescPtrs = new List<ChannelDescPtrs>();
 			this.activePICASuites = new ActivePICASuites();
 			this.picaSuites = new PICASuites();
 			this.colorProfileConverter = new ColorProfileConverter();
@@ -422,6 +408,7 @@ namespace PSFilterHostDll.PSApi
 
 			this.imageServicesSuite = new ImageServicesSuite();
 			this.propertySuite = new PropertySuite(sourceImage, this.imageMode);
+			this.readImageDocument = new ReadImageDocument(source.Width, source.Height, dpiX, dpiY, imageMode);
 
 			this.selectedRegion = null;
 			this.filterCase = FilterCase.EditableTransparencyNoSelection;
@@ -3392,142 +3379,6 @@ namespace PSFilterHostDll.PSApi
 			return PSError.memFullErr;
 		}
 
-		private unsafe void CreateReadImageDocument()
-		{
-			readDocumentPtr = Memory.Allocate(Marshal.SizeOf(typeof(ReadImageDocumentDesc)), true);
-			ReadImageDocumentDesc* doc = (ReadImageDocumentDesc*)readDocumentPtr.ToPointer();
-			doc->minVersion = PSConstants.kCurrentMinVersReadImageDocDesc;
-			doc->maxVersion = PSConstants.kCurrentMaxVersReadImageDocDesc;
-			doc->imageMode = (int)imageMode;
-
-			switch (imageMode)
-			{
-				case ImageModes.GrayScale:
-				case ImageModes.RGB:
-					doc->depth = 8;
-					break;
-				case ImageModes.Gray16:
-				case ImageModes.RGB48:
-					doc->depth = 16;
-					break;
-			}
-
-			doc->bounds.top = 0;
-			doc->bounds.left = 0;
-			doc->bounds.right = source.Width;
-			doc->bounds.bottom = source.Height;
-			doc->hResolution = new Fixed16((int)(dpiX + 0.5));
-			doc->vResolution = new Fixed16((int)(dpiY + 0.5));
-
-			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
-			{
-				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Red, Resources.RedChannelName, doc->depth, doc->bounds);
-
-				ReadChannelDesc* ch = (ReadChannelDesc*)channel.ToPointer();
-
-				for (int i = PSConstants.ChannelPorts.Green; i <= PSConstants.ChannelPorts.Blue; i++)
-				{
-					string name = null;
-					switch (i)
-					{
-						case PSConstants.ChannelPorts.Green:
-							name = Resources.GreenChannelName;
-							break;
-						case PSConstants.ChannelPorts.Blue:
-							name = Resources.BlueChannelName;
-							break;
-					}
-
-					IntPtr ptr = CreateReadChannelDesc(i, name, doc->depth, doc->bounds);
-
-					ch->next = ptr;
-
-					ch = (ReadChannelDesc*)ptr.ToPointer();
-				}
-
-				doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
-
-				if (!ignoreAlpha)
-				{
-					IntPtr alphaPtr = CreateReadChannelDesc(PSConstants.ChannelPorts.Alpha, Resources.AlphaChannelName, doc->depth, doc->bounds);
-					doc->targetTransparency = doc->mergedTransparency = alphaPtr;
-				}
-			}
-			else
-			{
-				IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Gray, Resources.GrayChannelName, doc->depth, doc->bounds);
-				doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
-			}
-
-			if (selectedRegion != null)
-			{
-				IntPtr selectionPtr = CreateReadChannelDesc(PSConstants.ChannelPorts.SelectionMask, Resources.MaskChannelName, doc->depth, doc->bounds);
-				doc->selection = selectionPtr;
-			}
-		}
-
-		private unsafe IntPtr CreateReadChannelDesc(int channel, string name, int depth, VRect bounds)
-		{
-			IntPtr addressPtr = Memory.Allocate(Marshal.SizeOf(typeof(ReadChannelDesc)), true);
-			IntPtr namePtr = IntPtr.Zero;
-			try
-			{
-				namePtr = Marshal.StringToHGlobalAnsi(name);
-
-				channelReadDescPtrs.Add(new ChannelDescPtrs(addressPtr, namePtr));
-			}
-			catch (Exception)
-			{
-				Memory.Free(addressPtr);
-				if (namePtr != IntPtr.Zero)
-				{
-					Marshal.FreeHGlobal(namePtr);
-					namePtr = IntPtr.Zero;
-				}
-				throw;
-			}
-
-			ReadChannelDesc* desc = (ReadChannelDesc*)addressPtr.ToPointer();
-			desc->minVersion = PSConstants.kCurrentMinVersReadChannelDesc;
-			desc->maxVersion = PSConstants.kCurrentMaxVersReadChannelDesc;
-			desc->depth = depth;
-			desc->bounds = bounds;
-
-			desc->target = (channel < 3);
-			desc->shown = (channel < 4);
-
-			desc->tileOrigin.h = 0;
-			desc->tileOrigin.v = 0;
-			desc->tileSize.h = bounds.right - bounds.left;
-			desc->tileSize.v = bounds.bottom - bounds.top;
-
-			desc->port = new IntPtr(channel);
-			switch (channel)
-			{
-				case PSConstants.ChannelPorts.Gray:
-					desc->channelType = ChannelTypes.Black;
-					break;
-				case PSConstants.ChannelPorts.Red:
-					desc->channelType = ChannelTypes.Red;
-					break;
-				case PSConstants.ChannelPorts.Green:
-					desc->channelType = ChannelTypes.Green;
-					break;
-				case PSConstants.ChannelPorts.Blue:
-					desc->channelType = ChannelTypes.Blue;
-					break;
-				case PSConstants.ChannelPorts.Alpha:
-					desc->channelType = ChannelTypes.Transparency;
-					break;
-				case PSConstants.ChannelPorts.SelectionMask:
-					desc->channelType = ChannelTypes.SelectionMask;
-					break;
-			}
-			desc->name = namePtr;
-
-			return addressPtr;
-		}
-
 		private static unsafe void SetFilterEdgePadding8(IntPtr inData, int inRowBytes, Rect16 rect, int nplanes, short ofs, Rectangle lockRect, SurfaceBase surface)
 		{
 			int top = rect.top < 0 ? -rect.top : 0;
@@ -4732,7 +4583,7 @@ namespace PSFilterHostDll.PSApi
 				channelPorts->writeBasePixelsProc = Marshal.GetFunctionPointerForDelegate(writeBasePixelsProc);
 				channelPorts->readPortForWritePortProc = Marshal.GetFunctionPointerForDelegate(readPortForWritePortProc);
 
-				CreateReadImageDocument();
+				readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(ignoreAlpha, selectedRegion != null);
 			}
 			else
 			{
@@ -5032,6 +4883,12 @@ namespace PSFilterHostDll.PSApi
 						scaledSelectionMask = null;
 					}
 
+					if (readImageDocument != null)
+					{
+						readImageDocument.Dispose();
+						readImageDocument = null;
+					}
+
 					if (activePICASuites != null)
 					{
 						activePICASuites.Dispose();
@@ -5121,16 +4978,6 @@ namespace PSFilterHostDll.PSApi
 				{
 					Memory.Free(readDocumentPtr);
 					readDocumentPtr = IntPtr.Zero;
-				}
-
-				if (channelReadDescPtrs != null)
-				{
-					foreach (var item in channelReadDescPtrs)
-					{
-						Marshal.FreeHGlobal(item.name);
-						Memory.Free(item.address);
-					}
-					channelReadDescPtrs = null;
 				}
 
 				if (descriptorParametersPtr != IntPtr.Zero)
