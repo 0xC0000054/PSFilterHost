@@ -42,6 +42,128 @@ namespace HostTest
 			}
 		}
 
+		private static BitmapMetadata GetEXIFMetaData(BitmapMetadata metaData, string format)
+		{
+			BitmapMetadata exif = null;
+			// GIF and PNG files do not contain EXIF meta data.
+			if (format != "gif" && format != "png")
+			{
+				try
+				{
+					if (format == "jpg")
+					{
+						exif = metaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
+					}
+					else
+					{
+						exif = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
+					}
+				}
+				catch (IOException)
+				{
+					// WINCODEC_ERR_INVALIDQUERYREQUEST
+				}
+			}
+
+			return exif;
+		}
+
+		/// <summary>
+		/// Loads the PNG XMP meta data using a dummy TIFF.
+		/// </summary>
+		/// <param name="xmp">The XMP string to load.</param>
+		/// <returns>The loaded XMP block, or null.</returns>
+		private static BitmapMetadata LoadPNGMetaData(string xmp)
+		{
+			BitmapMetadata xmpData = null;
+
+			using (MemoryStream stream = new MemoryStream())
+			{
+				// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
+				// so we have to save it to a dummy tiff and grab the XMP meta-data on load.
+				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+				tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+
+				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+				TiffBitmapEncoder encoder = new TiffBitmapEncoder();
+				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+				encoder.Save(stream);
+
+				TiffBitmapDecoder dec = new TiffBitmapDecoder(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+
+				if (dec.Frames.Count == 1)
+				{
+					BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
+					if (meta != null)
+					{
+						xmpData = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
+					}
+				}
+			}
+
+			return xmpData;
+		}
+
+		private static BitmapMetadata GetXMPMetaData(BitmapMetadata metaData, string format)
+		{
+			BitmapMetadata xmp = null;
+
+			// GIF files do not contain frame level XMP meta data.
+			if (format != "gif")
+			{
+				try
+				{
+					if (format == "png")
+					{
+						BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
+
+						if (textChunk != null)
+						{
+							string keyWord = textChunk.GetQuery("/Keyword") as string;
+
+							if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
+							{
+								string data = textChunk.GetQuery("/TextEntry") as string;
+
+								if (!string.IsNullOrEmpty(data))
+								{
+									xmp = LoadPNGMetaData(data);
+								}
+							}
+						}
+					}
+					else if (format == "jpg")
+					{
+						xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
+					}
+					else
+					{
+						try
+						{
+							xmp = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
+						}
+						catch (IOException)
+						{
+							// WINCODEC_ERR_INVALIDQUERYREQUEST
+						}
+
+						if (xmp == null)
+						{
+							// Some codecs may store the XMP data outside of the IFD block.
+							xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
+						}
+					}
+				}
+				catch (IOException)
+				{
+					// WINCODEC_ERR_INVALIDQUERYREQUEST
+				}
+			}
+
+			return xmp;
+		}
+
 		#region TIFF conversion
 		private static BitmapMetadata ConvertIFDMetadata(BitmapMetadata source)
 		{
@@ -369,127 +491,6 @@ namespace HostTest
 		}
 
 		#region Save format conversion
-		private static BitmapMetadata GetEXIFMetaData(BitmapMetadata metaData, string format)
-		{
-			BitmapMetadata exif = null;
-			// GIF and PNG files do not contain EXIF meta data.
-			if (format != "gif" && format != "png")
-			{
-				try
-				{
-					if (format == "jpg")
-					{
-						exif = metaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
-					}
-					else
-					{
-						exif = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
-					}
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-			}
-
-			return exif;
-		}
-
-		/// <summary>
-		/// Loads the PNG XMP meta data using a dummy TIFF.
-		/// </summary>
-		/// <param name="xmp">The XMP string to load.</param>
-		/// <returns>The loaded XMP block, or null.</returns>
-		private static BitmapMetadata LoadPNGMetaData(string xmp)
-		{
-			BitmapMetadata xmpData = null;
-
-			using (MemoryStream stream = new MemoryStream())
-			{
-				// PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
-				// so we have to save it to a dummy tiff and grab the XMP meta-data on load.
-				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-				tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
-
-				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
-				TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
-				encoder.Save(stream);
-
-				TiffBitmapDecoder dec = new TiffBitmapDecoder(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
-
-				if (dec.Frames.Count == 1)
-				{
-					BitmapMetadata meta = dec.Frames[0].Metadata as BitmapMetadata;
-					if (meta != null)
-					{
-						xmpData = meta.GetQuery("/ifd/xmp") as BitmapMetadata;
-					}
-				}
-			}
-
-			return xmpData;
-		}
-
-		private static BitmapMetadata GetXMPMetaData(BitmapMetadata metaData, string format)
-		{
-			BitmapMetadata xmp = null;
-
-			// GIF files do not contain frame level XMP meta data.
-			if (format != "gif")
-			{
-				try
-				{
-					if (format == "png")
-					{
-						BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
-
-						if (textChunk != null)
-						{
-							string keyWord = textChunk.GetQuery("/Keyword") as string;
-
-							if ((keyWord != null) && keyWord == "XML:com.adobe.xmp")
-							{
-								string data = textChunk.GetQuery("/TextEntry") as string;
-
-								if (!string.IsNullOrEmpty(data))
-								{
-									xmp = LoadPNGMetaData(data);
-								}
-							}
-						}
-					}
-					else if (format == "jpg")
-					{
-						xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
-					}
-					else
-					{
-						try
-						{
-							xmp = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
-						}
-						catch (IOException)
-						{
-							// WINCODEC_ERR_INVALIDQUERYREQUEST
-						}
-
-						if (xmp == null)
-						{
-							// Some codecs may store the XMP data outside of the IFD block.
-							xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
-						}
-					}
-				}
-				catch (IOException)
-				{
-					// WINCODEC_ERR_INVALIDQUERYREQUEST
-				}
-			}
-
-			return xmp;
-		}
 
 		private static BitmapMetadata ConvertMetaDataToJPEG(BitmapMetadata metaData, string format)
 		{
