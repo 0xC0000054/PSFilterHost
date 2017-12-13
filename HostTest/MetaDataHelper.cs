@@ -346,7 +346,7 @@ namespace HostTest
 				{
 					try
 					{
-						iptcCaption = metaData.GetQuery("/ifd/xmp/dc:description") as string;
+						iptcCaption = metaData.GetQuery("/ifd/xmp/dc:description/x-default") as string;
 					}
 					catch (IOException)
 					{
