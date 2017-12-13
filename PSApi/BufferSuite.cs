@@ -166,6 +166,11 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Size: {0}", size));
 #endif
+			if (size < 0)
+			{
+				return PSError.paramErr;
+			}
+
 			short err = PSError.noErr;
 			try
 			{
