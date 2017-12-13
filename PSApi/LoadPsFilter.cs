@@ -26,7 +26,6 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using System.Text;
 using PSFilterHostDll.BGRASurface;
 using PSFilterHostDll.Properties;
 
