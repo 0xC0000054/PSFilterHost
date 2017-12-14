@@ -33,29 +33,16 @@ namespace HostTest
             };
         }
 
-		protected override void OnEnabledChanged(System.EventArgs e)
+		public override bool HasDropDownItems
 		{
-			base.OnEnabledChanged(e);
-
-			if (this.items != null)
+			get
 			{
-				if (base.Enabled)
+				if (!Enabled)
 				{
-					if (base.DropDownItems.Count == 0)
-					{
-						ToolStripItem[] array = new ToolStripItem[items.Count];
-						items.CopyTo(array, 0);
+					return false;
+				}
 
-						base.DropDownItems.AddRange(array);
-					}
-				}
-				else
-				{
-					if (base.DropDownItems.Count > 0)
-					{
-						base.DropDownItems.Clear();
-					}
-				}
+				return base.HasDropDownItems;
 			}
 		}
 
@@ -67,7 +54,10 @@ namespace HostTest
 		{
 			base.OnPaint(e);
 
-			// When a menu is disabled we remove the DropDownItems and draw the arrow manually.
+			// The HasDropDownItems property is overridden to return false when the menu is disabled
+			// and the drop down arrow will be drawn manually.
+			// This is done to prevent the ToolStripMenuItem from expanding the child menus
+			// of a disabled item when the mouse hovers over it.
 			if ((this.items != null) && !base.Enabled)
 			{
 				bool rightToLeft = base.RightToLeft == System.Windows.Forms.RightToLeft.Yes;
