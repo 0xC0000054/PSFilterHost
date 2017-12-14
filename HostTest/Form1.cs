@@ -1448,7 +1448,7 @@ namespace HostTest
 
 				ToolStripItemComparer comparer = new ToolStripItemComparer();
 
-				Array.Sort<ToolStripItem>(filters, comparer);
+				Array.Sort(filters, comparer);
 
 				// sort the items in the sub menus.
 				for (int i = 0; i < filters.Length; i++)
