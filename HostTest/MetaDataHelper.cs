@@ -207,11 +207,14 @@ namespace HostTest
 		/// </summary>
 		/// <param name="metaData">The meta data.</param>
 		/// <returns>The converted meta data or null</returns>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="metaData"/> is null.
+		/// </exception>
 		internal static BitmapMetadata ConvertMetaDataToTIFF(BitmapMetadata metaData)
 		{
 			if (metaData == null)
 			{
-				return null;
+				throw new ArgumentNullException(nameof(metaData));
 			}
 
 			string format = string.Empty;
@@ -317,8 +320,16 @@ namespace HostTest
 		/// </summary>
 		/// <param name="image">The image.</param>
 		/// <returns>The IPTC caption or null.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="image"/> is null.
+		/// </exception>
 		internal static string GetIPTCCaption(BitmapSource image)
 		{
+			if (image == null)
+			{
+				throw new ArgumentNullException(nameof(image));
+			}
+
 			BitmapMetadata metaData = null;
 
 			try
@@ -596,8 +607,22 @@ namespace HostTest
 		/// <param name="metaData">The meta-data.</param>
 		/// <param name="encoder">The encoder.</param>
 		/// <returns>The converted meta-data, or null.</returns>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="metaData"/> is null.
+		/// or
+		/// <paramref name="encoder"/> is null.
+		/// </exception>
 		internal static BitmapMetadata ConvertSaveMetaDataFormat(BitmapMetadata metaData, BitmapEncoder encoder)
 		{
+			if (metaData == null)
+			{
+				throw new ArgumentNullException(nameof(metaData));
+			}
+			if (encoder == null)
+			{
+				throw new ArgumentNullException(nameof(encoder));
+			}
+
 			string format = string.Empty;
 
 			try
