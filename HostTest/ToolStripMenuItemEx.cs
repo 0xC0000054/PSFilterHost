@@ -27,11 +27,11 @@ namespace HostTest
 
 		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text)
 		{
-            this.items = new SubMenuItemCollection(this)
-            {
-                dropDownItem
-            };
-        }
+			this.items = new SubMenuItemCollection(this)
+			{
+				dropDownItem
+			};
+		}
 
 		public override bool HasDropDownItems
 		{
