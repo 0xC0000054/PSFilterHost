@@ -21,6 +21,10 @@ namespace HostTest
 	/// </summary>
 	internal sealed class ToolStripMenuItemEx : ToolStripMenuItem
 	{
+		private static readonly int ArrowOffset2X = UI.ScaleWidth(2);
+		private static readonly int ArrowOffset2Y = UI.ScaleHeight(2);
+		private static readonly int ArrowOffset4Y = UI.ScaleHeight(4);
+
 		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text, null, dropDownItem)
 		{
 		}
@@ -37,10 +41,6 @@ namespace HostTest
 				return base.HasDropDownItems;
 			}
 		}
-
-		private static readonly int ArrowOffset2X = UI.ScaleWidth(2);
-		private static readonly int ArrowOffset2Y = UI.ScaleHeight(2);
-		private static readonly int ArrowOffset4Y = UI.ScaleHeight(4);
 
 		protected override void OnPaint(PaintEventArgs e)
 		{
