@@ -316,7 +316,7 @@ namespace HostTest
 		/// Gets the IPTC caption of the image.
 		/// </summary>
 		/// <param name="image">The image.</param>
-		/// <returns></returns>
+		/// <returns>The IPTC caption or null.</returns>
 		internal static string GetIPTCCaption(BitmapSource image)
 		{
 			BitmapMetadata metaData = null;
