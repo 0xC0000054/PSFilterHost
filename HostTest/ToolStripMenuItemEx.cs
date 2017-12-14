@@ -57,7 +57,8 @@ namespace HostTest
 				int arrowWidth = 10;
 				ArrowDirection direction = rightToLeft ? ArrowDirection.Left : ArrowDirection.Right;
 
-				int textPadding = direction == ArrowDirection.Right ? 8 : 9; // See the TextPadding field in the System.Windows.Forms.ToolStripDropDownMenu static constructor.
+				// See the TextPadding field in the System.Windows.Forms.ToolStripDropDownMenu static constructor.
+				int textPadding = direction == ArrowDirection.Right ? 8 : 9;
 
 				int arrowX = 0;
 
