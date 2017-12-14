@@ -370,7 +370,7 @@ namespace HostTest
 
 					if (menu != null)
 					{
-						var nodes = menu.SubMenuItems;
+						var nodes = menu.DropDownItems;
 						int count = nodes.Count;
 						List<bool> catEnabled = new List<bool>(count);
 
@@ -1420,9 +1420,9 @@ namespace HostTest
 					{
 						ToolStripMenuItemEx parent = filterList[plug.Category];
 
-						if (!parent.SubMenuItems.ContainsKey(plug.Title))
+						if (!parent.DropDownItems.ContainsKey(plug.Title))
 						{
-							parent.SubMenuItems.Add(child);
+							parent.DropDownItems.Add(child);
 							if (plug.HasAboutBox)
 							{
 								aboutList.Add(aboutItem);
@@ -1453,7 +1453,7 @@ namespace HostTest
 				// sort the items in the sub menus.
 				for (int i = 0; i < filters.Length; i++)
 				{
-					filters[i].SubMenuItems.Sort(comparer);
+					filters[i].DropDownItems.Sort(comparer);
 				}
 
 				aboutList.Sort(comparer);

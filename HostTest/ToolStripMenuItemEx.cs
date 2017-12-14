@@ -23,14 +23,8 @@ namespace HostTest
 	/// </summary>
 	internal sealed class ToolStripMenuItemEx : ToolStripMenuItem
 	{
-		private SubMenuItemCollection items;
-
-		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text)
+		public ToolStripMenuItemEx(string text, ToolStripItem dropDownItem) : base(text, null, dropDownItem)
 		{
-			this.items = new SubMenuItemCollection(this)
-			{
-				dropDownItem
-			};
 		}
 
 		public override bool HasDropDownItems
@@ -58,7 +52,7 @@ namespace HostTest
 			// and the drop down arrow will be drawn manually.
 			// This is done to prevent the ToolStripMenuItem from expanding the child menus
 			// of a disabled item when the mouse hovers over it.
-			if ((this.items != null) && !base.Enabled)
+			if (!Enabled && DropDownItems.Count > 0)
 			{
 				bool rightToLeft = base.RightToLeft == System.Windows.Forms.RightToLeft.Yes;
 
@@ -113,79 +107,5 @@ namespace HostTest
 				}
 			}
 		}
-
-		public SubMenuItemCollection SubMenuItems
-		{
-			get
-			{
-				return this.items;
-			}
-		}
-
-		private void UpdateDropDownItems(ToolStripItem item)
-		{
-			if (base.Enabled)
-			{
-				base.DropDownItems.Add(item);
-			}
-		}
-
-		private void UpdateSortedItems(List<ToolStripItem> sortedItems)
-		{
-			if (base.Enabled)
-			{
-				base.DropDownItems.Clear();
-				base.DropDownItems.AddRange(sortedItems.ToArray());
-			}
-		}
-
-		internal sealed class SubMenuItemCollection : Collection<ToolStripItem>
-		{
-			private ToolStripMenuItemEx owner;
-
-			public SubMenuItemCollection(ToolStripMenuItemEx owner) : base(new List<ToolStripItem>())
-			{
-				this.owner = owner;
-			}
-
-			protected override void InsertItem(int index, ToolStripItem item)
-			{
-				base.InsertItem(index, item);
-
-				if (owner != null)
-				{
-					owner.UpdateDropDownItems(item);
-				}
-			}
-
-			public bool ContainsKey(string key)
-			{
-				if (!string.IsNullOrEmpty(key))
-				{
-					for (int i = 0; i < base.Items.Count; i++)
-					{
-						if (base.Items[i].Name == key)
-						{
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-
-			public void Sort(IComparer<ToolStripItem> comparer)
-			{
-				List<ToolStripItem> items = (List<ToolStripItem>)base.Items;
-
-				items.Sort(comparer);
-
-				if (owner != null)
-				{
-					owner.UpdateSortedItems(items);
-				}
-			}
-		}
-
 	}
 }
