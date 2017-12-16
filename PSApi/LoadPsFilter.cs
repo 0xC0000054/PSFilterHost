@@ -47,13 +47,13 @@ namespace PSFilterHostDll.PSApi
 
 		#region CallbackDelegates
 		// MiscCallbacks
-		private AdvanceStateProc advanceProc;
-		private ColorServicesProc colorProc;
-		private DisplayPixelsProc displayPixelsProc;
-		private HostProcs hostProc;
-		private ProcessEventProc processEventProc;
-		private ProgressProc progressProc;
-		private TestAbortProc abortProc;
+		private readonly AdvanceStateProc advanceProc;
+		private readonly ColorServicesProc colorProc;
+		private readonly DisplayPixelsProc displayPixelsProc;
+		private readonly HostProcs hostProc;
+		private readonly ProcessEventProc processEventProc;
+		private readonly ProgressProc progressProc;
+		private readonly TestAbortProc abortProc;
 		#endregion
 		private readonly IntPtr parentWindowHandle;
 
@@ -386,6 +386,14 @@ namespace PSFilterHostDll.PSApi
 			this.dpiX = sourceImage.DpiX;
 			this.dpiY = sourceImage.DpiY;
 #endif
+
+			this.advanceProc = new AdvanceStateProc(AdvanceStateProc);
+			this.colorProc = new ColorServicesProc(ColorServicesProc);
+			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
+			this.hostProc = new HostProcs(HostProc);
+			this.processEventProc = new ProcessEventProc(ProcessEvent);
+			this.progressProc = new ProgressProc(ProgressProc);
+			this.abortProc = new TestAbortProc(AbortProc);
 
 			this.channelPortsSuite = new ChannelPortsSuite(this, imageMode);
 			this.imageServicesSuite = new ImageServicesSuite();
@@ -1598,7 +1606,6 @@ namespace PSFilterHostDll.PSApi
 			this.descriptorSuite.Aete = pdata.Aete;
 			this.basicSuiteProvider.Aete = pdata.Aete;
 
-			SetupDelegates();
 			SetupSuites();
 			SetupFilterRecord();
 
@@ -3858,21 +3865,6 @@ namespace PSFilterHostDll.PSApi
 
 			filterRecord->wholeSize.h = width;
 			filterRecord->wholeSize.v = height;
-		}
-
-		/// <summary>
-		/// Setup the delegates for this instance.
-		/// </summary>
-		private void SetupDelegates()
-		{
-			// Misc Callbacks
-			advanceProc = new AdvanceStateProc(AdvanceStateProc);
-			colorProc = new ColorServicesProc(ColorServicesProc);
-			displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
-			hostProc = new HostProcs(HostProc);
-			processEventProc = new ProcessEventProc(ProcessEvent);
-			progressProc = new ProgressProc(ProgressProc);
-			abortProc = new TestAbortProc(AbortProc);
 		}
 
 		/// <summary>
