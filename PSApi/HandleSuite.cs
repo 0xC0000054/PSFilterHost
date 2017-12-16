@@ -146,6 +146,25 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
+		public HandleProcs CreateHandleProcs()
+		{
+			HandleProcs procs = new HandleProcs
+			{
+				handleProcsVersion = PSConstants.kCurrentHandleProcsVersion,
+				numHandleProcs = PSConstants.kCurrentHandleProcsCount,
+				newProc = Marshal.GetFunctionPointerForDelegate(this.handleNewProc),
+				disposeProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeProc),
+				getSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleGetSizeProc),
+				setSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleSetSizeProc),
+				lockProc = Marshal.GetFunctionPointerForDelegate(this.handleLockProc),
+				unlockProc = Marshal.GetFunctionPointerForDelegate(this.handleUnlockProc),
+				recoverSpaceProc = Marshal.GetFunctionPointerForDelegate(this.handleRecoverSpaceProc),
+				disposeRegularHandleProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeRegularProc)
+			};
+
+			return procs;
+		}
+
 		public IntPtr CreateHandleProcsPointer()
 		{
 			IntPtr handleProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(HandleProcs)), true);
