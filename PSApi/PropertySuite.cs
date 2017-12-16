@@ -17,7 +17,7 @@ using System.Text;
 
 namespace PSFilterHostDll.PSApi
 {
-    internal sealed class PropertySuite : IDisposable
+    internal sealed class PropertySuite : IDisposable, IPropertySuite
     {
         private readonly GetPropertyProc getPropertyProc;
         private readonly SetPropertyProc setPropertyProc;
@@ -124,6 +124,19 @@ namespace PSFilterHostDll.PSApi
 
                 this.numberOfChannels = value;
             }
+        }
+
+        PropertyProcs IPropertySuite.CreatePropertySuite()
+        {
+            PropertyProcs suite = new PropertyProcs
+            {
+                propertyProcsVersion = PSConstants.kCurrentPropertyProcsVersion,
+                numPropertyProcs = PSConstants.kCurrentPropertyProcsCount,
+                getPropertyProc = Marshal.GetFunctionPointerForDelegate(getPropertyProc),
+                setPropertyProc = Marshal.GetFunctionPointerForDelegate(setPropertyProc)
+            };
+
+            return suite;
         }
 
         public unsafe IntPtr CreatePropertySuitePointer()

@@ -35,7 +35,7 @@ using System.Windows.Media.Imaging;
 
 namespace PSFilterHostDll.PSApi
 {
-	internal sealed class LoadPsFilter : IDisposable, IFilterImageProvider
+	internal sealed class LoadPsFilter : IDisposable, IFilterImageProvider, IPICASuiteDataProvider
 	{
 		static bool RectNonEmpty(Rect16 rect)
 		{
@@ -54,15 +54,8 @@ namespace PSFilterHostDll.PSApi
 		private ProcessEventProc processEventProc;
 		private ProgressProc progressProc;
 		private TestAbortProc abortProc;
-		// SPBasic
-		private SPBasicAcquireSuite spAcquireSuite;
-		private SPBasicAllocateBlock spAllocateBlock;
-		private SPBasicFreeBlock spFreeBlock;
-		private SPBasicIsEqual spIsEqual;
-		private SPBasicReallocateBlock spReallocateBlock;
-		private SPBasicReleaseSuite spReleaseSuite;
-		private SPBasicUndefined spUndefined;
 		#endregion
+		private readonly IntPtr parentWindowHandle;
 
 		private IntPtr filterRecordPtr;
 		private IntPtr platFormDataPtr;
@@ -84,7 +77,6 @@ namespace PSFilterHostDll.PSApi
 
 		private GlobalParameters globalParameters;
 		private Dictionary<uint, AETEValue> scriptingData;
-		private PluginSettingsRegistry pluginSettings;
 		private bool showUI;
 		private bool parameterDataRestored;
 		private bool pluginDataRestored;
@@ -141,20 +133,16 @@ namespace PSFilterHostDll.PSApi
 		private bool copyToDest;
 		private bool writesOutsideSelection;
 		private bool useChannelPorts;
-		private ActivePICASuites activePICASuites;
-		private PICASuites picaSuites;
 		private ColorProfileConverter colorProfileConverter;
 		private byte[] documentColorProfile;
 
 		private ChannelPortsSuite channelPortsSuite;
 		private DescriptorSuite descriptorSuite;
-		private ErrorSuite errorSuite;
 		private ImageServicesSuite imageServicesSuite;
 		private PropertySuite propertySuite;
 		private ReadImageDocument readImageDocument;
 		private ResourceSuite resourceSuite;
-		private ActionSuiteProvider actionSuites;
-		private DescriptorRegistrySuite descriptorRegistrySuite;
+		private SPBasicSuiteProvider basicSuiteProvider;
 
 		/// <summary>
 		/// The host signature of this library - '.NET'
@@ -238,7 +226,7 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		internal PluginSettingsRegistry GetPluginSettings()
 		{
-			return this.pluginSettings;
+			return this.basicSuiteProvider.GetPluginSettings();
 		}
 
 		/// <summary>
@@ -249,7 +237,7 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		internal void SetPluginSettings(PluginSettingsRegistry value)
 		{
-			this.pluginSettings = value;
+			this.basicSuiteProvider.SetPluginSettings(value);
 		}
 
 		public string ErrorMessage
@@ -364,17 +352,15 @@ namespace PSFilterHostDll.PSApi
 			this.pluginDataHandle = IntPtr.Zero;
 			this.inputHandling = FilterDataHandling.None;
 			this.outputHandling = FilterDataHandling.None;
+			this.parentWindowHandle = owner;
 
 			abortFunc = null;
 			progressFunc = null;
 			ColorPickerManager.SetPickColorCallback(null);
 			this.descriptorSuite = new DescriptorSuite();
 			this.resourceSuite = new ResourceSuite();
-			this.actionSuites = new ActionSuiteProvider();
 
 			this.useChannelPorts = false;
-			this.activePICASuites = new ActivePICASuites();
-			this.picaSuites = new PICASuites();
 			this.colorProfileConverter = new ColorProfileConverter();
 			this.documentColorProfile = null;
 
@@ -405,6 +391,7 @@ namespace PSFilterHostDll.PSApi
 			this.imageServicesSuite = new ImageServicesSuite();
 			this.propertySuite = new PropertySuite(sourceImage, this.imageMode);
 			this.readImageDocument = new ReadImageDocument(source.Width, source.Height, dpiX, dpiY, imageMode);
+			this.basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
 
 			this.selectedRegion = null;
 			this.filterCase = FilterCase.EditableTransparencyNoSelection;
@@ -481,6 +468,46 @@ namespace PSFilterHostDll.PSApi
 			get
 			{
 				return this.mask;
+			}
+		}
+
+		IntPtr IPICASuiteDataProvider.ParentWindowHandle
+		{
+			get
+			{
+				return this.parentWindowHandle;
+			}
+		}
+
+		DisplayPixelsProc IPICASuiteDataProvider.DisplayPixels
+		{
+			get
+			{
+				return this.displayPixelsProc;
+			}
+		}
+
+		ProcessEventProc IPICASuiteDataProvider.ProcessEvent
+		{
+			get
+			{
+				return this.processEventProc;
+			}
+		}
+
+		ProgressProc IPICASuiteDataProvider.Progress
+		{
+			get
+			{
+				return this.progressProc;
+			}
+		}
+
+		TestAbortProc IPICASuiteDataProvider.TestAbort
+		{
+			get
+			{
+				return this.abortProc;
 			}
 		}
 
@@ -643,17 +670,6 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Saves the plug-in settings from the descriptor registry suite.
-		/// </summary>
-		private void SavePluginSettings()
-		{
-			if (descriptorRegistrySuite != null)
-			{
-				this.pluginSettings = this.descriptorRegistrySuite.GetPluginSettings();
-			}
-		}
-
-		/// <summary>
 		/// Saves the filter scripting parameters for repeat runs.
 		/// </summary>
 		private unsafe void SaveScriptingParameters()
@@ -662,8 +678,7 @@ namespace PSFilterHostDll.PSApi
 			if (descriptorParameters->descriptor != IntPtr.Zero)
 			{
 				Dictionary<uint, AETEValue> data;
-				if (actionSuites.DescriptorSuiteCreated &&
-					actionSuites.DescriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
+				if (basicSuiteProvider.TryGetScriptingData(descriptorParameters->descriptor, out data))
 				{
 					this.scriptingData = data;
 				}
@@ -1117,7 +1132,6 @@ namespace PSFilterHostDll.PSApi
 			{
 				SaveParameterHandles();
 				SaveScriptingParameters();
-				SavePluginSettings();
 			}
 
 			PostProcessOutputData();
@@ -1543,7 +1557,7 @@ namespace PSFilterHostDll.PSApi
 			LoadFilter(pdata);
 
 			this.useChannelPorts = EnableChannelPorts(pdata);
-			this.picaSuites.SetPluginName(pdata.Title.TrimEnd('.'));
+			this.basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
 
 			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
 
@@ -1582,6 +1596,7 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			this.descriptorSuite.Aete = pdata.Aete;
+			this.basicSuiteProvider.Aete = pdata.Aete;
 
 			SetupDelegates();
 			SetupSuites();
@@ -1699,9 +1714,9 @@ namespace PSFilterHostDll.PSApi
 			{
 				if (error == PSError.errReportString)
 				{
-					if (errorSuite != null && errorSuite.HasErrorMessage)
+					if (basicSuiteProvider.ErrorSuiteMessage != null)
 					{
-						message = this.errorSuite.ErrorMessage;
+						message = this.basicSuiteProvider.ErrorSuiteMessage;
 					}
 					else
 					{
@@ -3798,330 +3813,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private int SPBasicAcquireSuite(IntPtr name, int version, ref IntPtr suite)
-		{
-
-			string suiteName = Marshal.PtrToStringAnsi(name);
-			if (name == null)
-			{
-				return PSError.kSPBadParameterError;
-			}
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("name: {0}, version: {1}", suiteName, version));
-#endif
-			int error = PSError.kSPNoError;
-			ActivePICASuites.PICASuiteKey suiteKey = new ActivePICASuites.PICASuiteKey(suiteName, version);
-
-			if (activePICASuites.IsLoaded(suiteKey))
-			{
-				suite = this.activePICASuites.AddRef(suiteKey);
-			}
-			else
-			{
-				error = AllocatePICASuite(suiteKey, ref suite);
-			}
-
-			return error;
-		}
-
-		private unsafe void CreateActionDescriptorSuite()
-		{
-			PIDescriptorParameters* descriptorParameters = (PIDescriptorParameters*)descriptorParametersPtr.ToPointer();
-
-			this.actionSuites.CreateDescriptorSuite(this.descriptorSuite.Aete, descriptorParameters->descriptor,
-				 this.scriptingData, this.picaSuites.ASZStringSuite);
-		}
-
-		private unsafe int AllocatePICASuite(ActivePICASuites.PICASuiteKey suiteKey, ref IntPtr suite)
-		{
-			try
-			{
-				string suiteName = suiteKey.Name;
-				int version = suiteKey.Version;
-
-				if (suiteName.Equals(PSConstants.PICA.BufferSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					PSBufferSuite1 bufferSuite = this.picaSuites.CreateBufferSuite1();
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, bufferSuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.HandleSuite, StringComparison.Ordinal))
-				{
-					if (version == 1)
-					{
-						PSHandleSuite1 handleSuite = PICASuites.CreateHandleSuite1((HandleProcs*)handleProcsPtr.ToPointer());
-
-						suite = this.activePICASuites.AllocateSuite(suiteKey, handleSuite);
-					}
-					else if (version == 2)
-					{
-						PSHandleSuite2 handleSuite = PICASuites.CreateHandleSuite2((HandleProcs*)handleProcsPtr.ToPointer());
-
-						suite = this.activePICASuites.AllocateSuite(suiteKey, handleSuite);
-					}
-					else
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-				}
-				else if (suiteName.Equals(PSConstants.PICA.PropertySuite, StringComparison.Ordinal))
-				{
-					if (version != PSConstants.kCurrentPropertyProcsVersion)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					PropertyProcs propertySuite = PICASuites.CreatePropertySuite((PropertyProcs*)propertyProcsPtr.ToPointer());
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, propertySuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.UIHooksSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					PSUIHooksSuite1 uiHooks = this.picaSuites.CreateUIHooksSuite1((FilterRecord*)filterRecordPtr.ToPointer());
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, uiHooks);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ActionDescriptorSuite, StringComparison.Ordinal))
-				{
-					if (version != 2)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-					if (!actionSuites.DescriptorSuiteCreated)
-					{
-						CreateActionDescriptorSuite();
-					}
-
-					PSActionDescriptorProc actionDescriptor = this.actionSuites.DescriptorSuite.CreateActionDescriptorSuite2();
-					suite = this.activePICASuites.AllocateSuite(suiteKey, actionDescriptor);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ActionListSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-					if (!actionSuites.ListSuiteCreated)
-					{
-						this.actionSuites.CreateListSuite(this.picaSuites.ASZStringSuite);
-					}
-
-					PSActionListProcs listSuite = this.actionSuites.ListSuite.CreateActionListSuite1();
-					suite = this.activePICASuites.AllocateSuite(suiteKey, listSuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ActionReferenceSuite, StringComparison.Ordinal))
-				{
-					if (version != 2)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-					if (!actionSuites.ReferenceSuiteCreated)
-					{
-						this.actionSuites.CreateReferenceSuite();
-					}
-
-					PSActionReferenceProcs referenceSuite = this.actionSuites.ReferenceSuite.CreateActionReferenceSuite2();
-					suite = this.activePICASuites.AllocateSuite(suiteKey, referenceSuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ASZStringSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					ASZStringSuite1 stringSuite = this.picaSuites.ASZStringSuite.CreateASZStringSuite1();
-					suite = this.activePICASuites.AllocateSuite(suiteKey, stringSuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ColorSpaceSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					PSColorSpaceSuite1 csSuite = this.picaSuites.CreateColorSpaceSuite1();
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, csSuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.DescriptorRegistrySuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					if (descriptorRegistrySuite == null)
-					{
-						if (!actionSuites.DescriptorSuiteCreated)
-						{
-							CreateActionDescriptorSuite();
-						}
-
-						this.descriptorRegistrySuite = new DescriptorRegistrySuite(this.actionSuites.DescriptorSuite);
-						if (pluginSettings != null)
-						{
-							this.descriptorRegistrySuite.SetPluginSettings(pluginSettings);
-						}
-					}
-
-					PSDescriptorRegistryProcs registrySuite = this.descriptorRegistrySuite.CreateDescriptorRegistrySuite1();
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, registrySuite);
-				}
-				else if (suiteName.Equals(PSConstants.PICA.ErrorSuite, StringComparison.Ordinal))
-				{
-					if (version != 1)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-					if (errorSuite == null)
-					{
-						this.errorSuite = new ErrorSuite(this.picaSuites.ASZStringSuite);
-					}
-
-					PSErrorSuite1 errorProcs = this.errorSuite.CreateErrorSuite1();
-					suite = this.activePICASuites.AllocateSuite(suiteKey, errorProcs);
-				}
-#if PICASUITEDEBUG
-				else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
-				{
-					if (version != 4)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
-
-					SPPluginsSuite4 plugs = PICASuites.CreateSPPlugs4();
-
-					suite = this.activePICASuites.AllocateSuite(suiteKey, plugs);
-				}
-#endif
-				else
-				{
-					return PSError.kSPSuiteNotFoundError;
-				}
-			}
-			catch (OutOfMemoryException)
-			{
-				return PSError.memFullErr;
-			}
-
-			return PSError.kSPNoError;
-		}
-
-		private int SPBasicReleaseSuite(IntPtr name, int version)
-		{
-			string suiteName = Marshal.PtrToStringAnsi(name);
-
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("name: {0}, version: {1}", suiteName, version.ToString()));
-#endif
-
-			ActivePICASuites.PICASuiteKey suiteKey = new ActivePICASuites.PICASuiteKey(suiteName, version);
-
-			this.activePICASuites.Release(suiteKey);
-
-			return PSError.kSPNoError;
-		}
-
-		private unsafe int SPBasicIsEqual(IntPtr token1, IntPtr token2)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("token1: {0}, token2: {1}", Marshal.PtrToStringAnsi(token1), Marshal.PtrToStringAnsi(token2)));
-#endif
-			if (token1 == IntPtr.Zero)
-			{
-				if (token2 == IntPtr.Zero)
-				{
-					return 1;
-				}
-
-				return 0;
-			}
-			else if (token2 == IntPtr.Zero)
-			{
-				return 0;
-			}
-
-			// Compare two null-terminated ASCII strings for equality.
-			byte* src = (byte*)token1.ToPointer();
-			byte* dst = (byte*)token2.ToPointer();
-
-			while (*dst != 0)
-			{
-				if ((*src - *dst) != 0)
-				{
-					return 0;
-				}
-				src++;
-				dst++;
-			}
-
-			return 1;
-		}
-
-		private int SPBasicAllocateBlock(int size, ref IntPtr block)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("size: {0}", size));
-#endif
-			try
-			{
-				block = Memory.Allocate(size, false);
-			}
-			catch (OutOfMemoryException)
-			{
-				return PSError.memFullErr;
-			}
-
-			return PSError.kSPNoError;
-		}
-
-		private int SPBasicFreeBlock(IntPtr block)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("block: 0x{0}", block.ToHexString()));
-#endif
-			Memory.Free(block);
-			return PSError.kSPNoError;
-		}
-
-		private int SPBasicReallocateBlock(IntPtr block, int newSize, ref IntPtr newblock)
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Format("block: 0x{0}, size: {1}", block.ToHexString(), newSize));
-#endif
-			try
-			{
-				newblock = Memory.ReAlloc(block, newSize);
-			}
-			catch (OutOfMemoryException)
-			{
-				return PSError.memFullErr;
-			}
-
-			return PSError.kSPNoError;
-		}
-
-		private int SPBasicUndefined()
-		{
-#if DEBUG
-			DebugUtils.Ping(DebugFlags.SPBasicSuite, string.Empty);
-#endif
-
-			return PSError.kSPNoError;
-		}
-
 		/// <summary>
 		/// Setup the FilterRecord image size data.
 		/// </summary>
@@ -4182,15 +3873,6 @@ namespace PSFilterHostDll.PSApi
 			processEventProc = new ProcessEventProc(ProcessEvent);
 			progressProc = new ProgressProc(ProgressProc);
 			abortProc = new TestAbortProc(AbortProc);
-
-			// SPBasicSuite
-			spAcquireSuite = new SPBasicAcquireSuite(SPBasicAcquireSuite);
-			spReleaseSuite = new SPBasicReleaseSuite(SPBasicReleaseSuite);
-			spIsEqual = new SPBasicIsEqual(SPBasicIsEqual);
-			spAllocateBlock = new SPBasicAllocateBlock(SPBasicAllocateBlock);
-			spFreeBlock = new SPBasicFreeBlock(SPBasicFreeBlock);
-			spReallocateBlock = new SPBasicReallocateBlock(SPBasicReallocateBlock);
-			spUndefined = new SPBasicUndefined(SPBasicUndefined);
 		}
 
 		/// <summary>
@@ -4244,6 +3926,7 @@ namespace PSFilterHostDll.PSApi
 					throw new OutOfMemoryException(Resources.OutOfMemoryError);
 				}
 				descriptorSuite.SetScriptingData(descriptorParameters->descriptor, scriptingData);
+				basicSuiteProvider.SetScriptingData(descriptorParameters->descriptor, scriptingData);
 				if (showUI)
 				{
 					descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
@@ -4258,15 +3941,7 @@ namespace PSFilterHostDll.PSApi
 				descriptorParameters->playInfo = PlayInfo.plugInDialogDisplay;
 			}
 
-			basicSuitePtr = Memory.Allocate(Marshal.SizeOf(typeof(SPBasicSuite)), true);
-			SPBasicSuite* basicSuite = (SPBasicSuite*)basicSuitePtr.ToPointer();
-			basicSuite->acquireSuite = Marshal.GetFunctionPointerForDelegate(spAcquireSuite);
-			basicSuite->releaseSuite = Marshal.GetFunctionPointerForDelegate(spReleaseSuite);
-			basicSuite->isEqual = Marshal.GetFunctionPointerForDelegate(spIsEqual);
-			basicSuite->allocateBlock = Marshal.GetFunctionPointerForDelegate(spAllocateBlock);
-			basicSuite->freeBlock = Marshal.GetFunctionPointerForDelegate(spFreeBlock);
-			basicSuite->reallocateBlock = Marshal.GetFunctionPointerForDelegate(spReallocateBlock);
-			basicSuite->undefined = Marshal.GetFunctionPointerForDelegate(spUndefined);
+			basicSuitePtr = basicSuiteProvider.CreateSPBasicSuitePointer();
 		}
 
 		/// <summary>
@@ -4500,18 +4175,6 @@ namespace PSFilterHostDll.PSApi
 						readImageDocument = null;
 					}
 
-					if (activePICASuites != null)
-					{
-						activePICASuites.Dispose();
-						activePICASuites = null;
-					}
-
-					if (picaSuites != null)
-					{
-						picaSuites.Dispose();
-						picaSuites = null;
-					}
-
 					if (propertySuite != null)
 					{
 						propertySuite.Dispose();
@@ -4536,10 +4199,10 @@ namespace PSFilterHostDll.PSApi
 						descriptorSuite = null;
 					}
 
-					if (actionSuites != null)
+					if (basicSuiteProvider != null)
 					{
-						actionSuites.Dispose();
-						actionSuites = null;
+						basicSuiteProvider.Dispose();
+						basicSuiteProvider = null;
 					}
 				}
 
