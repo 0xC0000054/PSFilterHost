@@ -58,7 +58,7 @@ namespace PSFilterHostDll.PSApi
 		private readonly IntPtr parentWindowHandle;
 
 		private IntPtr filterRecordPtr;
-		private IntPtr platFormDataPtr;
+		private IntPtr platformDataPtr;
 		private IntPtr bufferProcsPtr;
 		private IntPtr handleProcsPtr;
 		private IntPtr imageServicesProcsPtr;
@@ -434,8 +434,8 @@ namespace PSFilterHostDll.PSApi
 
 			unsafe
 			{
-				this.platFormDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
-				((PlatformData*)platFormDataPtr.ToPointer())->hwnd = owner;
+				this.platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
+				((PlatformData*)platformDataPtr.ToPointer())->hwnd = owner;
 			}
 
 #if DEBUG
@@ -3981,7 +3981,7 @@ namespace PSFilterHostDll.PSApi
 
 			filterRecord->hostSig = HostSignature;
 			filterRecord->hostProcs = Marshal.GetFunctionPointerForDelegate(hostProc);
-			filterRecord->platformData = platFormDataPtr;
+			filterRecord->platformData = platformDataPtr;
 			filterRecord->bufferProcs = bufferProcsPtr;
 			filterRecord->resourceProcs = resourceProcsPtr;
 			filterRecord->processEvent = Marshal.GetFunctionPointerForDelegate(processEventProc);
@@ -4198,10 +4198,10 @@ namespace PSFilterHostDll.PSApi
 					}
 				}
 
-				if (platFormDataPtr != IntPtr.Zero)
+				if (platformDataPtr != IntPtr.Zero)
 				{
-					Memory.Free(platFormDataPtr);
-					platFormDataPtr = IntPtr.Zero;
+					Memory.Free(platformDataPtr);
+					platformDataPtr = IntPtr.Zero;
 				}
 
 				if (bufferProcsPtr != IntPtr.Zero)
