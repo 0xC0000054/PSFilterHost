@@ -47,8 +47,8 @@ namespace PSFilterHostDll.PSApi
 
 		#region CallbackDelegates
 		// MiscCallbacks
-		private readonly AdvanceStateProc advanceProc;
-		private readonly ColorServicesProc colorProc;
+		private readonly AdvanceStateProc advanceStateProc;
+		private readonly ColorServicesProc colorServicesProc;
 		private readonly DisplayPixelsProc displayPixelsProc;
 		private readonly HostProcs hostProc;
 		private readonly ProcessEventProc processEventProc;
@@ -387,8 +387,8 @@ namespace PSFilterHostDll.PSApi
 			this.dpiY = sourceImage.DpiY;
 #endif
 
-			this.advanceProc = new AdvanceStateProc(AdvanceStateProc);
-			this.colorProc = new ColorServicesProc(ColorServicesProc);
+			this.advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
+			this.colorServicesProc = new ColorServicesProc(ColorServicesProc);
 			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
 			this.hostProc = new HostProcs(HostProc);
 			this.processEventProc = new ProcessEventProc(ProcessEvent);
@@ -3994,7 +3994,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->filterCase = filterCase;
 			filterRecord->dummyPlaneValue = -1;
 			filterRecord->premiereHook = IntPtr.Zero;
-			filterRecord->advanceState = Marshal.GetFunctionPointerForDelegate(advanceProc);
+			filterRecord->advanceState = Marshal.GetFunctionPointerForDelegate(advanceStateProc);
 
 			filterRecord->supportsAbsolute = true;
 			filterRecord->wantsAbsolute = false;
@@ -4008,7 +4008,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->reservedByte = 0;
 			filterRecord->inputRate = new Fixed16(1);
 			filterRecord->maskRate = new Fixed16(1);
-			filterRecord->colorServices = Marshal.GetFunctionPointerForDelegate(colorProc);
+			filterRecord->colorServices = Marshal.GetFunctionPointerForDelegate(colorServicesProc);
 			// New in 3.0.4
 			filterRecord->imageServicesProcs = imageServicesProcsPtr;
 			filterRecord->propertyProcs = propertyProcsPtr;
