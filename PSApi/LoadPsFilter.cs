@@ -455,6 +455,20 @@ namespace PSFilterHostDll.PSApi
 #endif
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LoadPsFilter"/> class.
+		/// This overload is only used when showing the about box.
+		/// </summary>
+		/// <param name="owner">The parent window handle.</param>
+		private LoadPsFilter(IntPtr owner)
+		{
+			unsafe
+			{
+				this.platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
+				((PlatformData*)platformDataPtr.ToPointer())->hwnd = owner;
+			}
+		}
+
 		SurfaceBase IFilterImageProvider.Source
 		{
 			get
@@ -945,71 +959,54 @@ namespace PSFilterHostDll.PSApi
 
 		}
 
-		private static bool PluginAbout(PluginData pdata, IntPtr owner, out string error)
+		private bool PluginAbout(PluginData pdata)
 		{
 			short result = PSError.noErr;
-			error = string.Empty;
 
 			using (PluginModule module = new PluginModule(pdata.FileName, pdata.EntryPoint))
 			{
-				PlatformData platform = new PlatformData()
-				{
-					hwnd = owner
-				};
+				IntPtr aboutRecordPtr = Memory.Allocate(Marshal.SizeOf(typeof(AboutRecord)), true);
 
-				GCHandle platformDataHandle = GCHandle.Alloc(platform, GCHandleType.Pinned);
 				try
 				{
-					AboutRecord about = new AboutRecord()
+					unsafe
 					{
-						platformData = platformDataHandle.AddrOfPinnedObject(),
-						sSPBasic = IntPtr.Zero,
-						plugInRef = IntPtr.Zero
-					};
-
-
-					GCHandle aboutRecordHandle = GCHandle.Alloc(about, GCHandleType.Pinned);
-
-					try
-					{
-						IntPtr dataPtr = IntPtr.Zero;
-
-						// If the filter only has one entry point call about on it.
-						if (pdata.ModuleEntryPoints == null)
-						{
-							module.entryPoint(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
-						}
-						else
-						{
-							// Otherwise call about on all the entry points in the module, per the SDK docs only one of the entry points will display the about box.
-							foreach (var entryPoint in pdata.ModuleEntryPoints)
-							{
-								PluginEntryPoint ep = module.GetEntryPoint(entryPoint);
-
-								ep(FilterSelector.About, aboutRecordHandle.AddrOfPinnedObject(), ref dataPtr, ref result);
-
-								if (result != PSError.noErr)
-								{
-									break;
-								}
-
-								GC.KeepAlive(ep);
-							}
-						}
+						AboutRecord* about = (AboutRecord*)aboutRecordPtr.ToPointer();
+						about->platformData = platformDataPtr;
+						about->sSPBasic = IntPtr.Zero;
+						about->plugInRef = IntPtr.Zero;
 					}
-					finally
+					IntPtr dataPtr = IntPtr.Zero;
+
+					// If the filter only has one entry point call about on it.
+					if (pdata.ModuleEntryPoints == null)
 					{
-						if (aboutRecordHandle.IsAllocated)
+						module.entryPoint(FilterSelector.About, aboutRecordPtr, ref dataPtr, ref result);
+					}
+					else
+					{
+						// Otherwise call about on all the entry points in the module, per the SDK docs only one of the entry points will display the about box.
+						foreach (var entryPoint in pdata.ModuleEntryPoints)
 						{
-							aboutRecordHandle.Free();
+							PluginEntryPoint ep = module.GetEntryPoint(entryPoint);
+
+							ep(FilterSelector.About, aboutRecordPtr, ref dataPtr, ref result);
+
+							if (result != PSError.noErr)
+							{
+								break;
+							}
+
+							GC.KeepAlive(ep);
 						}
 					}
 				}
 				finally
 				{
-					if (platformDataHandle.IsAllocated)
+					if (aboutRecordPtr != IntPtr.Zero)
 					{
-						platformDataHandle.Free();
+						Memory.Free(aboutRecordPtr);
+						aboutRecordPtr = IntPtr.Zero;
 					}
 				}
 			}
@@ -1017,20 +1014,9 @@ namespace PSFilterHostDll.PSApi
 
 			if (result != PSError.noErr)
 			{
-				if (result < 0 && result != PSError.userCanceledErr)
-				{
-					switch (result)
-					{
-						case PSError.errPlugInHostInsufficient:
-							error = Resources.PlugInHostInsufficient;
-							break;
-						default:
-							error = GetMacOSErrorMessage(result);
-							break;
-					}
-				}
+				errorMessage = GetErrorMessage(result);
 #if DEBUG
-				DebugUtils.Ping(DebugFlags.Error, string.Format("filterSelectorAbout returned: {0}({1})", error, result));
+				DebugUtils.Ping(DebugFlags.Error, string.Format("filterSelectorAbout returned: {0}({1})", errorMessage, result));
 #endif
 				return false;
 			}
@@ -1643,7 +1629,19 @@ namespace PSFilterHostDll.PSApi
 
 		internal static bool ShowAboutDialog(PluginData pdata, IntPtr owner, out string errorMessage)
 		{
-			return PluginAbout(pdata, owner, out errorMessage);
+			bool result = false;
+			errorMessage = string.Empty;
+
+			using (LoadPsFilter lps = new LoadPsFilter(owner))
+			{
+				result = lps.PluginAbout(pdata);
+				if (!result)
+				{
+					errorMessage = lps.errorMessage;
+				}
+			}
+
+			return result;
 		}
 
 		private static string GetImageModeString(ImageModes mode)
