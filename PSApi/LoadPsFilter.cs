@@ -462,6 +462,19 @@ namespace PSFilterHostDll.PSApi
 		/// <param name="owner">The parent window handle.</param>
 		private LoadPsFilter(IntPtr owner)
 		{
+			this.parentWindowHandle = owner;
+
+			this.advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
+			this.colorServicesProc = new ColorServicesProc(ColorServicesProc);
+			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
+			this.hostProc = new HostProcs(HostProc);
+			this.processEventProc = new ProcessEventProc(ProcessEvent);
+			this.progressProc = new ProgressProc(ProgressProc);
+			this.abortProc = new TestAbortProc(AbortProc);
+
+			this.basicSuiteProvider = new SPBasicSuiteProvider(this);
+			this.basicSuitePtr = basicSuiteProvider.CreateSPBasicSuitePointer();
+
 			unsafe
 			{
 				this.platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
@@ -973,7 +986,7 @@ namespace PSFilterHostDll.PSApi
 					{
 						AboutRecord* about = (AboutRecord*)aboutRecordPtr.ToPointer();
 						about->platformData = platformDataPtr;
-						about->sSPBasic = IntPtr.Zero;
+						about->sSPBasic = basicSuitePtr;
 						about->plugInRef = IntPtr.Zero;
 					}
 					IntPtr dataPtr = IntPtr.Zero;

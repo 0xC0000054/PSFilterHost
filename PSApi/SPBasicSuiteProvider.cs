@@ -50,21 +50,26 @@ namespace PSFilterHostDll.PSApi
 		/// Initializes a new instance of the <see cref="SPBasicSuiteProvider"/> class.
 		/// </summary>
 		/// <param name="picaSuiteData">The filter record provider.</param>
+		/// <exception cref="ArgumentNullException">
+		/// <paramref name="picaSuiteData"/> is null.
+		/// </exception>
+		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData) : this(picaSuiteData, null)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SPBasicSuiteProvider"/> class.
+		/// </summary>
+		/// <param name="picaSuiteData">The filter record provider.</param>
 		/// <param name="propertySuite">The property suite.</param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="picaSuiteData"/> is null.
-		/// or
-		/// <paramref name="propertySuite"/> is null.
 		/// </exception>
 		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData, IPropertySuite propertySuite)
 		{
 			if (picaSuiteData == null)
 			{
 				throw new ArgumentNullException("picaSuiteData");
-			}
-			if (propertySuite == null)
-			{
-				throw new ArgumentNullException("propertySuite");
 			}
 
 			this.picaSuiteData = picaSuiteData;
@@ -333,7 +338,8 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (suiteName.Equals(PSConstants.PICA.PropertySuite, StringComparison.Ordinal))
 				{
-					if (version != PSConstants.kCurrentPropertyProcsVersion)
+					// The property suite can be null when the filter is showing its about box.
+					if (propertySuite == null || version != PSConstants.kCurrentPropertyProcsVersion)
 					{
 						return PSError.kSPSuiteNotFoundError;
 					}
