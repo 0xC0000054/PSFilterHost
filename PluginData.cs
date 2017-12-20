@@ -298,6 +298,11 @@ namespace PSFilterHostDll
         /// </returns>
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
             PluginData other = obj as PluginData;
 
             if (other != null)
@@ -322,6 +327,11 @@ namespace PSFilterHostDll
                 return false;
             }
 
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
             return (this.fileName == other.fileName && this.category == other.category && this.entryPoint == other.entryPoint && this.title == other.title);
         }
 
@@ -335,9 +345,14 @@ namespace PSFilterHostDll
         /// </returns>
         public static bool operator ==(PluginData p1, PluginData p2)
         {
+            if (ReferenceEquals(p1, p2))
+            {
+                return true;
+            }
+
             if (((object)p1) == null || ((object)p2) == null)
             {
-                return Object.Equals(p1, p2);
+                return false;
             }
 
             return p1.Equals(p2);
