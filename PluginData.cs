@@ -286,7 +286,17 @@ namespace PSFilterHostDll
         /// </returns>
         public override int GetHashCode()
         {
-            return HashCodeHelper.GetHashCode(this.fileName, this.entryPoint, this.category, this.title);
+            int hash = 23;
+
+            unchecked
+            {
+                hash = (hash * 127) + (this.fileName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(this.fileName) : 0);
+                hash = (hash * 127) + (this.entryPoint != null ? this.entryPoint.GetHashCode() : 0);
+                hash = (hash * 127) + (this.category != null ? this.category.GetHashCode() : 0);
+                hash = (hash * 127) + (this.title != null ? this.title.GetHashCode() : 0);
+            }
+
+            return hash;
         }
 
         /// <summary>
@@ -332,7 +342,10 @@ namespace PSFilterHostDll
                 return true;
             }
 
-            return (this.fileName == other.fileName && this.category == other.category && this.entryPoint == other.entryPoint && this.title == other.title);
+            return (string.Equals(this.fileName, other.fileName, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(this.entryPoint, other.entryPoint, StringComparison.Ordinal) &&
+                    string.Equals(this.category, other.category, StringComparison.Ordinal) &&
+                    string.Equals(this.title, other.title, StringComparison.Ordinal));
         }
 
         /// <summary>
