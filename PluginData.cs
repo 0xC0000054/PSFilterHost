@@ -235,9 +235,15 @@ namespace PSFilterHostDll
         /// <param name="enableInfo">The information describing the conditions that the filter requires to execute.</param>
         /// <param name="supportedModes">The bit field describing the image modes supported by the filter.</param>
         /// <param name="hasAboutBox">Indicates if the filter has an about box.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="fileName"/> is null.</exception>
         internal PluginData(string fileName, string entryPoint, string category, string title, FilterCaseInfo[] filterInfo, PluginAETE aete,
             string enableInfo, ushort? supportedModes, bool hasAboutBox)
         {
+            if (fileName == null)
+            {
+                throw new ArgumentNullException(nameof(fileName));
+            }
+
             this.fileName = fileName;
             this.entryPoint = entryPoint;
             this.category = category;
