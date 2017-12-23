@@ -266,7 +266,7 @@ namespace PSFilterHostDll
         private readonly FindExInfoLevel infoLevel;
         private readonly FindExAdditionalFlags additionalFlags;
         private readonly string fileExtension;
-        private readonly bool searchSubDirectories;
+        private readonly SearchOption searchOption;
         private readonly bool dereferenceLinks;
         private readonly uint oldErrorMode;
 
@@ -275,7 +275,7 @@ namespace PSFilterHostDll
         /// </summary>
         /// <param name="path">The directory to search.</param>
         /// <param name="fileExtension">The file extension to search for.</param>
-        /// <param name="searchSubDirectories">If set to <c>true</c> search the sub directories of <paramref name="path"/>.</param>
+        /// <param name="searchOption">If set to <c>true</c> search the sub directories of <paramref name="path"/>.</param>
         /// <param name="dereferenceLinks">If set to <c>true</c> search the target of shortcuts.</param>
         /// <exception cref="System.ArgumentNullException">
         /// <paramref name="path"/> in null.
@@ -283,12 +283,13 @@ namespace PSFilterHostDll
         /// <paramref name="fileExtension"/> is null.
         /// </exception>
         /// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
         /// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
         /// <exception cref="System.IO.IOException"><paramref name="path"/> is a file.</exception>
         /// <exception cref="System.IO.PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters and file names must be less than 260 characters.</exception>
         /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
         /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
-        public FileEnumerator(string path, string fileExtension, bool searchSubDirectories, bool dereferenceLinks)
+        public FileEnumerator(string path, string fileExtension, SearchOption searchOption, bool dereferenceLinks)
         {
             if (path == null)
             {
@@ -299,6 +300,10 @@ namespace PSFilterHostDll
             {
                 throw new ArgumentNullException("fileExtension");
             }
+            if (searchOption < SearchOption.TopDirectoryOnly || searchOption > SearchOption.AllDirectories)
+            {
+                throw new ArgumentOutOfRangeException("searchOption");
+            }
 
             string fullPath = Path.GetFullPath(path);
             string demandPath = GetPermissionPath(fullPath, false);
@@ -307,7 +312,7 @@ namespace PSFilterHostDll
 
             this.searchData = new SearchData(fullPath, false);
             this.fileExtension = fileExtension;
-            this.searchSubDirectories = searchSubDirectories;
+            this.searchOption = searchOption;
             this.searchDirectories = new Queue<SearchData>();
             if (dereferenceLinks)
             {
@@ -442,7 +447,7 @@ namespace PSFilterHostDll
         {
             if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY)
             {
-                if (this.searchSubDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
+                if (this.searchOption == SearchOption.AllDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
                 {
                     this.searchDirectories.Enqueue(new SearchData(this.searchData, findData.cFileName));
                 }
@@ -628,7 +633,7 @@ namespace PSFilterHostDll
                                     return true;
                                 }
                             }
-                            else if (this.searchSubDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
+                            else if (this.searchOption == SearchOption.AllDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
                             {
                                 this.searchDirectories.Enqueue(new SearchData(this.searchData, findData.cFileName));
                             }

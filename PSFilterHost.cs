@@ -435,16 +435,7 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException("path");
 			}
 
-			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchSubdirectories, true))
-			{
-				while (enumerator.MoveNext())
-				{
-					foreach (var item in PluginLoader.LoadFiltersFromFile(enumerator.Current))
-					{
-						yield return item;
-					}
-				}
-			}
+			return EnumerateFilters(path, searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 		}
 
 #if NET_40_OR_GREATER
@@ -494,7 +485,16 @@ namespace PSFilterHostDll
 				throw new ArgumentOutOfRangeException("searchOption");
 			}
 
-			return EnumerateFilters(path, searchOption == SearchOption.AllDirectories);
+			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchOption, true))
+			{
+				while (enumerator.MoveNext())
+				{
+					foreach (var item in PluginLoader.LoadFiltersFromFile(enumerator.Current))
+					{
+						yield return item;
+					}
+				}
+			}
 		}
 
 		/// <summary>
