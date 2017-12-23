@@ -275,7 +275,9 @@ namespace PSFilterHostDll
         /// </summary>
         /// <param name="path">The directory to search.</param>
         /// <param name="fileExtension">The file extension to search for.</param>
-        /// <param name="searchOption">If set to <c>true</c> search the sub directories of <paramref name="path"/>.</param>
+        /// <param name="searchOption">
+        /// One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.
+        /// </param>
         /// <param name="dereferenceLinks">If set to <c>true</c> search the target of shortcuts.</param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="path"/> in null.
