@@ -277,18 +277,18 @@ namespace PSFilterHostDll
         /// <param name="fileExtension">The file extension to search for.</param>
         /// <param name="searchOption">If set to <c>true</c> search the sub directories of <paramref name="path"/>.</param>
         /// <param name="dereferenceLinks">If set to <c>true</c> search the target of shortcuts.</param>
-        /// <exception cref="System.ArgumentNullException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="path"/> in null.
         /// -or-
         /// <paramref name="fileExtension"/> is null.
         /// </exception>
-        /// <exception cref="System.ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="System.IO.Path.GetInvalidPathChars"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters as defined by <see cref="Path.GetInvalidPathChars"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
-        /// <exception cref="System.IO.DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
-        /// <exception cref="System.IO.IOException"><paramref name="path"/> is a file.</exception>
-        /// <exception cref="System.IO.PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters and file names must be less than 260 characters.</exception>
-        /// <exception cref="System.UnauthorizedAccessException">The caller does not have the required permission.</exception>
-        /// <exception cref="System.Security.SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or combined exceed the system-defined maximum length. For example, on Windows-based platforms, paths must be less than 248 characters and file names must be less than 260 characters.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
         public FileEnumerator(string path, string fileExtension, SearchOption searchOption, bool dereferenceLinks)
         {
             if (path == null)
