@@ -430,11 +430,6 @@ namespace PSFilterHostDll
 #endif
 		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
 		{
-			if (path == null)
-			{
-				throw new ArgumentNullException("path");
-			}
-
 			return EnumerateFilters(path, searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 		}
 
