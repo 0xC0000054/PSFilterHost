@@ -35,8 +35,9 @@ namespace PSFilterHostDll
         /// Initializes a new instance of the <see cref="PluginSettingsRegistry"/> class.
         /// </summary>
         /// <param name="values">The registry values.</param>
+        /// <param name="persistentValuesChanged"><c>true</c> if the persistent values have been changed; otherwise, <c>false</c>.</param>
         /// <exception cref="ArgumentNullException"><paramref name="values"/> is null.</exception>
-        internal PluginSettingsRegistry(Dictionary<string, PluginSettingsRegistryItem> values)
+        internal PluginSettingsRegistry(Dictionary<string, PluginSettingsRegistryItem> values, bool persistentValuesChanged)
         {
             if (values == null)
             {
@@ -62,7 +63,7 @@ namespace PSFilterHostDll
             this.sessionValues = new ReadOnlyDictionary<string, PluginSettingsRegistryItem>(sessionItems);
             // Mark the plug-in settings as dirty when the persisted items change.
             // The host can use this information to determine if it needs to save the plug-in settings.
-            this.dirty = this.persistedValues.Count > 0;
+            this.dirty = persistentValuesChanged;
         }
 
         /// <summary>

@@ -24,6 +24,7 @@ namespace PSFilterHostDll.PSApi
 
         private IActionDescriptorSuite actionDescriptorSuite;
         private Dictionary<string, PluginSettingsRegistryItem> registry;
+        private bool persistentValuesChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DescriptorRegistrySuite"/> class.
@@ -42,6 +43,7 @@ namespace PSFilterHostDll.PSApi
             this.erase = new DescriptorRegistryErase(Erase);
             this.get = new DescriptorRegistryGet(Get);
             this.registry = new Dictionary<string, PluginSettingsRegistryItem>(StringComparer.Ordinal);
+            this.persistentValuesChanged = false;
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.registry.Count > 0)
             {
-                return new PluginSettingsRegistry(this.registry);
+                return new PluginSettingsRegistry(this.registry, this.persistentValuesChanged);
             }
 
             return null;
@@ -124,6 +126,10 @@ namespace PSFilterHostDll.PSApi
                 if (this.actionDescriptorSuite.TryGetDescriptorValues(descriptor, out values))
                 {
                     this.registry.AddOrUpdate(registryKey, new PluginSettingsRegistryItem(values, isPersistent));
+                    if (isPersistent)
+                    {
+                        this.persistentValuesChanged = true;
+                    }
                 }
                 else
                 {
