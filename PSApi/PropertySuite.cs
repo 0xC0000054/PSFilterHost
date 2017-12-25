@@ -216,7 +216,7 @@ namespace PSFilterHostDll.PSApi
                         }
                         break;
                     case PSProperties.ChannelName:
-                        if (index < 0 || index > (numberOfChannels - 1))
+                        if (index < 0 || index >= numberOfChannels)
                         {
                             return PSError.errPlugInPropertyUndefined;
                         }
