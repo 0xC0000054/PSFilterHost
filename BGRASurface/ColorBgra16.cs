@@ -18,7 +18,6 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
-using System;
 using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.BGRASurface

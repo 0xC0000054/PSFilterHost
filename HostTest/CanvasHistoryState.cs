@@ -11,10 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using HostTest.Tools;
-using System.Windows.Media.Imaging;
 
 namespace HostTest
 {

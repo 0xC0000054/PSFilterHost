@@ -21,7 +21,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Globalization;
-using System.Security.Permissions;
 using PSFilterHostDll.PSApi;
 
 namespace PSFilterHostDll.BGRASurface

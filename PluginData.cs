@@ -11,7 +11,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using PSFilterHostDll.PSApi;
 
