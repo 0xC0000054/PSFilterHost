@@ -10,9 +10,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+#if !NET_35_OR_GREATER
 using System;
 
-#if !NET_35_OR_GREATER
 namespace System.Runtime.CompilerServices
 {
     [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method)]
