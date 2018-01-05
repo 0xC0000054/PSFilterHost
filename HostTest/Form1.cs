@@ -589,9 +589,11 @@ namespace HostTest
 					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilterCallback));
 					host.SetPickColorCallback(new PickColor(PickColorCallback));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
-					if (filterParameters.ContainsKey(pluginData))
+
+					ParameterData parameters;
+					if (filterParameters.TryGetValue(pluginData, out parameters))
 					{
-						host.FilterParameters = filterParameters[pluginData];
+						host.FilterParameters = parameters;
 					}
 
 					host.PseudoResources = pseudoResources;
