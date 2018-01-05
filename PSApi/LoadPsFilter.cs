@@ -109,7 +109,7 @@ namespace PSFilterHostDll.PSApi
 		private byte[] backgroundColor;
 		private byte[] foregroundColor;
 
-		private bool ignoreAlpha;
+		private bool ignoreTransparency;
 		private FilterDataHandling inputHandling;
 		private FilterDataHandling outputHandling;
 		private IntPtr filterParametersHandle;
@@ -1251,7 +1251,7 @@ namespace PSFilterHostDll.PSApi
 			}
 			else
 			{
-				if (ignoreAlpha)
+				if (ignoreTransparency)
 				{
 					filterRecord->inLayerPlanes = 0;
 					filterRecord->inTransparencyMask = 0;
@@ -1266,11 +1266,11 @@ namespace PSFilterHostDll.PSApi
 
 				if (imageMode == ImageModes.RGB48)
 				{
-					filterRecord->inColumnBytes = ignoreAlpha ? 6 : 8;
+					filterRecord->inColumnBytes = ignoreTransparency ? 6 : 8;
 				}
 				else
 				{
-					filterRecord->inColumnBytes = ignoreAlpha ? 3 : 4;
+					filterRecord->inColumnBytes = ignoreTransparency ? 3 : 4;
 				}
 
 				if (filterCase == FilterCase.ProtectedTransparencyNoSelection ||
@@ -1305,7 +1305,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->absLayerMasks = filterRecord->inLayerMasks;
 			filterRecord->absInvertedLayerMasks = filterRecord->inInvertedLayerMasks;
 
-			if (ignoreAlpha && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
+			if (ignoreTransparency && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
 			{
 				filterRecord->absNonLayerPlanes = 4;
 			}
@@ -1566,7 +1566,7 @@ namespace PSFilterHostDll.PSApi
 			this.useChannelPorts = EnableChannelPorts(pdata);
 			this.basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
 
-			this.ignoreAlpha = IgnoreAlphaChannel(pdata);
+			this.ignoreTransparency = IgnoreAlphaChannel(pdata);
 
 			if (pdata.FilterInfo != null)
 			{
@@ -1597,7 +1597,7 @@ namespace PSFilterHostDll.PSApi
 				dest.CopySurface(source); // Copy the source image to the dest image if the filter does not write to all the pixels.
 			}
 
-			if (ignoreAlpha)
+			if (ignoreTransparency)
 			{
 				CopySourceAlpha();
 			}
@@ -3450,7 +3450,7 @@ namespace PSFilterHostDll.PSApi
 
 				displaySurface = new SurfaceBGRA32(width, height);
 
-				if (ignoreAlpha || !haveMask)
+				if (ignoreTransparency || !haveMask)
 				{
 					displaySurface.SetAlphaToOpaque();
 				}
@@ -3859,7 +3859,7 @@ namespace PSFilterHostDll.PSApi
 					break;
 				case ImageModes.RGB:
 				case ImageModes.RGB48:
-					filterRecord->planes = ignoreAlpha ? (short)3 : (short)4;
+					filterRecord->planes = ignoreTransparency ? (short)3 : (short)4;
 					break;
 			}
 
@@ -3891,7 +3891,7 @@ namespace PSFilterHostDll.PSApi
 			if (useChannelPorts)
 			{
 				channelPortsPtr = channelPortsSuite.CreateChannelPortsSuitePointer();
-				readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(ignoreAlpha, selectedRegion != null);
+				readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(ignoreTransparency, selectedRegion != null);
 			}
 			else
 			{
