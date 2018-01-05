@@ -553,7 +553,7 @@ namespace PSFilterHostDll.PSApi
 				return true; // Return true for the FlatImage cases as we do not have any transparency.
 			}
 
-			// Some filters do not handle the alpha channel correctly despite what their FilterInfo says.
+			// Some filters do not handle transparency correctly despite what their FilterInfo says.
 			if (data.FilterInfo == null ||
 				data.Category.Equals("Axion", StringComparison.Ordinal) ||
 				data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
