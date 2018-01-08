@@ -1282,7 +1282,7 @@ namespace PSFilterHostDll.PSApi
 					filterRecord->outNonLayerPlanes = 3;
 					filterRecord->outColumnBytes = imageMode == ImageModes.RGB48 ? 6 : 3;
 
-					CopySourceAlpha();
+					CopySourceTransparency();
 				}
 				else
 				{
@@ -1368,9 +1368,9 @@ namespace PSFilterHostDll.PSApi
 		}
 
 		/// <summary>
-		/// Sets the dest alpha to the source alpha when the filter ignores the alpha channel.
+		/// Copies the source transparency to the destination when the filter ignores transparency.
 		/// </summary>
-		private unsafe void CopySourceAlpha()
+		private unsafe void CopySourceTransparency()
 		{
 			if (!copyToDest && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
 			{
@@ -1599,7 +1599,7 @@ namespace PSFilterHostDll.PSApi
 
 			if (ignoreTransparency)
 			{
-				CopySourceAlpha();
+				CopySourceTransparency();
 			}
 
 			this.descriptorSuite.Aete = pdata.Aete;
