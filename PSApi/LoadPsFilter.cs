@@ -93,7 +93,7 @@ namespace PSFilterHostDll.PSApi
 		private Bitmap checkerBoardBitmap;
 		private SurfaceBGRA32 colorCorrectedDisplaySurface;
 
-		private PluginPhase phase;
+		private PluginPhase previousPhase;
 		private PluginModule module;
 
 		private IntPtr dataPtr;
@@ -336,7 +336,7 @@ namespace PSFilterHostDll.PSApi
 			}
 
 			this.dataPtr = IntPtr.Zero;
-			this.phase = PluginPhase.None;
+			this.previousPhase = PluginPhase.None;
 			this.disposed = false;
 			this.copyToDest = true;
 			this.writesOutsideSelection = false;
@@ -872,7 +872,7 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		private unsafe void RestoreParameterHandles()
 		{
-			if (phase == PluginPhase.Parameters)
+			if (previousPhase == PluginPhase.Parameters)
 			{
 				return;
 			}
@@ -1040,7 +1040,7 @@ namespace PSFilterHostDll.PSApi
 		private unsafe bool PluginApply()
 		{
 #if DEBUG
-			System.Diagnostics.Debug.Assert(phase == PluginPhase.Prepare);
+			System.Diagnostics.Debug.Assert(previousPhase == PluginPhase.Prepare);
 #endif
 			result = PSError.noErr;
 
@@ -1186,7 +1186,7 @@ namespace PSFilterHostDll.PSApi
 				return false;
 			}
 
-			phase = PluginPhase.Parameters;
+			previousPhase = PluginPhase.Parameters;
 
 			return true;
 		}
@@ -1361,7 +1361,7 @@ namespace PSFilterHostDll.PSApi
 			}
 
 #if DEBUG
-			phase = PluginPhase.Prepare;
+			previousPhase = PluginPhase.Prepare;
 #endif
 
 			return true;
