@@ -1281,8 +1281,6 @@ namespace PSFilterHostDll.PSApi
 					filterRecord->outTransparencyMask = 0;
 					filterRecord->outNonLayerPlanes = 3;
 					filterRecord->outColumnBytes = imageMode == ImageModes.RGB48 ? 6 : 3;
-
-					CopySourceTransparency();
 				}
 				else
 				{
@@ -1596,7 +1594,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				dest.CopySurface(source); // Copy the source image to the dest image if the filter does not write to all the pixels.
 			}
-			else if (ignoreTransparency)
+			else if (ignoreTransparency || filterCase == FilterCase.ProtectedTransparencyNoSelection || filterCase == FilterCase.ProtectedTransparencyWithSelection)
 			{
 				CopySourceTransparency();
 			}
