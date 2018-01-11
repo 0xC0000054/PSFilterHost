@@ -584,8 +584,7 @@ namespace PSFilterHostDll.PSApi
 			// If the EditableTransparency cases are not supported use the other modes.
 			if (filterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 			{
-				bool hasTransparency = source.HasTransparency();
-				if (!hasTransparency)
+				if (!source.HasTransparency())
 				{
 					switch (filterCase)
 					{
@@ -602,7 +601,7 @@ namespace PSFilterHostDll.PSApi
 				else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
 				{
 					// If the protected transparency modes are not supported use the next most appropriate mode.
-					if (hasTransparency && filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
+					if (filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
 					{
 						this.filterCase = FilterCase.FloatingSelection;
 					}
