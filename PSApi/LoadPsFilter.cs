@@ -1594,8 +1594,9 @@ namespace PSFilterHostDll.PSApi
 			{
 				dest.CopySurface(source); // Copy the source image to the dest image if the filter does not write to all the pixels.
 			}
-			else if (ignoreTransparency || filterCase == FilterCase.ProtectedTransparencyNoSelection || filterCase == FilterCase.ProtectedTransparencyWithSelection)
+			else if (filterCase != FilterCase.EditableTransparencyNoSelection && filterCase != FilterCase.EditableTransparencyWithSelection)
 			{
+				// Copy the source transparency to the destination if the filter does not modify it.
 				CopySourceTransparency();
 			}
 
