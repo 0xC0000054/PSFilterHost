@@ -113,10 +113,6 @@ namespace PSFilterHostDll.PSApi
 
 		public PluginAETE Aete
 		{
-			get
-			{
-				return this.aete;
-			}
 			set
 			{
 				this.aete = value;
