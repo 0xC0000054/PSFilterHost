@@ -3447,7 +3447,7 @@ namespace PSFilterHostDll.PSApi
 
 				displaySurface = new SurfaceBGRA32(width, height);
 
-				if (ignoreTransparency || !haveMask)
+				if (!haveMask)
 				{
 					displaySurface.SetAlphaToOpaque();
 				}
