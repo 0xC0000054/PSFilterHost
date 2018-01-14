@@ -1275,7 +1275,6 @@ namespace PSFilterHostDll.PSApi
 				if (filterCase == FilterCase.ProtectedTransparencyNoSelection ||
 					filterCase == FilterCase.ProtectedTransparencyWithSelection)
 				{
-					filterRecord->planes = 3;
 					filterRecord->outLayerPlanes = 0;
 					filterRecord->outTransparencyMask = 0;
 					filterRecord->outNonLayerPlanes = 3;
