@@ -401,7 +401,6 @@ namespace PSFilterHostDll.PSApi
 			this.basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
 
 			this.selectedRegion = null;
-			this.filterCase = FilterCase.EditableTransparencyNoSelection;
 
 			if (selection != null)
 			{
@@ -411,20 +410,6 @@ namespace PSFilterHostDll.PSApi
 				if (!selectionBounds.IsEmpty && selectionBounds != source.Bounds)
 				{
 					this.selectedRegion = selection.Clone();
-					this.filterCase = FilterCase.EditableTransparencyWithSelection;
-				}
-			}
-
-			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
-			{
-				switch (filterCase)
-				{
-					case FilterCase.EditableTransparencyNoSelection:
-						this.filterCase = FilterCase.FlatImageNoSelection;
-						break;
-					case FilterCase.EditableTransparencyWithSelection:
-						this.filterCase = FilterCase.FlatImageWithSelection;
-						break;
 				}
 			}
 
@@ -547,92 +532,92 @@ namespace PSFilterHostDll.PSApi
 
 		private bool SetFilterTransparencyMode(PluginData data)
 		{
-			if (filterCase < FilterCase.EditableTransparencyNoSelection)
+			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
+				this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
+
 				return true; // Return true for the FlatImage cases as we do not have any transparency.
 			}
-
-			// Some filters do not handle transparency correctly despite what their FilterInfo says.
-			if (data.FilterInfo == null ||
-				data.Category.Equals("Axion", StringComparison.Ordinal) ||
-				data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
+			else
 			{
-				if (source.HasTransparency())
+				// Some filters do not handle transparency correctly despite what their FilterInfo says.
+				if (data.FilterInfo == null ||
+					data.Category.Equals("Axion", StringComparison.Ordinal) ||
+					data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
 				{
-					this.filterCase = FilterCase.FloatingSelection;
-				}
-				else
-				{
-					switch (filterCase)
-					{
-						case FilterCase.EditableTransparencyNoSelection:
-							this.filterCase = FilterCase.FlatImageNoSelection;
-							break;
-						case FilterCase.EditableTransparencyWithSelection:
-							this.filterCase = FilterCase.FlatImageWithSelection;
-							break;
-					}
-				}
-
-				return true;
-			}
-
-			int filterCaseIndex = this.filterCase - 1;
-			FilterCaseInfo[] filterInfo = data.FilterInfo;
-
-			// If the EditableTransparency cases are not supported use the other modes.
-			if (filterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
-			{
-				if (!source.HasTransparency())
-				{
-					switch (filterCase)
-					{
-						case FilterCase.EditableTransparencyNoSelection:
-							this.filterCase = FilterCase.FlatImageNoSelection;
-							break;
-						case FilterCase.EditableTransparencyWithSelection:
-							this.filterCase = FilterCase.FlatImageWithSelection;
-							break;
-					}
-
-					return true;
-				}
-				else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
-				{
-					// If the protected transparency modes are not supported use the next most appropriate mode.
-					if (filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
+					if (source.HasTransparency())
 					{
 						this.filterCase = FilterCase.FloatingSelection;
 					}
 					else
 					{
-						switch (filterCase)
-						{
-							case FilterCase.EditableTransparencyNoSelection:
-								this.filterCase = FilterCase.FlatImageNoSelection;
-								break;
-							case FilterCase.EditableTransparencyWithSelection:
-								this.filterCase = FilterCase.FlatImageWithSelection;
-								break;
-						}
+						this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
 					}
 
 					return true;
 				}
 				else
 				{
-					switch (filterCase)
+					this.filterCase = selectedRegion != null ? FilterCase.EditableTransparencyWithSelection : FilterCase.EditableTransparencyNoSelection;
+
+					int filterCaseIndex = this.filterCase - 1;
+					FilterCaseInfo[] filterInfo = data.FilterInfo;
+
+					// If the EditableTransparency cases are not supported use the other modes.
+					if (filterInfo[filterCaseIndex].inputHandling == FilterDataHandling.CantFilter)
 					{
-						case FilterCase.EditableTransparencyNoSelection:
-							this.filterCase = FilterCase.ProtectedTransparencyNoSelection;
-							break;
-						case FilterCase.EditableTransparencyWithSelection:
-							this.filterCase = FilterCase.ProtectedTransparencyWithSelection;
-							break;
+						if (!source.HasTransparency())
+						{
+							switch (filterCase)
+							{
+								case FilterCase.EditableTransparencyNoSelection:
+									this.filterCase = FilterCase.FlatImageNoSelection;
+									break;
+								case FilterCase.EditableTransparencyWithSelection:
+									this.filterCase = FilterCase.FlatImageWithSelection;
+									break;
+							}
+
+							return true;
+						}
+						else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
+						{
+							// If the protected transparency modes are not supported use the next most appropriate mode.
+							if (filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
+							{
+								this.filterCase = FilterCase.FloatingSelection;
+							}
+							else
+							{
+								switch (filterCase)
+								{
+									case FilterCase.EditableTransparencyNoSelection:
+										this.filterCase = FilterCase.FlatImageNoSelection;
+										break;
+									case FilterCase.EditableTransparencyWithSelection:
+										this.filterCase = FilterCase.FlatImageWithSelection;
+										break;
+								}
+							}
+
+							return true;
+						}
+						else
+						{
+							switch (filterCase)
+							{
+								case FilterCase.EditableTransparencyNoSelection:
+									this.filterCase = FilterCase.ProtectedTransparencyNoSelection;
+									break;
+								case FilterCase.EditableTransparencyWithSelection:
+									this.filterCase = FilterCase.ProtectedTransparencyWithSelection;
+									break;
+							}
+
+						}
+
 					}
-
 				}
-
 			}
 
 			return false;
