@@ -530,13 +530,11 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private bool SetFilterTransparencyMode(PluginData data)
+		private void SetFilterTransparencyMode(PluginData data)
 		{
 			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
 				this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
-
-				return true; // Return true for the FlatImage cases as we do not have any transparency.
 			}
 			else
 			{
@@ -553,8 +551,6 @@ namespace PSFilterHostDll.PSApi
 					{
 						this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
 					}
-
-					return true;
 				}
 				else
 				{
@@ -577,8 +573,6 @@ namespace PSFilterHostDll.PSApi
 									this.filterCase = FilterCase.FlatImageWithSelection;
 									break;
 							}
-
-							return true;
 						}
 						else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
 						{
@@ -599,8 +593,6 @@ namespace PSFilterHostDll.PSApi
 										break;
 								}
 							}
-
-							return true;
 						}
 						else
 						{
@@ -619,8 +611,6 @@ namespace PSFilterHostDll.PSApi
 					}
 				}
 			}
-
-			return false;
 		}
 
 		/// <summary>
