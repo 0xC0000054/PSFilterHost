@@ -1301,15 +1301,7 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->absTransparencyMask = filterRecord->inTransparencyMask;
 			filterRecord->absLayerMasks = filterRecord->inLayerMasks;
 			filterRecord->absInvertedLayerMasks = filterRecord->inInvertedLayerMasks;
-
-			if (ignoreTransparency && (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48))
-			{
-				filterRecord->absNonLayerPlanes = 4;
-			}
-			else
-			{
-				filterRecord->absNonLayerPlanes = filterRecord->inNonLayerPlanes;
-			}
+			filterRecord->absNonLayerPlanes = filterRecord->inNonLayerPlanes;
 
 			filterRecord->inPreDummyPlanes = 0;
 			filterRecord->inPostDummyPlanes = 0;
