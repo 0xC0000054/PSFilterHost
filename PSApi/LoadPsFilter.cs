@@ -545,7 +545,7 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private bool IgnoreTransparency(PluginData data)
+		private bool SetFilterTransparencyMode(PluginData data)
 		{
 			if (filterCase < FilterCase.EditableTransparencyNoSelection)
 			{
@@ -1554,7 +1554,7 @@ namespace PSFilterHostDll.PSApi
 			this.useChannelPorts = EnableChannelPorts(pdata);
 			this.basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
 
-			IgnoreTransparency(pdata);
+			SetFilterTransparencyMode(pdata);
 
 			if (pdata.FilterInfo != null)
 			{
