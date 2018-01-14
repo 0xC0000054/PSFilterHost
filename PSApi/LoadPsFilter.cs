@@ -109,7 +109,6 @@ namespace PSFilterHostDll.PSApi
 		private byte[] backgroundColor;
 		private byte[] foregroundColor;
 
-		private bool ignoreTransparency;
 		private FilterDataHandling inputHandling;
 		private FilterDataHandling outputHandling;
 		private IntPtr filterParametersHandle;
@@ -1250,26 +1249,27 @@ namespace PSFilterHostDll.PSApi
 			}
 			else
 			{
-				if (ignoreTransparency)
+				switch (filterCase)
 				{
-					filterRecord->inLayerPlanes = 0;
-					filterRecord->inTransparencyMask = 0;
-					filterRecord->inNonLayerPlanes = 3;
-				}
-				else
-				{
-					filterRecord->inLayerPlanes = 3;
-					filterRecord->inTransparencyMask = 1;
-					filterRecord->inNonLayerPlanes = 0;
-				}
-
-				if (imageMode == ImageModes.RGB48)
-				{
-					filterRecord->inColumnBytes = ignoreTransparency ? 6 : 8;
-				}
-				else
-				{
-					filterRecord->inColumnBytes = ignoreTransparency ? 3 : 4;
+					case FilterCase.FlatImageNoSelection:
+					case FilterCase.FlatImageWithSelection:
+					case FilterCase.FloatingSelection:
+						filterRecord->inLayerPlanes = 0;
+						filterRecord->inTransparencyMask = 0;
+						filterRecord->inNonLayerPlanes = 3;
+						filterRecord->inColumnBytes = imageMode == ImageModes.RGB48 ? 6 : 3;
+						break;
+					case FilterCase.EditableTransparencyNoSelection:
+					case FilterCase.EditableTransparencyWithSelection:
+					case FilterCase.ProtectedTransparencyNoSelection:
+					case FilterCase.ProtectedTransparencyWithSelection:
+						filterRecord->inLayerPlanes = 3;
+						filterRecord->inTransparencyMask = 1;
+						filterRecord->inNonLayerPlanes = 0;
+						filterRecord->inColumnBytes = imageMode == ImageModes.RGB48 ? 8 : 4;
+						break;
+					default:
+						throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported filter case: {0}", filterCase));
 				}
 
 				if (filterCase == FilterCase.ProtectedTransparencyNoSelection ||
@@ -1555,7 +1555,7 @@ namespace PSFilterHostDll.PSApi
 			this.useChannelPorts = EnableChannelPorts(pdata);
 			this.basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
 
-			this.ignoreTransparency = IgnoreTransparency(pdata);
+			IgnoreTransparency(pdata);
 
 			if (pdata.FilterInfo != null)
 			{
@@ -3840,16 +3840,33 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->imageSize.h = width;
 			filterRecord->imageSize.v = height;
 
-			switch (imageMode)
+			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
-				case ImageModes.GrayScale:
-				case ImageModes.Gray16:
-					filterRecord->planes = 1;
-					break;
-				case ImageModes.RGB:
-				case ImageModes.RGB48:
-					filterRecord->planes = ignoreTransparency ? (short)3 : (short)4;
-					break;
+				switch (filterCase)
+				{
+					case FilterCase.FlatImageNoSelection:
+					case FilterCase.FlatImageWithSelection:
+					case FilterCase.FloatingSelection:
+					case FilterCase.ProtectedTransparencyNoSelection:
+					case FilterCase.ProtectedTransparencyWithSelection:
+						filterRecord->planes = 3;
+						break;
+					case FilterCase.EditableTransparencyNoSelection:
+					case FilterCase.EditableTransparencyWithSelection:
+						filterRecord->planes = 4;
+						break;
+					default:
+						throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported filter case: {0}", filterCase));
+				}
+			}
+			else
+			{
+				if (imageMode != ImageModes.GrayScale && imageMode != ImageModes.Gray16)
+				{
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
+				}
+
+				filterRecord->planes = 1;
 			}
 
 			propertySuite.NumberOfChannels = filterRecord->planes;
@@ -3880,6 +3897,7 @@ namespace PSFilterHostDll.PSApi
 			if (useChannelPorts)
 			{
 				channelPortsPtr = channelPortsSuite.CreateChannelPortsSuitePointer();
+				bool ignoreTransparency = filterCase != FilterCase.EditableTransparencyNoSelection && filterCase != FilterCase.EditableTransparencyWithSelection;
 				readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(ignoreTransparency, selectedRegion != null);
 			}
 			else
