@@ -180,9 +180,9 @@ namespace PSFilterHostDll.PSApi
 					byte? flags2 = ParseField(ptr, offset, out bytesRead);
 					offset += bytesRead;
 
-					if (IsFilterDataHandlingValid(inputHandling) &&
-						IsFilterDataHandlingValid(outputHandling) &&
-						IsFilterCaseInfoFlagsValid(flags1) &&
+					if (inputHandling.HasValue &&
+						outputHandling.HasValue &&
+						flags1.HasValue &&
 						flags2.HasValue)
 					{
 						info[i] = new FilterCaseInfo
@@ -200,33 +200,6 @@ namespace PSFilterHostDll.PSApi
 				}
 
 				return new FilterCaseInfoResult(filterInfoValid ? info : null, offset);
-			}
-
-			private static bool IsFilterDataHandlingValid(byte? handling)
-			{
-				if (handling.HasValue)
-				{
-					byte value = handling.Value;
-
-					return (value >= (byte)FilterDataHandling.CantFilter && value <= (byte)FilterDataHandling.ForegroundZap);
-				}
-
-				return false;
-			}
-
-			private static bool IsFilterCaseInfoFlagsValid(byte? filterCaseInfoFlags)
-			{
-				if (filterCaseInfoFlags.HasValue)
-				{
-					const byte ValidFlags = (byte)FilterCaseInfoFlags.DontCopyToDestination |
-											(byte)FilterCaseInfoFlags.WorksWithBlankData |
-											(byte)FilterCaseInfoFlags.FiltersLayerMask |
-											(byte)FilterCaseInfoFlags.WritesOutsideSelection;
-
-					return ((filterCaseInfoFlags.Value & ~ValidFlags) == 0);
-				}
-
-				return false;
 			}
 
 			private static bool IsHexadecimalChar(char value)
