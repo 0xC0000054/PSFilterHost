@@ -380,6 +380,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				PIProperty* pipp = (PIProperty*)propPtr;
 				uint propKey = pipp->propertyKey;
+				int propertyLength = pipp->propertyLength;
 
 				byte* dataPtr = propPtr + PIProperty.SizeOf;
 				if (propKey == PIPropertyID.PIKindProperty)
@@ -394,7 +395,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == platformEntryPoint)
 				{
-					pluginDataBuilder.EntryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
+					pluginDataBuilder.EntryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIVersionProperty)
 				{
@@ -486,7 +487,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
 				{
-					pluginDataBuilder.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, pipp->propertyLength).TrimEnd('\0');
+					pluginDataBuilder.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIRequiredHostProperty)
 				{
@@ -511,7 +512,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 
 				// The property data is padded to a 4 byte boundary.
-				int propertyDataPaddedLength = (pipp->propertyLength + 3) & ~3;
+				int propertyDataPaddedLength = (propertyLength + 3) & ~3;
 				propPtr += (PIProperty.SizeOf + propertyDataPaddedLength);
 			}
 
