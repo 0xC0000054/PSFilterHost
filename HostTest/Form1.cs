@@ -372,18 +372,18 @@ namespace HostTest
 					{
 						var nodes = menu.DropDownItems;
 						int count = nodes.Count;
-						List<bool> catEnabled = new List<bool>(count);
+						bool catEnabled = false;
 
 						for (int j = 0; j < count; j++)
 						{
 							PluginData data = (PluginData)nodes[j].Tag;
 
 							bool enabled = data.SupportsImageMode(format);
-							catEnabled.Add(enabled);
+							catEnabled |= enabled;
 							nodes[j].Enabled = enabled;
 						}
 
-						menu.Enabled = catEnabled.Contains(true);
+						menu.Enabled = catEnabled;
 					}
 					else
 					{
