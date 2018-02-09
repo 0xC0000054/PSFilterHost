@@ -231,7 +231,7 @@ namespace PSFilterHostDll.PSApi
 
 			if (SafeNativeMethods.GlobalMemoryStatusEx(ref buffer))
 			{
-				if (buffer.ullAvailVirtual < int.MaxValue)
+				if (buffer.ullAvailVirtual < (ulong)space)
 				{
 					space = (int)buffer.ullAvailVirtual;
 				}
