@@ -424,6 +424,7 @@ namespace PSFilterHostDll.PSApi
 
 #if DEBUG
 			DebugFlags debugFlags = DebugFlags.AdvanceState;
+			debugFlags |= DebugFlags.BufferSuite;
 			debugFlags |= DebugFlags.Call;
 			debugFlags |= DebugFlags.ColorServices;
 			debugFlags |= DebugFlags.DisplayPixels;
