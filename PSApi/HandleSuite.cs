@@ -75,23 +75,8 @@ namespace PSFilterHostDll.PSApi
 
 			public void Dispose()
 			{
-				Dispose(true);
-				GC.SuppressFinalize(this);
-			}
-
-			~HandleEntry()
-			{
-				Dispose(false);
-			}
-
-			private void Dispose(bool disposing)
-			{
 				if (!disposed)
 				{
-					if (disposing)
-					{
-					}
-
 					if (handle != IntPtr.Zero)
 					{
 						Memory.Free(this.handle);
