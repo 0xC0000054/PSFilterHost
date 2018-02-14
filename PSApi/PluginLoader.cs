@@ -43,101 +43,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-		private sealed class PluginDataBuilder
-		{
-			private string fileName;
-			private string entryPoint;
-			private string category;
-			private string title;
-			private FilterCaseInfo[] filterInfo;
-			private PluginAETE aete;
-			private string enableInfo;
-			private ushort? supportedModes;
-			private bool hasAboutBox;
-
-			public string EntryPoint
-			{
-				set
-				{
-					this.entryPoint = value;
-				}
-			}
-
-			public string Category
-			{
-				set
-				{
-					this.category = value;
-				}
-			}
-
-			public string Title
-			{
-				set
-				{
-					this.title = value;
-				}
-			}
-
-			public FilterCaseInfo[] FilterInfo
-			{
-				set
-				{
-					this.filterInfo = value;
-				}
-			}
-
-			public PluginAETE Aete
-			{
-				set
-				{
-					this.aete = value;
-				}
-			}
-
-			public string EnableInfo
-			{
-				set
-				{
-					this.enableInfo = value;
-				}
-			}
-
-			public ushort? SupportedModes
-			{
-				set
-				{
-					this.supportedModes = value;
-				}
-			}
-
-			public bool HasAboutBox
-			{
-				set
-				{
-					this.hasAboutBox = value;
-				}
-			}
-
-			public PluginDataBuilder(string fileName)
-			{
-				this.fileName = fileName;
-				this.entryPoint = null;
-				this.category = null;
-				this.title = null;
-				this.filterInfo = null;
-				this.aete = null;
-				this.enableInfo = null;
-				this.supportedModes = null;
-				this.hasAboutBox = true;
-			}
-
-			public PluginData Create()
-			{
-				return new PluginData(fileName, entryPoint, category, title, filterInfo, aete, enableInfo, supportedModes, hasAboutBox);
-			}
-		}
-
 		private sealed class FilterCaseInfoResult
 		{
 			public readonly FilterCaseInfo[] filterCaseInfo;
@@ -508,7 +413,14 @@ namespace PSFilterHostDll.PSApi
 
 			byte* propPtr = (byte*)lockRes.ToPointer() + 10L;
 
-			PluginDataBuilder pluginDataBuilder = new PluginDataBuilder(query.fileName);
+			string entryPoint = null;
+			string category = null;
+			string title = null;
+			FilterCaseInfo[] filterInfo = null;
+			PluginAETE aete = null;
+			string enableInfo = null;
+			ushort? supportedModes = null;
+			bool hasAboutBox = true;
 
 			uint platformEntryPoint = IntPtr.Size == 8 ? PIPropertyID.PIWin64X86CodeProperty : PIPropertyID.PIWin32X86CodeProperty;
 
@@ -531,7 +443,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == platformEntryPoint)
 				{
-					pluginDataBuilder.EntryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
+					entryPoint = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIVersionProperty)
 				{
@@ -568,15 +480,15 @@ namespace PSFilterHostDll.PSApi
 						return true;
 					}
 #endif
-					pluginDataBuilder.SupportedModes = *(ushort*)dataPtr;
+					supportedModes = *(ushort*)dataPtr;
 				}
 				else if (propKey == PIPropertyID.PICategoryProperty)
 				{
-					pluginDataBuilder.Category = StringUtil.FromPascalString(dataPtr);
+					category = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PINameProperty)
 				{
-					pluginDataBuilder.Title = StringUtil.FromPascalString(dataPtr);
+					title = StringUtil.FromPascalString(dataPtr);
 				}
 				else if (propKey == PIPropertyID.PIFilterCaseInfoProperty)
 				{
@@ -584,7 +496,7 @@ namespace PSFilterHostDll.PSApi
 
 					if (result != null)
 					{
-						pluginDataBuilder.FilterInfo = result.filterCaseInfo;
+						filterInfo = result.filterCaseInfo;
 						// The actual property length may be longer than the header specifies
 						// if the FilterCaseInfo fields are incorrectly escaped.
 						if (propertyLength != result.propertyLength)
@@ -622,13 +534,13 @@ namespace PSFilterHostDll.PSApi
 
 						if (queryAETE.enumAETE != null)
 						{
-							pluginDataBuilder.Aete = queryAETE.enumAETE;
+							aete = queryAETE.enumAETE;
 						}
 					}
 				}
 				else if (propKey == PIPropertyID.EnableInfo)
 				{
-					pluginDataBuilder.EnableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
+					enableInfo = Marshal.PtrToStringAnsi((IntPtr)dataPtr, propertyLength).TrimEnd('\0');
 				}
 				else if (propKey == PIPropertyID.PIRequiredHostProperty)
 				{
@@ -643,7 +555,7 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (propKey == PIPropertyID.NoAboutBox)
 				{
-					pluginDataBuilder.HasAboutBox = false;
+					hasAboutBox = false;
 				}
 #if DEBUG
 				else
@@ -657,7 +569,7 @@ namespace PSFilterHostDll.PSApi
 				propPtr += (PIProperty.SizeOf + propertyDataPaddedLength);
 			}
 
-			PluginData pluginData = pluginDataBuilder.Create();
+			PluginData pluginData = new PluginData(query.fileName, entryPoint, category, title, filterInfo, aete, enableInfo, supportedModes, hasAboutBox);
 
 			if (pluginData.IsValid())
 			{
