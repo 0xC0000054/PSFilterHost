@@ -113,6 +113,8 @@
     <Reference Include="WindowsBase" Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0'" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Framework Replacements\Enumerable.cs" />
+    <Compile Include="Framework Replacements\ExtensionAttribute.cs" />
     <Compile Include="BGRASurface\BGRASurfaceMemory.cs" />
     <Compile Include="BGRASurface\ColorBgra16.cs" />
     <Compile Include="BGRASurface\ColorBgra8.cs">
@@ -128,8 +130,6 @@
     <Compile Include="ColorPickerResult.cs" />
     <Compile Include="ColorProfileHelper.cs" />
     <Compile Include="EnableInfoParser.cs" />
-    <Compile Include="Enumerable.cs" />
-    <Compile Include="ExtensionAttribute.cs" />
     <Compile Include="FileEnumerator.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HashCodeHelper.cs" />
