@@ -3623,23 +3623,26 @@ namespace PSFilterHostDll.PSApi
 					{
 						bool allOpaque = true;
 						PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
-						byte* maskData = (byte*)srcMask->maskData.ToPointer();
-
-						for (int y = 0; y < height; y++)
+						if (srcMask->maskData != IntPtr.Zero && srcMask->colBytes != 0 && srcMask->rowBytes != 0)
 						{
-							byte* src = maskData + (y * srcMask->rowBytes);
-							byte* dst = displaySurface.GetRowAddressUnchecked(y);
+							byte* maskData = (byte*)srcMask->maskData.ToPointer();
 
-							for (int x = 0; x < width; x++)
+							for (int y = 0; y < height; y++)
 							{
-								dst[3] = *src;
-								if (*src < 255)
-								{
-									allOpaque = false;
-								}
+								byte* src = maskData + (y * srcMask->rowBytes);
+								byte* dst = displaySurface.GetRowAddressUnchecked(y);
 
-								src += srcMask->colBytes;
-								dst += 4;
+								for (int x = 0; x < width; x++)
+								{
+									dst[3] = *src;
+									if (*src < 255)
+									{
+										allOpaque = false;
+									}
+
+									src += srcMask->colBytes;
+									dst += 4;
+								}
 							}
 						}
 
