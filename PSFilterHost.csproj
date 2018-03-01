@@ -136,6 +136,15 @@
     <Compile Include="HostColorManagement.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
+    <Compile Include="Interop\NativeConstants.cs" />
+    <Compile Include="Interop\NativeEnums.cs" />
+    <Compile Include="Interop\NativeInterfaces.cs" />
+    <Compile Include="Interop\NativeStructs.cs" />
+    <Compile Include="Interop\SafeLibraryHandle.cs" />
+    <Compile Include="Interop\SafeNativeMethods.cs" />
+    <Compile Include="Interop\SafeProfileHandle.cs" />
+    <Compile Include="Interop\SafeTransformHandle.cs" />
+    <Compile Include="Interop\UnsafeNativeMethods.cs" />
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PluginSettingsRegistry.cs" />
@@ -175,7 +184,6 @@
     <Compile Include="PSApi\IPropertySuite.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
     <Compile Include="PSApi\MetaDataConverter.cs" />
-    <Compile Include="PSApi\NativeEnums.cs" />
     <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="PSApi\PICA\ASZStringSuite.cs" />
     <Compile Include="PSApi\PICA\IASZStringSuite.cs" />
@@ -196,8 +204,6 @@
     <Compile Include="PSApi\PSErrorSuite.cs" />
     <Compile Include="PSApi\ReadImageDocument.cs" />
     <Compile Include="PSApi\ResourceSuite.cs" />
-    <Compile Include="PSApi\SafeProfileHandle.cs" />
-    <Compile Include="PSApi\SafeTransformHandle.cs" />
     <Compile Include="PSApi\SPBasicSuiteProvider.cs" />
     <Compile Include="PSApi\StringUtil.cs" />
     <Compile Include="PSApi\TestAbortProc.cs" />
@@ -207,7 +213,6 @@
     <Compile Include="FilterProgressEventArgs.cs" />
     <Compile Include="FilterRunExecption.cs" />
     <Compile Include="PSApi\Memory.cs" />
-    <Compile Include="NativeInterfaces.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -239,8 +244,6 @@
     <Compile Include="PSApi\ImageServicesProc.cs" />
     <Compile Include="ImageSizeTooLargeException.cs" />
     <Compile Include="PSApi\LoadPsFilter.cs" />
-    <Compile Include="PSApi\NativeConstants.cs" />
-    <Compile Include="PSApi\NativeStructs.cs" />
     <Compile Include="ParameterData.cs" />
     <Compile Include="PSApi\PICASuiteStructs.cs" />
     <Compile Include="PSApi\PIDescriptorParameters.cs" />
@@ -264,16 +267,13 @@
     <Compile Include="PSApi\RegionExtensions.cs" />
     <Compile Include="PSApi\ResourceProc.cs" />
     <Compile Include="PSApi\RGBColor.cs" />
-    <Compile Include="PSApi\SafeLibraryHandle.cs" />
     <Compile Include="PSApi\SPBasicSuite.cs" />
-    <Compile Include="PSApi\UnsafeNativeMethods.cs" />
     <Compile Include="PSApi\VPoint.cs" />
     <Compile Include="PSApi\VRect.cs" />
     <Compile Include="PseudoResourceCollection.cs" />
     <Compile Include="PSFilterHost.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PSResource.cs" />
-    <Compile Include="PSApi\SafeNativeMethods.cs" />
     <Compile Include="ShellLink.cs" />
   </ItemGroup>
   <ItemGroup>
