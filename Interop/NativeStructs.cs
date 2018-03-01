@@ -22,7 +22,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.Interop
 {
     internal static class NativeStructs
     {

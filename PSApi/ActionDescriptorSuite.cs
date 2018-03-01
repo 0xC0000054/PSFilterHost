@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using PSFilterHostDll.Interop;
 using PSFilterHostDll.PSApi.PICA;
 using System;
 using System.Collections.Generic;

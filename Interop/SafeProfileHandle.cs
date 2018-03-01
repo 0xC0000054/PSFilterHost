@@ -12,7 +12,7 @@
 
 using Microsoft.Win32.SafeHandles;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.Interop
 {
     internal sealed class SafeProfileHandle : SafeHandleZeroOrMinusOneIsInvalid
     {

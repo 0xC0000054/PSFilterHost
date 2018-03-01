@@ -21,7 +21,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Globalization;
-using PSFilterHostDll.PSApi;
+using PSFilterHostDll.Interop;
 
 namespace PSFilterHostDll.BGRASurface
 {

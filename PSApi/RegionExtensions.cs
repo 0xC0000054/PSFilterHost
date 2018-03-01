@@ -19,6 +19,7 @@
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
 
+using PSFilterHostDll.Interop;
 using System;
 using System.ComponentModel;
 using System.Drawing;

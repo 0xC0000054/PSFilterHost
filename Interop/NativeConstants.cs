@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.Interop
 {
     internal static class NativeConstants
     {

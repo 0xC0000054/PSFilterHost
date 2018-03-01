@@ -12,7 +12,7 @@
 
 using System;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.Interop
 {
     internal static class NativeEnums
     {

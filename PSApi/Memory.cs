@@ -22,6 +22,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using PSFilterHostDll.Interop;
 
 namespace PSFilterHostDll.PSApi
 {

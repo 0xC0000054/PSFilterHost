@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using PSFilterHostDll.BGRASurface;
 using PSFilterHostDll.Properties;
+using PSFilterHostDll.Interop;
 
 #if !GDIPLUS
 using System.Windows.Media.Imaging;

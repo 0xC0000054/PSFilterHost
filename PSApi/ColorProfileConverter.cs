@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using PSFilterHostDll.BGRASurface;
+using PSFilterHostDll.Interop;
 using PSFilterHostDll.Properties;
 using System;
 using System.ComponentModel;
