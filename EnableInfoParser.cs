@@ -31,13 +31,13 @@ namespace PSFilterHostDll
 			RParen
 		}
 
-		class Expression
+		class Token
 		{
 			public string value;
 			public int intValue;
 			public TokenType type;
 
-			public Expression()
+			public Token()
 			{
 				this.value = string.Empty;
 				this.intValue = 0;
@@ -78,15 +78,15 @@ namespace PSFilterHostDll
 
 			while (index < length && !supports16Bit)
 			{
-				Expression exp = this.NextToken();
+				Token token = this.NextToken();
 
-				switch (exp.type)
+				switch (token.type)
 				{
 					case TokenType.InFunction: // parse the in() function
 						supports16Bit = ParseInFunction();
 						break;
 					case TokenType.BooleanConstant: // enable all modes
-						supports16Bit = (exp.value == "true" && length == 4);
+						supports16Bit = (token.value == "true" && length == 4);
 						break;
 					case TokenType.Or: // the || PSHOP_ImageDepth == 16 case
 						supports16Bit = ParseOr();
@@ -107,15 +107,15 @@ namespace PSFilterHostDll
 
 			while (index < length && !supportsMode)
 			{
-				Expression exp = this.NextToken();
+				Token token = this.NextToken();
 
-				switch (exp.type)
+				switch (token.type)
 				{
 					case TokenType.InFunction: // parse the in() function
 						supportsMode = ParseInFunction();
 						break;
 					case TokenType.BooleanConstant: // enable all modes
-						supportsMode = (exp.value == "true" && length == 4);
+						supportsMode = (token.value == "true" && length == 4);
 						break;
 				}
 			}
@@ -166,11 +166,11 @@ namespace PSFilterHostDll
 			}
 		}
 
-		private Expression NextToken()
+		private Token NextToken()
 		{
 			SkipWhitespace();
 
-			Expression exp = new Expression();
+			Token token = new Token();
 
 			if (index < length)
 			{
@@ -187,8 +187,8 @@ namespace PSFilterHostDll
 							break;
 						}
 					}
-					exp.intValue = int.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture);
-					exp.type = TokenType.Number;
+					token.intValue = int.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture);
+					token.type = TokenType.Number;
 				}
 				else if (Char.IsLetter(chars[index]))
 				{
@@ -204,20 +204,20 @@ namespace PSFilterHostDll
 						}
 					}
 
-					exp.value = new string(chars, startIndex, index - startIndex);
+					token.value = new string(chars, startIndex, index - startIndex);
 
-					if (exp.value == inFunction)
+					if (token.value == inFunction)
 					{
-						exp.type = TokenType.InFunction;
+						token.type = TokenType.InFunction;
 					}
-					else if (string.Equals(exp.value, "true", StringComparison.OrdinalIgnoreCase) ||
-							 string.Equals(exp.value, "false", StringComparison.OrdinalIgnoreCase))
+					else if (string.Equals(token.value, "true", StringComparison.OrdinalIgnoreCase) ||
+							 string.Equals(token.value, "false", StringComparison.OrdinalIgnoreCase))
 					{
-						exp.type = TokenType.BooleanConstant;
+						token.type = TokenType.BooleanConstant;
 					}
 					else
 					{
-						exp.type = TokenType.Identifier;
+						token.type = TokenType.Identifier;
 					}
 				}
 				else
@@ -227,8 +227,8 @@ namespace PSFilterHostDll
 						case '|':
 							if (chars[index + 1] == '|')
 							{
-								exp.value = "||";
-								exp.type = TokenType.Or;
+								token.value = "||";
+								token.type = TokenType.Or;
 								index += 2;
 							}
 							else
@@ -239,8 +239,8 @@ namespace PSFilterHostDll
 						case '=':
 							if (chars[index + 1] == '=')
 							{
-								exp.value = "==";
-								exp.type = TokenType.Equals;
+								token.value = "==";
+								token.type = TokenType.Equals;
 								index += 2;
 							}
 							else
@@ -249,11 +249,11 @@ namespace PSFilterHostDll
 							}
 							break;
 						case '(':
-							exp.type = TokenType.LParen;
+							token.type = TokenType.LParen;
 							index++;
 							break;
 						case ')':
-							exp.type = TokenType.RParen;
+							token.type = TokenType.RParen;
 							index++;
 							break;
 						default:
@@ -263,7 +263,7 @@ namespace PSFilterHostDll
 				}
 			}
 
-			return exp;
+			return token;
 		}
 
 		private bool ParseInFunction()
@@ -313,15 +313,15 @@ namespace PSFilterHostDll
 
 		private bool ParseOr()
 		{
-			Expression keyword = this.NextToken();
+			Token keyword = this.NextToken();
 
 			if (keyword.value == psImageDepth)
 			{
-				Expression equal = this.NextToken();
+				Token equal = this.NextToken();
 
 				if (equal.type == TokenType.Equals)
 				{
-					Expression depth = this.NextToken();
+					Token depth = this.NextToken();
 
 					return depth.intValue == 16;
 				}
