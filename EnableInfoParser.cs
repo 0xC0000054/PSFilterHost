@@ -22,8 +22,8 @@ namespace PSFilterHostDll
 		{
 			None,
 			InFunction,
-			Constant,
-			Keyword,
+			BooleanConstant,
+			Identifier,
 			Or,
 			Equals,
 			Number,
@@ -91,7 +91,7 @@ namespace PSFilterHostDll
 					case TokenTypes.InFunction: // parse the in() function
 						supports16Bit = ParseInFunction();
 						break;
-					case TokenTypes.Constant: // enable all modes
+					case TokenTypes.BooleanConstant: // enable all modes
 						supports16Bit = (exp.value == "true" && length == 4);
 						break;
 					case TokenTypes.Or: // the || PSHOP_ImageDepth == 16 case
@@ -120,7 +120,7 @@ namespace PSFilterHostDll
 					case TokenTypes.InFunction: // parse the in() function
 						supportsMode = ParseInFunction();
 						break;
-					case TokenTypes.Constant: // enable all modes
+					case TokenTypes.BooleanConstant: // enable all modes
 						supportsMode = (exp.value == "true" && length == 4);
 						break;
 				}
@@ -219,11 +219,11 @@ namespace PSFilterHostDll
 					else if (string.Equals(exp.value, "true", StringComparison.OrdinalIgnoreCase) ||
 							 string.Equals(exp.value, "false", StringComparison.OrdinalIgnoreCase))
 					{
-						exp.type = TokenTypes.Constant;
+						exp.type = TokenTypes.BooleanConstant;
 					}
 					else
 					{
-						exp.type = TokenTypes.Keyword;
+						exp.type = TokenTypes.Identifier;
 					}
 				}
 				else
