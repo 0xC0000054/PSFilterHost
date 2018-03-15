@@ -18,7 +18,7 @@ namespace PSFilterHostDll
 {
 	internal sealed class EnableInfoParser
 	{
-		enum TokenTypes
+		enum TokenType
 		{
 			None,
 			InFunction,
@@ -35,13 +35,13 @@ namespace PSFilterHostDll
 		{
 			public string value;
 			public int intValue;
-			public TokenTypes type;
+			public TokenType type;
 
 			public Expression()
 			{
 				this.value = string.Empty;
 				this.intValue = 0;
-				this.type = TokenTypes.None;
+				this.type = TokenType.None;
 			}
 		}
 
@@ -82,13 +82,13 @@ namespace PSFilterHostDll
 
 				switch (exp.type)
 				{
-					case TokenTypes.InFunction: // parse the in() function
+					case TokenType.InFunction: // parse the in() function
 						supports16Bit = ParseInFunction();
 						break;
-					case TokenTypes.BooleanConstant: // enable all modes
+					case TokenType.BooleanConstant: // enable all modes
 						supports16Bit = (exp.value == "true" && length == 4);
 						break;
-					case TokenTypes.Or: // the || PSHOP_ImageDepth == 16 case
+					case TokenType.Or: // the || PSHOP_ImageDepth == 16 case
 						supports16Bit = ParseOr();
 						break;
 
@@ -111,10 +111,10 @@ namespace PSFilterHostDll
 
 				switch (exp.type)
 				{
-					case TokenTypes.InFunction: // parse the in() function
+					case TokenType.InFunction: // parse the in() function
 						supportsMode = ParseInFunction();
 						break;
-					case TokenTypes.BooleanConstant: // enable all modes
+					case TokenType.BooleanConstant: // enable all modes
 						supportsMode = (exp.value == "true" && length == 4);
 						break;
 				}
@@ -188,7 +188,7 @@ namespace PSFilterHostDll
 						}
 					}
 					exp.intValue = int.Parse(sb.ToString(), System.Globalization.CultureInfo.InvariantCulture);
-					exp.type = TokenTypes.Number;
+					exp.type = TokenType.Number;
 				}
 				else if (Char.IsLetter(chars[index]))
 				{
@@ -208,16 +208,16 @@ namespace PSFilterHostDll
 
 					if (exp.value == inFunction)
 					{
-						exp.type = TokenTypes.InFunction;
+						exp.type = TokenType.InFunction;
 					}
 					else if (string.Equals(exp.value, "true", StringComparison.OrdinalIgnoreCase) ||
 							 string.Equals(exp.value, "false", StringComparison.OrdinalIgnoreCase))
 					{
-						exp.type = TokenTypes.BooleanConstant;
+						exp.type = TokenType.BooleanConstant;
 					}
 					else
 					{
-						exp.type = TokenTypes.Identifier;
+						exp.type = TokenType.Identifier;
 					}
 				}
 				else
@@ -228,7 +228,7 @@ namespace PSFilterHostDll
 							if (chars[index + 1] == '|')
 							{
 								exp.value = "||";
-								exp.type = TokenTypes.Or;
+								exp.type = TokenType.Or;
 								index += 2;
 							}
 							else
@@ -240,7 +240,7 @@ namespace PSFilterHostDll
 							if (chars[index + 1] == '=')
 							{
 								exp.value = "==";
-								exp.type = TokenTypes.Equals;
+								exp.type = TokenType.Equals;
 								index += 2;
 							}
 							else
@@ -249,11 +249,11 @@ namespace PSFilterHostDll
 							}
 							break;
 						case '(':
-							exp.type = TokenTypes.LParen;
+							exp.type = TokenType.LParen;
 							index++;
 							break;
 						case ')':
-							exp.type = TokenTypes.RParen;
+							exp.type = TokenType.RParen;
 							index++;
 							break;
 						default:
@@ -319,7 +319,7 @@ namespace PSFilterHostDll
 			{
 				Expression equal = this.NextToken();
 
-				if (equal.type == TokenTypes.Equals)
+				if (equal.type == TokenType.Equals)
 				{
 					Expression depth = this.NextToken();
 
