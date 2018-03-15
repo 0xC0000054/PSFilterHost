@@ -59,20 +59,14 @@ namespace PSFilterHostDll
 		private const string GrayScaleMode = "GrayScaleMode";
 		private const string Gray16Mode = "Gray16Mode";
 
-		public EnableInfoParser()
+		public EnableInfoParser() : this(false)
 		{
-			Init();
 		}
 
 		public EnableInfoParser(bool grayScale)
 		{
-			Init();
-			this.imageMode = grayScale ? Gray16Mode : RGB48Mode;
-		}
-
-		private void Init()
-		{
 			this.index = 0;
+			this.imageMode = grayScale ? Gray16Mode : RGB48Mode;
 		}
 
 		public bool Parse(string info)
