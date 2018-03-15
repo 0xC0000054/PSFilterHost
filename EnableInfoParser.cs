@@ -45,9 +45,6 @@ namespace PSFilterHostDll
 			}
 		}
 
-		private ReadOnlyCollection<string> keywords;
-		private ReadOnlyCollection<string> constants;
-
 		private string imageMode;
 		private char[] chars;
 		private int index;
@@ -75,8 +72,6 @@ namespace PSFilterHostDll
 
 		private void Init()
 		{
-			this.keywords = new ReadOnlyCollection<string>(new[] { psImageMode, psImageDepth });
-			this.constants = new ReadOnlyCollection<string>(new[] { "true", "false", GrayScaleMode, RGBMode, Gray16Mode, RGB48Mode });
 			this.index = 0;
 		}
 
@@ -221,13 +216,14 @@ namespace PSFilterHostDll
 					{
 						exp.type = TokenTypes.InFunction;
 					}
-					else if (keywords.Contains(exp.value))
-					{
-						exp.type = TokenTypes.Keyword;
-					}
-					else if (constants.Contains(exp.value))
+					else if (string.Equals(exp.value, "true", StringComparison.OrdinalIgnoreCase) ||
+							 string.Equals(exp.value, "false", StringComparison.OrdinalIgnoreCase))
 					{
 						exp.type = TokenTypes.Constant;
+					}
+					else
+					{
+						exp.type = TokenTypes.Keyword;
 					}
 				}
 				else
