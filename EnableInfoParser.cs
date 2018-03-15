@@ -94,7 +94,7 @@ namespace PSFilterHostDll
 				switch (exp.type)
 				{
 					case TokenTypes.Function: // parse the in() function
-						supports16Bit = ParseFunction();
+						supports16Bit = ParseInFunction();
 						break;
 					case TokenTypes.Constant: // enable all modes
 						supports16Bit = (exp.value == "true" && length == 4);
@@ -123,7 +123,7 @@ namespace PSFilterHostDll
 				switch (exp.type)
 				{
 					case TokenTypes.Function: // parse the in() function
-						supportsMode = ParseFunction();
+						supportsMode = ParseInFunction();
 						break;
 					case TokenTypes.Constant: // enable all modes
 						supportsMode = (exp.value == "true" && length == 4);
@@ -276,7 +276,7 @@ namespace PSFilterHostDll
 			return exp;
 		}
 
-		private bool ParseFunction()
+		private bool ParseInFunction()
 		{
 			SkipWhitespace();
 			int argCount = 1;
