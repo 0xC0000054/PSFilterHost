@@ -21,7 +21,7 @@ namespace PSFilterHostDll
 		enum TokenTypes
 		{
 			None,
-			Function,
+			InFunction,
 			Constant,
 			Keyword,
 			Or,
@@ -93,7 +93,7 @@ namespace PSFilterHostDll
 
 				switch (exp.type)
 				{
-					case TokenTypes.Function: // parse the in() function
+					case TokenTypes.InFunction: // parse the in() function
 						supports16Bit = ParseInFunction();
 						break;
 					case TokenTypes.Constant: // enable all modes
@@ -122,7 +122,7 @@ namespace PSFilterHostDll
 
 				switch (exp.type)
 				{
-					case TokenTypes.Function: // parse the in() function
+					case TokenTypes.InFunction: // parse the in() function
 						supportsMode = ParseInFunction();
 						break;
 					case TokenTypes.Constant: // enable all modes
@@ -219,7 +219,7 @@ namespace PSFilterHostDll
 
 					if (exp.value == inFunction)
 					{
-						exp.type = TokenTypes.Function;
+						exp.type = TokenTypes.InFunction;
 					}
 					else if (keywords.Contains(exp.value))
 					{
