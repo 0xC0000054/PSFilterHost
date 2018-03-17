@@ -543,7 +543,8 @@ namespace PSFilterHostDll.PSApi
 				// Some filters do not handle transparency correctly despite what their FilterInfo says.
 				if (data.FilterInfo == null ||
 					data.Category.Equals("Axion", StringComparison.Ordinal) ||
-					data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal))
+					data.Category.Equals("Vizros 4", StringComparison.Ordinal) && data.Title.StartsWith("Lake", StringComparison.Ordinal) ||
+					data.Category.Equals("Nik Collection", StringComparison.Ordinal) && data.Title.StartsWith("Dfine 2", StringComparison.Ordinal))
 				{
 					if (source.HasTransparency())
 					{
