@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security;
 using System.Threading;
@@ -158,6 +159,10 @@ namespace HostTest
 				}
 			}
 			catch (ArgumentException ex)
+			{
+				ShowErrorMessage(ex.Message);
+			}
+			catch (ExternalException ex)
 			{
 				ShowErrorMessage(ex.Message);
 			}
@@ -773,6 +778,10 @@ namespace HostTest
 				{
 					ShowErrorMessage(ex.Message);
 				}
+				catch (ExternalException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
 				catch (FileNotFoundException ex)
 				{
 					ShowErrorMessage(ex.Message);
@@ -1329,6 +1338,10 @@ namespace HostTest
 					OpenFile(this.dropImageFileName);
 				}
 				catch (ArgumentException ex)
+				{
+					ShowErrorMessage(ex.Message);
+				}
+				catch (ExternalException ex)
 				{
 					ShowErrorMessage(ex.Message);
 				}
