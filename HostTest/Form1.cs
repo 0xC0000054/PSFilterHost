@@ -887,6 +887,8 @@ namespace HostTest
 					this.imageType = "RGB/";
 				}
 
+				this.canvas.ClearSelection();
+
 				this.panel1.SuspendLayout();
 
 				if (bitsPerChannel >= 16)

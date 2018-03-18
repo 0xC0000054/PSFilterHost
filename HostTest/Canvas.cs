@@ -272,6 +272,14 @@ namespace HostTest
 		}
 
 		/// <summary>
+		/// Clears the selection.
+		/// </summary>
+		public void ClearSelection()
+		{
+			RenderSelection(null, true);
+		}
+
+		/// <summary>
 		/// Suspends the redrawing of the canvas.
 		/// </summary>
 		public void SuspendPaint()
