@@ -26,11 +26,11 @@ namespace PSFilterHostDll.BGRASurface
 {
 	internal abstract class SurfaceBase : IDisposable
 	{
-		protected int width;
-		protected int height;
-		protected long stride;
+		protected readonly int width;
+		protected readonly int height;
+		protected readonly long stride;
 		protected MemoryBlock scan0;
-		private int bytesPerPixel;
+		private readonly int bytesPerPixel;
 		private bool disposed;
 
 		public int Width
