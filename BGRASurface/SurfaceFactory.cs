@@ -43,7 +43,7 @@ namespace PSFilterHostDll.BGRASurface
 			int height = image.Height;
 
 			imageMode = ImageModes.RGB;
-			SurfaceBGRA32 surface = new SurfaceBGRA32(width, height);
+			SurfaceBGRA32 surface = new SurfaceBGRA32(width, height, image.HorizontalResolution, image.VerticalResolution);
 
 			using (Bitmap temp = new Bitmap(image)) // Copy the image to remove any invalid meta-data that causes LockBits to fail.
 			{
@@ -88,7 +88,7 @@ namespace PSFilterHostDll.BGRASurface
 				format == PixelFormats.Gray8)
 			{
 				imageMode = ImageModes.GrayScale;
-				SurfaceGray8 surface = new SurfaceGray8(width, height);
+				SurfaceGray8 surface = new SurfaceGray8(width, height, bitmap.DpiX, bitmap.DpiY);
 
 				if (format != PixelFormats.Gray8)
 				{
@@ -105,7 +105,7 @@ namespace PSFilterHostDll.BGRASurface
 			else if (format == PixelFormats.Gray16 || format == PixelFormats.Gray32Float)
 			{
 				imageMode = ImageModes.Gray16;
-				SurfaceGray16 surface = new SurfaceGray16(width, height);
+				SurfaceGray16 surface = new SurfaceGray16(width, height, bitmap.DpiX, bitmap.DpiY);
 
 				if (format == PixelFormats.Gray32Float)
 				{
@@ -154,7 +154,7 @@ namespace PSFilterHostDll.BGRASurface
 				}
 
 				imageMode = ImageModes.RGB48;
-				SurfaceBGRA64 surface = new SurfaceBGRA64(width, height);
+				SurfaceBGRA64 surface = new SurfaceBGRA64(width, height, bitmap.DpiX, bitmap.DpiY);
 
 				fixed (ushort* ptr = pixels)
 				{
@@ -190,7 +190,7 @@ namespace PSFilterHostDll.BGRASurface
 			else
 			{
 				imageMode = ImageModes.RGB;
-				SurfaceBGRA32 surface = new SurfaceBGRA32(width, height);
+				SurfaceBGRA32 surface = new SurfaceBGRA32(width, height, bitmap.DpiX, bitmap.DpiY);
 
 				if (format != PixelFormats.Bgra32)
 				{
@@ -217,16 +217,31 @@ namespace PSFilterHostDll.BGRASurface
 		/// <returns></returns>
 		internal static SurfaceBase CreateFromImageMode(int width, int height, ImageModes mode)
 		{
+			return CreateFromImageMode(width, height, 96.0, 96.0, mode);
+		}
+
+		/// <summary>
+		/// Creates an new surface from the host image mode.
+		/// </summary>
+		/// <param name="width">The width of the new surface.</param>
+		/// <param name="height">The height of the new surface.</param>
+		/// <param name="dpiX">The horizontal dots per inch (dpi) of the image.</param>
+		/// <param name="dpiY">The vertical dots per inch (dpi) of the image.</param>
+		/// <param name="mode">The current <see cref="ImageModes"/> of the host.</param>
+		/// <returns></returns>
+		/// <exception cref="InvalidEnumArgumentException"><paramref name="mode"/> is not a supported value.</exception>
+		internal static SurfaceBase CreateFromImageMode(int width, int height, double dpiX, double dpiY, ImageModes mode)
+		{
 			switch (mode)
 			{
 				case ImageModes.GrayScale:
-					return new SurfaceGray8(width, height);
+					return new SurfaceGray8(width, height, dpiX, dpiY);
 				case ImageModes.RGB:
-					return new SurfaceBGRA32(width, height);
+					return new SurfaceBGRA32(width, height, dpiX, dpiY);
 				case ImageModes.Gray16:
-					return new SurfaceGray16(width, height);
+					return new SurfaceGray16(width, height, dpiX, dpiY);
 				case ImageModes.RGB48:
-					return new SurfaceBGRA64(width, height);
+					return new SurfaceBGRA64(width, height, dpiX, dpiY);
 				default:
 					throw new InvalidEnumArgumentException("mode", (int)mode, typeof(ImageModes));
 			}

@@ -29,6 +29,8 @@ namespace PSFilterHostDll.BGRASurface
 		protected readonly int width;
 		protected readonly int height;
 		protected readonly long stride;
+		protected readonly double dpiX;
+		protected readonly double dpiY;
 		protected MemoryBlock scan0;
 		private readonly int bytesPerPixel;
 		private bool disposed;
@@ -58,6 +60,16 @@ namespace PSFilterHostDll.BGRASurface
 			get { return new Rectangle(0, 0, width, height); }
 		}
 
+		public double DpiX
+		{
+			get { return dpiX; }
+		}
+
+		public double DpiY
+		{
+			get { return dpiY; }
+		}
+
 		public abstract int ChannelCount
 		{
 			get;
@@ -74,12 +86,16 @@ namespace PSFilterHostDll.BGRASurface
 		/// <param name="width">The width.</param>
 		/// <param name="height">The height.</param>
 		/// <param name="bytesPerPixel">The bytes per pixel.</param>
-		public SurfaceBase(int width, int height, int bytesPerPixel)
+		/// <param name="dpiX">The horizontal resolution of the surface.</param>
+		/// <param name="dpiY">The vertical resolution of the surface.</param>
+		public SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY)
 		{
 			this.width = width;
 			this.height = height;
 			this.bytesPerPixel = bytesPerPixel;
 			this.stride = width * bytesPerPixel;
+			this.dpiX = dpiX;
+			this.dpiY = dpiY;
 			this.scan0 = new MemoryBlock(stride * height);
 			this.disposed = false;
 		}

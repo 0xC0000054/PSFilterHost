@@ -33,7 +33,11 @@ namespace PSFilterHostDll.BGRASurface
     /// </summary>
     internal sealed class SurfaceBGRA32 : SurfaceBase
     {
-        public SurfaceBGRA32(int width, int height) : base(width, height, 4)
+        public SurfaceBGRA32(int width, int height) : this(width, height, 96.0, 96.0)
+        {
+        }
+
+        public SurfaceBGRA32(int width, int height, double dpiX, double dpiY) : base(width, height, 4, dpiX, dpiY)
         {
         }
 

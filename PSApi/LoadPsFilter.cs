@@ -377,7 +377,7 @@ namespace PSFilterHostDll.PSApi
 #else
 			this.source = SurfaceFactory.CreateFromBitmapSource(sourceImage, out this.imageMode);
 #endif
-			this.dest = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, this.imageMode);
+			this.dest = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, source.DpiX, source.DpiY, this.imageMode);
 
 #if GDIPLUS
 			this.dpiX = sourceImage.HorizontalResolution;
