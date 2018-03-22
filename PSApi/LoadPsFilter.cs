@@ -102,8 +102,6 @@ namespace PSFilterHostDll.PSApi
 		private string errorMessage;
 
 		private short filterCase;
-		private double dpiX;
-		private double dpiY;
 		private Region selectedRegion;
 
 		private ImageModes imageMode;
@@ -379,14 +377,6 @@ namespace PSFilterHostDll.PSApi
 #endif
 			this.dest = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, source.DpiX, source.DpiY, this.imageMode);
 
-#if GDIPLUS
-			this.dpiX = sourceImage.HorizontalResolution;
-			this.dpiY = sourceImage.VerticalResolution;
-#else
-			this.dpiX = sourceImage.DpiX;
-			this.dpiY = sourceImage.DpiY;
-#endif
-
 			this.advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
 			this.colorServicesProc = new ColorServicesProc(ColorServicesProc);
 			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
@@ -398,7 +388,7 @@ namespace PSFilterHostDll.PSApi
 			this.channelPortsSuite = new ChannelPortsSuite(this, imageMode);
 			this.imageServicesSuite = new ImageServicesSuite();
 			this.propertySuite = new PropertySuite(sourceImage, this.imageMode);
-			this.readImageDocument = new ReadImageDocument(source.Width, source.Height, dpiX, dpiY, imageMode);
+			this.readImageDocument = new ReadImageDocument(source.Width, source.Height, source.DpiX, source.DpiY, imageMode);
 			this.basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
 
 			this.selectedRegion = null;
@@ -3857,8 +3847,8 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->filterRect.right = width;
 			filterRecord->filterRect.bottom = height;
 
-			filterRecord->imageHRes = new Fixed16((int)(dpiX + 0.5));
-			filterRecord->imageVRes = new Fixed16((int)(dpiY + 0.5));
+			filterRecord->imageHRes = new Fixed16((int)(source.DpiX + 0.5));
+			filterRecord->imageVRes = new Fixed16((int)(source.DpiY + 0.5));
 
 			filterRecord->wholeSize.h = width;
 			filterRecord->wholeSize.v = height;
