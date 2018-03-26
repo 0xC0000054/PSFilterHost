@@ -540,16 +540,8 @@ namespace HostTest
 						}
 
 						this.imageBounds = new Rectangle(0, 0, value.Width, value.Height);
-
-						if (HasTransparency(value))
-						{
-							this.image = value.Clone(imageBounds, PixelFormat.Format32bppArgb);
-							this.DrawCheckerBoardBitmap(value.Width, value.Height);
-						}
-						else
-						{
-							this.image = value.Clone(imageBounds, PixelFormat.Format24bppRgb);
-						}
+						this.image = new Bitmap(value.Width, value.Height, value.PixelFormat);
+						CopyFromBitmap(value, imageBounds);
 
 						this.Size = new Size(value.Width, value.Height);
 
