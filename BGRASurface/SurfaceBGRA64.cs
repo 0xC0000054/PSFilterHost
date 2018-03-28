@@ -53,24 +53,6 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-        private unsafe void BGRAtoRGBA()
-        {
-            for (int y = 0; y < height; y++)
-            {
-                ColorBgra16* ptr = (ColorBgra16*)this.GetRowAddressUnchecked(y);
-                ColorBgra16* ptrEnd = ptr + width;
-
-                while (ptr < ptrEnd)
-                {
-                    ushort temp = ptr->B;
-                    ptr->B = ptr->R;
-                    ptr->R = temp;
-
-                    ptr++;
-                }
-            }
-        }
-
         /// <summary>
         /// Scales the data to the internal 16 bit range used by Adobe(R) Photoshop(R).
         /// </summary>
