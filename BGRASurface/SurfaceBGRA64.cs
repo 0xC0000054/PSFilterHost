@@ -117,28 +117,142 @@ namespace PSFilterHostDll.BGRASurface
         }
 
 
-        public override unsafe Bitmap CreateAliasedBitmap()
+        public override unsafe Bitmap ToGdipBitmap()
         {
-            return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format64bppArgb, this.scan0.Pointer);
+            Bitmap image = null;
+
+            System.Drawing.Imaging.PixelFormat format;
+            if (HasTransparency())
+            {
+                format = System.Drawing.Imaging.PixelFormat.Format64bppArgb;
+            }
+            else
+            {
+                format = System.Drawing.Imaging.PixelFormat.Format48bppRgb;
+            }
+
+            using (Bitmap temp = new Bitmap(width, height, format))
+            {
+                System.Drawing.Imaging.BitmapData bitmapData = temp.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, format);
+                try
+                {
+                    byte* destScan0 = (byte*)bitmapData.Scan0;
+                    int destStride = bitmapData.Stride;
+
+                    if (format == System.Drawing.Imaging.PixelFormat.Format64bppArgb)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            ColorBgra16* src = (ColorBgra16*)GetRowAddressUnchecked(y);
+                            ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[0] = Fix16BitRange(src->B);
+                                dst[1] = Fix16BitRange(src->G);
+                                dst[2] = Fix16BitRange(src->R);
+                                dst[3] = Fix16BitRange(src->A);
+
+                                src++;
+                                dst += 4;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            ColorBgra16* src = (ColorBgra16*)GetRowAddressUnchecked(y);
+                            ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[0] = Fix16BitRange(src->B);
+                                dst[1] = Fix16BitRange(src->G);
+                                dst[2] = Fix16BitRange(src->R);
+
+                                src++;
+                                dst += 3;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    temp.UnlockBits(bitmapData);
+                }
+
+                image = (Bitmap)temp.Clone();
+            }
+
+            return image;
         }
 
 #if !GDIPLUS
-        public override unsafe System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource()
+        public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
-            this.ScaleFromPhotoshop16BitRange();
-            this.BGRAtoRGBA();
+            System.Windows.Media.PixelFormat format;
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(
-                this.width,
-                this.height,
-                96.0,
-                96.0,
-                System.Windows.Media.PixelFormats.Rgba64,
-                null,
-                this.scan0.Pointer,
-                (int)this.scan0.Length,
-                (int)this.stride
-                );
+            IntPtr buffer = IntPtr.Zero;
+            int bufferSize = 0;
+            int destStride = 0;
+
+            if (HasTransparency())
+            {
+                format = System.Windows.Media.PixelFormats.Rgba64;
+                destStride = ((width * format.BitsPerPixel) + 7) / 8;
+                bufferSize = destStride * height;
+
+                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+                byte* destScan0 = (byte*)buffer;
+
+                for (int y = 0; y < height; y++)
+                {
+                    ColorBgra16* src = (ColorBgra16*)GetRowAddressUnchecked(y);
+                    ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        dst[0] = Fix16BitRange(src->R);
+                        dst[1] = Fix16BitRange(src->G);
+                        dst[2] = Fix16BitRange(src->B);
+                        dst[3] = Fix16BitRange(src->A);
+
+                        src++;
+                        dst += 4;
+                    }
+                }
+            }
+            else
+            {
+                format = System.Windows.Media.PixelFormats.Rgb48;
+                destStride = ((width * format.BitsPerPixel) + 7) / 8;
+
+                bufferSize = destStride * height;
+
+                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+                byte* destScan0 = (byte*)buffer;
+
+                for (int y = 0; y < height; y++)
+                {
+                    ColorBgra16* src = (ColorBgra16*)GetRowAddressUnchecked(y);
+                    ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        dst[0] = Fix16BitRange(src->R);
+                        dst[1] = Fix16BitRange(src->G);
+                        dst[2] = Fix16BitRange(src->B);
+
+                        src++;
+                        dst += 3;
+                    }
+                }
+            }
+
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96.0, 96.0, format, null, buffer, bufferSize, destStride);
         }
 #endif
 

@@ -94,27 +94,72 @@ namespace PSFilterHostDll.BGRASurface
         }
 
 
-        public override unsafe Bitmap CreateAliasedBitmap()
+        public override unsafe Bitmap ToGdipBitmap()
         {
-            return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format16bppGrayScale, this.scan0.Pointer);
+            Bitmap image = null;
+
+            System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format16bppGrayScale;
+
+            using (Bitmap temp = new Bitmap(width, height, format))
+            {
+                System.Drawing.Imaging.BitmapData bitmapData = temp.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, format);
+                try
+                {
+                    byte* destScan0 = (byte*)bitmapData.Scan0;
+                    int destStride = bitmapData.Stride;
+
+                    for (int y = 0; y < height; y++)
+                    {
+                        ushort* src = (ushort*)GetRowAddressUnchecked(y);
+                        ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                        for (int x = 0; x < width; x++)
+                        {
+                            *dst = Fix16BitRange(*src);
+
+                            src++;
+                            dst++;
+                        }
+                    }
+                }
+                finally
+                {
+                    temp.UnlockBits(bitmapData);
+                }
+
+                image = (Bitmap)temp.Clone();
+            }
+
+            return image;
         }
 
 #if !GDIPLUS
-        public override unsafe System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource()
+        public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
-            this.ScaleFromPhotoshop16BitRange();
+            System.Windows.Media.PixelFormat format = System.Windows.Media.PixelFormats.Gray16;
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(
-                this.width,
-                this.height,
-                96.0,
-                96.0,
-                System.Windows.Media.PixelFormats.Gray16,
-                null,
-                this.scan0.Pointer,
-                (int)this.scan0.Length,
-                (int)this.stride
-                );
+            int destStride = ((width * format.BitsPerPixel) + 7) / 8;
+            int bufferSize = destStride * height;
+
+            IntPtr buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+            byte* destScan0 = (byte*)buffer;
+
+            for (int y = 0; y < height; y++)
+            {
+                ushort* src = (ushort*)GetRowAddressUnchecked(y);
+                ushort* dst = (ushort*)(destScan0 + (y * destStride));
+
+                for (int x = 0; x < width; x++)
+                {
+                    *dst = Fix16BitRange(*src);
+
+                    src++;
+                    dst++;
+                }
+            }
+
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96.0, 96.0, format, null, buffer, bufferSize, destStride);
         }
 #endif
 

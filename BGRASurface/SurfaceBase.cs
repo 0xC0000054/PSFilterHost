@@ -180,9 +180,9 @@ namespace PSFilterHostDll.BGRASurface
 			return (ushort)value;
 		}
 
-		public unsafe abstract Bitmap CreateAliasedBitmap();
+		public unsafe abstract Bitmap ToGdipBitmap();
 #if !GDIPLUS
-		public unsafe abstract System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource();
+		public unsafe abstract System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
 #endif
 		public unsafe byte* GetRowAddressUnchecked(int y)
 		{

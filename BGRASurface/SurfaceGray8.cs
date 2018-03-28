@@ -53,11 +53,11 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-        public override unsafe Bitmap CreateAliasedBitmap()
+        public override unsafe Bitmap ToGdipBitmap()
         {
             Bitmap image = null;
 
-            using (Bitmap temp = new Bitmap(this.width, this.height, PixelFormat.Format8bppIndexed))
+            using (Bitmap temp = new Bitmap(width, height, PixelFormat.Format8bppIndexed))
             {
                 ColorPalette pal = temp.Palette;
 
@@ -103,19 +103,32 @@ namespace PSFilterHostDll.BGRASurface
         }
 
 #if !GDIPLUS
-        public override unsafe System.Windows.Media.Imaging.BitmapSource CreateAliasedBitmapSource()
+        public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
-            return System.Windows.Media.Imaging.BitmapSource.Create(
-                this.width,
-                this.height,
-                96.0,
-                96.0,
-                System.Windows.Media.PixelFormats.Gray8,
-                null,
-                this.scan0.Pointer,
-                (int)this.scan0.Length,
-                (int)this.stride
-                );
+            System.Windows.Media.PixelFormat format = System.Windows.Media.PixelFormats.Gray8;
+
+            int destStride = ((width * format.BitsPerPixel) + 7) / 8;
+            int bufferSize = destStride * height;
+
+            IntPtr buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+            byte* destScan0 = (byte*)buffer;
+
+            for (int y = 0; y < height; y++)
+            {
+                byte* src = GetRowAddressUnchecked(y);
+                byte* dst = destScan0 + (y * destStride);
+
+                for (int x = 0; x < width; x++)
+                {
+                    *dst = *src;
+
+                    src++;
+                    dst++;
+                }
+            }
+
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96.0, 96.0, format, null, buffer, bufferSize, destStride);
         }
 #endif
 

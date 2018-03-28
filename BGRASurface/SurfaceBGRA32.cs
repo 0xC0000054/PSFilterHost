@@ -57,7 +57,7 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-        public override unsafe Bitmap CreateAliasedBitmap()
+        public unsafe Bitmap CreateAliasedBitmap()
         {
             if (HasTransparency())
             {
@@ -69,44 +69,142 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-#if !GDIPLUS
-        public override unsafe BitmapSource CreateAliasedBitmapSource()
+        public override unsafe Bitmap ToGdipBitmap()
         {
-#if DEBUG
-            using (Bitmap bmp = this.CreateAliasedBitmap())
-            {
+            Bitmap image = null;
 
-            }
-#endif
-
+            System.Drawing.Imaging.PixelFormat format;
             if (HasTransparency())
             {
-                return BitmapSource.Create(
-                    this.width,
-                    this.height,
-                    96.0,
-                    96.0,
-                    PixelFormats.Bgra32,
-                    null,
-                    this.scan0.Pointer,
-                    (int)this.scan0.Length,
-                    (int)this.stride
-                    );
+                format = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
             }
             else
             {
-                return BitmapSource.Create(
-                    this.width,
-                    this.height,
-                    96.0,
-                    96.0,
-                    PixelFormats.Bgr32,
-                    null,
-                    this.scan0.Pointer,
-                    (int)this.scan0.Length,
-                    (int)this.stride
-                    );
+                format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
             }
+
+            using (Bitmap temp = new Bitmap(width, height, format))
+            {
+                System.Drawing.Imaging.BitmapData bitmapData = temp.LockBits(new Rectangle(0, 0, width, height), System.Drawing.Imaging.ImageLockMode.WriteOnly, format);
+                try
+                {
+                    byte* destScan0 = (byte*)bitmapData.Scan0;
+                    int destStride = bitmapData.Stride;
+
+                    if (format == System.Drawing.Imaging.PixelFormat.Format32bppArgb)
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                            byte* dst = destScan0 + (y * destStride);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[0] = src->B;
+                                dst[1] = src->G;
+                                dst[2] = src->R;
+                                dst[3] = src->A;
+
+                                src++;
+                                dst += 4;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int y = 0; y < height; y++)
+                        {
+                            ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                            byte* dst = destScan0 + (y * destStride);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[0] = src->B;
+                                dst[1] = src->G;
+                                dst[2] = src->R;
+
+                                src++;
+                                dst += 3;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    temp.UnlockBits(bitmapData);
+                }
+
+                image = (Bitmap)temp.Clone();
+            }
+
+            return image;
+        }
+
+#if !GDIPLUS
+        public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
+        {
+            System.Windows.Media.PixelFormat format;
+
+            IntPtr buffer = IntPtr.Zero;
+            int bufferSize = 0;
+            int destStride = 0;
+
+            if (HasTransparency())
+            {
+                format = System.Windows.Media.PixelFormats.Bgra32;
+                destStride = ((width * format.BitsPerPixel) + 7) / 8;
+                bufferSize = destStride * height;
+
+                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+                byte* destScan0 = (byte*)buffer;
+
+                for (int y = 0; y < height; y++)
+                {
+                    ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                    byte* dst = destScan0 + (y * destStride);
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        dst[0] = src->R;
+                        dst[1] = src->G;
+                        dst[2] = src->B;
+                        dst[3] = src->A;
+
+                        src++;
+                        dst += 4;
+                    }
+                }
+            }
+            else
+            {
+                format = System.Windows.Media.PixelFormats.Bgr24;
+                destStride = ((width * format.BitsPerPixel) + 7) / 8;
+
+                bufferSize = destStride * height;
+
+                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
+
+                byte* destScan0 = (byte*)buffer;
+
+                for (int y = 0; y < height; y++)
+                {
+                    ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                    byte* dst = destScan0 + (y * destStride);
+
+                    for (int x = 0; x < width; x++)
+                    {
+                        dst[0] = src->R;
+                        dst[1] = src->G;
+                        dst[2] = src->B;
+
+                        src++;
+                        dst += 3;
+                    }
+                }
+            }
+
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96.0, 96.0, format, null, buffer, bufferSize, destStride);
         }
 #endif
 

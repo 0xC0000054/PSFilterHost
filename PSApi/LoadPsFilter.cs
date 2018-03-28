@@ -1367,7 +1367,7 @@ namespace PSFilterHostDll.PSApi
 				}
 
 #if DEBUG
-				using (Bitmap dst = dest.CreateAliasedBitmap())
+				using (Bitmap dst = dest.ToGdipBitmap())
 				{
 
 				}
@@ -2201,7 +2201,7 @@ namespace PSFilterHostDll.PSApi
 			DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane,
 				filterRecord->outHiPlane }));
 
-			using (Bitmap dst = dest.CreateAliasedBitmap())
+			using (Bitmap dst = dest.ToGdipBitmap())
 			{
 			}
 #endif
@@ -2726,7 +2726,7 @@ namespace PSFilterHostDll.PSApi
 				}
 
 #if DEBUG
-				using (Bitmap bmp = dest.CreateAliasedBitmap())
+				using (Bitmap bmp = dest.ToGdipBitmap())
 				{
 				}
 #endif

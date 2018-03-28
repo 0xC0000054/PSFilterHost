@@ -651,9 +651,9 @@ namespace PSFilterHostDll
 				if (result)
 				{
 #if GDIPLUS
-					this.dest = new Bitmap(lps.Dest.CreateAliasedBitmap());
+					this.dest = lps.Dest.ToGdipBitmap();
 #else
-					this.dest = lps.Dest.CreateAliasedBitmapSource().Clone();
+					this.dest = lps.Dest.ToBitmapSource();
 					this.dest.Freeze();
 #endif
 

@@ -425,7 +425,7 @@ namespace PSFilterHostDll.PSApi
                         }
 
 #if DEBUG
-                        using (System.Drawing.Bitmap bmp = scaledChannelSurface.CreateAliasedBitmap())
+                        using (System.Drawing.Bitmap bmp = scaledChannelSurface.ToGdipBitmap())
                         {
                         }
 #endif
