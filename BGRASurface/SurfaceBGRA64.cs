@@ -76,29 +76,6 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-        /// <summary>
-        /// Scales the data from the internal 16 bit range used by Adobe(R) Photoshop(R).
-        /// </summary>
-        private unsafe void ScaleFromPhotoshop16BitRange()
-        {
-            for (int y = 0; y < height; y++)
-            {
-                ColorBgra16* ptr = (ColorBgra16*)this.GetRowAddressUnchecked(y);
-                ColorBgra16* ptrEnd = ptr + width;
-
-                while (ptr < ptrEnd)
-                {
-                    ptr->B = Fix16BitRange(ptr->B);
-                    ptr->G = Fix16BitRange(ptr->G);
-                    ptr->R = Fix16BitRange(ptr->R);
-                    ptr->A = Fix16BitRange(ptr->A);
-
-                    ptr++;
-                }
-            }
-        }
-
-
         public override unsafe Bitmap ToGdipBitmap()
         {
             Bitmap image = null;
