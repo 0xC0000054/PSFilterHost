@@ -21,11 +21,6 @@
 using System;
 using System.Drawing;
 
-#if !GDIPLUS
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-#endif
-
 namespace PSFilterHostDll.BGRASurface
 {
     /// <summary>
