@@ -59,14 +59,7 @@ namespace PSFilterHostDll.BGRASurface
 
         public unsafe Bitmap CreateAliasedBitmap()
         {
-            if (HasTransparency())
-            {
-                return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb, this.scan0.Pointer);
-            }
-            else
-            {
-                return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format32bppRgb, this.scan0.Pointer);
-            }
+            return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb, this.scan0.Pointer);
         }
 
         public override unsafe Bitmap ToGdipBitmap()
