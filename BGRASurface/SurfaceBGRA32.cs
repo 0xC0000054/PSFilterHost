@@ -57,6 +57,10 @@ namespace PSFilterHostDll.BGRASurface
             return new Bitmap(this.width, this.height, (int)this.stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb, this.scan0.Pointer);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Microsoft.Design",
+            "CA1031:DoNotCatchGeneralExceptionTypes",
+            Justification = "Required as Bitmap.SetResolution is documented to throw it.")]
         public override unsafe Bitmap ToGdipBitmap()
         {
             Bitmap image = null;
@@ -120,6 +124,15 @@ namespace PSFilterHostDll.BGRASurface
                 finally
                 {
                     temp.UnlockBits(bitmapData);
+                }
+
+                try
+                {
+                    temp.SetResolution((float)dpiX, (float)dpiY);
+                }
+                catch (Exception)
+                {
+                    // Ignore any errors when setting the resolution.
                 }
 
                 image = (Bitmap)temp.Clone();
@@ -192,7 +205,7 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, 96.0, 96.0, format, null, buffer, bufferSize, destStride);
+            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, dpiX, dpiY, format, null, buffer, bufferSize, destStride);
         }
 #endif
 
