@@ -101,7 +101,7 @@ namespace PSFilterHostDll.PSApi
 		private short result;
 		private string errorMessage;
 
-		private short filterCase;
+		private FilterCase filterCase;
 		private Region selectedRegion;
 
 		private ImageModes imageMode;
@@ -549,7 +549,7 @@ namespace PSFilterHostDll.PSApi
 				{
 					this.filterCase = selectedRegion != null ? FilterCase.EditableTransparencyWithSelection : FilterCase.EditableTransparencyNoSelection;
 
-					int filterCaseIndex = this.filterCase - 1;
+					int filterCaseIndex = (int)this.filterCase - 1;
 					FilterCaseInfo[] filterInfo = data.FilterInfo;
 
 					// If the EditableTransparency cases are not supported use the other modes.
@@ -570,7 +570,7 @@ namespace PSFilterHostDll.PSApi
 						else if (filterInfo[filterCaseIndex + 2].inputHandling == FilterDataHandling.CantFilter)
 						{
 							// If the protected transparency modes are not supported use the next most appropriate mode.
-							if (filterInfo[FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
+							if (filterInfo[(int)FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
 							{
 								this.filterCase = FilterCase.FloatingSelection;
 							}
@@ -1526,7 +1526,7 @@ namespace PSFilterHostDll.PSApi
 
 			if (pdata.FilterInfo != null)
 			{
-				FilterCaseInfo info = pdata.FilterInfo[this.filterCase - 1];
+				FilterCaseInfo info = pdata.FilterInfo[(int)this.filterCase - 1];
 				this.inputHandling = info.inputHandling;
 				this.outputHandling = info.outputHandling;
 
