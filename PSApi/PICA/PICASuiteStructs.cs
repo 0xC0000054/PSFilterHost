@@ -17,7 +17,7 @@
 
 using System;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
 	internal struct PSBufferSuite1
 	{

@@ -10,11 +10,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using PSFilterHostDll.PSApi.PICA;
 using System;
 using System.Collections.Generic;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     /// <summary>
     /// Provides access to the Action Descriptor, Action List and Action Reference PICA suites

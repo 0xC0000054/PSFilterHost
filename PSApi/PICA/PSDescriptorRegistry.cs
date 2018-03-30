@@ -10,30 +10,27 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-/* Adapted from PIErrorSuite.h
- * Copyright (c) 1997-1998, Adobe Systems Incorporated.
+/* Adapted from PIActions.h
+ * Copyright (c) 1992-1998, Adobe Systems Incorporated.
  * All rights reserved.
 */
 
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int ErrorSuiteSetErrorFromPString(IntPtr str);
-
+    internal delegate int DescriptorRegistryRegister(IntPtr key, IntPtr descriptor, [MarshalAs(UnmanagedType.U1)] bool isPersistent);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int ErrorSuiteSetErrorFromCString(IntPtr str);
-
+    internal delegate int DescriptorRegistryErase(IntPtr key);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int ErrorSuiteSetErrorFromZString(IntPtr str);
+    internal delegate int DescriptorRegistryGet(IntPtr key, ref IntPtr descriptor);
 
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct PSErrorSuite1
+    internal struct PSDescriptorRegistryProcs
     {
-        public IntPtr SetErrorFromPString;
-        public IntPtr SetErrorFromCString;
-        public IntPtr SetErrorFromZString;
+        public IntPtr Register;
+        public IntPtr Erase;
+        public IntPtr Get;
     }
 }

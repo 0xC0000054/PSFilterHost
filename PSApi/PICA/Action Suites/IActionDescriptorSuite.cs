@@ -12,7 +12,7 @@
 
 using System;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     internal interface IActionDescriptorSuite
     {

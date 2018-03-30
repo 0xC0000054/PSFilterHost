@@ -11,12 +11,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using PSFilterHostDll.Interop;
-using PSFilterHostDll.PSApi.PICA;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     internal sealed class ActionDescriptorSuite : IActionDescriptorSuite, IDisposable
     {

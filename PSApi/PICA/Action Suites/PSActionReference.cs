@@ -18,7 +18,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate int ActionReferenceMake(ref IntPtr reference);

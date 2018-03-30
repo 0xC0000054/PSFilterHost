@@ -10,11 +10,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using PSFilterHostDll.PSApi.PICA;
 using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.PSApi
+namespace PSFilterHostDll.PSApi.PICA
 {
     internal sealed class ErrorSuite
     {
