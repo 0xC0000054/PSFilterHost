@@ -377,4 +377,13 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSErrorSuite1.#SetErrorFromPString")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSErrorSuite1.#SetErrorFromCString")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSErrorSuite1.#SetErrorFromZString")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.ImageServicesProcs.#interpolate1DProc")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.ImageServicesProcs.#interpolate2DProc")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSUIHooksSuite1.#processEvent")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSUIHooksSuite1.#displayPixels")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSUIHooksSuite1.#progressBar")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSUIHooksSuite1.#testAbort")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSDescriptorRegistryProcs.#Register")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSDescriptorRegistryProcs.#Erase")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources", Scope = "member", Target = "PSFilterHostDll.PSApi.PICA.PSDescriptorRegistryProcs.#Get")]
 
