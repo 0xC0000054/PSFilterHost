@@ -56,6 +56,7 @@ namespace HostTest
 		private string monitorColorProfilePath;
 		private HostColorManagement hostColorProfiles;
 		private PluginSettingsRegistry sessionSettings;
+		private bool disabledIncompatableFilters;
 
 		private static readonly ReadOnlyCollection<string> ImageFileExtensions = WICHelpers.GetDecoderFileExtensions();
 		private static readonly ColorContext SrgbColorContext = ColorProfileHelper.GetSrgbColorContext();
@@ -938,7 +939,7 @@ namespace HostTest
 
 				this.panel1.ResumeLayout(true);
 
-				EnableFiltersForImageFormat();
+				this.disabledIncompatableFilters = false;
 
 				this.pointerSelectBtn.Enabled = true;
 				this.rectangleSelectBtn.Enabled = true;
@@ -1557,6 +1558,19 @@ namespace HostTest
 			{
 				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
 				DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
+			}
+			if (!this.disabledIncompatableFilters)
+			{
+				this.Cursor = Cursors.WaitCursor;
+				try
+				{
+					EnableFiltersForImageFormat();
+				}
+				finally
+				{
+					this.Cursor = Cursors.Default;
+				}
+				this.disabledIncompatableFilters = true;
 			}
 		}
 
