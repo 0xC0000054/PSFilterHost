@@ -394,7 +394,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeInteger, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Integer, data));
             }
             catch (OutOfMemoryException)
             {
@@ -408,7 +408,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeFloat, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Float, data));
             }
             catch (OutOfMemoryException)
             {
@@ -424,7 +424,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 UnitFloat item = new UnitFloat(unit, data);
 
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeUintFloat, item));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.UintFloat, item));
             }
             catch (OutOfMemoryException)
             {
@@ -447,7 +447,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 byte[] data = new byte[length];
                 Marshal.Copy(cstrValue, data, 0, length);
 
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeChar, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Char, data));
             }
             catch (OutOfMemoryException)
             {
@@ -461,7 +461,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeBoolean, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Boolean, data));
             }
             catch (OutOfMemoryException)
             {
@@ -478,7 +478,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 ActionListItemCollection items;
                 if (this.actionLists.TryGetValue(data, out items))
                 {
-                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeValueList, items.Clone()));
+                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.ValueList, items.Clone()));
                 }
                 else
                 {
@@ -507,7 +507,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 if (this.actionDescriptorSuite.TryGetDescriptorValues(descriptor, out descriptorValues))
                 {
                     ActionListDescriptor item = new ActionListDescriptor(type, descriptorValues);
-                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeObject, item));
+                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Object, item));
                 }
                 else
                 {
@@ -532,7 +532,7 @@ namespace PSFilterHostDll.PSApi.PICA
             try
             {
                 EnumeratedValue item = new EnumeratedValue(type, data);
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeEnumerated, item));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Enumerated, item));
             }
             catch (OutOfMemoryException)
             {
@@ -549,7 +549,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 ActionDescriptorReference value;
                 if (this.actionReferenceSuite.ConvertToActionDescriptor(reference, out value))
                 {
-                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeObjectReference, value));
+                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.ObjectReference, value));
                 }
                 else
                 {
@@ -568,7 +568,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeClass, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Class, data));
             }
             catch (OutOfMemoryException)
             {
@@ -582,7 +582,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeGlobalClass, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.GlobalClass, data));
             }
             catch (OutOfMemoryException)
             {
@@ -604,7 +604,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     byte[] data = new byte[size];
                     Marshal.Copy(hPtr, data, 0, size);
 
-                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeAlias, data));
+                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Alias, data));
                 }
                 finally
                 {
@@ -635,7 +635,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
                     for (uint i = 0; i < count; i++)
                     {
-                        items.Add(new ActionListItem(DescriptorTypes.typeInteger, *ptr));
+                        items.Add(new ActionListItem(DescriptorTypes.Integer, *ptr));
                         ptr++;
                     }
                 }
@@ -661,7 +661,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 Marshal.Copy(blob, data, 0, length);
 
-                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeRawData, data));
+                this.actionLists[list].Add(new ActionListItem(DescriptorTypes.RawData, data));
             }
             catch (OutOfMemoryException)
             {
@@ -678,7 +678,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 ActionDescriptorZString value;
                 if (zstringSuite.ConvertToActionDescriptor(zstring, out value))
                 {
-                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.typeChar, value));
+                    this.actionLists[list].Add(new ActionListItem(DescriptorTypes.Char, value));
                 }
                 else
                 {
@@ -968,7 +968,7 @@ namespace PSFilterHostDll.PSApi.PICA
                         ActionListItem item = items[i];
 
                         // The first through valueCount items in the list are required to be integers.
-                        if (item.Type != DescriptorTypes.typeInteger)
+                        if (item.Type != DescriptorTypes.Integer)
                         {
                             return PSError.kSPLogicError;
                         }
