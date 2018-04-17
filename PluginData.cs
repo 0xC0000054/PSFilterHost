@@ -11,6 +11,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 using PSFilterHostDll.PSApi;
 
@@ -24,6 +25,7 @@ namespace PSFilterHostDll
     /// Represents the information used to load and execute a Photoshop-compatible filter plug-in.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
+    [DebuggerTypeProxy(typeof(PluginDataDebugView))] 
     [Serializable]
     public sealed class PluginData : IEquatable<PluginData>
     {
@@ -381,6 +383,61 @@ namespace PSFilterHostDll
         public static bool operator !=(PluginData p1, PluginData p2)
         {
             return !(p1 == p2);
+        }
+
+        private sealed class PluginDataDebugView
+        {
+            private readonly PluginData pluginData;
+
+            public PluginDataDebugView(PluginData pluginData)
+            {
+                if (pluginData == null)
+                {
+                    throw new ArgumentNullException(nameof(pluginData));
+                }
+
+                this.pluginData = pluginData;
+            }
+
+            public string FileName
+            {
+                get
+                {
+                    return pluginData.FileName;
+                }
+            }
+
+            public string EntryPoint
+            {
+                get
+                {
+                    return pluginData.EntryPoint;
+                }
+            }
+
+            public string Category
+            {
+                get
+                {
+                    return pluginData.Category;
+                }
+            }
+
+            public string Title
+            {
+                get
+                {
+                    return pluginData.Title;
+                }
+            }
+
+            public bool HasAboutBox
+            {
+                get
+                {
+                    return pluginData.HasAboutBox;
+                }
+            }
         }
     }
 }
