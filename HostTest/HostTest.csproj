@@ -120,6 +120,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="BitmapFrameExtensions.cs" />
     <Compile Include="CanvasDirtyChangedEventArgs.cs" />
     <Compile Include="CanvasZoomChangedEventArgs.cs" />
     <Compile Include="ColorProfileHelper.cs" />

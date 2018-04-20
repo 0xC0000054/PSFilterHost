@@ -855,8 +855,31 @@ namespace HostTest
 				BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
 				BitmapFrame frame = BitmapFrame.Create(new Uri(path), createOptions, BitmapCacheOption.None);
 
-				srcImage = frame.Clone();
-				srcImage.Freeze();
+				PixelFormat actualFormat = frame.DetectDishonestAlphaFormat();
+
+				if (frame.Format != actualFormat)
+				{
+					// Convert the image to a non-alpha format if it does not have transparency.
+					FormatConvertedBitmap convertedBitmap = new FormatConvertedBitmap(frame, actualFormat, null, 0.0);
+
+					BitmapMetadata metaData = null;
+
+					try
+					{
+						metaData = frame.Metadata as BitmapMetadata;
+					}
+					catch (NotSupportedException)
+					{
+					}
+
+					srcImage = BitmapFrame.Create(convertedBitmap, null, metaData, null);
+					srcImage.Freeze();
+				}
+				else
+				{
+					srcImage = frame.Clone();
+					srcImage.Freeze();
+				}
 
 				if (frame.ColorContexts != null)
 				{
