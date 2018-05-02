@@ -132,7 +132,7 @@ namespace PSFilterHostDll
 		{
 			if (sourceImage == null)
 			{
-				throw new ArgumentNullException("sourceImage", "sourceImage is null.");
+				throw new ArgumentNullException("sourceImage");
 			}
 
 			int imageWidth = 0;

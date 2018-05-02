@@ -90,7 +90,7 @@ namespace PSFilterHostDll
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new ArgumentNullException("info", "info is null.");
+                throw new ArgumentNullException("info");
 
             info.AddValue("globalParameters", this.globalParameters, typeof(GlobalParameters));
             info.AddValue("scriptingData", this.scriptingData, typeof(Dictionary<uint, AETEValue>));

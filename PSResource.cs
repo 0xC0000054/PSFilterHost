@@ -206,7 +206,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info", "info is null.");
+				throw new ArgumentNullException("info");
 			}
 
 			this.key = info.GetUInt32("key");
@@ -228,7 +228,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info", "info is null.");
+				throw new ArgumentNullException("info");
 			}
 
 			info.AddValue("key", this.key);

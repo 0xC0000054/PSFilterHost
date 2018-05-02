@@ -174,7 +174,7 @@ namespace PSFilterHostDll
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new ArgumentNullException("info", "info is null.");
+                throw new ArgumentNullException("info");
 
             info.AddValue("parameterDataBytes", this.parameterDataBytes, typeof(byte[]));
             info.AddValue("parameterDataStorageMethod", this.parameterDataStorageMethod, typeof(DataStorageMethod));
