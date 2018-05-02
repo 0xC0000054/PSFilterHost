@@ -79,7 +79,7 @@ namespace PSFilterHostDll
 		{
 			if (resourceData == null)
 			{
-				throw new ArgumentNullException("resourceData");
+				throw new ArgumentNullException(nameof(resourceData));
 			}
 
 			this.key = resourceKey;
@@ -97,7 +97,7 @@ namespace PSFilterHostDll
 		{
 			if (existing == null)
 			{
-				throw new ArgumentNullException("existing");
+				throw new ArgumentNullException(nameof(existing));
 			}
 
 			this.key = existing.key;
@@ -206,7 +206,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info");
+				throw new ArgumentNullException(nameof(info));
 			}
 
 			this.key = info.GetUInt32("key");
@@ -228,7 +228,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info");
+				throw new ArgumentNullException(nameof(info));
 			}
 
 			info.AddValue("key", this.key);

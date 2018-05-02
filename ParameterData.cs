@@ -71,7 +71,7 @@ namespace PSFilterHostDll
         private ParameterData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
 
             this.globalParameters = (GlobalParameters)info.GetValue("globalParameters", typeof(GlobalParameters));
             this.scriptingData =  (Dictionary<uint, AETEValue>)info.GetValue("scriptingData", typeof(Dictionary<uint, AETEValue>));
@@ -90,7 +90,7 @@ namespace PSFilterHostDll
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
-                throw new ArgumentNullException("info");
+                throw new ArgumentNullException(nameof(info));
 
             info.AddValue("globalParameters", this.globalParameters, typeof(GlobalParameters));
             info.AddValue("scriptingData", this.scriptingData, typeof(Dictionary<uint, AETEValue>));

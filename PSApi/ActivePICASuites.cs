@@ -36,7 +36,7 @@ namespace PSFilterHostDll.PSApi
             {
                 if (name == null)
                 {
-                    throw new ArgumentNullException("name");
+                    throw new ArgumentNullException(nameof(name));
                 }
 
                 this.name = name;
@@ -229,7 +229,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActivePICASuites");
+                throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
             IntPtr suitePointer = Memory.Allocate(Marshal.SizeOf(typeof(TSuite)), false);
@@ -259,7 +259,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActivePICASuites");
+                throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
             return this.activeSuites.ContainsKey(key);
@@ -274,7 +274,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActivePICASuites");
+                throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
             PICASuite suite = this.activeSuites[key];
@@ -292,7 +292,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActivePICASuites");
+                throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
             PICASuite suite;

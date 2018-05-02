@@ -290,7 +290,7 @@ namespace PSFilterHostDll.BGRASurface
 		public void SetAlphaToOpaque(Rectangle[] scans)
 		{
 			if (scans == null)
-				throw new ArgumentNullException("scans");
+				throw new ArgumentNullException(nameof(scans));
 
 			for (int i = 0; i < scans.Length; i++)
 			{

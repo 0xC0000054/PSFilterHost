@@ -45,7 +45,7 @@ namespace PSFilterHostDll.BGRASurface
             {
                 if (disposed)
                 {
-                    throw new ObjectDisposedException("MemoryBlock");
+                    throw new ObjectDisposedException(nameof(MemoryBlock));
                 }
 
                 return length;
@@ -58,7 +58,7 @@ namespace PSFilterHostDll.BGRASurface
             {
                 if (disposed)
                 {
-                    throw new ObjectDisposedException("MemoryBlock");
+                    throw new ObjectDisposedException(nameof(MemoryBlock));
                 }
 
                 return new IntPtr(voidStar);
@@ -71,7 +71,7 @@ namespace PSFilterHostDll.BGRASurface
             {
                 if (disposed)
                 {
-                    throw new ObjectDisposedException("MemoryBlock");
+                    throw new ObjectDisposedException(nameof(MemoryBlock));
                 }
 
                 return voidStar;
@@ -86,7 +86,7 @@ namespace PSFilterHostDll.BGRASurface
         {
             if (bytes <= 0)
             {
-                throw new ArgumentOutOfRangeException("bytes", bytes, "Bytes must be greater than zero");
+                throw new ArgumentOutOfRangeException(nameof(bytes), bytes, "Bytes must be greater than zero");
             }
 
             this.length = bytes;

@@ -184,11 +184,11 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (actionReferenceSuite == null)
             {
-                throw new ArgumentNullException("actionReferenceSuite");
+                throw new ArgumentNullException(nameof(actionReferenceSuite));
             }
             if (zstringSuite == null)
             {
-                throw new ArgumentNullException("zstringSuite");
+                throw new ArgumentNullException(nameof(zstringSuite));
             }
 
             this.make = new ActionListMake(Make);
@@ -257,7 +257,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (descriptor == null)
             {
-                throw new ArgumentNullException("descriptor");
+                throw new ArgumentNullException(nameof(descriptor));
             }
 
             IntPtr list = GenerateDictionaryKey();

@@ -218,7 +218,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (disposed)
             {
-                throw new ObjectDisposedException("PICABufferSuite");
+                throw new ObjectDisposedException(nameof(PICABufferSuite));
             }
 
             PSBufferSuite1 suite = new PSBufferSuite1

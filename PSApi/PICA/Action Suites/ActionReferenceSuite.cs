@@ -213,7 +213,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (descriptor == null)
             {
-                throw new ArgumentNullException("descriptor");
+                throw new ArgumentNullException(nameof(descriptor));
             }
 
             IntPtr reference = GenerateDictionaryKey();

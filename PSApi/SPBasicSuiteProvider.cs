@@ -69,7 +69,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (picaSuiteData == null)
 			{
-				throw new ArgumentNullException("picaSuiteData");
+				throw new ArgumentNullException(nameof(picaSuiteData));
 			}
 
 			this.picaSuiteData = picaSuiteData;
@@ -211,7 +211,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (name == null)
 			{
-				throw new ArgumentNullException("name");
+				throw new ArgumentNullException(nameof(name));
 			}
 
 			this.pluginName = name;

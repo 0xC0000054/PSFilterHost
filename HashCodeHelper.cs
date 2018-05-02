@@ -27,7 +27,7 @@ namespace PSFilterHostDll
         {
             if (hashCodes == null)
             {
-                throw new ArgumentNullException("hashCodes");
+                throw new ArgumentNullException(nameof(hashCodes));
             }
 
             int hash = InitialPrime;

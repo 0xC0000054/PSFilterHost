@@ -40,7 +40,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (filterImageProvider == null)
             {
-                throw new ArgumentNullException("filterImageProvider");
+                throw new ArgumentNullException(nameof(filterImageProvider));
             }
 
             this.filterImageProvider = filterImageProvider;

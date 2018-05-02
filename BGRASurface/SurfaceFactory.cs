@@ -243,7 +243,7 @@ namespace PSFilterHostDll.BGRASurface
 				case ImageModes.RGB48:
 					return new SurfaceBGRA64(width, height, dpiX, dpiY);
 				default:
-					throw new InvalidEnumArgumentException("mode", (int)mode, typeof(ImageModes));
+					throw new InvalidEnumArgumentException(nameof(mode), (int)mode, typeof(ImageModes));
 			}
 		}
 	}

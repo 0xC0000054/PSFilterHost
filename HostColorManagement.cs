@@ -109,7 +109,7 @@ namespace PSFilterHostDll
 		{
 			if (documentProfile == null)
 			{
-				throw new ArgumentNullException("documentProfile");
+				throw new ArgumentNullException(nameof(documentProfile));
 			}
 
 			this.documentProfileBytes = (byte[])documentProfile.Clone();
@@ -120,7 +120,7 @@ namespace PSFilterHostDll
 		{
 			if (documentProfilePath == null)
 			{
-				throw new ArgumentNullException("documentProfilePath");
+				throw new ArgumentNullException(nameof(documentProfilePath));
 			}
 
 			this.documentProfileBytes = ReadProfileFromFile(documentProfilePath);
@@ -133,7 +133,7 @@ namespace PSFilterHostDll
 			// If the profile is not from the user the embedded sRGB profile will be used for a null or empty string.
 			if (monitorProfilePath == null && monitorProfileFromUser)
 			{
-				throw new ArgumentNullException("monitorProfilePath");
+				throw new ArgumentNullException(nameof(monitorProfilePath));
 			}
 
 			byte[] profileBytes = null;

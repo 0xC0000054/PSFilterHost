@@ -121,7 +121,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 if (ptr == IntPtr.Zero)
                 {
-                    throw new ArgumentNullException("ptr");
+                    throw new ArgumentNullException(nameof(ptr));
                 }
 
                 this.refCount = 1;
@@ -138,7 +138,7 @@ namespace PSFilterHostDll.PSApi.PICA
                         this.data = PtrToStringPascal(ptr, length);
                         break;
                     default:
-                        throw new InvalidEnumArgumentException("format", (int)format, typeof(ZStringFormat));
+                        throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(ZStringFormat));
                 }
             }
 
@@ -313,7 +313,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (value == null)
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
 
             IntPtr newZString;

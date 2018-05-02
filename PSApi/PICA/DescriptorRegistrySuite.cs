@@ -35,7 +35,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (actionDescriptorSuite == null)
             {
-                throw new ArgumentNullException("actionDescriptorSuite");
+                throw new ArgumentNullException(nameof(actionDescriptorSuite));
             }
 
             this.actionDescriptorSuite = actionDescriptorSuite;
@@ -88,7 +88,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (settings == null)
             {
-                throw new ArgumentNullException("settings");
+                throw new ArgumentNullException(nameof(settings));
             }
 
             ReadOnlyDictionary<string, PluginSettingsRegistryItem> persistedValues = settings.PersistedValues;

@@ -44,7 +44,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (source == null)
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
 
             this.getPropertyProc = new GetPropertyProc(PropertyGetProc);
@@ -139,7 +139,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("PropertySuite");
+                throw new ObjectDisposedException(nameof(PropertySuite));
             }
 
             IntPtr propertyProcsPtr = Memory.Allocate(Marshal.SizeOf(typeof(PropertyProcs)), true);

@@ -81,7 +81,7 @@ namespace PSFilterHostDll.PSApi
             {
                 if (data == IntPtr.Zero)
                 {
-                    throw new ArgumentNullException("data");
+                    throw new ArgumentNullException(nameof(data));
                 }
 
                 byte* ptr = (byte*)data.ToPointer();
@@ -115,7 +115,7 @@ namespace PSFilterHostDll.PSApi
             {
                 if (buffer == null)
                 {
-                    throw new ArgumentNullException("buffer");
+                    throw new ArgumentNullException(nameof(buffer));
                 }
 
                 if (buffer.Length < SizeOf)

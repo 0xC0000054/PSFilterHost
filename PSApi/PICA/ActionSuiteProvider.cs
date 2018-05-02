@@ -94,7 +94,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("ActionSuiteProvider");
+                    throw new ObjectDisposedException(nameof(ActionSuiteProvider));
                 }
                 if (this.actionDescriptorSuite == null)
                 {
@@ -120,7 +120,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("ActionSuiteProvider");
+                    throw new ObjectDisposedException(nameof(ActionSuiteProvider));
                 }
                 if (this.actionListSuite == null)
                 {
@@ -146,7 +146,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 if (this.disposed)
                 {
-                    throw new ObjectDisposedException("ActionSuiteProvider");
+                    throw new ObjectDisposedException(nameof(ActionSuiteProvider));
                 }
                 if (this.actionReferenceSuite == null)
                 {
@@ -170,11 +170,11 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (zstringSuite == null)
             {
-                throw new ArgumentNullException("zstringSuite");
+                throw new ArgumentNullException(nameof(zstringSuite));
             }
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActionSuiteProvider");
+                throw new ObjectDisposedException(nameof(ActionSuiteProvider));
             }
 
             if (!DescriptorSuiteCreated)
@@ -206,11 +206,11 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (zstringSuite == null)
             {
-                throw new ArgumentNullException("zstringSuite");
+                throw new ArgumentNullException(nameof(zstringSuite));
             }
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActionSuiteProvider");
+                throw new ObjectDisposedException(nameof(ActionSuiteProvider));
             }
 
             if (!ListSuiteCreated)
@@ -232,7 +232,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException("ActionSuiteProvider");
+                throw new ObjectDisposedException(nameof(ActionSuiteProvider));
             }
 
             if (!ReferenceSuiteCreated)

@@ -77,7 +77,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (disposed)
             {
-                throw new ObjectDisposedException("PluginModule");
+                throw new ObjectDisposedException(nameof(PluginModule));
             }
 
             IntPtr address = UnsafeNativeMethods.GetProcAddress(handle, entryPointName);

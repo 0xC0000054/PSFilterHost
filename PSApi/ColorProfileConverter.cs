@@ -51,7 +51,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (colorProfiles == null)
             {
-                throw new ArgumentNullException("colorProfiles");
+                throw new ArgumentNullException(nameof(colorProfiles));
             }
 
             int result = OpenColorProfile(colorProfiles.GetDocumentProfileReadOnly(), out this.documentProfile);
@@ -96,7 +96,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (profileBytes == null)
             {
-                throw new ArgumentNullException("profileBytes");
+                throw new ArgumentNullException(nameof(profileBytes));
             }
 
             handle = null;
@@ -150,11 +150,11 @@ namespace PSFilterHostDll.PSApi
         {
             if (input == null)
             {
-                throw new ArgumentNullException("input");
+                throw new ArgumentNullException(nameof(input));
             }
             if (output == null)
             {
-                throw new ArgumentNullException("output");
+                throw new ArgumentNullException(nameof(output));
             }
 #if DEBUG
             System.Diagnostics.Debug.Assert(!input.IsInvalid, "Input handle is invalid.");
@@ -290,7 +290,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (destSurface == null)
             {
-                throw new ArgumentNullException("destSurface");
+                throw new ArgumentNullException(nameof(destSurface));
             }
 
             if (this.transform == null)
@@ -328,11 +328,11 @@ namespace PSFilterHostDll.PSApi
         {
             if (sourceSurface == null)
             {
-                throw new ArgumentNullException("sourceSurface");
+                throw new ArgumentNullException(nameof(sourceSurface));
             }
             if (destinationSurface == null)
             {
-                throw new ArgumentNullException("destinationSurface");
+                throw new ArgumentNullException(nameof(destinationSurface));
             }
 
             if (this.transform == null)

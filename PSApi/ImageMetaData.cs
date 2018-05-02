@@ -48,7 +48,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (image == null)
 			{
-				throw new ArgumentNullException("image");
+				throw new ArgumentNullException(nameof(image));
 			}
 
 #if GDIPLUS
@@ -74,7 +74,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (this.disposed)
 			{
-				throw new ObjectDisposedException("ImageMetaData");
+				throw new ObjectDisposedException(nameof(ImageMetaData));
 			}
 
 			bytes = null;

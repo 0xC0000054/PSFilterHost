@@ -52,7 +52,7 @@ namespace PSFilterHostDll.PSApi
 						this.maxChannelValue = 255;
 						break;
 					default:
-						throw new InvalidEnumArgumentException("bitsPerChannel", (int)bitsPerChannel, typeof(BitsPerChannel));
+						throw new InvalidEnumArgumentException(nameof(bitsPerChannel), (int)bitsPerChannel, typeof(BitsPerChannel));
 				}
 			}
 		}
@@ -211,7 +211,7 @@ namespace PSFilterHostDll.PSApi
 						colorComponents[3] = (short)Math.Round(result.component3 * 255.0).Clamp(0, 255);
 						break;
 					default:
-						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+						throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 				}
 			}
 
@@ -345,7 +345,7 @@ namespace PSFilterHostDll.PSApi
 						c3 = (byte)Math.Round(result.component3 * 255.0).Clamp(0, 255);
 						break;
 					default:
-						throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+						throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 				}
 			}
 
@@ -386,7 +386,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(xyz.X, xyz.Y, xyz.Z);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -427,7 +427,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(ColorConverter.CMYKtoRGB(c, m, y, k).GetIntensity(source.maxChannelValue));
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -467,7 +467,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(ColorConverter.HSBtoRGB(h, s, b).GetIntensity(source.maxChannelValue));
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -506,7 +506,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(ColorConverter.HSLtoRGB(h, s, l).GetIntensity(source.maxChannelValue));
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -547,7 +547,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(ColorConverter.LabtoRGB(l, a, b).GetIntensity(source.maxChannelValue));
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -587,7 +587,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(ColorConverter.XYZtoRGB(x, y, z).GetIntensity(source.maxChannelValue));
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;
@@ -625,7 +625,7 @@ namespace PSFilterHostDll.PSApi
 					color = new ColorResult(xyz.X, xyz.Y, xyz.Z);
 					break;
 				default:
-					throw new InvalidEnumArgumentException("resultSpace", (int)resultSpace, typeof(ColorSpace));
+					throw new InvalidEnumArgumentException(nameof(resultSpace), (int)resultSpace, typeof(ColorSpace));
 			}
 
 			return color;

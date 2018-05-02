@@ -132,7 +132,7 @@ namespace PSFilterHostDll
 		{
 			if (sourceImage == null)
 			{
-				throw new ArgumentNullException("sourceImage");
+				throw new ArgumentNullException(nameof(sourceImage));
 			}
 
 			int imageWidth = 0;
@@ -222,7 +222,7 @@ namespace PSFilterHostDll
 			{
 				if (disposed)
 				{
-					throw new ObjectDisposedException("PSFilterHost");
+					throw new ObjectDisposedException(nameof(PSFilterHost));
 				}
 
 				return this.dest;
@@ -311,7 +311,7 @@ namespace PSFilterHostDll
 		{
 			if (abortCallback == null)
 			{
-				throw new ArgumentNullException("abortCallback");
+				throw new ArgumentNullException(nameof(abortCallback));
 			}
 
 			this.abortFunc = abortCallback;
@@ -326,7 +326,7 @@ namespace PSFilterHostDll
 		{
 			if (pickerCallback == null)
 			{
-				throw new ArgumentNullException("pickerCallback");
+				throw new ArgumentNullException(nameof(pickerCallback));
 			}
 
 			this.pickColor = pickerCallback;
@@ -341,7 +341,7 @@ namespace PSFilterHostDll
 		{
 			if (colorProfiles == null)
 			{
-				throw new ArgumentNullException("colorProfiles");
+				throw new ArgumentNullException(nameof(colorProfiles));
 			}
 
 			this.hostColorProfiles = colorProfiles;
@@ -384,7 +384,7 @@ namespace PSFilterHostDll
 		{
 			if (path == null)
 			{
-				throw new ArgumentNullException("path");
+				throw new ArgumentNullException(nameof(path));
 			}
 
 			var filters = EnumerateFilters(path, searchSubdirectories);
@@ -472,12 +472,12 @@ namespace PSFilterHostDll
 		{
 			if (path == null)
 			{
-				throw new ArgumentNullException("path");
+				throw new ArgumentNullException(nameof(path));
 			}
 
 			if (searchOption < SearchOption.TopDirectoryOnly || searchOption > SearchOption.AllDirectories)
 			{
-				throw new ArgumentOutOfRangeException("searchOption");
+				throw new ArgumentOutOfRangeException(nameof(searchOption));
 			}
 
 			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchOption, true))
@@ -568,12 +568,12 @@ namespace PSFilterHostDll
 		{
 			if (pluginData == null)
 			{
-				throw new ArgumentNullException("pluginData");
+				throw new ArgumentNullException(nameof(pluginData));
 			}
 
 			if (disposed)
 			{
-				throw new ObjectDisposedException("PSFilterHost");
+				throw new ObjectDisposedException(nameof(PSFilterHost));
 			}
 
 			if (!showUI && filterParameters == null)
@@ -698,7 +698,7 @@ namespace PSFilterHostDll
 		{
 			if (pluginData == null)
 			{
-				throw new ArgumentNullException("pluginData");
+				throw new ArgumentNullException(nameof(pluginData));
 			}
 
 			if (pluginData.HasAboutBox)

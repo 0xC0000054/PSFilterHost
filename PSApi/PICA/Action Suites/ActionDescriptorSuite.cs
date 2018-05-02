@@ -180,15 +180,15 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (actionListSuite == null)
             {
-                throw new ArgumentNullException("actionListSuite");
+                throw new ArgumentNullException(nameof(actionListSuite));
             }
             if (actionReferenceSuite == null)
             {
-                throw new ArgumentNullException("actionReferenceSuite");
+                throw new ArgumentNullException(nameof(actionReferenceSuite));
             }
             if (zstringSuite == null)
             {
-                throw new ArgumentNullException("zstringSuite");
+                throw new ArgumentNullException(nameof(zstringSuite));
             }
 
             this.make = new ActionDescriptorMake(Make);
@@ -382,11 +382,11 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (descriptorHandle == IntPtr.Zero)
             {
-                throw new ArgumentNullException("descriptorHandle");
+                throw new ArgumentNullException(nameof(descriptorHandle));
             }
             if (scriptingData == null)
             {
-                throw new ArgumentNullException("scriptingData");
+                throw new ArgumentNullException(nameof(scriptingData));
             }
 
             this.descriptorHandles.Add(descriptorHandle, new ScriptingParameters(scriptingData));

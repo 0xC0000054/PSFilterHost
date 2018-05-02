@@ -164,7 +164,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (value == null)
 			{
-				throw new ArgumentNullException("value");
+				throw new ArgumentNullException(nameof(value));
 			}
 
 			progressFunc = value;
@@ -179,7 +179,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (value == null)
 			{
-				throw new ArgumentNullException("value");
+				throw new ArgumentNullException(nameof(value));
 			}
 
 			abortFunc = value;
@@ -194,7 +194,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (value == null)
 			{
-				throw new ArgumentNullException("value");
+				throw new ArgumentNullException(nameof(value));
 			}
 
 			ColorPickerManager.SetPickColorCallback(value);
@@ -209,7 +209,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (colorProfiles == null)
 			{
-				throw new ArgumentNullException("colorProfiles");
+				throw new ArgumentNullException(nameof(colorProfiles));
 			}
 
 			this.colorProfileConverter.Initialize(colorProfiles);
@@ -330,7 +330,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (sourceImage == null)
 			{
-				throw new ArgumentNullException("sourceImage");
+				throw new ArgumentNullException(nameof(sourceImage));
 			}
 
 			this.dataPtr = IntPtr.Zero;

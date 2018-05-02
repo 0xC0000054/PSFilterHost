@@ -112,7 +112,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info");
+				throw new ArgumentNullException(nameof(info));
 			}
 
 			this.unit = info.GetUInt32("unit");
@@ -123,7 +123,7 @@ namespace PSFilterHostDll
 		{
 			if (info == null)
 			{
-				throw new ArgumentNullException("info");
+				throw new ArgumentNullException(nameof(info));
 			}
 
 			info.AddValue("unit", this.unit);

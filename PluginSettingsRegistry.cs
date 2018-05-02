@@ -41,7 +41,7 @@ namespace PSFilterHostDll
         {
             if (values == null)
             {
-                throw new ArgumentNullException("values");
+                throw new ArgumentNullException(nameof(values));
             }
 
             Dictionary<string, PluginSettingsRegistryItem> persistentItems = new Dictionary<string, PluginSettingsRegistryItem>(StringComparer.Ordinal);
