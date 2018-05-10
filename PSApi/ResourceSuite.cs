@@ -138,9 +138,9 @@ namespace PSFilterHostDll.PSApi
 					});
 
 					if (next < 0)
-                    {
-                        break;
-                    }
+					{
+						break;
+					}
 
 					PSResource existing = pseudoResources[next];
 					int newIndex = i - 1;
