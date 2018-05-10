@@ -159,7 +159,9 @@ namespace PSFilterHostDll
         private GlobalParameters(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
+            {
                 throw new ArgumentNullException(nameof(info));
+            }
 
             this.parameterDataBytes = (byte[])info.GetValue("parameterDataBytes", typeof(byte[]));
             this.parameterDataStorageMethod = (DataStorageMethod)info.GetValue("parameterDataStorageMethod", typeof(DataStorageMethod));
@@ -174,7 +176,9 @@ namespace PSFilterHostDll
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             if (info == null)
+            {
                 throw new ArgumentNullException(nameof(info));
+            }
 
             info.AddValue("parameterDataBytes", this.parameterDataBytes, typeof(byte[]));
             info.AddValue("parameterDataStorageMethod", this.parameterDataStorageMethod, typeof(DataStorageMethod));

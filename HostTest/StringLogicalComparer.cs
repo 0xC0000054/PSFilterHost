@@ -33,12 +33,25 @@ namespace HostTest
 
         public int Compare(object x, object y)
         {
-            if (null == x && null == y) return 0;
-            if (null == x) return -1;
-            if (null == y) return 1;
+            if (null == x && null == y)
+            {
+                return 0;
+            }
+
+            if (null == x)
+            {
+                return -1;
+            }
+
+            if (null == y)
+            {
+                return 1;
+            }
 
             if (x is string && y is string)
+            {
                 return Compare((string)x, (string)y);
+            }
 
             return Comparer.Default.Compare(x, y);
         }
@@ -47,7 +60,11 @@ namespace HostTest
         {
             if (null == s1 || 0 == s1.Length)
             {
-                if (null == s2 || 0 == s2.Length) return 0;
+                if (null == s2 || 0 == s2.Length)
+                {
+                    return 0;
+                }
+
                 return -1;
             }
             else if (null == s2 || 0 == s2.Length)
@@ -61,8 +78,15 @@ namespace HostTest
             bool sp1 = char.IsLetterOrDigit(s1[0]);
             bool sp2 = char.IsLetterOrDigit(s2[0]);
 
-            if (sp1 && !sp2) return 1;
-            if (!sp1 && sp2) return -1;
+            if (sp1 && !sp2)
+            {
+                return 1;
+            }
+
+            if (!sp1 && sp2)
+            {
+                return -1;
+            }
 
             char c1, c2;
             int i1 = 0, i2 = 0;
@@ -90,12 +114,18 @@ namespace HostTest
                             c2 = char.ToUpper(c2);
 
                             r = c1 - c2;
-                            if (0 != r) return r;
+                            if (0 != r)
+                            {
+                                return r;
+                            }
                         }
                         else if (!letter1 && !letter2)
                         {
                             r = c1 - c2;
-                            if (0 != r) return r;
+                            if (0 != r)
+                            {
+                                return r;
+                            }
                         }
                         else if (letter1)
                         {
@@ -111,7 +141,10 @@ namespace HostTest
                 else if (sp1 && sp2)
                 {
                     r = CompareNumbers(s1, s1Length, ref i1, s2, s2Length, ref i2);
-                    if (0 != r) return r;
+                    if (0 != r)
+                    {
+                        return r;
+                    }
                 }
                 else if (sp1)
                 {
@@ -127,7 +160,11 @@ namespace HostTest
 
                 if (i1 >= s1Length)
                 {
-                    if (i2 >= s2Length) return 0;
+                    if (i2 >= s2Length)
+                    {
+                        return 0;
+                    }
+
                     return -1;
                 }
                 else if (i2 >= s2Length)
@@ -161,16 +198,26 @@ namespace HostTest
                 for (int j1 = nzStart1, j2 = nzStart2; j1 <= i1; j1++, j2++)
                 {
                     r = s1[j1] - s2[j2];
-                    if (0 != r) return r;
+                    if (0 != r)
+                    {
+                        return r;
+                    }
                 }
 
                 length1 = end1 - start1;
                 length2 = end2 - start2;
 
-                if (length1 == length2) return 0;
+                if (length1 == length2)
+                {
+                    return 0;
+                }
             }
 
-            if (length1 > length2) return -1;
+            if (length1 > length2)
+            {
+                return -1;
+            }
+
             return 1;
         }
 
@@ -197,10 +244,16 @@ namespace HostTest
                 }
 
                 end++;
-                if (end >= length) break;
+                if (end >= length)
+                {
+                    break;
+                }
 
                 c = s[end];
-                if (!char.IsDigit(c)) break;
+                if (!char.IsDigit(c))
+                {
+                    break;
+                }
             }
         }
     }

@@ -137,7 +137,10 @@ namespace PSFilterHostDll.PSApi
 						return r.Equals(ofType, i);
 					});
 
-					if (next < 0) break;
+					if (next < 0)
+                    {
+                        break;
+                    }
 
 					PSResource existing = this.pseudoResources[next];
 					int newIndex = i - 1;
