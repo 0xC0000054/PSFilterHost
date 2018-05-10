@@ -44,22 +44,22 @@ namespace HostTest.Tools
 
         public SelectionBase()
         {
-            this.tracking = false;
-            this.selectPoints = null;
-            this.disposed = false;
+            tracking = false;
+            selectPoints = null;
+            disposed = false;
         }
 
         internal void MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
-                this.tracking = true;
+                tracking = true;
 
-                this.selectPoints = new List<Point>
+                selectPoints = new List<Point>
                 {
                     new Point(e.X, e.Y)
                 };
-                this.OnCursorChanged(Cursors.Cross);
+                OnCursorChanged(Cursors.Cross);
             }
         }
 
@@ -73,14 +73,14 @@ namespace HostTest.Tools
                 {
                     selectPoints.Add(newPoint);
                 }
-                this.RenderSelection();
+                RenderSelection();
             }
         }
         internal void MouseUp(object sender, MouseEventArgs e)
         {
-            this.tracking = false;
-            this.OnCursorChanged(Cursors.Default);
-            this.RenderSelection();
+            tracking = false;
+            OnCursorChanged(Cursors.Default);
+            RenderSelection();
         }
 
         internal void KeyDown(object sender, KeyEventArgs e)
@@ -92,8 +92,8 @@ namespace HostTest.Tools
                 // Clear the selection if Escape or Ctrl + D is pressed.
                 if (selectPoints != null)
                 {
-                    this.selectPoints.Clear();
-                    this.RenderSelection();
+                    selectPoints.Clear();
+                    RenderSelection();
                 }
             }
         }
@@ -144,8 +144,8 @@ namespace HostTest.Tools
         {
             if (selectPoints != null)
             {
-                List<Point> trimPoints = this.TrimShapePath(this.selectPoints);
-                List<PointF> shapePoints = this.CreateShape(trimPoints);
+                List<Point> trimPoints = TrimShapePath(selectPoints);
+                List<PointF> shapePoints = CreateShape(trimPoints);
 
                 EventHandler<SelectionPathChangedEventArgs> handler = SelectedPathChanged;
                 if (handler != null)
@@ -178,16 +178,16 @@ namespace HostTest.Tools
 
         protected void OnCursorChanged(Cursor cursor)
         {
-            if (this.CursorChanged != null)
+            if (CursorChanged != null)
             {
-                this.CursorChanged(this, new CursorChangedEventArgs(cursor));
+                CursorChanged(this, new CursorChangedEventArgs(cursor));
             }
         }
 
         private bool disposed;
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
         public void Dispose(bool disposing)
@@ -198,10 +198,10 @@ namespace HostTest.Tools
                 {
                     if (selectPoints != null)
                     {
-                        this.selectPoints.Clear();
+                        selectPoints.Clear();
                     }
 
-                    this.disposed = true;
+                    disposed = true;
                 }
             }
 

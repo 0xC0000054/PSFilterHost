@@ -25,7 +25,7 @@ namespace HostTest
 
         protected override bool ReleaseHandle()
         {
-            return SafeNativeMethods.DeleteDC(this.handle);
+            return SafeNativeMethods.DeleteDC(handle);
         }
     }
 }

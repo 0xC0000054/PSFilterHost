@@ -33,7 +33,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             get
             {
-                return this.errorMessage;
+                return errorMessage;
             }
         }
 
@@ -47,7 +47,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             get
             {
-                return this.errorMessage != null;
+                return errorMessage != null;
             }
         }
 
@@ -63,11 +63,11 @@ namespace PSFilterHostDll.PSApi.PICA
                 throw new ArgumentNullException(nameof(zstringSuite));
             }
 
-            this.setErrorFromPString = new ErrorSuiteSetErrorFromPString(SetErrorFromPString);
-            this.setErrorFromCString = new ErrorSuiteSetErrorFromCString(SetErrorFromCString);
-            this.setErrorFromZString = new ErrorSuiteSetErrorFromZString(SetErrorFromZString);
+            setErrorFromPString = new ErrorSuiteSetErrorFromPString(SetErrorFromPString);
+            setErrorFromCString = new ErrorSuiteSetErrorFromCString(SetErrorFromCString);
+            setErrorFromZString = new ErrorSuiteSetErrorFromZString(SetErrorFromZString);
             this.zstringSuite = zstringSuite;
-            this.errorMessage = null;
+            errorMessage = null;
         }
 
         /// <summary>
@@ -78,9 +78,9 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             PSErrorSuite1 suite = new PSErrorSuite1
             {
-                SetErrorFromPString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromPString),
-                SetErrorFromCString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromCString),
-                SetErrorFromZString = Marshal.GetFunctionPointerForDelegate(this.setErrorFromZString)
+                SetErrorFromPString = Marshal.GetFunctionPointerForDelegate(setErrorFromPString),
+                SetErrorFromCString = Marshal.GetFunctionPointerForDelegate(setErrorFromCString),
+                SetErrorFromZString = Marshal.GetFunctionPointerForDelegate(setErrorFromZString)
             };
 
             return suite;
@@ -90,7 +90,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (str != IntPtr.Zero)
             {
-                this.errorMessage = StringUtil.FromPascalString((byte*)str.ToPointer());
+                errorMessage = StringUtil.FromPascalString((byte*)str.ToPointer());
 
                 return PSError.kSPNoError;
             }
@@ -102,7 +102,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (str != IntPtr.Zero)
             {
-                this.errorMessage = Marshal.PtrToStringAnsi(str);
+                errorMessage = Marshal.PtrToStringAnsi(str);
 
                 return PSError.kSPNoError;
             }
@@ -115,7 +115,7 @@ namespace PSFilterHostDll.PSApi.PICA
             string value;
             if (zstringSuite.ConvertToString(str, out value))
             {
-                this.errorMessage = value;
+                errorMessage = value;
 
                 return PSError.kSPNoError;
             }

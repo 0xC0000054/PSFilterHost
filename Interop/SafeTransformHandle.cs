@@ -22,7 +22,7 @@ namespace PSFilterHostDll.Interop
 
         protected override bool ReleaseHandle()
         {
-            return UnsafeNativeMethods.Mscms.DeleteColorTransform(this.handle);
+            return UnsafeNativeMethods.Mscms.DeleteColorTransform(handle);
         }
     }
 }

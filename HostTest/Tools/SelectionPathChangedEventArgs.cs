@@ -22,14 +22,14 @@ namespace HostTest.Tools
 
         public SelectionPathChangedEventArgs(GraphicsPath path)
         {
-            this.disposed = false;
+            disposed = false;
             if (path != null)
             {
-                this.selectedPath = (GraphicsPath)path.Clone();
+                selectedPath = (GraphicsPath)path.Clone();
             }
             else
             {
-                this.selectedPath = null;
+                selectedPath = null;
             }
         }
 
@@ -37,7 +37,7 @@ namespace HostTest.Tools
         {
             get
             {
-                return this.selectedPath;
+                return selectedPath;
             }
         }
 
@@ -49,16 +49,16 @@ namespace HostTest.Tools
 
         private void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
-                this.disposed = true;
+                disposed = true;
 
                 if (disposing)
                 {
-                    if (this.selectedPath != null)
+                    if (selectedPath != null)
                     {
-                        this.selectedPath.Dispose();
-                        this.selectedPath = null;
+                        selectedPath.Dispose();
+                        selectedPath = null;
                     }
                 }
             }

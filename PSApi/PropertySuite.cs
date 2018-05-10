@@ -47,21 +47,21 @@ namespace PSFilterHostDll.PSApi
                 throw new ArgumentNullException(nameof(source));
             }
 
-            this.getPropertyProc = new GetPropertyProc(PropertyGetProc);
-            this.setPropertyProc = new SetPropertyProc(PropertySetProc);
+            getPropertyProc = new GetPropertyProc(PropertyGetProc);
+            setPropertyProc = new SetPropertyProc(PropertySetProc);
             this.imageMode = imageMode;
 #if GDIPLUS
-            this.documentWidth = source.Width;
-            this.documentHeight = source.Height;
+            documentWidth = source.Width;
+            documentHeight = source.Height;
 #else
-            this.documentWidth = source.PixelWidth;
-            this.documentHeight = source.PixelHeight;
+            documentWidth = source.PixelWidth;
+            documentHeight = source.PixelHeight;
 #endif
-            this.imageMetaData = new ImageMetaData(source);
-            this.hostInfo = new HostInformation();
-            this.numberOfChannels = 0;
-            this.hostSerial = "0";
-            this.disposed = false;
+            imageMetaData = new ImageMetaData(source);
+            hostInfo = new HostInformation();
+            numberOfChannels = 0;
+            hostSerial = "0";
+            disposed = false;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace PSFilterHostDll.PSApi
         {
             get
             {
-                return Marshal.GetFunctionPointerForDelegate(this.getPropertyProc);
+                return Marshal.GetFunctionPointerForDelegate(getPropertyProc);
             }
         }
 
@@ -89,7 +89,7 @@ namespace PSFilterHostDll.PSApi
         {
             get
             {
-                return this.hostInfo;
+                return hostInfo;
             }
             set
             {
@@ -98,7 +98,7 @@ namespace PSFilterHostDll.PSApi
                     throw new ArgumentNullException("value");
                 }
 
-                this.hostInfo = value;
+                hostInfo = value;
             }
         }
 
@@ -118,7 +118,7 @@ namespace PSFilterHostDll.PSApi
                     throw new ArgumentOutOfRangeException("value", value, "The value must be at least one.");
                 }
 
-                this.numberOfChannels = value;
+                numberOfChannels = value;
             }
         }
 
@@ -137,7 +137,7 @@ namespace PSFilterHostDll.PSApi
 
         public unsafe IntPtr CreatePropertySuitePointer()
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(PropertySuite));
             }
@@ -155,9 +155,9 @@ namespace PSFilterHostDll.PSApi
 
         public void Dispose()
         {
-            if (!this.disposed)
+            if (!disposed)
             {
-                this.disposed = true;
+                disposed = true;
 
                 if (imageMetaData != null)
                 {

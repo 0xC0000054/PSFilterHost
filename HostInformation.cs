@@ -180,13 +180,13 @@ namespace PSFilterHostDll
         /// </summary>
         public HostInformation()
         {
-            this.title = null;
-            this.caption = null;
-            this.url = null;
-            this.copyRight = false;
-            this.waterMark = false;
-            this.rulerUnit = HostRulerUnit.Pixels;
-            this.highDpi = false;
+            title = null;
+            caption = null;
+            url = null;
+            copyRight = false;
+            waterMark = false;
+            rulerUnit = HostRulerUnit.Pixels;
+            highDpi = false;
         }
     }
 }

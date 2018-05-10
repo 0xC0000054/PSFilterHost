@@ -169,15 +169,15 @@ namespace PSFilterHostDll
 			}
 
 #if GDIPLUS
-			this.source = (Bitmap)sourceImage.Clone();
+			source = (Bitmap)sourceImage.Clone();
 #else
-			this.source = sourceImage.Clone();
+			source = sourceImage.Clone();
 #endif
-			this.disposed = false;
-			this.dest = null;
-			this.filterParameters = null;
-			this.primaryColor = primary;
-			this.secondaryColor = secondary;
+			disposed = false;
+			dest = null;
+			filterParameters = null;
+			primaryColor = primary;
+			secondaryColor = secondary;
 			if (selectedRegion != null)
 			{
 				this.selectedRegion = selectedRegion.Clone();
@@ -186,12 +186,12 @@ namespace PSFilterHostDll
 			{
 				this.selectedRegion = null;
 			}
-			this.owner = parentWindowHandle;
-			this.pseudoResources = null;
-			this.abortFunc = null;
-			this.hostInfo = null;
-			this.hostColorProfiles = null;
-			this.sessionSettings = null;
+			owner = parentWindowHandle;
+			pseudoResources = null;
+			abortFunc = null;
+			hostInfo = null;
+			hostColorProfiles = null;
+			sessionSettings = null;
 		}
 
 #if GDIPLUS
@@ -208,7 +208,7 @@ namespace PSFilterHostDll
 					throw new ObjectDisposedException("PSFilterHost");
 				}
 
-				return this.dest;
+				return dest;
 			}
 		}
 #else
@@ -225,7 +225,7 @@ namespace PSFilterHostDll
 					throw new ObjectDisposedException(nameof(PSFilterHost));
 				}
 
-				return this.dest;
+				return dest;
 			}
 		}
 #endif
@@ -240,11 +240,11 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.filterParameters;
+				return filterParameters;
 			}
 			set
 			{
-				this.filterParameters = value;
+				filterParameters = value;
 			}
 		}
 
@@ -258,11 +258,11 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.hostInfo;
+				return hostInfo;
 			}
 			set
 			{
-				this.hostInfo = value;
+				hostInfo = value;
 			}
 		}
 
@@ -276,11 +276,11 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.pseudoResources;
+				return pseudoResources;
 			}
 			set
 			{
-				this.pseudoResources = value;
+				pseudoResources = value;
 			}
 		}
 
@@ -294,11 +294,11 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.sessionSettings;
+				return sessionSettings;
 			}
 			set
 			{
-				this.sessionSettings = value;
+				sessionSettings = value;
 			}
 		}
 
@@ -314,7 +314,7 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(abortCallback));
 			}
 
-			this.abortFunc = abortCallback;
+			abortFunc = abortCallback;
 		}
 
 		/// <summary>
@@ -329,7 +329,7 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(pickerCallback));
 			}
 
-			this.pickColor = pickerCallback;
+			pickColor = pickerCallback;
 		}
 
 		/// <summary>
@@ -344,7 +344,7 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(colorProfiles));
 			}
 
-			this.hostColorProfiles = colorProfiles;
+			hostColorProfiles = colorProfiles;
 		}
 
 #if NET_40_OR_GREATER
@@ -651,16 +651,16 @@ namespace PSFilterHostDll
 				if (result)
 				{
 #if GDIPLUS
-					this.dest = lps.Dest.ToGdipBitmap();
+					dest = lps.Dest.ToGdipBitmap();
 #else
-					this.dest = lps.Dest.ToBitmapSource();
-					this.dest.Freeze();
+					dest = lps.Dest.ToBitmapSource();
+					dest.Freeze();
 #endif
 
-					this.filterParameters = lps.ParameterData;
-					this.pseudoResources = lps.PseudoResources;
-					this.hostInfo = lps.HostInformation;
-					this.sessionSettings = lps.GetPluginSettings();
+					filterParameters = lps.ParameterData;
+					pseudoResources = lps.PseudoResources;
+					hostInfo = lps.HostInformation;
+					sessionSettings = lps.GetPluginSettings();
 				}
 				else if (!string.IsNullOrEmpty(lps.ErrorMessage))
 				{

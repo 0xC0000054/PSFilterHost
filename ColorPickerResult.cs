@@ -27,9 +27,9 @@ namespace PSFilterHostDll
 		/// <overloads>Initializes a new instance of the <see cref="ColorPickerResult"/> class.</overloads>
 		public ColorPickerResult(byte red, byte green, byte blue)
 		{
-			this.R = red;
-			this.G = green;
-			this.B = blue;
+			R = red;
+			G = green;
+			B = blue;
 		}
 
 		/// <summary>

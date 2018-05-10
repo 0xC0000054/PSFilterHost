@@ -27,13 +27,13 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             get
             {
-                return this.references;
+                return references;
             }
         }
 
         internal ActionDescriptorReference(IList<ActionReferenceSuite.ActionReferenceItem> items)
         {
-            this.references = new ReadOnlyCollection<ActionReferenceSuite.ActionReferenceItem>(items);
+            references = new ReadOnlyCollection<ActionReferenceSuite.ActionReferenceItem>(items);
         }
     }
 
@@ -62,7 +62,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 get
                 {
-                    return this.form;
+                    return form;
                 }
             }
 
@@ -70,7 +70,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 get
                 {
-                    return this.desiredClass;
+                    return desiredClass;
                 }
             }
 
@@ -78,7 +78,7 @@ namespace PSFilterHostDll.PSApi.PICA
             {
                 get
                 {
-                    return this.value;
+                    return value;
                 }
             }
 
@@ -111,21 +111,21 @@ namespace PSFilterHostDll.PSApi.PICA
 
             public void Add(ActionReferenceItem item)
             {
-                this.references.Add(item);
+                references.Add(item);
             }
 
             public ActionDescriptorReference ConvertToActionDescriptor()
             {
-                List<ActionReferenceItem> clone = new List<ActionReferenceItem>(this.references);
+                List<ActionReferenceItem> clone = new List<ActionReferenceItem>(references);
                 return new ActionDescriptorReference(clone);
             }
 
             public ActionReferenceContainer GetNextContainer()
             {
-                int nextIndex = this.index + 1;
-                if (nextIndex < this.references.Count)
+                int nextIndex = index + 1;
+                if (nextIndex < references.Count)
                 {
-                    return new ActionReferenceContainer(this.references, nextIndex);
+                    return new ActionReferenceContainer(references, nextIndex);
                 }
 
                 return null;
@@ -133,9 +133,9 @@ namespace PSFilterHostDll.PSApi.PICA
 
             public ActionReferenceItem GetReference()
             {
-                if (this.index < this.references.Count)
+                if (index < references.Count)
                 {
-                    return this.references[this.index];
+                    return references[index];
                 }
 
                 return null;
@@ -170,28 +170,28 @@ namespace PSFilterHostDll.PSApi.PICA
         /// </summary>
         public ActionReferenceSuite()
         {
-            this.make = new ActionReferenceMake(Make);
-            this.free = new ActionReferenceFree(Free);
-            this.getForm = new ActionReferenceGetForm(GetForm);
-            this.getDesiredClass = new ActionReferenceGetDesiredClass(GetDesiredClass);
-            this.putName = new ActionReferencePutName(PutName);
-            this.putIndex = new ActionReferencePutIndex(PutIndex);
-            this.putIdentifier = new ActionReferencePutIdentifier(PutIdentifier);
-            this.putOffset = new ActionReferencePutOffset(PutOffset);
-            this.putEnumerated = new ActionReferencePutEnumerated(PutEnumerated);
-            this.putProperty = new ActionReferencePutProperty(PutProperty);
-            this.putClass = new ActionReferencePutClass(PutClass);
-            this.getNameLength = new ActionReferenceGetNameLength(GetNameLength);
-            this.getName = new ActionReferenceGetName(GetName);
-            this.getIndex = new ActionReferenceGetIndex(GetIndex);
-            this.getIdentifier = new ActionReferenceGetIdentifier(GetIdentifier);
-            this.getOffset = new ActionReferenceGetOffset(GetOffset);
-            this.getEnumerated = new ActionReferenceGetEnumerated(GetEnumerated);
-            this.getProperty = new ActionReferenceGetProperty(GetProperty);
-            this.getContainer = new ActionReferenceGetContainer(GetContainer);
+            make = new ActionReferenceMake(Make);
+            free = new ActionReferenceFree(Free);
+            getForm = new ActionReferenceGetForm(GetForm);
+            getDesiredClass = new ActionReferenceGetDesiredClass(GetDesiredClass);
+            putName = new ActionReferencePutName(PutName);
+            putIndex = new ActionReferencePutIndex(PutIndex);
+            putIdentifier = new ActionReferencePutIdentifier(PutIdentifier);
+            putOffset = new ActionReferencePutOffset(PutOffset);
+            putEnumerated = new ActionReferencePutEnumerated(PutEnumerated);
+            putProperty = new ActionReferencePutProperty(PutProperty);
+            putClass = new ActionReferencePutClass(PutClass);
+            getNameLength = new ActionReferenceGetNameLength(GetNameLength);
+            getName = new ActionReferenceGetName(GetName);
+            getIndex = new ActionReferenceGetIndex(GetIndex);
+            getIdentifier = new ActionReferenceGetIdentifier(GetIdentifier);
+            getOffset = new ActionReferenceGetOffset(GetOffset);
+            getEnumerated = new ActionReferenceGetEnumerated(GetEnumerated);
+            getProperty = new ActionReferenceGetProperty(GetProperty);
+            getContainer = new ActionReferenceGetContainer(GetContainer);
 
-            this.actionReferences = new Dictionary<IntPtr, ActionReferenceContainer>(IntPtrEqualityComparer.Instance);
-            this.actionReferencesIndex = 0;
+            actionReferences = new Dictionary<IntPtr, ActionReferenceContainer>(IntPtrEqualityComparer.Instance);
+            actionReferencesIndex = 0;
         }
 
         bool IActionReferenceSuite.ConvertToActionDescriptor(IntPtr reference, out ActionDescriptorReference descriptor)
@@ -199,7 +199,7 @@ namespace PSFilterHostDll.PSApi.PICA
             descriptor = null;
 
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 descriptor = container.ConvertToActionDescriptor();
 
@@ -217,7 +217,7 @@ namespace PSFilterHostDll.PSApi.PICA
             }
 
             IntPtr reference = GenerateDictionaryKey();
-            this.actionReferences.Add(reference, new ActionReferenceContainer(descriptor.References));
+            actionReferences.Add(reference, new ActionReferenceContainer(descriptor.References));
 
             return reference;
         }
@@ -230,25 +230,25 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             PSActionReferenceProcs suite = new PSActionReferenceProcs
             {
-                Make = Marshal.GetFunctionPointerForDelegate(this.make),
-                Free = Marshal.GetFunctionPointerForDelegate(this.free),
-                GetForm = Marshal.GetFunctionPointerForDelegate(this.getForm),
-                GetDesiredClass = Marshal.GetFunctionPointerForDelegate(this.getDesiredClass),
-                PutName = Marshal.GetFunctionPointerForDelegate(this.putName),
-                PutIndex = Marshal.GetFunctionPointerForDelegate(this.putIndex),
-                PutIdentifier = Marshal.GetFunctionPointerForDelegate(this.putIdentifier),
-                PutOffset = Marshal.GetFunctionPointerForDelegate(this.putOffset),
-                PutEnumerated = Marshal.GetFunctionPointerForDelegate(this.putEnumerated),
-                PutProperty = Marshal.GetFunctionPointerForDelegate(this.putProperty),
-                PutClass = Marshal.GetFunctionPointerForDelegate(this.putClass),
-                GetNameLength = Marshal.GetFunctionPointerForDelegate(this.getNameLength),
-                GetName = Marshal.GetFunctionPointerForDelegate(this.getName),
-                GetIndex = Marshal.GetFunctionPointerForDelegate(this.getIndex),
-                GetIdentifier = Marshal.GetFunctionPointerForDelegate(this.getIdentifier),
-                GetOffset = Marshal.GetFunctionPointerForDelegate(this.getOffset),
-                GetEnumerated = Marshal.GetFunctionPointerForDelegate(this.getEnumerated),
-                GetProperty = Marshal.GetFunctionPointerForDelegate(this.getProperty),
-                GetContainer = Marshal.GetFunctionPointerForDelegate(this.getContainer)
+                Make = Marshal.GetFunctionPointerForDelegate(make),
+                Free = Marshal.GetFunctionPointerForDelegate(free),
+                GetForm = Marshal.GetFunctionPointerForDelegate(getForm),
+                GetDesiredClass = Marshal.GetFunctionPointerForDelegate(getDesiredClass),
+                PutName = Marshal.GetFunctionPointerForDelegate(putName),
+                PutIndex = Marshal.GetFunctionPointerForDelegate(putIndex),
+                PutIdentifier = Marshal.GetFunctionPointerForDelegate(putIdentifier),
+                PutOffset = Marshal.GetFunctionPointerForDelegate(putOffset),
+                PutEnumerated = Marshal.GetFunctionPointerForDelegate(putEnumerated),
+                PutProperty = Marshal.GetFunctionPointerForDelegate(putProperty),
+                PutClass = Marshal.GetFunctionPointerForDelegate(putClass),
+                GetNameLength = Marshal.GetFunctionPointerForDelegate(getNameLength),
+                GetName = Marshal.GetFunctionPointerForDelegate(getName),
+                GetIndex = Marshal.GetFunctionPointerForDelegate(getIndex),
+                GetIdentifier = Marshal.GetFunctionPointerForDelegate(getIdentifier),
+                GetOffset = Marshal.GetFunctionPointerForDelegate(getOffset),
+                GetEnumerated = Marshal.GetFunctionPointerForDelegate(getEnumerated),
+                GetProperty = Marshal.GetFunctionPointerForDelegate(getProperty),
+                GetContainer = Marshal.GetFunctionPointerForDelegate(getContainer)
             };
 
             return suite;
@@ -256,9 +256,9 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private IntPtr GenerateDictionaryKey()
         {
-            this.actionReferencesIndex++;
+            actionReferencesIndex++;
 
-            return new IntPtr(this.actionReferencesIndex);
+            return new IntPtr(actionReferencesIndex);
         }
 
         private int Make(ref IntPtr reference)
@@ -266,7 +266,7 @@ namespace PSFilterHostDll.PSApi.PICA
             try
             {
                 reference = GenerateDictionaryKey();
-                this.actionReferences.Add(reference, new ActionReferenceContainer());
+                actionReferences.Add(reference, new ActionReferenceContainer());
             }
             catch (OutOfMemoryException)
             {
@@ -278,10 +278,10 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int Free(IntPtr reference)
         {
-            this.actionReferences.Remove(reference);
-            if (this.actionReferencesIndex == reference.ToInt32())
+            actionReferences.Remove(reference);
+            if (actionReferencesIndex == reference.ToInt32())
             {
-                this.actionReferencesIndex--;
+                actionReferencesIndex--;
             }
 
             return PSError.kSPNoError;
@@ -290,7 +290,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetForm(IntPtr reference, ref uint value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -307,7 +307,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetDesiredClass(IntPtr reference, ref uint value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -331,7 +331,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     byte[] bytes = new byte[length];
                     Marshal.Copy(cstrValue, bytes, 0, length);
 
-                    this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Name, desiredClass, bytes));
+                    actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Name, desiredClass, bytes));
                 }
                 catch (OutOfMemoryException)
                 {
@@ -348,7 +348,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Index, desiredClass, value));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Index, desiredClass, value));
             }
             catch (OutOfMemoryException)
             {
@@ -362,7 +362,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Identifier, desiredClass, value));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Identifier, desiredClass, value));
             }
             catch (OutOfMemoryException)
             {
@@ -376,7 +376,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Offset, desiredClass, value));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Offset, desiredClass, value));
             }
             catch (OutOfMemoryException)
             {
@@ -390,7 +390,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Enumerated, desiredClass, new EnumeratedValue(type, value)));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Enumerated, desiredClass, new EnumeratedValue(type, value)));
             }
             catch (OutOfMemoryException)
             {
@@ -404,7 +404,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Property, desiredClass, value));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Property, desiredClass, value));
             }
             catch (OutOfMemoryException)
             {
@@ -418,7 +418,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             try
             {
-                this.actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Class, desiredClass, null));
+                actionReferences[reference].Add(new ActionReferenceItem(ActionReferenceForm.Class, desiredClass, null));
             }
             catch (OutOfMemoryException)
             {
@@ -431,7 +431,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetNameLength(IntPtr reference, ref uint stringLength)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -451,7 +451,7 @@ namespace PSFilterHostDll.PSApi.PICA
             if (cstrValue != IntPtr.Zero)
             {
                 ActionReferenceContainer container;
-                if (this.actionReferences.TryGetValue(reference, out container))
+                if (actionReferences.TryGetValue(reference, out container))
                 {
                     ActionReferenceItem item = container.GetReference();
                     if (item != null)
@@ -478,7 +478,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetIndex(IntPtr reference, ref uint value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -495,7 +495,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetIdentifier(IntPtr reference, ref uint value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -512,7 +512,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetOffset(IntPtr reference, ref int value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -529,7 +529,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetEnumerated(IntPtr reference, ref uint type, ref uint enumValue)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -548,7 +548,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetProperty(IntPtr reference, ref uint value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 ActionReferenceItem item = container.GetReference();
                 if (item != null)
@@ -565,7 +565,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private int GetContainer(IntPtr reference, ref IntPtr value)
         {
             ActionReferenceContainer container;
-            if (this.actionReferences.TryGetValue(reference, out container))
+            if (actionReferences.TryGetValue(reference, out container))
             {
                 try
                 {
@@ -573,7 +573,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     if (nextContainer != null)
                     {
                         value = GenerateDictionaryKey();
-                        this.actionReferences.Add(value, nextContainer);
+                        actionReferences.Add(value, nextContainer);
                     }
                     else
                     {

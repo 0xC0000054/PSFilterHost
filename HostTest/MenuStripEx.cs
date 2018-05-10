@@ -25,7 +25,7 @@ namespace HostTest
 
         public MenuStripEx()
         {
-            this.clickThrough = false;
+            clickThrough = false;
         }
 
         /// <summary>

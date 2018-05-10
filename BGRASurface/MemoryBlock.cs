@@ -89,10 +89,10 @@ namespace PSFilterHostDll.BGRASurface
                 throw new ArgumentOutOfRangeException(nameof(bytes), bytes, "Bytes must be greater than zero");
             }
 
-            this.length = bytes;
-            this.parentBlock = null;
-            this.voidStar = Allocate(bytes).ToPointer();
-            this.valid = true;
+            length = bytes;
+            parentBlock = null;
+            voidStar = Allocate(bytes).ToPointer();
+            valid = true;
         }
 
         ~MemoryBlock()
@@ -116,11 +116,11 @@ namespace PSFilterHostDll.BGRASurface
                 {
                 }
 
-                if (this.valid && parentBlock == null)
+                if (valid && parentBlock == null)
                 {
-                    if (this.length >= largeBlockThreshold)
+                    if (length >= largeBlockThreshold)
                     {
-                        BGRASurfaceMemory.FreeLarge(new IntPtr(voidStar), (ulong)this.length);
+                        BGRASurfaceMemory.FreeLarge(new IntPtr(voidStar), (ulong)length);
                     }
                     else
                     {
@@ -130,7 +130,7 @@ namespace PSFilterHostDll.BGRASurface
 
                 parentBlock = null;
                 voidStar = null;
-                this.valid = false;
+                valid = false;
             }
         }
 

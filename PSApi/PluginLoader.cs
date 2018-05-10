@@ -27,8 +27,8 @@ namespace PSFilterHostDll.PSApi
 
 			public QueryAETE(int terminologyID)
 			{
-				this.resourceID = new IntPtr(terminologyID);
-				this.enumAETE = null;
+				resourceID = new IntPtr(terminologyID);
+				enumAETE = null;
 			}
 		}
 
@@ -40,7 +40,7 @@ namespace PSFilterHostDll.PSApi
 			public QueryFilter(string fileName)
 			{
 				this.fileName = fileName;
-				this.plugins = new List<PluginData>();
+				plugins = new List<PluginData>();
 			}
 		}
 

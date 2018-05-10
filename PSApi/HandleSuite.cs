@@ -30,7 +30,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.handle;
+				return handle;
 			}
 		}
 	}
@@ -55,7 +55,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				get
 				{
-					return this.pointer;
+					return pointer;
 				}
 			}
 
@@ -63,7 +63,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				get
 				{
-					return this.size;
+					return size;
 				}
 			}
 
@@ -80,14 +80,14 @@ namespace PSFilterHostDll.PSApi
 				{
 					if (handle != IntPtr.Zero)
 					{
-						Memory.Free(this.handle);
-						this.handle = IntPtr.Zero;
+						Memory.Free(handle);
+						handle = IntPtr.Zero;
 					}
 
 					if (pointer != IntPtr.Zero)
 					{
-						Memory.Free(this.pointer);
-						this.pointer = IntPtr.Zero;
+						Memory.Free(pointer);
+						pointer = IntPtr.Zero;
 					}
 					disposed = true;
 				}
@@ -108,15 +108,15 @@ namespace PSFilterHostDll.PSApi
 
 		private HandleSuite()
 		{
-			this.handleNewProc = new NewPIHandleProc(NewHandle);
-			this.handleDisposeProc = new DisposePIHandleProc(DisposeHandle);
-			this.handleGetSizeProc = new GetPIHandleSizeProc(GetHandleSize);
-			this.handleSetSizeProc = new SetPIHandleSizeProc(SetHandleSize);
-			this.handleLockProc = new LockPIHandleProc(LockHandle);
-			this.handleUnlockProc = new UnlockPIHandleProc(UnlockHandle);
-			this.handleRecoverSpaceProc = new RecoverSpaceProc(RecoverHandleSpace);
-			this.handleDisposeRegularProc = new DisposeRegularPIHandleProc(DisposeRegularHandle);
-			this.handles = new Dictionary<IntPtr, HandleEntry>(IntPtrEqualityComparer.Instance);
+			handleNewProc = new NewPIHandleProc(NewHandle);
+			handleDisposeProc = new DisposePIHandleProc(DisposeHandle);
+			handleGetSizeProc = new GetPIHandleSizeProc(GetHandleSize);
+			handleSetSizeProc = new SetPIHandleSizeProc(SetHandleSize);
+			handleLockProc = new LockPIHandleProc(LockHandle);
+			handleUnlockProc = new UnlockPIHandleProc(UnlockHandle);
+			handleRecoverSpaceProc = new RecoverSpaceProc(RecoverHandleSpace);
+			handleDisposeRegularProc = new DisposeRegularPIHandleProc(DisposeRegularHandle);
+			handles = new Dictionary<IntPtr, HandleEntry>(IntPtrEqualityComparer.Instance);
 		}
 
 		/// <summary>
@@ -138,14 +138,14 @@ namespace PSFilterHostDll.PSApi
 			{
 				handleProcsVersion = PSConstants.kCurrentHandleProcsVersion,
 				numHandleProcs = PSConstants.kCurrentHandleProcsCount,
-				newProc = Marshal.GetFunctionPointerForDelegate(this.handleNewProc),
-				disposeProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeProc),
-				getSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleGetSizeProc),
-				setSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleSetSizeProc),
-				lockProc = Marshal.GetFunctionPointerForDelegate(this.handleLockProc),
-				unlockProc = Marshal.GetFunctionPointerForDelegate(this.handleUnlockProc),
-				recoverSpaceProc = Marshal.GetFunctionPointerForDelegate(this.handleRecoverSpaceProc),
-				disposeRegularHandleProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeRegularProc)
+				newProc = Marshal.GetFunctionPointerForDelegate(handleNewProc),
+				disposeProc = Marshal.GetFunctionPointerForDelegate(handleDisposeProc),
+				getSizeProc = Marshal.GetFunctionPointerForDelegate(handleGetSizeProc),
+				setSizeProc = Marshal.GetFunctionPointerForDelegate(handleSetSizeProc),
+				lockProc = Marshal.GetFunctionPointerForDelegate(handleLockProc),
+				unlockProc = Marshal.GetFunctionPointerForDelegate(handleUnlockProc),
+				recoverSpaceProc = Marshal.GetFunctionPointerForDelegate(handleRecoverSpaceProc),
+				disposeRegularHandleProc = Marshal.GetFunctionPointerForDelegate(handleDisposeRegularProc)
 			};
 
 			return procs;
@@ -160,14 +160,14 @@ namespace PSFilterHostDll.PSApi
 				HandleProcs* handleProcs = (HandleProcs*)handleProcsPtr.ToPointer();
 				handleProcs->handleProcsVersion = PSConstants.kCurrentHandleProcsVersion;
 				handleProcs->numHandleProcs = PSConstants.kCurrentHandleProcsCount;
-				handleProcs->newProc = Marshal.GetFunctionPointerForDelegate(this.handleNewProc);
-				handleProcs->disposeProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeProc);
-				handleProcs->getSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleGetSizeProc);
-				handleProcs->setSizeProc = Marshal.GetFunctionPointerForDelegate(this.handleSetSizeProc);
-				handleProcs->lockProc = Marshal.GetFunctionPointerForDelegate(this.handleLockProc);
-				handleProcs->unlockProc = Marshal.GetFunctionPointerForDelegate(this.handleUnlockProc);
-				handleProcs->recoverSpaceProc = Marshal.GetFunctionPointerForDelegate(this.handleRecoverSpaceProc);
-				handleProcs->disposeRegularHandleProc = Marshal.GetFunctionPointerForDelegate(this.handleDisposeRegularProc);
+				handleProcs->newProc = Marshal.GetFunctionPointerForDelegate(handleNewProc);
+				handleProcs->disposeProc = Marshal.GetFunctionPointerForDelegate(handleDisposeProc);
+				handleProcs->getSizeProc = Marshal.GetFunctionPointerForDelegate(handleGetSizeProc);
+				handleProcs->setSizeProc = Marshal.GetFunctionPointerForDelegate(handleSetSizeProc);
+				handleProcs->lockProc = Marshal.GetFunctionPointerForDelegate(handleLockProc);
+				handleProcs->unlockProc = Marshal.GetFunctionPointerForDelegate(handleUnlockProc);
+				handleProcs->recoverSpaceProc = Marshal.GetFunctionPointerForDelegate(handleRecoverSpaceProc);
+				handleProcs->disposeRegularHandleProc = Marshal.GetFunctionPointerForDelegate(handleDisposeRegularProc);
 			}
 
 			return handleProcsPtr;
@@ -182,16 +182,16 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		public bool AllocatedBySuite(IntPtr handle)
 		{
-			return this.handles.ContainsKey(handle);
+			return handles.ContainsKey(handle);
 		}
 
 		public void FreeRemainingHandles()
 		{
-			foreach (var item in this.handles)
+			foreach (var item in handles)
 			{
 				item.Value.Dispose();
 			}
-			this.handles.Clear();
+			handles.Clear();
 		}
 
 		/// <summary>
@@ -278,7 +278,7 @@ namespace PSFilterHostDll.PSApi
 
 				hand->pointer = Memory.Allocate(size, true);
 
-				this.handles.Add(handle, new HandleEntry(handle, hand->pointer, size));
+				handles.Add(handle, new HandleEntry(handle, hand->pointer, size));
 #if DEBUG
 				string message = string.Format("Handle: 0x{0}, pointer: 0x{1}, size: {2}", handle.ToHexString(), hand->pointer.ToHexString(), size);
 				DebugUtils.Ping(DebugFlags.HandleSuite, message);
@@ -328,10 +328,10 @@ namespace PSFilterHostDll.PSApi
 			if (handle != IntPtr.Zero && IsValidReadPtr(handle))
 			{
 				HandleEntry item;
-				if (this.handles.TryGetValue(handle, out item))
+				if (handles.TryGetValue(handle, out item))
 				{
 					item.Dispose();
-					this.handles.Remove(handle);
+					handles.Remove(handle);
 					OnSuiteHandleDisposed(handle);
 				}
 				else
@@ -357,7 +357,7 @@ namespace PSFilterHostDll.PSApi
 			DebugUtils.Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}, moveHigh: {1}", h.ToHexString(), moveHigh));
 #endif
 			HandleEntry item;
-			if (this.handles.TryGetValue(h, out item))
+			if (handles.TryGetValue(h, out item))
 			{
 				return item.Pointer;
 			}
@@ -388,7 +388,7 @@ namespace PSFilterHostDll.PSApi
 			DebugUtils.Ping(DebugFlags.HandleSuite, string.Format("Handle: 0x{0}", h.ToHexString()));
 #endif
 			HandleEntry item;
-			if (this.handles.TryGetValue(h, out item))
+			if (handles.TryGetValue(h, out item))
 			{
 				return item.Size;
 			}
@@ -437,7 +437,7 @@ namespace PSFilterHostDll.PSApi
 
 					handle->pointer = ptr;
 
-					this.handles.AddOrUpdate(h, new HandleEntry(h, ptr, newSize));
+					handles.AddOrUpdate(h, new HandleEntry(h, ptr, newSize));
 				}
 				catch (OutOfMemoryException)
 				{

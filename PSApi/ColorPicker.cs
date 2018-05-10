@@ -27,7 +27,7 @@ namespace PSFilterHostDll.PSApi
             {
                 if (!string.IsNullOrEmpty(title))
                 {
-                    SafeNativeMethods.SetWindowTextW(hWnd, this.title);
+                    SafeNativeMethods.SetWindowTextW(hWnd, title);
                 }
             }
 
@@ -37,10 +37,10 @@ namespace PSFilterHostDll.PSApi
         public ColorPicker(string title)
         {
             this.title = title;
-            this.AllowFullOpen = true;
-            this.AnyColor = true;
-            this.SolidColorOnly = true;
-            this.FullOpen = true;
+            AllowFullOpen = true;
+            AnyColor = true;
+            SolidColorOnly = true;
+            FullOpen = true;
         }
 
     }

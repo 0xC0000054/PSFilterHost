@@ -39,12 +39,12 @@ namespace PSFilterHostDll.PSApi.PICA
                 throw new ArgumentNullException(nameof(zstringSuite));
             }
 
-            this.hwnd = parentWindowHandle;
-            this.pluginName = name ?? string.Empty;
-            this.uiWindowHandle = new UISuiteMainWindowHandle(MainWindowHandle);
-            this.uiSetCursor = new UISuiteHostSetCursor(HostSetCursor);
-            this.uiTickCount = new UISuiteHostTickCount(HostTickCount);
-            this.uiPluginName = new UISuiteGetPluginName(GetPluginName);
+            hwnd = parentWindowHandle;
+            pluginName = name ?? string.Empty;
+            uiWindowHandle = new UISuiteMainWindowHandle(MainWindowHandle);
+            uiSetCursor = new UISuiteHostSetCursor(HostSetCursor);
+            uiTickCount = new UISuiteHostTickCount(HostTickCount);
+            uiPluginName = new UISuiteGetPluginName(GetPluginName);
             this.zstringSuite = zstringSuite;
         }
 
@@ -65,7 +65,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int GetPluginName(IntPtr pluginRef, ref IntPtr name)
         {
-            name = zstringSuite.CreateFromString(this.pluginName);
+            name = zstringSuite.CreateFromString(pluginName);
 
             return PSError.kSPNoError;
         }
@@ -78,10 +78,10 @@ namespace PSFilterHostDll.PSApi.PICA
                 displayPixels = Marshal.GetFunctionPointerForDelegate(suiteDataProvider.DisplayPixels),
                 progressBar = Marshal.GetFunctionPointerForDelegate(suiteDataProvider.Progress),
                 testAbort = Marshal.GetFunctionPointerForDelegate(suiteDataProvider.TestAbort),
-                MainAppWindow = Marshal.GetFunctionPointerForDelegate(this.uiWindowHandle),
-                SetCursor = Marshal.GetFunctionPointerForDelegate(this.uiSetCursor),
-                TickCount = Marshal.GetFunctionPointerForDelegate(this.uiTickCount),
-                GetPluginName = Marshal.GetFunctionPointerForDelegate(this.uiPluginName)
+                MainAppWindow = Marshal.GetFunctionPointerForDelegate(uiWindowHandle),
+                SetCursor = Marshal.GetFunctionPointerForDelegate(uiSetCursor),
+                TickCount = Marshal.GetFunctionPointerForDelegate(uiTickCount),
+                GetPluginName = Marshal.GetFunctionPointerForDelegate(uiPluginName)
             };
 
             return suite;

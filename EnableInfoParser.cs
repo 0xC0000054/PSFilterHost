@@ -39,9 +39,9 @@ namespace PSFilterHostDll
 
 			public Token()
 			{
-				this.value = string.Empty;
-				this.intValue = 0;
-				this.type = TokenType.None;
+				value = string.Empty;
+				intValue = 0;
+				type = TokenType.None;
 			}
 		}
 
@@ -65,20 +65,20 @@ namespace PSFilterHostDll
 
 		public EnableInfoParser(bool grayScale)
 		{
-			this.index = 0;
-			this.imageMode = grayScale ? Gray16Mode : RGB48Mode;
+			index = 0;
+			imageMode = grayScale ? Gray16Mode : RGB48Mode;
 		}
 
 		public bool Parse(string info)
 		{
-			this.chars = info.ToCharArray();
-			this.length = chars.Length;
+			chars = info.ToCharArray();
+			length = chars.Length;
 
 			bool supports16Bit = false;
 
 			while (index < length && !supports16Bit)
 			{
-				Token token = this.NextToken();
+				Token token = NextToken();
 
 				switch (token.type)
 				{
@@ -100,14 +100,14 @@ namespace PSFilterHostDll
 
 		private bool SupportsMode(string mode)
 		{
-			this.imageMode = mode;
-			this.index = 0;
+			imageMode = mode;
+			index = 0;
 
 			bool supportsMode = false;
 
 			while (index < length && !supportsMode)
 			{
-				Token token = this.NextToken();
+				Token token = NextToken();
 
 				switch (token.type)
 				{
@@ -125,8 +125,8 @@ namespace PSFilterHostDll
 
 		public ushort GetSupportedModes(string info)
 		{
-			this.chars = info.ToCharArray();
-			this.length = chars.Length;
+			chars = info.ToCharArray();
+			length = chars.Length;
 
 			ushort modes = 0;
 
@@ -313,15 +313,15 @@ namespace PSFilterHostDll
 
 		private bool ParseOr()
 		{
-			Token keyword = this.NextToken();
+			Token keyword = NextToken();
 
 			if (keyword.value == psImageDepth)
 			{
-				Token equal = this.NextToken();
+				Token equal = NextToken();
 
 				if (equal.type == TokenType.Equals)
 				{
-					Token depth = this.NextToken();
+					Token depth = NextToken();
 
 					return depth.intValue == 16;
 				}

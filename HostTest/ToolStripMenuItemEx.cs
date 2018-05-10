@@ -68,10 +68,10 @@ namespace HostTest
 				}
 				else
 				{
-					arrowX = (this.Bounds.Width - arrowWidth) - textPadding;
+					arrowX = (Bounds.Width - arrowWidth) - textPadding;
 				}
 
-				Rectangle arrowRect = new Rectangle(arrowX, 0, arrowWidth, this.Bounds.Height - this.Padding.Vertical);
+				Rectangle arrowRect = new Rectangle(arrowX, 0, arrowWidth, Bounds.Height - Padding.Vertical);
 
 				Point center = new Point(arrowRect.Left + (arrowRect.Width / 2), arrowRect.Top + (arrowRect.Height / 2));
 				Point[] points = new Point[3];

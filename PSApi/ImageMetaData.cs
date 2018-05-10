@@ -56,11 +56,11 @@ namespace PSFilterHostDll.PSApi
 #else
 			this.image = image.Clone();
 #endif
-			this.exifBytes = null;
-			this.xmpBytes = null;
-			this.extractedExif = false;
-			this.extractedXMP = false;
-			this.disposed = false;
+			exifBytes = null;
+			xmpBytes = null;
+			extractedExif = false;
+			extractedXMP = false;
+			disposed = false;
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace PSFilterHostDll.PSApi
 		/// <exception cref="System.ObjectDisposedException">The object has been disposed.</exception>
 		public bool Extract(out byte[] bytes, bool exif)
 		{
-			if (this.disposed)
+			if (disposed)
 			{
 				throw new ObjectDisposedException(nameof(ImageMetaData));
 			}
@@ -82,17 +82,17 @@ namespace PSFilterHostDll.PSApi
 			// Return the cached data if it has already been extracted.
 			if (exif)
 			{
-				if (this.extractedExif)
+				if (extractedExif)
 				{
-					bytes = this.exifBytes;
+					bytes = exifBytes;
 					return (bytes != null);
 				}
 			}
 			else
 			{
-				if (this.extractedXMP)
+				if (extractedXMP)
 				{
-					bytes = this.xmpBytes;
+					bytes = xmpBytes;
 					return (bytes != null);
 				}
 			}
@@ -102,7 +102,7 @@ namespace PSFilterHostDll.PSApi
 
 			try
 			{
-				metaData = this.image.Metadata as BitmapMetadata;
+				metaData = image.Metadata as BitmapMetadata;
 			}
 			catch (NotSupportedException)
 			{
@@ -110,8 +110,8 @@ namespace PSFilterHostDll.PSApi
 
 			if (metaData == null)
 			{
-				this.extractedExif = true;
-				this.extractedXMP = true;
+				extractedExif = true;
+				extractedXMP = true;
 
 				return false;
 			}
@@ -122,7 +122,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (exifMetaData == null)
 				{
-					this.extractedExif = true;
+					extractedExif = true;
 
 					return false;
 				}
@@ -134,7 +134,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (xmpMetaData == null)
 				{
-					this.extractedXMP = true;
+					extractedXMP = true;
 
 					return false;
 				}
@@ -147,15 +147,15 @@ namespace PSFilterHostDll.PSApi
 				using (MemoryStream ms = new MemoryStream())
 				{
 #if GDIPLUS
-					this.image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+					image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 #else
 					JpegBitmapEncoder enc = new JpegBitmapEncoder();
-					enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
+					enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
 					enc.Save(ms);
 #endif
-					this.exifBytes = JpegReader.ExtractEXIF(ms.GetBuffer());
-					this.extractedExif = true;
-					bytes = this.exifBytes;
+					exifBytes = JpegReader.ExtractEXIF(ms.GetBuffer());
+					extractedExif = true;
+					bytes = exifBytes;
 				}
 			}
 			else
@@ -163,15 +163,15 @@ namespace PSFilterHostDll.PSApi
 				using (MemoryStream ms = new MemoryStream())
 				{
 #if GDIPLUS
-					this.image.Save(ms, System.Drawing.Imaging.ImageFormat.Tiff);
+					image.Save(ms, System.Drawing.Imaging.ImageFormat.Tiff);
 #else
 					TiffBitmapEncoder enc = new TiffBitmapEncoder();
-					enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
+					enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
 					enc.Save(ms);
 #endif
-					this.xmpBytes = TiffReader.ExtractXMP(ms);
-					this.extractedXMP = true;
-					bytes = this.xmpBytes;
+					xmpBytes = TiffReader.ExtractXMP(ms);
+					extractedXMP = true;
+					bytes = xmpBytes;
 				}
 			}
 
@@ -180,20 +180,20 @@ namespace PSFilterHostDll.PSApi
 
 		public void Dispose()
 		{
-			if (!this.disposed)
+			if (!disposed)
 			{
-				this.disposed = true;
+				disposed = true;
 
 #if GDIPLUS
-				if (this.image != null)
+				if (image != null)
 				{
-					this.image.Dispose();
-					this.image = null;
+					image.Dispose();
+					image = null;
 				}
 #endif
 
-				this.exifBytes = null;
-				this.xmpBytes = null;
+				exifBytes = null;
+				xmpBytes = null;
 			}
 		}
 
@@ -317,10 +317,10 @@ namespace PSFilterHostDll.PSApi
 
 				public IFD(Stream stream, bool littleEndian)
 				{
-					this.tag = ReadShort(stream, littleEndian);
-					this.type = (DataType)ReadShort(stream, littleEndian);
-					this.count = ReadLong(stream, littleEndian);
-					this.offset = ReadLong(stream, littleEndian);
+					tag = ReadShort(stream, littleEndian);
+					type = (DataType)ReadShort(stream, littleEndian);
+					count = ReadLong(stream, littleEndian);
+					offset = ReadLong(stream, littleEndian);
 				}
 			}
 

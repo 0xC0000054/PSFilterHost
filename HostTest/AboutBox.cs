@@ -22,12 +22,12 @@ namespace HostTest
         {
             InitializeComponent();
 
-            this.Text = String.Format("About {0}", AssemblyTitle);
-            this.labelProductName.Text = String.Format("{0} ({1}-bit)", AssemblyProduct, IntPtr.Size * 8);
-            this.labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
-            this.labelCopyright.Text = AssemblyCopyright;
-            this.labelCompanyName.Text = AssemblyCompany;
-            this.textBoxDescription.Text = AssemblyDescription;
+            Text = String.Format("About {0}", AssemblyTitle);
+            labelProductName.Text = String.Format("{0} ({1}-bit)", AssemblyProduct, IntPtr.Size * 8);
+            labelVersion.Text = String.Format("Version {0}", AssemblyVersion);
+            labelCopyright.Text = AssemblyCopyright;
+            labelCompanyName.Text = AssemblyCompany;
+            textBoxDescription.Text = AssemblyDescription;
         }
 
         #region Assembly Attribute Accessors

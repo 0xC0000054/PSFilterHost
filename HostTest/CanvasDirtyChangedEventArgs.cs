@@ -28,7 +28,7 @@ namespace HostTest
 
         public CanvasDirtyChangedEventArgs(bool isDirty)
         {
-            this.dirty = isDirty;
+            dirty = isDirty;
         }
 
     }

@@ -112,8 +112,8 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(documentProfile));
 			}
 
-			this.documentProfileBytes = (byte[])documentProfile.Clone();
-			this.monitorProfileBytes = InitializeMonitorProfile(monitorProfilePath, monitorProfileFromUser);
+			documentProfileBytes = (byte[])documentProfile.Clone();
+			monitorProfileBytes = InitializeMonitorProfile(monitorProfilePath, monitorProfileFromUser);
 		}
 
 		private HostColorManagement(string documentProfilePath, string monitorProfilePath, bool monitorProfileFromUser)
@@ -123,8 +123,8 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(documentProfilePath));
 			}
 
-			this.documentProfileBytes = ReadProfileFromFile(documentProfilePath);
-			this.monitorProfileBytes = InitializeMonitorProfile(monitorProfilePath, monitorProfileFromUser);
+			documentProfileBytes = ReadProfileFromFile(documentProfilePath);
+			monitorProfileBytes = InitializeMonitorProfile(monitorProfilePath, monitorProfileFromUser);
 		}
 
 		private static byte[] InitializeMonitorProfile(string monitorProfilePath, bool monitorProfileFromUser)
@@ -176,7 +176,7 @@ namespace PSFilterHostDll
 		/// <returns>>A byte array that contains the color profile of the document.</returns>
 		internal byte[] GetDocumentProfileReadOnly()
 		{
-			return this.documentProfileBytes;
+			return documentProfileBytes;
 		}
 
 		/// <summary>
@@ -185,7 +185,7 @@ namespace PSFilterHostDll
 		/// <returns>>A byte array that contains the color profile of the document.</returns>
 		public byte[] GetDocumentColorProfile()
 		{
-			return (byte[])this.documentProfileBytes.Clone();
+			return (byte[])documentProfileBytes.Clone();
 		}
 
 		/// <summary>
@@ -194,7 +194,7 @@ namespace PSFilterHostDll
 		/// <returns>>A byte array that contains the color profile of the monitor.</returns>
 		internal byte[] GetMonitorProfileReadOnly()
 		{
-			return this.monitorProfileBytes;
+			return monitorProfileBytes;
 		}
 
 		/// <summary>
@@ -203,7 +203,7 @@ namespace PSFilterHostDll
 		/// <returns>A byte array that contains the color profile of the monitor.</returns>
 		public byte[] GetMonitorProfile()
 		{
-			return (byte[])this.monitorProfileBytes.Clone();
+			return (byte[])monitorProfileBytes.Clone();
 		}
 	}
 }

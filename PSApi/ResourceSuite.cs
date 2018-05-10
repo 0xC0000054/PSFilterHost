@@ -26,18 +26,18 @@ namespace PSFilterHostDll.PSApi
 
 		public ResourceSuite()
 		{
-			this.countResourceProc = new CountPIResourcesProc(CountResource);
-			this.addResourceProc = new AddPIResourceProc(AddResource);
-			this.deleteResourceProc = new DeletePIResourceProc(DeleteResource);
-			this.getResourceProc = new GetPIResourceProc(GetResource);
-			this.pseudoResources = new List<PSResource>();
+			countResourceProc = new CountPIResourcesProc(CountResource);
+			addResourceProc = new AddPIResourceProc(AddResource);
+			deleteResourceProc = new DeletePIResourceProc(DeleteResource);
+			getResourceProc = new GetPIResourceProc(GetResource);
+			pseudoResources = new List<PSResource>();
 		}
 
 		public PseudoResourceCollection PseudoResources
 		{
 			get
 			{
-				return new PseudoResourceCollection(this.pseudoResources);
+				return new PseudoResourceCollection(pseudoResources);
 			}
 			set
 			{
@@ -46,7 +46,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.pseudoResources = new List<PSResource>(value);
+				pseudoResources = new List<PSResource>(value);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace PSFilterHostDll.PSApi
 				}
 
 				int index = CountResource(ofType) + 1;
-				this.pseudoResources.Add(new PSResource(ofType, index, bytes));
+				pseudoResources.Add(new PSResource(ofType, index, bytes));
 			}
 			catch (OutOfMemoryException)
 			{
@@ -102,7 +102,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			short count = 0;
 
-			foreach (var item in this.pseudoResources)
+			foreach (var item in pseudoResources)
 			{
 				if (item.Equals(ofType))
 				{
@@ -118,21 +118,21 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.ResourceSuite, string.Format("{0}, {1}", DebugUtils.PropToString(ofType), index));
 #endif
-			int resourceIndex = this.pseudoResources.FindIndex(delegate (PSResource r)
+			int resourceIndex = pseudoResources.FindIndex(delegate (PSResource r)
 			{
 				return r.Equals(ofType, index);
 			});
 
 			if (resourceIndex >= 0)
 			{
-				this.pseudoResources.RemoveAt(resourceIndex);
+				pseudoResources.RemoveAt(resourceIndex);
 
 				int i = index + 1;
 
 				while (true)
 				{
 					// Renumber the index of subsequent items.
-					int next = this.pseudoResources.FindIndex(delegate (PSResource r)
+					int next = pseudoResources.FindIndex(delegate (PSResource r)
 					{
 						return r.Equals(ofType, i);
 					});
@@ -142,10 +142,10 @@ namespace PSFilterHostDll.PSApi
                         break;
                     }
 
-					PSResource existing = this.pseudoResources[next];
+					PSResource existing = pseudoResources[next];
 					int newIndex = i - 1;
 
-					this.pseudoResources[next] = new PSResource(existing, newIndex);
+					pseudoResources[next] = new PSResource(existing, newIndex);
 
 					i++;
 				}
@@ -157,7 +157,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.ResourceSuite, string.Format("{0}, {1}", DebugUtils.PropToString(ofType), index));
 #endif
-			PSResource res = this.pseudoResources.Find(delegate (PSResource r)
+			PSResource res = pseudoResources.Find(delegate (PSResource r)
 			{
 				return r.Equals(ofType, index);
 			});

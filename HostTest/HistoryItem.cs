@@ -48,9 +48,9 @@ namespace HostTest
         /// </summary>
         public HistoryItem(CanvasHistoryState historyCanvas, BitmapSource currentImage)
         {
-            this.backingFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            this.state = HistoryItemState.Memory;
-            this.chunk = new HistoryChunk(historyCanvas, currentImage);
+            backingFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            state = HistoryItemState.Memory;
+            chunk = new HistoryChunk(historyCanvas, currentImage);
 
             ToDisk();
         }
@@ -60,14 +60,14 @@ namespace HostTest
         /// </summary>
         public void ToDisk()
         {
-            if (this.state == HistoryItemState.Memory)
+            if (state == HistoryItemState.Memory)
             {
-                using (FileStream fs = new FileStream(this.backingFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
+                using (FileStream fs = new FileStream(backingFile, FileMode.OpenOrCreate, FileAccess.Write, FileShare.None))
                 {
                     BinaryFormatter bf = new BinaryFormatter();
-                    bf.Serialize(fs, this.chunk);
-                    this.state = HistoryItemState.Disk;
-                    this.chunk.Dispose();
+                    bf.Serialize(fs, chunk);
+                    state = HistoryItemState.Disk;
+                    chunk.Dispose();
                 }
             }
         }
@@ -77,13 +77,13 @@ namespace HostTest
         /// </summary>
         public void ToMemory()
         {
-            if (this.state == HistoryItemState.Disk)
+            if (state == HistoryItemState.Disk)
             {
-                using (FileStream fs = new FileStream(this.backingFile, FileMode.Open, FileAccess.Read, FileShare.None))
+                using (FileStream fs = new FileStream(backingFile, FileMode.Open, FileAccess.Read, FileShare.None))
                 {
                     BinaryFormatter bf = new BinaryFormatter();
-                    this.chunk = (HistoryChunk)bf.Deserialize(fs);
-                    this.state = HistoryItemState.Memory;
+                    chunk = (HistoryChunk)bf.Deserialize(fs);
+                    state = HistoryItemState.Memory;
                 }
             }
         }
@@ -98,10 +98,10 @@ namespace HostTest
         {
             if (!disposed)
             {
-                File.Delete(this.backingFile);
-                this.chunk.Dispose();
-                this.state = HistoryItemState.Disposed;
-                this.disposed = true;
+                File.Delete(backingFile);
+                chunk.Dispose();
+                state = HistoryItemState.Disposed;
+                disposed = true;
             }
         }
         #endregion
@@ -115,28 +115,28 @@ namespace HostTest
 
             public HistoryChunk(CanvasHistoryState canvasHistory, BitmapSource source)
             {
-                this.canvas = canvasHistory;
-                this.image = source;
-                this.disposed = false;
+                canvas = canvasHistory;
+                image = source;
+                disposed = false;
             }
 
             private HistoryChunk(SerializationInfo info, StreamingContext context)
             {
-                this.canvas = (CanvasHistoryState)info.GetValue("canvas", typeof(CanvasHistoryState));
+                canvas = (CanvasHistoryState)info.GetValue("canvas", typeof(CanvasHistoryState));
 
                 byte[] temp = (byte[])info.GetValue("image", typeof(byte[]));
 
                 using (MemoryStream stream = new MemoryStream(temp))
                 {
                     BitmapFrame frame = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                    this.image = new WriteableBitmap(frame); // Copy the frame using a WriteableBitmap to fix the threading issue with the BitmapFrameDecoder.
-                    this.image.Freeze();
+                    image = new WriteableBitmap(frame); // Copy the frame using a WriteableBitmap to fix the threading issue with the BitmapFrameDecoder.
+                    image.Freeze();
                 }
             }
 
             public void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                info.AddValue("canvas", this.canvas, typeof(CanvasHistoryState));
+                info.AddValue("canvas", canvas, typeof(CanvasHistoryState));
 
                 using (MemoryStream stream = new MemoryStream())
                 {
@@ -145,14 +145,14 @@ namespace HostTest
 
                     try
                     {
-                        metaData = this.image.Metadata as BitmapMetadata;
+                        metaData = image.Metadata as BitmapMetadata;
                     }
                     catch (NotSupportedException)
                     {
                     }
 
                     PngBitmapEncoder enc = new PngBitmapEncoder();
-                    enc.Frames.Add(BitmapFrame.Create(this.image, null, metaData, null));
+                    enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
                     enc.Save(stream);
 
                     info.AddValue("image", stream.GetBuffer(), typeof(byte[]));
@@ -167,11 +167,11 @@ namespace HostTest
             {
                 if (!disposed)
                 {
-                    this.disposed = true;
+                    disposed = true;
                     if (canvas != null)
                     {
-                        this.canvas.Dispose();
-                        this.canvas = null;
+                        canvas.Dispose();
+                        canvas = null;
                     }
                 }
             }

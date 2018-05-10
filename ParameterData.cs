@@ -34,7 +34,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.globalParameters;
+                return globalParameters;
             }
         }
 
@@ -45,7 +45,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.scriptingData;
+                return scriptingData;
             }
         }
 
@@ -56,15 +56,15 @@ namespace PSFilterHostDll
         /// <param name="aete">The dictionary containing the scripting parameters.</param>
         internal ParameterData(GlobalParameters globals, Dictionary<uint, AETEValue> aete)
         {
-            this.globalParameters = globals;
+            globalParameters = globals;
 
             if ((aete != null) && aete.Count > 0)
             {
-                this.scriptingData = aete;
+                scriptingData = aete;
             }
             else
             {
-                this.scriptingData = null;
+                scriptingData = null;
             }
         }
 
@@ -75,8 +75,8 @@ namespace PSFilterHostDll
                 throw new ArgumentNullException(nameof(info));
             }
 
-            this.globalParameters = (GlobalParameters)info.GetValue("globalParameters", typeof(GlobalParameters));
-            this.scriptingData =  (Dictionary<uint, AETEValue>)info.GetValue("scriptingData", typeof(Dictionary<uint, AETEValue>));
+            globalParameters = (GlobalParameters)info.GetValue("globalParameters", typeof(GlobalParameters));
+            scriptingData =  (Dictionary<uint, AETEValue>)info.GetValue("scriptingData", typeof(Dictionary<uint, AETEValue>));
         }
 
         /// <summary>
@@ -96,8 +96,8 @@ namespace PSFilterHostDll
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue("globalParameters", this.globalParameters, typeof(GlobalParameters));
-            info.AddValue("scriptingData", this.scriptingData, typeof(Dictionary<uint, AETEValue>));
+            info.AddValue("globalParameters", globalParameters, typeof(GlobalParameters));
+            info.AddValue("scriptingData", scriptingData, typeof(Dictionary<uint, AETEValue>));
         }
     }
 }

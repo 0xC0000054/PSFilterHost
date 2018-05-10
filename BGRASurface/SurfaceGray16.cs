@@ -61,7 +61,7 @@ namespace PSFilterHostDll.BGRASurface
             ushort[] map = CreatePhotoshopRangeLookupTable();
             for (int y = 0; y < height; y++)
             {
-                ushort* ptr = (ushort*)this.GetRowAddressUnchecked(y);
+                ushort* ptr = (ushort*)GetRowAddressUnchecked(y);
                 ushort* ptrEnd = ptr + width;
 
                 while (ptr < ptrEnd)
@@ -157,7 +157,7 @@ namespace PSFilterHostDll.BGRASurface
 
         protected override unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi)
         {
-            Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
+            Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -190,7 +190,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcRowFloor = Math.Floor(srcRow);
                 double srcRowFrac = srcRow - srcRowFloor;
                 int srcRowInt = (int)srcRow;
-                ushort* dstPtr = (ushort*)this.GetPointAddressUnchecked(roi.Left, dstY);
+                ushort* dstPtr = (ushort*)GetPointAddressUnchecked(roi.Left, dstY);
 
                 // Compute the R() values for this row
                 for (int n = -1; n <= 2; ++n)
@@ -260,7 +260,7 @@ namespace PSFilterHostDll.BGRASurface
 
         protected override unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi)
         {
-            Rectangle roi = Rectangle.Intersect(dstRoi, this.Bounds);
+            Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
@@ -293,7 +293,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcRowFloor = (double)Math.Floor(srcRow);
                 double srcRowFrac = srcRow - srcRowFloor;
                 int srcRowInt = (int)srcRow;
-                ushort* dstPtr = (ushort*)this.GetPointAddressUnchecked(roi.Left, dstY);
+                ushort* dstPtr = (ushort*)GetPointAddressUnchecked(roi.Left, dstY);
 
                 // Compute the R() values for this row
                 for (int n = -1; n <= 2; ++n)
@@ -376,7 +376,7 @@ namespace PSFilterHostDll.BGRASurface
 
         public override unsafe void SuperSampleFitSurface(SurfaceBase source)
         {
-            Rectangle dstRoi2 = Rectangle.Intersect(source.Bounds, this.Bounds);
+            Rectangle dstRoi2 = Rectangle.Intersect(source.Bounds, Bounds);
 
             int srcHeight = source.Height;
             int srcWidth = source.Width;
@@ -394,7 +394,7 @@ namespace PSFilterHostDll.BGRASurface
                 double srcBottomWeight = srcBottom - srcBottomFloor;
                 int srcBottomInt = (int)srcBottomFloor;
 
-                ushort* dstPtr = (ushort*)this.GetPointAddressUnchecked(dstRoi2.Left, dstY);
+                ushort* dstPtr = (ushort*)GetPointAddressUnchecked(dstRoi2.Left, dstY);
 
                 for (int dstX = dstRoi2.Left; dstX < dstRoi2.Right; ++dstX)
                 {

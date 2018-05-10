@@ -59,11 +59,11 @@ namespace PSFilterHostDll
                 }
             }
 
-            this.persistedValues = new ReadOnlyDictionary<string, PluginSettingsRegistryItem>(persistentItems);
-            this.sessionValues = new ReadOnlyDictionary<string, PluginSettingsRegistryItem>(sessionItems);
+            persistedValues = new ReadOnlyDictionary<string, PluginSettingsRegistryItem>(persistentItems);
+            sessionValues = new ReadOnlyDictionary<string, PluginSettingsRegistryItem>(sessionItems);
             // Mark the plug-in settings as dirty when the persisted items change.
             // The host can use this information to determine if it needs to save the plug-in settings.
-            this.dirty = persistentValuesChanged;
+            dirty = persistentValuesChanged;
         }
 
         /// <summary>
@@ -76,11 +76,11 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.dirty;
+                return dirty;
             }
             set
             {
-                this.dirty = value;
+                dirty = value;
             }
         }
 
@@ -94,7 +94,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.persistedValues;
+                return persistedValues;
             }
         }
 
@@ -108,7 +108,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.sessionValues;
+                return sessionValues;
             }
         }
     }

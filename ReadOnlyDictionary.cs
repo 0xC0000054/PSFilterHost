@@ -40,8 +40,8 @@ namespace PSFilterHostDll
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
         {
             this.dictionary = dictionary;
-            this.keys = null;
-            this.values = null;
+            keys = null;
+            values = null;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.dictionary.Count;
+                return dictionary.Count;
             }
         }
 
@@ -62,12 +62,12 @@ namespace PSFilterHostDll
         {
             get
             {
-                if (this.keys == null)
+                if (keys == null)
                 {
-                    this.keys = new KeyCollection(this.dictionary.Keys);
+                    keys = new KeyCollection(dictionary.Keys);
                 }
 
-                return this.keys;
+                return keys;
             }
         }
 
@@ -78,9 +78,9 @@ namespace PSFilterHostDll
         {
             get
             {
-                if (this.values == null)
+                if (values == null)
                 {
-                    this.values = new ValueCollection(this.dictionary.Values);
+                    values = new ValueCollection(dictionary.Values);
                 }
 
                 return values;
@@ -99,7 +99,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.dictionary[key];
+                return dictionary[key];
             }
         }
 
@@ -112,7 +112,7 @@ namespace PSFilterHostDll
         /// </returns>
         public bool ContainsKey(TKey key)
         {
-            return this.dictionary.ContainsKey(key);
+            return dictionary.ContainsKey(key);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace PSFilterHostDll
         /// </returns>
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return this.dictionary.GetEnumerator();
+            return dictionary.GetEnumerator();
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace PSFilterHostDll
         /// </returns>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return this.dictionary.TryGetValue(key, out value);
+            return dictionary.TryGetValue(key, out value);
         }
 
         private static void ThrowNotSupportedException()
@@ -169,12 +169,12 @@ namespace PSFilterHostDll
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
-            return this.dictionary.Contains(item);
+            return dictionary.Contains(item);
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            this.dictionary.CopyTo(array, arrayIndex);
+            dictionary.CopyTo(array, arrayIndex);
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
@@ -189,7 +189,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return new KeyCollection(this.dictionary.Keys);
+                return new KeyCollection(dictionary.Keys);
             }
         }
 
@@ -197,7 +197,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return new ValueCollection(this.dictionary.Values);
+                return new ValueCollection(dictionary.Values);
             }
         }
 
@@ -205,7 +205,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.dictionary.Count;
+                return dictionary.Count;
             }
         }
 
@@ -213,7 +213,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.dictionary[key];
+                return dictionary[key];
             }
             set
             {
@@ -228,7 +228,7 @@ namespace PSFilterHostDll
 
         bool IDictionary<TKey, TValue>.ContainsKey(TKey key)
         {
-            return this.dictionary.ContainsKey(key);
+            return dictionary.ContainsKey(key);
         }
 
         bool IDictionary<TKey, TValue>.Remove(TKey key)
@@ -239,14 +239,14 @@ namespace PSFilterHostDll
 
         bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)
         {
-            return this.dictionary.TryGetValue(key, out value);
+            return dictionary.TryGetValue(key, out value);
         }
         #endregion
 
         #region IEnumerator Methods
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.dictionary.GetEnumerator();
+            return dictionary.GetEnumerator();
         }
         #endregion
 
@@ -272,7 +272,7 @@ namespace PSFilterHostDll
             {
                 get
                 {
-                    return this.items.Count;
+                    return items.Count;
                 }
             }
 
@@ -285,7 +285,7 @@ namespace PSFilterHostDll
             /// </returns>
             public bool Contains(TKey item)
             {
-                return this.items.Contains(item);
+                return items.Contains(item);
             }
 
             /// <summary>
@@ -298,7 +298,7 @@ namespace PSFilterHostDll
             /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
             public void CopyTo(TKey[] array, int arrayIndex)
             {
-                this.items.CopyTo(array, arrayIndex);
+                items.CopyTo(array, arrayIndex);
             }
 
             /// <summary>
@@ -309,7 +309,7 @@ namespace PSFilterHostDll
             /// </returns>
             public IEnumerator<TKey> GetEnumerator()
             {
-                return this.items.GetEnumerator();
+                return items.GetEnumerator();
             }
 
             bool ICollection<TKey>.IsReadOnly
@@ -332,7 +332,7 @@ namespace PSFilterHostDll
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return this.items.GetEnumerator();
+                return items.GetEnumerator();
             }
 
             bool ICollection<TKey>.Remove(TKey item)
@@ -364,7 +364,7 @@ namespace PSFilterHostDll
             {
                 get
                 {
-                    return this.items.Count;
+                    return items.Count;
                 }
             }
 
@@ -377,7 +377,7 @@ namespace PSFilterHostDll
             /// </returns>
             public bool Contains(TValue item)
             {
-                return this.items.Contains(item);
+                return items.Contains(item);
             }
 
             /// <summary>
@@ -390,7 +390,7 @@ namespace PSFilterHostDll
             /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
             public void CopyTo(TValue[] array, int arrayIndex)
             {
-                this.items.CopyTo(array, arrayIndex);
+                items.CopyTo(array, arrayIndex);
             }
 
             /// <summary>
@@ -401,7 +401,7 @@ namespace PSFilterHostDll
             /// </returns>
             public IEnumerator<TValue> GetEnumerator()
             {
-                return this.items.GetEnumerator();
+                return items.GetEnumerator();
             }
 
             bool ICollection<TValue>.IsReadOnly
@@ -424,7 +424,7 @@ namespace PSFilterHostDll
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return this.items.GetEnumerator();
+                return items.GetEnumerator();
             }
 
             bool ICollection<TValue>.Remove(TValue item)

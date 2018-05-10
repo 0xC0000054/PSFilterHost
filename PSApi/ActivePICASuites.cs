@@ -53,7 +53,7 @@ namespace PSFilterHostDll.PSApi
             {
                 get
                 {
-                    return this.name;
+                    return name;
                 }
             }
 
@@ -67,7 +67,7 @@ namespace PSFilterHostDll.PSApi
             {
                 get
                 {
-                    return this.version;
+                    return version;
                 }
             }
 
@@ -75,7 +75,7 @@ namespace PSFilterHostDll.PSApi
             {
                 get
                 {
-                    return string.Format(CultureInfo.CurrentCulture, "{0}, version {1}", this.name, this.version);
+                    return string.Format(CultureInfo.CurrentCulture, "{0}, version {1}", name, version);
                 }
             }
 
@@ -106,8 +106,8 @@ namespace PSFilterHostDll.PSApi
 
                 unchecked
                 {
-                    hash = (hash * 127) + this.name.GetHashCode();
-                    hash = (hash * 127) + this.version.GetHashCode();
+                    hash = (hash * 127) + name.GetHashCode();
+                    hash = (hash * 127) + version.GetHashCode();
                 }
 
                 return hash;
@@ -120,7 +120,7 @@ namespace PSFilterHostDll.PSApi
                     return false;
                 }
 
-                return (this.name.Equals(other.name, StringComparison.Ordinal) && this.version == other.version);
+                return (name.Equals(other.name, StringComparison.Ordinal) && version == other.version);
             }
 
             public static bool operator ==(PICASuiteKey left, PICASuiteKey right)
@@ -154,7 +154,7 @@ namespace PSFilterHostDll.PSApi
             {
                 get
                 {
-                    return this.suitePointer;
+                    return suitePointer;
                 }
             }
 
@@ -162,18 +162,18 @@ namespace PSFilterHostDll.PSApi
             {
                 get
                 {
-                    return this.refCount;
+                    return refCount;
                 }
                 set
                 {
-                    this.refCount = value;
+                    refCount = value;
                 }
             }
 
             public PICASuite(IntPtr suite)
             {
-                this.suitePointer = suite;
-                this.refCount = 1;
+                suitePointer = suite;
+                refCount = 1;
             }
 
             public void Dispose()
@@ -195,10 +195,10 @@ namespace PSFilterHostDll.PSApi
                     {
                     }
 
-                    if (this.suitePointer != IntPtr.Zero)
+                    if (suitePointer != IntPtr.Zero)
                     {
-                        Memory.Free(this.suitePointer);
-                        this.suitePointer = IntPtr.Zero;
+                        Memory.Free(suitePointer);
+                        suitePointer = IntPtr.Zero;
                     }
 
                     disposed = true;
@@ -214,8 +214,8 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public ActivePICASuites()
         {
-            this.activeSuites = new Dictionary<PICASuiteKey, PICASuite>();
-            this.disposed = false;
+            activeSuites = new Dictionary<PICASuiteKey, PICASuite>();
+            disposed = false;
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace PSFilterHostDll.PSApi
         /// <returns>The pointer to the allocated suite.</returns>
         public IntPtr AllocateSuite<TSuite>(PICASuiteKey key, TSuite suite)
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
@@ -237,7 +237,7 @@ namespace PSFilterHostDll.PSApi
             {
                 Marshal.StructureToPtr(suite, suitePointer, false);
 
-                this.activeSuites.Add(key, new PICASuite(suitePointer));
+                activeSuites.Add(key, new PICASuite(suitePointer));
             }
             catch (Exception)
             {
@@ -257,12 +257,12 @@ namespace PSFilterHostDll.PSApi
         /// </returns>
         public bool IsLoaded(PICASuiteKey key)
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
-            return this.activeSuites.ContainsKey(key);
+            return activeSuites.ContainsKey(key);
         }
 
         /// <summary>
@@ -272,14 +272,14 @@ namespace PSFilterHostDll.PSApi
         /// <returns>The pointer to the suite instance.</returns>
         public IntPtr AddRef(PICASuiteKey key)
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
-            PICASuite suite = this.activeSuites[key];
+            PICASuite suite = activeSuites[key];
             suite.RefCount += 1;
-            this.activeSuites[key] = suite;
+            activeSuites[key] = suite;
 
             return suite.SuitePointer;
         }
@@ -290,24 +290,24 @@ namespace PSFilterHostDll.PSApi
         /// <param name="key">The <see cref="PICASuiteKey"/> specifying the suite name and version.</param>
         public void Release(PICASuiteKey key)
         {
-            if (this.disposed)
+            if (disposed)
             {
                 throw new ObjectDisposedException(nameof(ActivePICASuites));
             }
 
             PICASuite suite;
-            if (this.activeSuites.TryGetValue(key, out suite))
+            if (activeSuites.TryGetValue(key, out suite))
             {
                 suite.RefCount -= 1;
 
                 if (suite.RefCount == 0)
                 {
                     suite.Dispose();
-                    this.activeSuites.Remove(key);
+                    activeSuites.Remove(key);
                 }
                 else
                 {
-                    this.activeSuites[key] = suite;
+                    activeSuites[key] = suite;
                 }
             }
         }
@@ -317,15 +317,15 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public void Dispose()
         {
-            if (!this.disposed)
+            if (!disposed)
             {
-                this.disposed = true;
+                disposed = true;
 
-                foreach (PICASuite item in this.activeSuites.Values)
+                foreach (PICASuite item in activeSuites.Values)
                 {
                     item.Dispose();
                 }
-                this.activeSuites = null;
+                activeSuites = null;
             }
         }
     }

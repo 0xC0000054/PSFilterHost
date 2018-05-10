@@ -38,8 +38,8 @@ namespace PSFilterHostDll
         /// </summary>
         public ShellLink()
         {
-            this.shellLink = (NativeInterfaces.IShellLinkW)new ShellLinkCoClass();
-            this.disposed = false;
+            shellLink = (NativeInterfaces.IShellLinkW)new ShellLinkCoClass();
+            disposed = false;
         }
 
         /// <summary>

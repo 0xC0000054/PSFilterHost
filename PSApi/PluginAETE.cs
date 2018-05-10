@@ -28,7 +28,7 @@ namespace PSFilterHostDll.PSApi
             this.name = name;
             this.key = key;
             this.type = type;
-            this.desc = description;
+            desc = description;
             this.flags = flags;
         }
     }
@@ -59,7 +59,7 @@ namespace PSFilterHostDll.PSApi
         {
             this.name = name;
             this.type = type;
-            this.desc = description;
+            desc = description;
         }
     }
 

@@ -713,10 +713,10 @@ namespace HostTest
 
 				public IFD(Stream stream, bool littleEndian)
 				{
-					this.tag = ReadShort(stream, littleEndian);
-					this.type = (DataType)ReadShort(stream, littleEndian);
-					this.count = ReadLong(stream, littleEndian);
-					this.offset = ReadLong(stream, littleEndian);
+                    tag = ReadShort(stream, littleEndian);
+                    type = (DataType)ReadShort(stream, littleEndian);
+                    count = ReadLong(stream, littleEndian);
+                    offset = ReadLong(stream, littleEndian);
 				}
 			}
 

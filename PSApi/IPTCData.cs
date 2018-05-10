@@ -45,7 +45,7 @@ namespace PSFilterHostDll.PSApi
             /// </summary>
             public IPTCTag(ushort type, ushort length)
             {
-                this.signature = IPTCTagSignature;
+                signature = IPTCTagSignature;
                 this.type = type;
                 this.length = length;
             }
@@ -87,21 +87,21 @@ namespace PSFilterHostDll.PSApi
                 byte* ptr = (byte*)data.ToPointer();
 
                 // Swap the version structure to little-endian.
-                this.version.tag.signature = *ptr;
+                version.tag.signature = *ptr;
                 ptr += 1;
-                this.version.tag.type = SwapUInt16(*(ushort*)ptr);
+                version.tag.type = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
-                this.version.tag.length = SwapUInt16(*(ushort*)ptr);
+                version.tag.length = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
-                this.version.version = SwapUInt16(*(ushort*)ptr);
+                version.version = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
 
                 // Swap the tag structure to little-endian.
-                this.tag.signature = *ptr;
+                tag.signature = *ptr;
                 ptr += 1;
-                this.tag.type = SwapUInt16(*(ushort*)ptr);
+                tag.type = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
-                this.tag.length = SwapUInt16(*(ushort*)ptr);
+                tag.length = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
             }
 
@@ -128,21 +128,21 @@ namespace PSFilterHostDll.PSApi
                     byte* ptr = pinData;
 
                     // Swap the version structure to big-endian.
-                    *ptr = this.version.tag.signature;
+                    *ptr = version.tag.signature;
                     ptr += 1;
-                    *((ushort*)ptr) = SwapUInt16(this.version.tag.type);
+                    *((ushort*)ptr) = SwapUInt16(version.tag.type);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(this.version.tag.length);
+                    *((ushort*)ptr) = SwapUInt16(version.tag.length);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(this.version.version);
+                    *((ushort*)ptr) = SwapUInt16(version.version);
                     ptr += 2;
 
                     // Swap the tag structure to big-endian.
-                    *ptr = this.tag.signature;
+                    *ptr = tag.signature;
                     ptr += 1;
-                    *((ushort*)ptr) = SwapUInt16(this.tag.type);
+                    *((ushort*)ptr) = SwapUInt16(tag.type);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(this.tag.length);
+                    *((ushort*)ptr) = SwapUInt16(tag.length);
                     ptr += 2;
                 }
             }

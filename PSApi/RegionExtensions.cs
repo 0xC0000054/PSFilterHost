@@ -189,15 +189,15 @@ namespace PSFilterHostDll.PSApi
 
 			internal NullGraphics()
 			{
-				this.hdc = SafeNativeMethods.CreateCompatibleDC(IntPtr.Zero);
+				hdc = SafeNativeMethods.CreateCompatibleDC(IntPtr.Zero);
 
-				if (this.hdc == IntPtr.Zero)
+				if (hdc == IntPtr.Zero)
 				{
 					int error = Marshal.GetLastWin32Error();
 					throw new Win32Exception(error, "CreateCompatibleDC returned NULL");
 				}
 
-				this.graphics = Graphics.FromHdc(this.hdc);
+				graphics = Graphics.FromHdc(hdc);
 			}
 
 			~NullGraphics()
@@ -217,11 +217,11 @@ namespace PSFilterHostDll.PSApi
 				{
 					if (disposing)
 					{
-						this.graphics.Dispose();
-						this.graphics = null;
+						graphics.Dispose();
+						graphics = null;
 					}
 
-					SafeNativeMethods.DeleteDC(this.hdc);
+					SafeNativeMethods.DeleteDC(hdc);
 					disposed = true;
 				}
 			}

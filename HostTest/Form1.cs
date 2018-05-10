@@ -64,44 +64,44 @@ namespace HostTest
 		public Form1()
 		{
 			InitializeComponent();
-			this.srcImage = null;
-			this.dstImage = null;
-			this.pseudoResources = null;
-			this.filterParameters = new Dictionary<PluginData, ParameterData>();
-			this.historyStack = new HistoryStack();
-			this.historyStack.HistoryChanged += new EventHandler(historyStack_HistoryChanged);
-			this.currentFilterMenuItem = null;
-			this.setFilterApplyText = false;
-			this.filterName = string.Empty;
-			this.imageFileName = string.Empty;
-			this.imageType = string.Empty;
-			this.dropImageFileName = string.Empty;
-			this.panelClientSize = Size.Empty;
-			this.srcImageTempFileName = string.Empty;
-			this.currentPluginDirectory = string.Empty;
-			this.hostInfo = new HostInformation();
-			this.srcMetaData = null;
-			this.srcMetaData = null;
-			this.srcColorContext = null;
-			this.monitorColorContext = null;
-			this.monitorColorProfilePath = null;
-			this.hostColorProfiles = null;
-			this.sessionSettings = null;
+			srcImage = null;
+			dstImage = null;
+			pseudoResources = null;
+			filterParameters = new Dictionary<PluginData, ParameterData>();
+			historyStack = new HistoryStack();
+			historyStack.HistoryChanged += new EventHandler(historyStack_HistoryChanged);
+			currentFilterMenuItem = null;
+			setFilterApplyText = false;
+			filterName = string.Empty;
+			imageFileName = string.Empty;
+			imageType = string.Empty;
+			dropImageFileName = string.Empty;
+			panelClientSize = Size.Empty;
+			srcImageTempFileName = string.Empty;
+			currentPluginDirectory = string.Empty;
+			hostInfo = new HostInformation();
+			srcMetaData = null;
+			srcMetaData = null;
+			srcColorContext = null;
+			monitorColorContext = null;
+			monitorColorProfilePath = null;
+			hostColorProfiles = null;
+			sessionSettings = null;
 
 			if (IntPtr.Size == 8)
 			{
-				this.Text += " x64";
+				Text += " x64";
 			}
 
-			this.applicationName = this.Text;
+			applicationName = Text;
 
-			this.messageFilter = new AbortMessageFilter();
-			Application.AddMessageFilter(this.messageFilter);
+			messageFilter = new AbortMessageFilter();
+			Application.AddMessageFilter(messageFilter);
 
-			this.openFileDialog1.Filter = WICHelpers.GetOpenDialogFilterString();
+			openFileDialog1.Filter = WICHelpers.GetOpenDialogFilterString();
 
 			PaintDotNet.SystemLayer.UI.InitScaling(this);
-			this.highDPIMode = PaintDotNet.SystemLayer.UI.GetXScaleFactor() > 1f;
+			highDPIMode = PaintDotNet.SystemLayer.UI.GetXScaleFactor() > 1f;
 			InitializeDPIScaling();
 		}
 
@@ -111,8 +111,8 @@ namespace HostTest
 			// The scroll buttons in the ToolStripDropDownMenu have not been updated with high DPI support, so we will scale them when the menu is first opened.
 			if (Environment.Version.Major < 4)
 			{
-				ScaleToolStripImageSize(this.menuStrip1);
-				ScaleToolStripImageSize(this.toolStrip1);
+				ScaleToolStripImageSize(menuStrip1);
+				ScaleToolStripImageSize(toolStrip1);
 				ToolStripManager.Renderer = new DpiAwareToolStripRenderer();
 			}
 			if (primaryColorBtn.ImageSize != toolStrip1.ImageScalingSize)
@@ -195,18 +195,18 @@ namespace HostTest
 
 		private void UpdateMonitorColorProfile()
 		{
-			string newMonitorProfile = ColorProfileHelper.GetMonitorColorProfilePath(this.Handle);
+			string newMonitorProfile = ColorProfileHelper.GetMonitorColorProfilePath(Handle);
 			if (string.IsNullOrEmpty(newMonitorProfile))
 			{
 				// If the current monitor does not have a color profile use the default sRGB profile.
-				this.monitorColorProfilePath = SrgbColorContext.ProfileUri.LocalPath;
-				this.monitorColorContext = SrgbColorContext;
+				monitorColorProfilePath = SrgbColorContext.ProfileUri.LocalPath;
+				monitorColorContext = SrgbColorContext;
 			}
 			else if (!newMonitorProfile.Equals(monitorColorProfilePath, StringComparison.OrdinalIgnoreCase))
 			{
-				this.monitorColorProfilePath = newMonitorProfile;
+				monitorColorProfilePath = newMonitorProfile;
 				Uri uri = new Uri(newMonitorProfile, UriKind.Absolute);
-				this.monitorColorContext = new ColorContext(uri);
+				monitorColorContext = new ColorContext(uri);
 			}
 		}
 
@@ -219,8 +219,8 @@ namespace HostTest
 				using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
 				{
 					BinaryFormatter bf = new BinaryFormatter();
-					this.sessionSettings = (PluginSettingsRegistry)bf.Deserialize(fs);
-					this.sessionSettings.Dirty = false;
+					sessionSettings = (PluginSettingsRegistry)bf.Deserialize(fs);
+					sessionSettings.Dirty = false;
 				}
 			}
 			catch (FileNotFoundException)
@@ -239,9 +239,9 @@ namespace HostTest
 
 		private void SavePluginSessionSettings()
 		{
-			if (this.sessionSettings != null)
+			if (sessionSettings != null)
 			{
-				if (this.sessionSettings.Dirty)
+				if (sessionSettings.Dirty)
 				{
 					try
 					{
@@ -250,9 +250,9 @@ namespace HostTest
 						using (FileStream fs = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
 						{
 							BinaryFormatter bf = new BinaryFormatter();
-							bf.Serialize(fs, this.sessionSettings);
+							bf.Serialize(fs, sessionSettings);
 						}
-						this.sessionSettings.Dirty = false;
+						sessionSettings.Dirty = false;
 					}
 					catch (IOException ex)
 					{
@@ -324,12 +324,12 @@ namespace HostTest
 			{
 				base.Invoke(new Action<string>(delegate(string error)
 					{
-						MessageBox.Show(this, error, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show(this, error, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}), new object[] { message });
 			}
 			else
 			{
-				MessageBox.Show(this, message, this.Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show(this, message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 			}
 		}
 
@@ -337,7 +337,7 @@ namespace HostTest
 		{
 			if (folderBrowserDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 			{
-				QueryDirectory(this.folderBrowserDialog1.SelectedPath);
+				QueryDirectory(folderBrowserDialog1.SelectedPath);
 			}
 		}
 
@@ -345,21 +345,21 @@ namespace HostTest
 		{
 			if (!backgroundWorker1.IsBusy)
 			{
-				this.Cursor = Cursors.WaitCursor;
+				Cursor = Cursors.WaitCursor;
 
 				if (filtersToolStripMenuItem.HasDropDownItems)
 				{
-					this.filtersToolStripMenuItem.DropDownItems.Clear();
+					filtersToolStripMenuItem.DropDownItems.Clear();
 				}
 
 				if (aboutPluginsMenuItem.HasDropDownItems)
 				{
-					this.aboutPluginsMenuItem.DropDownItems.Clear();
+					aboutPluginsMenuItem.DropDownItems.Clear();
 				}
 
 				WorkerArgs args = new WorkerArgs(path);
 
-				this.backgroundWorker1.RunWorkerAsync(args);
+				backgroundWorker1.RunWorkerAsync(args);
 			}
 		}
 
@@ -420,7 +420,7 @@ namespace HostTest
 		{
 			ToolStripItem item = (ToolStripItem)sender;
 			PluginData pluginData = (PluginData)item.Tag;
-			this.currentFilterMenuItem = item;
+			currentFilterMenuItem = item;
 
 			RunPhotoshopFilterThread(pluginData, true);
 		}
@@ -432,7 +432,7 @@ namespace HostTest
 
 			try
 			{
-				PSFilterHost.ShowAboutDialog(pluginData, this.Handle);
+				PSFilterHost.ShowAboutDialog(pluginData, Handle);
 			}
 			catch (FileNotFoundException ex)
 			{
@@ -448,15 +448,15 @@ namespace HostTest
 		{
 			if (filterThread == null)
 			{
-				this.Cursor = Cursors.WaitCursor;
+				Cursor = Cursors.WaitCursor;
 
-				this.filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, showUI))
+				filterThread = new Thread(() => RunPhotoshopFilterImpl(pluginData, showUI))
 				{
 					IsBackground = true,
 					Priority = ThreadPriority.AboveNormal
 				};
-				this.filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
-				this.filterThread.Start();
+				filterThread.SetApartmentState(ApartmentState.STA); // Some filters may use OLE which requires Single Threaded Apartment mode.
+				filterThread.Start();
 			}
 		}
 
@@ -467,14 +467,14 @@ namespace HostTest
 				SetRepeatEffectMenuItem();
 			}
 
-			this.filterThread.Join();
-			this.filterThread = null;
+			filterThread.Join();
+			filterThread = null;
 
-			this.currentFilterMenuItem = null;
-			this.Cursor = Cursors.Default;
-			this.toolStripProgressBar1.Value = 0;
-			this.toolStripProgressBar1.Visible = false;
-			this.toolStripStatusLabel1.Text = string.Empty;
+			currentFilterMenuItem = null;
+			Cursor = Cursors.Default;
+			toolStripProgressBar1.Value = 0;
+			toolStripProgressBar1.Visible = false;
+			toolStripStatusLabel1.Text = string.Empty;
 		}
 
 		private void SaveImageOnUIThread()
@@ -484,35 +484,35 @@ namespace HostTest
 				if (historyStack.Count == 0)
 				{
 					// Add the original image to the history stack.
-					this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.srcImage);
+					historyStack.AddHistoryItem(canvas.ToCanvasHistoryState(), srcImage);
 				}
 
-				this.srcImageTempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tif");
+				srcImageTempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tif");
 
 				BitmapMetadata metaData = null;
 
 				try
 				{
-					metaData = this.srcImage.Metadata as BitmapMetadata;
+					metaData = srcImage.Metadata as BitmapMetadata;
 				}
 				catch (NotSupportedException)
 				{
 				}
 
-				this.srcMetaData = null;
+				srcMetaData = null;
 				if (metaData != null)
 				{
 					// As WIC does not automatically convert between meta-data formats we have to do it manually.
 					BitmapMetadata convertedMetaData = MetaDataHelper.ConvertMetaDataToTIFF(metaData);
 					if (convertedMetaData != null)
 					{
-						this.srcMetaData = convertedMetaData.Clone();
-						this.srcMetaData.Freeze();
+						srcMetaData = convertedMetaData.Clone();
+						srcMetaData.Freeze();
 					}
 					metaData = convertedMetaData;
 				}
 
-				this.hostColorProfiles = null;
+				hostColorProfiles = null;
 				if (srcColorContext != null && srcColorContext != monitorColorContext)
 				{
 					byte[] documentColorProfile = null;
@@ -532,13 +532,13 @@ namespace HostTest
 						} while (numBytesToRead > 0);
 					}
 
-					this.hostColorProfiles = new HostColorManagement(documentColorProfile, this.monitorColorProfilePath);
+					hostColorProfiles = new HostColorManagement(documentColorProfile, monitorColorProfilePath);
 				}
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Create, FileAccess.Write))
 				{
 					TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-					encoder.Frames.Add(BitmapFrame.Create(this.srcImage, null, metaData, null));
+					encoder.Frames.Add(BitmapFrame.Create(srcImage, null, metaData, null));
 					encoder.Save(stream);
 				}
 			}
@@ -580,19 +580,19 @@ namespace HostTest
 			{
 				image = BitmapFrame.Create(dstImage, null, srcMetaData, null); // Create a new BitmapFrame so the source image's meta-data is available to the filters.
 			}
-			hostInfo.HighDpi = this.highDPIMode;
+			hostInfo.HighDpi = highDPIMode;
 
-			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return this.Handle; }));
+			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return Handle; }));
 			bool setRepeatFilter = false;
 
 			try
 			{
-				System.Windows.Media.Color primary = GDIPlusToWPFColor(this.primaryColorBtn.Color);
-				System.Windows.Media.Color secondary = GDIPlusToWPFColor(this.secondaryColorBtn.Color);
+				System.Windows.Media.Color primary = GDIPlusToWPFColor(primaryColorBtn.Color);
+				System.Windows.Media.Color secondary = GDIPlusToWPFColor(secondaryColorBtn.Color);
 
 				using (PSFilterHost host = new PSFilterHost(image, primary, secondary, selection, owner))
 				{
-					host.SetAbortCallback(new AbortFunc(this.messageFilter.AbortFilterCallback));
+					host.SetAbortCallback(new AbortFunc(messageFilter.AbortFilterCallback));
 					host.SetPickColorCallback(new PickColor(PickColorCallback));
 					host.UpdateProgress += new EventHandler<FilterProgressEventArgs>(UpdateFilterProgress);
 
@@ -603,20 +603,20 @@ namespace HostTest
 					}
 
 					host.PseudoResources = pseudoResources;
-					host.HostInfo = this.hostInfo;
-					host.SessionSettings = this.sessionSettings;
+					host.HostInfo = hostInfo;
+					host.SessionSettings = sessionSettings;
 					if (hostColorProfiles != null)
 					{
 						host.SetColorProfiles(hostColorProfiles);
 					}
 
-					this.filterName = pluginData.Title.TrimEnd('.');
-					this.setFilterApplyText = false;
-					this.messageFilter.Reset();
+					filterName = pluginData.Title.TrimEnd('.');
+					setFilterApplyText = false;
+					messageFilter.Reset();
 
 					if (host.RunFilter(pluginData, showUI))
 					{
-						this.dstImage = host.Dest;
+						dstImage = host.Dest;
 
 						FormatConvertedBitmap convertedImage = null;
 
@@ -625,16 +625,16 @@ namespace HostTest
 
 						if (bitsPerChannel >= 16)
 						{
-							convertedImage = new FormatConvertedBitmap(this.dstImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0);
+							convertedImage = new FormatConvertedBitmap(dstImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0);
 						}
 
-						this.canvas.SuspendPaint();
+						canvas.SuspendPaint();
 
-						UpdateCanvasImage(convertedImage ?? this.dstImage);
+						UpdateCanvasImage(convertedImage ?? dstImage);
 
-						this.historyStack.AddHistoryItem(this.canvas.ToCanvasHistoryState(), this.dstImage);
+						historyStack.AddHistoryItem(canvas.ToCanvasHistoryState(), dstImage);
 
-						this.canvas.ResumePaint();
+						canvas.ResumePaint();
 
 						if (showUI)
 						{
@@ -647,9 +647,9 @@ namespace HostTest
 								filterParameters.Add(pluginData, host.FilterParameters);
 							}
 
-							this.pseudoResources = host.PseudoResources;
-							this.hostInfo = host.HostInfo;
-							this.sessionSettings = host.SessionSettings;
+							pseudoResources = host.PseudoResources;
+							hostInfo = host.HostInfo;
+							sessionSettings = host.SessionSettings;
 							setRepeatFilter = true;
 						}
 
@@ -690,14 +690,14 @@ namespace HostTest
 
 		private void SetRepeatEffectMenuItem()
 		{
-			if (this.currentFilterMenuItem != null)
+			if (currentFilterMenuItem != null)
 			{
 				if (!filtersToolStripMenuItem.DropDownItems.ContainsKey("repeatEffect"))
 				{
-					ToolStripMenuItem repeatItem = new ToolStripMenuItem(this.currentFilterMenuItem.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
+					ToolStripMenuItem repeatItem = new ToolStripMenuItem(currentFilterMenuItem.Text.TrimEnd('.'), null, new EventHandler(RepeatLastEffect))
 					{
 						Name = "repeatEffect",
-						Tag = this.currentFilterMenuItem.Tag,
+						Tag = currentFilterMenuItem.Tag,
 						ShowShortcutKeys = true,
 						ShortcutKeys = Keys.Control | Keys.F
 					};
@@ -714,8 +714,8 @@ namespace HostTest
 				else
 				{
 					ToolStripMenuItem repeatItem = (ToolStripMenuItem)filtersToolStripMenuItem.DropDownItems[0];
-					repeatItem.Text = this.currentFilterMenuItem.Text.TrimEnd('.');
-					repeatItem.Tag = this.currentFilterMenuItem.Tag;
+					repeatItem.Text = currentFilterMenuItem.Text.TrimEnd('.');
+					repeatItem.Tag = currentFilterMenuItem.Tag;
 				}
 			}
 		}
@@ -735,14 +735,14 @@ namespace HostTest
 			{
 				base.Invoke(new Action<string>(delegate(string text)
 				{
-					this.toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, this.filterName);
-					this.toolStripProgressBar1.Visible = true;
+					toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, filterName);
+					toolStripProgressBar1.Visible = true;
 				}), new object[] { filterName });
 			}
 			else
 			{
-				this.toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, this.filterName);
-				this.toolStripProgressBar1.Visible = true;
+				toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, filterName);
+				toolStripProgressBar1.Visible = true;
 			}
 		}
 
@@ -751,19 +751,19 @@ namespace HostTest
 			if (!setFilterApplyText)
 			{
 				SetApplyFilterText();
-				this.setFilterApplyText = true;
+				setFilterApplyText = true;
 			}
 
 			if (base.InvokeRequired)
 			{
 				base.Invoke(new Action<int>(delegate(int value)
 				{
-					this.toolStripProgressBar1.Value = value;
+					toolStripProgressBar1.Value = value;
 				}), new object[] { e.Progress });
 			}
 			else
 			{
-				this.toolStripProgressBar1.Value = e.Progress;
+				toolStripProgressBar1.Value = e.Progress;
 			}
 		}
 
@@ -825,7 +825,7 @@ namespace HostTest
 					catch (FileFormatException)
 					{
 						// Ignore the image color context if it is not valid.
-						this.srcColorContext = null;
+						srcColorContext = null;
 					}
 				}
 
@@ -837,19 +837,19 @@ namespace HostTest
 				{
 					base.Invoke(new Action<MemoryStream>(delegate (MemoryStream ms)
 					{
-						this.canvas.Surface = new Bitmap(ms);
+						canvas.Surface = new Bitmap(ms);
 					}), new object[] { stream });
 				}
 				else
 				{
-					this.canvas.Surface = new Bitmap(stream);
+					canvas.Surface = new Bitmap(stream);
 				}
 			}
 		}
 
 		private void OpenFile(string path)
 		{
-			this.Cursor = Cursors.WaitCursor;
+			Cursor = Cursors.WaitCursor;
 			try
 			{
 				BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
@@ -883,19 +883,19 @@ namespace HostTest
 
 				if (frame.ColorContexts != null)
 				{
-					this.srcColorContext = frame.ColorContexts[0];
+					srcColorContext = frame.ColorContexts[0];
 				}
 				else
 				{
 					// If the image does not have an embedded color profile assume it is sRGB.
-					this.srcColorContext = SrgbColorContext;
+					srcColorContext = SrgbColorContext;
 				}
 
 				PixelFormat format = srcImage.Format;
 				int channelCount = format.Masks.Count;
 				int bitsPerChannel = format.BitsPerPixel / channelCount;
 
-				this.imageFileName = Path.GetFileName(path);
+				imageFileName = Path.GetFileName(path);
 
 				if (format == PixelFormats.BlackWhite ||
 					format == PixelFormats.Gray2 ||
@@ -904,32 +904,32 @@ namespace HostTest
 					format == PixelFormats.Gray16 ||
 					format == PixelFormats.Gray32Float)
 				{
-					this.imageType = "Gray/";
+					imageType = "Gray/";
 				}
 				else
 				{
-					this.imageType = "RGB/";
+					imageType = "RGB/";
 				}
 
-				this.canvas.ClearSelection();
+				canvas.ClearSelection();
 
-				this.panel1.SuspendLayout();
+				panel1.SuspendLayout();
 
 				if (bitsPerChannel >= 16)
 				{
 					// Convert the image to an 8 bits-per-channel format for display.
 					UpdateCanvasImage(new FormatConvertedBitmap(srcImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0));
 
-					this.imageType += "16";
+					imageType += "16";
 				}
 				else
 				{
 					UpdateCanvasImage(srcImage);
 
-					this.imageType += "8";
+					imageType += "8";
 				}
 
-				this.panelClientSize = this.panel1.ClientSize;
+				panelClientSize = panel1.ClientSize;
 
 				if (canvas.Size.Width > panel1.ClientSize.Width ||
 					canvas.Size.Height > panel1.ClientSize.Height)
@@ -947,38 +947,38 @@ namespace HostTest
 						clientSize.Height -= SystemInformation.HorizontalScrollBarHeight;
 					}
 
-					this.panelClientSize = clientSize;
-					this.canvas.ZoomToWindow(clientSize);
+					panelClientSize = clientSize;
+					canvas.ZoomToWindow(clientSize);
 				}
 				else
 				{
-					this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.applicationName, this.imageFileName, 100, this.imageType });
+					Text = string.Format(Resources.TitleStringFormat, new object[] { applicationName, imageFileName, 100, imageType });
 
-					this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
-					this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
-					this.zoomToWindowBtn.Enabled = this.canvas.CanZoomToWindow(this.panel1.ClientSize);
-					this.zoomToActualSizeBtn.Enabled = this.canvas.CanZoomToActualSize();
+					zoomInBtn.Enabled = canvas.CanZoomIn();
+					zoomOutBtn.Enabled = canvas.CanZoomOut();
+					zoomToWindowBtn.Enabled = canvas.CanZoomToWindow(panel1.ClientSize);
+					zoomToActualSizeBtn.Enabled = canvas.CanZoomToActualSize();
 				}
 
-				this.panel1.ResumeLayout(true);
+				panel1.ResumeLayout(true);
 
-				this.disabledIncompatableFilters = false;
+				disabledIncompatableFilters = false;
 
-				this.pointerSelectBtn.Enabled = true;
-				this.rectangleSelectBtn.Enabled = true;
-				this.elipseSelectBtn.Enabled = true;
+				pointerSelectBtn.Enabled = true;
+				rectangleSelectBtn.Enabled = true;
+				elipseSelectBtn.Enabled = true;
 
-				this.historyStack.Clear();
+				historyStack.Clear();
 
-				this.canvas.IsDirty = false;
-				this.dstImage = null;
+				canvas.IsDirty = false;
+				dstImage = null;
 
-				this.hostInfo.Title = this.imageFileName;
+				hostInfo.Title = imageFileName;
 
 				if (!string.IsNullOrEmpty(srcImageTempFileName))
 				{
 					File.Delete(srcImageTempFileName);
-					this.srcImageTempFileName = string.Empty;
+					srcImageTempFileName = string.Empty;
 				}
 			}
 			catch (Exception)
@@ -987,7 +987,7 @@ namespace HostTest
 			}
 			finally
 			{
-				this.Cursor = Cursors.Default;
+				Cursor = Cursors.Default;
 			}
 		}
 
@@ -999,19 +999,19 @@ namespace HostTest
 
 				if (bitsPerChannel >= 16)
 				{
-					this.saveFileDialog1.Filter = "PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
-					this.saveFileDialog1.FilterIndex = 1;
+					saveFileDialog1.Filter = "PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
+					saveFileDialog1.FilterIndex = 1;
 				}
 				else
 				{
-					this.saveFileDialog1.Filter = "Bitmap Image (*.bmp)|*.bmp|GIF Image (*.gif)|*.gif|JPEG Image (*.jpg, *.jpeg, *.jpe)|*.jpg;*.jpeg;*.jpe|PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
-					this.saveFileDialog1.FilterIndex = 4;
+					saveFileDialog1.Filter = "Bitmap Image (*.bmp)|*.bmp|GIF Image (*.gif)|*.gif|JPEG Image (*.jpg, *.jpeg, *.jpe)|*.jpg;*.jpeg;*.jpe|PNG Image (*.png)|*.png|TIFF Image (*.tif, *.tiff)|*.tif;*.tiff|Windows Media Photo (*.wdp, *.jxr)|*.wdp;*.jxr";
+					saveFileDialog1.FilterIndex = 4;
 				}
-				this.saveFileDialog1.FileName = Path.ChangeExtension(this.imageFileName, null);
+				saveFileDialog1.FileName = Path.ChangeExtension(imageFileName, null);
 
 				if (saveFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
 				{
-					string path = this.saveFileDialog1.FileName;
+					string path = saveFileDialog1.FileName;
 					BitmapEncoder encoder = null;
 
 					switch (Path.GetExtension(path).ToUpperInvariant())
@@ -1044,7 +1044,7 @@ namespace HostTest
 
 					try
 					{
-						metaData = this.srcImage.Metadata as BitmapMetadata;
+						metaData = srcImage.Metadata as BitmapMetadata;
 					}
 					catch (NotSupportedException)
 					{
@@ -1058,7 +1058,7 @@ namespace HostTest
 					ReadOnlyCollection<ColorContext> colorContexts = null;
 					if (srcColorContext != null)
 					{
-						colorContexts = Array.AsReadOnly(new ColorContext[] { this.srcColorContext });
+						colorContexts = Array.AsReadOnly(new ColorContext[] { srcColorContext });
 					}
 
 					encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, colorContexts));
@@ -1070,7 +1070,7 @@ namespace HostTest
 							encoder.Save(fs);
 						}
 
-						this.canvas.IsDirty = false;
+						canvas.IsDirty = false;
 					}
 					catch (ArgumentException ex)
 					{
@@ -1096,15 +1096,15 @@ namespace HostTest
 		{
 			if (!pointerSelectBtn.Checked)
 			{
-				this.rectangleSelectBtn.Checked = false;
-				this.elipseSelectBtn.Checked = false;
-				this.pointerSelectBtn.Checked = true;
-				this.toolStripStatusLabel1.Text = string.Empty;
+				rectangleSelectBtn.Checked = false;
+				elipseSelectBtn.Checked = false;
+				pointerSelectBtn.Checked = true;
+				toolStripStatusLabel1.Text = string.Empty;
 			}
 
 			if (canvas.SelectionType != null)
 			{
-				this.canvas.SelectionType = null;
+				canvas.SelectionType = null;
 			}
 		}
 
@@ -1112,15 +1112,15 @@ namespace HostTest
 		{
 			if (!rectangleSelectBtn.Checked)
 			{
-				this.pointerSelectBtn.Checked = false;
-				this.elipseSelectBtn.Checked = false;
-				this.rectangleSelectBtn.Checked = true;
-				this.toolStripStatusLabel1.Text = Resources.RectangleSelectionToolStatusText;
+				pointerSelectBtn.Checked = false;
+				elipseSelectBtn.Checked = false;
+				rectangleSelectBtn.Checked = true;
+				toolStripStatusLabel1.Text = Resources.RectangleSelectionToolStatusText;
 			}
 
 			if ((canvas.SelectionType == null) || canvas.SelectionType.GetType() != typeof(RectangleSelectTool))
 			{
-				this.canvas.SelectionType = new RectangleSelectTool();
+				canvas.SelectionType = new RectangleSelectTool();
 			}
 		}
 
@@ -1128,48 +1128,48 @@ namespace HostTest
 		{
 			if (!elipseSelectBtn.Checked)
 			{
-				this.pointerSelectBtn.Checked = false;
-				this.rectangleSelectBtn.Checked = false;
-				this.elipseSelectBtn.Checked = true;
-				this.toolStripStatusLabel1.Text = Resources.EllipseSelectionToolStatusText;
+				pointerSelectBtn.Checked = false;
+				rectangleSelectBtn.Checked = false;
+				elipseSelectBtn.Checked = true;
+				toolStripStatusLabel1.Text = Resources.EllipseSelectionToolStatusText;
 			}
 
 			if ((canvas.SelectionType == null) || canvas.SelectionType.GetType() != typeof(EllipseSelectTool))
 			{
-				this.canvas.SelectionType = new EllipseSelectTool();
+				canvas.SelectionType = new EllipseSelectTool();
 			}
 		}
 
 		private void zoomInBtn_Click(object sender, EventArgs e)
 		{
-			this.canvas.ZoomIn();
+			canvas.ZoomIn();
 		}
 
 		private void zoomOutBtn_Click(object sender, EventArgs e)
 		{
-			this.canvas.ZoomOut();
+			canvas.ZoomOut();
 		}
 
 		private void zoomToWindowBtn_Click(object sender, EventArgs e)
 		{
 			if (!panelClientSize.IsEmpty)
 			{
-				this.canvas.ZoomToWindow(panelClientSize);
+				canvas.ZoomToWindow(panelClientSize);
 			}
 		}
 
 		private void zoomToActualSizeBtn_Click(object sender, EventArgs e)
 		{
-			this.canvas.ZoomToActualSize();
+			canvas.ZoomToActualSize();
 		}
 
 		private void canvas_ZoomChanged(object sender, CanvasZoomChangedEventArgs e)
 		{
-			this.zoomOutBtn.Enabled = this.canvas.CanZoomOut();
-			this.zoomInBtn.Enabled = this.canvas.CanZoomIn();
+			zoomOutBtn.Enabled = canvas.CanZoomOut();
+			zoomInBtn.Enabled = canvas.CanZoomIn();
 
-			this.zoomToActualSizeBtn.Enabled = this.canvas.CanZoomToActualSize();
-			this.zoomToWindowBtn.Enabled = this.canvas.CanZoomToWindow(panelClientSize);
+			zoomToActualSizeBtn.Enabled = canvas.CanZoomToActualSize();
+			zoomToWindowBtn.Enabled = canvas.CanZoomToWindow(panelClientSize);
 
 			int percent = 0;
 			if (e.NewZoom < 0.10f)
@@ -1181,26 +1181,26 @@ namespace HostTest
 				percent = (int)Math.Round(e.NewZoom * 100f);
 			}
 
-			this.Text = string.Format(Resources.TitleStringFormat, new object[] { this.applicationName, this.imageFileName, percent, this.imageType });
+			Text = string.Format(Resources.TitleStringFormat, new object[] { applicationName, imageFileName, percent, imageType });
 		}
 
 
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			this.historyStack.StepBackward(this.canvas, ref this.dstImage);
+			historyStack.StepBackward(canvas, ref dstImage);
 			EnableUndoButtons();
 		}
 
 		private void redoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			this.historyStack.StepForward(this.canvas, ref this.dstImage);
+			historyStack.StepForward(canvas, ref dstImage);
 			EnableUndoButtons();
 		}
 
 		private void EnableUndoButtons()
 		{
-			this.undoToolStripMenuItem.Enabled = this.historyStack.CanUndo;
-			this.redoToolStripMenuItem.Enabled = this.historyStack.CanRedo;
+			undoToolStripMenuItem.Enabled = historyStack.CanUndo;
+			redoToolStripMenuItem.Enabled = historyStack.CanRedo;
 		}
 
 		private void historyStack_HistoryChanged(object sender, EventArgs e)
@@ -1222,10 +1222,10 @@ namespace HostTest
 		{
 			using (ColorPickerForm dialog = new ColorPickerForm(Resources.ChoosePrimaryColor))
 			{
-				dialog.Color = this.primaryColorBtn.Color;
+				dialog.Color = primaryColorBtn.Color;
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
-					this.primaryColorBtn.Color = dialog.Color;
+					primaryColorBtn.Color = dialog.Color;
 				}
 			}
 		}
@@ -1234,10 +1234,10 @@ namespace HostTest
 		{
 			using (ColorPickerForm dialog = new ColorPickerForm(Resources.ChooseSecondaryColor))
 			{
-				dialog.Color = this.secondaryColorBtn.Color;
+				dialog.Color = secondaryColorBtn.Color;
 				if (dialog.ShowDialog() == DialogResult.OK)
 				{
-					this.secondaryColorBtn.Color = dialog.Color;
+					secondaryColorBtn.Color = dialog.Color;
 				}
 			}
 		}
@@ -1253,18 +1253,18 @@ namespace HostTest
 				TaskButton save = new TaskButton(Resources.saveHS, Resources.SaveChangesText, Resources.SaveChangesDescription);
 				TaskButton discard = new TaskButton(Resources.FileClose, Resources.DontSaveChangesText, Resources.DontSaveChangesDescription);
 				TaskButton cancel = new TaskButton(Resources.CancelIcon, Resources.CancelText, Resources.CancelDescription);
-				string actionText = string.Format(Resources.UnsavedChangesText, this.imageFileName);
+				string actionText = string.Format(Resources.UnsavedChangesText, imageFileName);
 
 				int width96 = (TaskDialog.DefaultPixelWidth96Dpi * 4) / 3; // 33% larger
 
-				using (Bitmap bmp = this.canvas.ResizeCopy(96, 96))
+				using (Bitmap bmp = canvas.ResizeCopy(96, 96))
 				{
 					TaskButton result = TaskDialog.Show(this, Resources.Warning, Resources.SaveChangesCaption, bmp, true, actionText,
 								new TaskButton[] { save, discard, cancel }, save, cancel, width96);
 
 					if (result == save)
 					{
-						this.saveToolStripMenuItem_Click(this, EventArgs.Empty);
+						saveToolStripMenuItem_Click(this, EventArgs.Empty);
 					}
 					else if (result == cancel)
 					{
@@ -1283,14 +1283,14 @@ namespace HostTest
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			this.Close();
+			Close();
 		}
 
 		protected override void OnResize(EventArgs e)
 		{
 			base.OnResize(e);
 
-			if (base.WindowState == FormWindowState.Maximized && this.canvas.IsActualSize)
+			if (base.WindowState == FormWindowState.Maximized && canvas.IsActualSize)
 			{
 				// If the window is maximized with the canvas at 100% do not resize the canvas.
 				return;
@@ -1298,16 +1298,16 @@ namespace HostTest
 
 			if (!panel1.ClientSize.IsEmpty && panelClientSize != panel1.ClientSize && canvas.Surface != null)
 			{
-				this.canvas.ResetSize();
-				this.panelClientSize = panel1.ClientSize;
+				canvas.ResetSize();
+				panelClientSize = panel1.ClientSize;
 
-				this.zoomToWindowBtn_Click(this, EventArgs.Empty);
+				zoomToWindowBtn_Click(this, EventArgs.Empty);
 			}
 		}
 
 		private void canvas_DirtyChanged(object sender, CanvasDirtyChangedEventArgs e)
 		{
-			this.saveToolStripMenuItem.Enabled = e.Dirty;
+			saveToolStripMenuItem.Enabled = e.Dirty;
 		}
 
 		private static bool FileDropIsImage(string file)
@@ -1339,7 +1339,7 @@ namespace HostTest
 
 		protected override void OnDragEnter(DragEventArgs drgevent)
 		{
-			this.dropImageFileName = string.Empty;
+			dropImageFileName = string.Empty;
 			drgevent.Effect = DragDropEffects.None;
 			if (drgevent.Data.GetDataPresent(DataFormats.FileDrop, false))
 			{
@@ -1348,7 +1348,7 @@ namespace HostTest
 				if (files != null && files.Length == 1 && FileDropIsImage(files[0]))
 				{
 					drgevent.Effect = DragDropEffects.Copy;
-					this.dropImageFileName = files[0];
+					dropImageFileName = files[0];
 				}
 			}
 
@@ -1357,11 +1357,11 @@ namespace HostTest
 
 		protected override void OnDragDrop(DragEventArgs drgevent)
 		{
-			if (!string.IsNullOrEmpty(this.dropImageFileName))
+			if (!string.IsNullOrEmpty(dropImageFileName))
 			{
 				try
 				{
-					OpenFile(this.dropImageFileName);
+					OpenFile(dropImageFileName);
 				}
 				catch (ArgumentException ex)
 				{
@@ -1436,9 +1436,9 @@ namespace HostTest
 
 			internal WorkerArgs(string path)
 			{
-				this.Path = path;
-				this.Filters = null;
-				this.AboutFilters = null;
+				Path = path;
+				Filters = null;
+				AboutFilters = null;
 			}
 		}
 
@@ -1517,44 +1517,44 @@ namespace HostTest
 				WorkerArgs args = (WorkerArgs)e.Result;
 				if (args.Filters != null)
 				{
-					this.filtersToolStripMenuItem.DropDownItems.AddRange(args.Filters);
+					filtersToolStripMenuItem.DropDownItems.AddRange(args.Filters);
 
 					if (args.AboutFilters.Length > 0)
 					{
-						this.aboutPluginsMenuItem.DropDownItems.AddRange(args.AboutFilters);
+						aboutPluginsMenuItem.DropDownItems.AddRange(args.AboutFilters);
 						if (!aboutPluginsMenuItem.Available)
 						{
-							this.aboutMenuToolStripSeparator.Available = true;
-							this.aboutPluginsMenuItem.Available = true;
+							aboutMenuToolStripSeparator.Available = true;
+							aboutPluginsMenuItem.Available = true;
 						}
 					}
 					else
 					{
-						this.aboutMenuToolStripSeparator.Available = false;
-						this.aboutPluginsMenuItem.Available = false;
+						aboutMenuToolStripSeparator.Available = false;
+						aboutPluginsMenuItem.Available = false;
 					}
 
 					EnableFiltersForImageFormat();
 
-					this.toolStripStatusLabel1.Text = string.Empty;
-					this.currentPluginDirectory = args.Path;
-					this.refreshFiltersToolStripMenuItem.Enabled = true;
+					toolStripStatusLabel1.Text = string.Empty;
+					currentPluginDirectory = args.Path;
+					refreshFiltersToolStripMenuItem.Enabled = true;
 				}
 				else
 				{
-					this.toolStripStatusLabel1.Text = Resources.NoFiltersStatusText;
-					this.refreshFiltersToolStripMenuItem.Enabled = false;
-					this.currentPluginDirectory = string.Empty;
+					toolStripStatusLabel1.Text = Resources.NoFiltersStatusText;
+					refreshFiltersToolStripMenuItem.Enabled = false;
+					currentPluginDirectory = string.Empty;
 
 					if (aboutPluginsMenuItem.Available)
 					{
-						this.aboutMenuToolStripSeparator.Available = false;
-						this.aboutPluginsMenuItem.Available = false;
+						aboutMenuToolStripSeparator.Available = false;
+						aboutPluginsMenuItem.Available = false;
 					}
 				}
 			}
 
-			this.Cursor = Cursors.Default;
+			Cursor = Cursors.Default;
 		}
 
 		private ColorPickerResult PickColorCallback(string prompt, byte defaultRed, byte defaultGreen, byte defaultBlue)
@@ -1577,29 +1577,29 @@ namespace HostTest
 
 		private void filtersToolStripMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			if (this.highDPIMode)
+			if (highDPIMode)
 			{
 				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
 				DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
 			}
-			if (!this.disabledIncompatableFilters)
+			if (!disabledIncompatableFilters)
 			{
-				this.Cursor = Cursors.WaitCursor;
+				Cursor = Cursors.WaitCursor;
 				try
 				{
 					EnableFiltersForImageFormat();
 				}
 				finally
 				{
-					this.Cursor = Cursors.Default;
+					Cursor = Cursors.Default;
 				}
-				this.disabledIncompatableFilters = true;
+				disabledIncompatableFilters = true;
 			}
 		}
 
 		private void aboutPluginsMenuItem_DropDownOpening(object sender, EventArgs e)
 		{
-			if (this.highDPIMode)
+			if (highDPIMode)
 			{
 				ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
 				DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);

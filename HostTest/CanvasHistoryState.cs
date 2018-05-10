@@ -31,7 +31,7 @@ namespace HostTest
         {
             this.image = (Bitmap)image.Clone();
 
-            this.disposed = false;
+            disposed = false;
         }
 
 
@@ -54,7 +54,7 @@ namespace HostTest
         {
             if (!disposed)
             {
-                this.disposed = true;
+                disposed = true;
 
                 if (disposing && image != null)
                 {

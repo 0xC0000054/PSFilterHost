@@ -20,8 +20,8 @@ namespace HostTest.Tools
         private Cursor cursor;
         public CursorChangedEventArgs(Cursor newCursor)
         {
-            this.cursor = newCursor;
-            this.disposed = false;
+            cursor = newCursor;
+            disposed = false;
         }
 
         public Cursor NewCursor
@@ -44,10 +44,10 @@ namespace HostTest.Tools
             {
                 if (disposing)
                 {
-                    if (this.cursor != null)
+                    if (cursor != null)
                     {
-                        this.cursor.Dispose();
-                        this.cursor = null;
+                        cursor.Dispose();
+                        cursor = null;
                     }
                     disposed = true;
                 }

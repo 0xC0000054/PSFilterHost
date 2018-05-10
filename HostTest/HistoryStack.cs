@@ -29,9 +29,9 @@ namespace HostTest
 
 		public HistoryStack()
 		{
-			this.historyList = new List<HistoryItem>();
-			this.index = -1;
-			this.disposed = false;
+            historyList = new List<HistoryItem>();
+            index = -1;
+            disposed = false;
 		}
 
 		/// <summary>
@@ -41,13 +41,13 @@ namespace HostTest
 		/// <param name="image">The current destination image.</param>
 		public void AddHistoryItem(CanvasHistoryState historyState, BitmapSource image)
 		{
-			if (this.index < (this.historyList.Count - 1))
+			if (index < (historyList.Count - 1))
 			{
-				this.historyList.RemoveRange(this.index + 1, (this.historyList.Count - 1) - this.index);
+                historyList.RemoveRange(index + 1, (historyList.Count - 1) - index);
 			}
 
-			this.historyList.Add(new HistoryItem(historyState, image));
-			this.index = this.historyList.Count - 1;
+            historyList.Add(new HistoryItem(historyState, image));
+            index = historyList.Count - 1;
 
 			OnHistoryChanged();
 		}
@@ -56,7 +56,7 @@ namespace HostTest
 		{
 			get
 			{
-				return this.historyList.Count;
+				return historyList.Count;
 			}
 		}
 
@@ -65,15 +65,15 @@ namespace HostTest
 		/// </summary>
 		public void Clear()
 		{
-			int count = this.historyList.Count;
+			int count = historyList.Count;
 
 			for (int i = 0; i < count; i++)
 			{
-				this.historyList[i].Dispose();
+                historyList[i].Dispose();
 			}
 
-			this.historyList.Clear();
-			this.index = -1;
+            historyList.Clear();
+            index = -1;
 
 			OnHistoryChanged();
 		}
@@ -85,18 +85,18 @@ namespace HostTest
 		/// <param name="image">The destination image for the current item.</param>
 		public void StepBackward(Canvas surface, ref BitmapSource image)
 		{
-			if (this.CanUndo)
+			if (CanUndo)
 			{
-				this.index--;
+                index--;
 
-				this.historyList[this.index].ToMemory();
+                historyList[index].ToMemory();
 
-				surface.CopyFromHistoryState(this.historyList[this.index].CanvasHistory);
-				image = this.historyList[this.index].Image;
+				surface.CopyFromHistoryState(historyList[index].CanvasHistory);
+				image = historyList[index].Image;
 
-				this.historyList[this.index].ToDisk();
+                historyList[index].ToDisk();
 
-				surface.IsDirty = this.index > 0;
+				surface.IsDirty = index > 0;
 			}
 		}
 
@@ -106,16 +106,16 @@ namespace HostTest
 		/// <param name="surface">The canvas to step forward.</param>
 		public void StepForward(Canvas surface, ref BitmapSource image)
 		{
-			if (this.CanRedo)
+			if (CanRedo)
 			{
-				this.index++;
+                index++;
 
-				this.historyList[this.index].ToMemory();
+                historyList[index].ToMemory();
 
-				surface.CopyFromHistoryState(this.historyList[this.index].CanvasHistory);
-				image = this.historyList[this.index].Image;
+				surface.CopyFromHistoryState(historyList[index].CanvasHistory);
+				image = historyList[index].Image;
 
-				this.historyList[this.index].ToDisk();
+                historyList[index].ToDisk();
 
 				surface.IsDirty = true;
 			}
@@ -125,7 +125,7 @@ namespace HostTest
 		{
 			get
 			{
-				return (this.index > 0);
+				return (index > 0);
 			}
 		}
 
@@ -133,13 +133,13 @@ namespace HostTest
 		{
 			get
 			{
-				return (this.index < (this.historyList.Count - 1));
+				return (index < (historyList.Count - 1));
 			}
 		}
 
 		private void OnHistoryChanged()
 		{
-			EventHandler historyChanged = this.HistoryChanged;
+			EventHandler historyChanged = HistoryChanged;
 
 			if (historyChanged != null)
 			{
@@ -156,12 +156,12 @@ namespace HostTest
 		{
 			if (!disposed)
 			{
-				for (int i = 0; i < this.historyList.Count; i++)
+				for (int i = 0; i < historyList.Count; i++)
 				{
-					this.historyList[i].Dispose();
+                    historyList[i].Dispose();
 				}
-				this.historyList = null;
-				this.disposed = true;
+                historyList = null;
+                disposed = true;
 			}
 		}
 		#endregion

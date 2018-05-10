@@ -151,7 +151,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.dest;
+				return dest;
 			}
 		}
 
@@ -212,8 +212,8 @@ namespace PSFilterHostDll.PSApi
 				throw new ArgumentNullException(nameof(colorProfiles));
 			}
 
-			this.colorProfileConverter.Initialize(colorProfiles);
-			this.documentColorProfile = colorProfiles.GetDocumentColorProfile();
+			colorProfileConverter.Initialize(colorProfiles);
+			documentColorProfile = colorProfiles.GetDocumentColorProfile();
 		}
 
 		/// <summary>
@@ -224,7 +224,7 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		internal PluginSettingsRegistry GetPluginSettings()
 		{
-			return this.basicSuiteProvider.GetPluginSettings();
+			return basicSuiteProvider.GetPluginSettings();
 		}
 
 		/// <summary>
@@ -235,14 +235,14 @@ namespace PSFilterHostDll.PSApi
 		/// </returns>
 		internal void SetPluginSettings(PluginSettingsRegistry value)
 		{
-			this.basicSuiteProvider.SetPluginSettings(value);
+			basicSuiteProvider.SetPluginSettings(value);
 		}
 
 		public string ErrorMessage
 		{
 			get
 			{
-				return this.errorMessage;
+				return errorMessage;
 			}
 		}
 
@@ -251,7 +251,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return new ParameterData(this.globalParameters, this.scriptingData);
+				return new ParameterData(globalParameters, scriptingData);
 			}
 			set
 			{
@@ -260,10 +260,10 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.globalParameters = value.GlobalParameters;
+				globalParameters = value.GlobalParameters;
 				if (value.ScriptingData != null)
 				{
-					this.scriptingData = value.ScriptingData;
+					scriptingData = value.ScriptingData;
 				}
 			}
 		}
@@ -275,7 +275,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			set
 			{
-				this.showUI = value;
+				showUI = value;
 			}
 		}
 
@@ -283,7 +283,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.resourceSuite.PseudoResources;
+				return resourceSuite.PseudoResources;
 			}
 			set
 			{
@@ -292,7 +292,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.resourceSuite.PseudoResources = value;
+				resourceSuite.PseudoResources = value;
 			}
 		}
 
@@ -300,7 +300,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.propertySuite.HostInformation;
+				return propertySuite.HostInformation;
 			}
 			set
 			{
@@ -309,7 +309,7 @@ namespace PSFilterHostDll.PSApi
 					throw new ArgumentNullException("value");
 				}
 
-				this.propertySuite.HostInformation = value;
+				propertySuite.HostInformation = value;
 			}
 		}
 
@@ -333,65 +333,65 @@ namespace PSFilterHostDll.PSApi
 				throw new ArgumentNullException(nameof(sourceImage));
 			}
 
-			this.dataPtr = IntPtr.Zero;
-			this.previousPhase = PluginPhase.None;
-			this.disposed = false;
-			this.copyToDest = true;
-			this.writesOutsideSelection = false;
-			this.sizesSetup = false;
-			this.frValuesSetup = false;
-			this.showUI = true;
-			this.parameterDataRestored = false;
-			this.pluginDataRestored = false;
-			this.globalParameters = new GlobalParameters();
-			this.scriptingData = null;
-			this.errorMessage = string.Empty;
-			this.filterParametersHandle = IntPtr.Zero;
-			this.pluginDataHandle = IntPtr.Zero;
-			this.inputHandling = FilterDataHandling.None;
-			this.outputHandling = FilterDataHandling.None;
-			this.parentWindowHandle = owner;
+			dataPtr = IntPtr.Zero;
+			previousPhase = PluginPhase.None;
+			disposed = false;
+			copyToDest = true;
+			writesOutsideSelection = false;
+			sizesSetup = false;
+			frValuesSetup = false;
+			showUI = true;
+			parameterDataRestored = false;
+			pluginDataRestored = false;
+			globalParameters = new GlobalParameters();
+			scriptingData = null;
+			errorMessage = string.Empty;
+			filterParametersHandle = IntPtr.Zero;
+			pluginDataHandle = IntPtr.Zero;
+			inputHandling = FilterDataHandling.None;
+			outputHandling = FilterDataHandling.None;
+			parentWindowHandle = owner;
 
 			abortFunc = null;
 			progressFunc = null;
 			ColorPickerManager.SetPickColorCallback(null);
-			this.descriptorSuite = new DescriptorSuite();
-			this.resourceSuite = new ResourceSuite();
+			descriptorSuite = new DescriptorSuite();
+			resourceSuite = new ResourceSuite();
 
-			this.useChannelPorts = false;
-			this.colorProfileConverter = new ColorProfileConverter();
-			this.documentColorProfile = null;
+			useChannelPorts = false;
+			colorProfileConverter = new ColorProfileConverter();
+			documentColorProfile = null;
 
-			this.lastInRect = Rect16.Empty;
-			this.lastOutRect = Rect16.Empty;
-			this.lastMaskRect = Rect16.Empty;
-			this.lastInLoPlane = -1;
-			this.lastOutRowBytes = 0;
-			this.lastOutHiPlane = 0;
-			this.lastOutLoPlane = -1;
+			lastInRect = Rect16.Empty;
+			lastOutRect = Rect16.Empty;
+			lastMaskRect = Rect16.Empty;
+			lastInLoPlane = -1;
+			lastOutRowBytes = 0;
+			lastOutHiPlane = 0;
+			lastOutLoPlane = -1;
 
 #if GDIPLUS
-			this.source = SurfaceFactory.CreateFromGdipBitmap(sourceImage, out this.imageMode);
+			source = SurfaceFactory.CreateFromGdipBitmap(sourceImage, out imageMode);
 #else
-			this.source = SurfaceFactory.CreateFromBitmapSource(sourceImage, out this.imageMode);
+			source = SurfaceFactory.CreateFromBitmapSource(sourceImage, out imageMode);
 #endif
-			this.dest = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, source.DpiX, source.DpiY, this.imageMode);
+			dest = SurfaceFactory.CreateFromImageMode(source.Width, source.Height, source.DpiX, source.DpiY, imageMode);
 
-			this.advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
-			this.colorServicesProc = new ColorServicesProc(ColorServicesProc);
-			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
-			this.hostProc = new HostProcs(HostProc);
-			this.processEventProc = new ProcessEventProc(ProcessEvent);
-			this.progressProc = new ProgressProc(ProgressProc);
-			this.abortProc = new TestAbortProc(AbortProc);
+			advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
+			colorServicesProc = new ColorServicesProc(ColorServicesProc);
+			displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
+			hostProc = new HostProcs(HostProc);
+			processEventProc = new ProcessEventProc(ProcessEvent);
+			progressProc = new ProgressProc(ProgressProc);
+			abortProc = new TestAbortProc(AbortProc);
 
-			this.channelPortsSuite = new ChannelPortsSuite(this, imageMode);
-			this.imageServicesSuite = new ImageServicesSuite();
-			this.propertySuite = new PropertySuite(sourceImage, this.imageMode);
-			this.readImageDocument = new ReadImageDocument(source.Width, source.Height, source.DpiX, source.DpiY, imageMode);
-			this.basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
+			channelPortsSuite = new ChannelPortsSuite(this, imageMode);
+			imageServicesSuite = new ImageServicesSuite();
+			propertySuite = new PropertySuite(sourceImage, imageMode);
+			readImageDocument = new ReadImageDocument(source.Width, source.Height, source.DpiX, source.DpiY, imageMode);
+			basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
 
-			this.selectedRegion = null;
+			selectedRegion = null;
 
 			if (selection != null)
 			{
@@ -400,16 +400,16 @@ namespace PSFilterHostDll.PSApi
 
 				if (!selectionBounds.IsEmpty && selectionBounds != source.Bounds)
 				{
-					this.selectedRegion = selection.Clone();
+					selectedRegion = selection.Clone();
 				}
 			}
 
-			this.foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
-			this.backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
+			foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
+			backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
 
 			unsafe
 			{
-				this.platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
+				platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
 				((PlatformData*)platformDataPtr.ToPointer())->hwnd = owner;
 			}
 
@@ -438,22 +438,22 @@ namespace PSFilterHostDll.PSApi
 		/// <param name="owner">The parent window handle.</param>
 		private LoadPsFilter(IntPtr owner)
 		{
-			this.parentWindowHandle = owner;
+			parentWindowHandle = owner;
 
-			this.advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
-			this.colorServicesProc = new ColorServicesProc(ColorServicesProc);
-			this.displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
-			this.hostProc = new HostProcs(HostProc);
-			this.processEventProc = new ProcessEventProc(ProcessEvent);
-			this.progressProc = new ProgressProc(ProgressProc);
-			this.abortProc = new TestAbortProc(AbortProc);
+			advanceStateProc = new AdvanceStateProc(AdvanceStateProc);
+			colorServicesProc = new ColorServicesProc(ColorServicesProc);
+			displayPixelsProc = new DisplayPixelsProc(DisplayPixelsProc);
+			hostProc = new HostProcs(HostProc);
+			processEventProc = new ProcessEventProc(ProcessEvent);
+			progressProc = new ProgressProc(ProgressProc);
+			abortProc = new TestAbortProc(AbortProc);
 
-			this.basicSuiteProvider = new SPBasicSuiteProvider(this);
-			this.basicSuitePtr = basicSuiteProvider.CreateSPBasicSuitePointer();
+			basicSuiteProvider = new SPBasicSuiteProvider(this);
+			basicSuitePtr = basicSuiteProvider.CreateSPBasicSuitePointer();
 
 			unsafe
 			{
-				this.platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
+				platformDataPtr = Memory.Allocate(Marshal.SizeOf(typeof(PlatformData)), true);
 				((PlatformData*)platformDataPtr.ToPointer())->hwnd = owner;
 			}
 		}
@@ -462,7 +462,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.source;
+				return source;
 			}
 		}
 
@@ -470,7 +470,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.dest;
+				return dest;
 			}
 		}
 
@@ -478,7 +478,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.mask;
+				return mask;
 			}
 		}
 
@@ -486,7 +486,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.parentWindowHandle;
+				return parentWindowHandle;
 			}
 		}
 
@@ -494,7 +494,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.displayPixelsProc;
+				return displayPixelsProc;
 			}
 		}
 
@@ -502,7 +502,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.processEventProc;
+				return processEventProc;
 			}
 		}
 
@@ -510,7 +510,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.progressProc;
+				return progressProc;
 			}
 		}
 
@@ -518,7 +518,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				return this.abortProc;
+				return abortProc;
 			}
 		}
 
@@ -526,7 +526,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
 			{
-				this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
+				filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
 			}
 			else
 			{
@@ -538,18 +538,18 @@ namespace PSFilterHostDll.PSApi
 				{
 					if (source.HasTransparency())
 					{
-						this.filterCase = FilterCase.FloatingSelection;
+						filterCase = FilterCase.FloatingSelection;
 					}
 					else
 					{
-						this.filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
+						filterCase = selectedRegion != null ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
 					}
 				}
 				else
 				{
-					this.filterCase = selectedRegion != null ? FilterCase.EditableTransparencyWithSelection : FilterCase.EditableTransparencyNoSelection;
+					filterCase = selectedRegion != null ? FilterCase.EditableTransparencyWithSelection : FilterCase.EditableTransparencyNoSelection;
 
-					int filterCaseIndex = (int)this.filterCase - 1;
+					int filterCaseIndex = (int)filterCase - 1;
 					FilterCaseInfo[] filterInfo = data.FilterInfo;
 
 					// If the EditableTransparency cases are not supported use the other modes.
@@ -560,10 +560,10 @@ namespace PSFilterHostDll.PSApi
 							switch (filterCase)
 							{
 								case FilterCase.EditableTransparencyNoSelection:
-									this.filterCase = FilterCase.FlatImageNoSelection;
+									filterCase = FilterCase.FlatImageNoSelection;
 									break;
 								case FilterCase.EditableTransparencyWithSelection:
-									this.filterCase = FilterCase.FlatImageWithSelection;
+									filterCase = FilterCase.FlatImageWithSelection;
 									break;
 							}
 						}
@@ -572,17 +572,17 @@ namespace PSFilterHostDll.PSApi
 							// If the protected transparency modes are not supported use the next most appropriate mode.
 							if (filterInfo[(int)FilterCase.FloatingSelection - 1].inputHandling != FilterDataHandling.CantFilter)
 							{
-								this.filterCase = FilterCase.FloatingSelection;
+								filterCase = FilterCase.FloatingSelection;
 							}
 							else
 							{
 								switch (filterCase)
 								{
 									case FilterCase.EditableTransparencyNoSelection:
-										this.filterCase = FilterCase.FlatImageNoSelection;
+										filterCase = FilterCase.FlatImageNoSelection;
 										break;
 									case FilterCase.EditableTransparencyWithSelection:
-										this.filterCase = FilterCase.FlatImageWithSelection;
+										filterCase = FilterCase.FlatImageWithSelection;
 										break;
 								}
 							}
@@ -592,10 +592,10 @@ namespace PSFilterHostDll.PSApi
 							switch (filterCase)
 							{
 								case FilterCase.EditableTransparencyNoSelection:
-									this.filterCase = FilterCase.ProtectedTransparencyNoSelection;
+									filterCase = FilterCase.ProtectedTransparencyNoSelection;
 									break;
 								case FilterCase.EditableTransparencyWithSelection:
-									this.filterCase = FilterCase.ProtectedTransparencyWithSelection;
+									filterCase = FilterCase.ProtectedTransparencyWithSelection;
 									break;
 							}
 
@@ -681,11 +681,11 @@ namespace PSFilterHostDll.PSApi
 				Dictionary<uint, AETEValue> data;
 				if (basicSuiteProvider.TryGetScriptingData(descriptorParameters->descriptor, out data))
 				{
-					this.scriptingData = data;
+					scriptingData = data;
 				}
 				else if (descriptorSuite.TryGetScriptingData(descriptorParameters->descriptor, out data))
 				{
-					this.scriptingData = data;
+					scriptingData = data;
 				}
 				HandleSuite.Instance.UnlockHandle(descriptorParameters->descriptor);
 				HandleSuite.Instance.DisposeHandle(descriptorParameters->descriptor);
@@ -710,8 +710,8 @@ namespace PSFilterHostDll.PSApi
 					Marshal.Copy(HandleSuite.Instance.LockHandle(filterRecord->parameters, 0), buf, 0, buf.Length);
 					HandleSuite.Instance.UnlockHandle(filterRecord->parameters);
 
-					this.globalParameters.SetParameterDataBytes(buf);
-					this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+					globalParameters.SetParameterDataBytes(buf);
+					globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 				}
 				else
 				{
@@ -732,10 +732,10 @@ namespace PSFilterHostDll.PSApi
 								{
 									byte[] buf = new byte[(int)ps];
 									Marshal.Copy(hPtr, buf, 0, buf.Length);
-									this.globalParameters.SetParameterDataBytes(buf);
-									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
+									globalParameters.SetParameterDataBytes(buf);
+									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
 									// Some filters may store executable code in the parameter block.
-									this.globalParameters.ParameterDataExecutable = IsMemoryExecutable(hPtr);
+									globalParameters.ParameterDataExecutable = IsMemoryExecutable(hPtr);
 								}
 
 							}
@@ -747,16 +747,16 @@ namespace PSFilterHostDll.PSApi
 									byte[] buf = new byte[(int)pointerSize];
 
 									Marshal.Copy(hPtr, buf, 0, buf.Length);
-									this.globalParameters.SetParameterDataBytes(buf);
-									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+									globalParameters.SetParameterDataBytes(buf);
+									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 								}
 								else
 								{
 									byte[] buf = new byte[(int)size];
 
 									Marshal.Copy(parameters, buf, 0, buf.Length);
-									this.globalParameters.SetParameterDataBytes(buf);
-									this.globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
+									globalParameters.SetParameterDataBytes(buf);
+									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 								}
 
 							}
@@ -799,8 +799,8 @@ namespace PSFilterHostDll.PSApi
 						Marshal.Copy(HandleSuite.Instance.LockHandle(pluginData, 0), dataBuf, 0, dataBuf.Length);
 						HandleSuite.Instance.UnlockHandle(pluginData);
 
-						this.globalParameters.SetPluginDataBytes(dataBuf);
-						this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
+						globalParameters.SetPluginDataBytes(dataBuf);
+						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.HandleSuite;
 					}
 					else if (pluginDataSize == OTOFHandleSize && Marshal.ReadInt32(pluginData, IntPtr.Size) == OTOFSignature)
 					{
@@ -810,9 +810,9 @@ namespace PSFilterHostDll.PSApi
 						{
 							byte[] dataBuf = new byte[(int)ps];
 							Marshal.Copy(hPtr, dataBuf, 0, dataBuf.Length);
-							this.globalParameters.SetPluginDataBytes(dataBuf);
-							this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
-							this.globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
+							globalParameters.SetPluginDataBytes(dataBuf);
+							globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
+							globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
 						}
 
 					}
@@ -820,8 +820,8 @@ namespace PSFilterHostDll.PSApi
 					{
 						byte[] dataBuf = new byte[(int)pluginDataSize];
 						Marshal.Copy(pluginData, dataBuf, 0, dataBuf.Length);
-						this.globalParameters.SetPluginDataBytes(dataBuf);
-						this.globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
+						globalParameters.SetPluginDataBytes(dataBuf);
+						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 					}
 
 				}
@@ -1525,21 +1525,21 @@ namespace PSFilterHostDll.PSApi
 		{
 			LoadFilter(pdata);
 
-			this.useChannelPorts = EnableChannelPorts(pdata);
-			this.basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
+			useChannelPorts = EnableChannelPorts(pdata);
+			basicSuiteProvider.SetPluginName(pdata.Title.TrimEnd('.'));
 
 			SetFilterTransparencyMode(pdata);
 
 			if (pdata.FilterInfo != null)
 			{
-				FilterCaseInfo info = pdata.FilterInfo[(int)this.filterCase - 1];
-				this.inputHandling = info.inputHandling;
-				this.outputHandling = info.outputHandling;
+				FilterCaseInfo info = pdata.FilterInfo[(int)filterCase - 1];
+				inputHandling = info.inputHandling;
+				outputHandling = info.outputHandling;
 
 				FilterCaseInfoFlags filterCaseFlags = info.flags1;
 
-				this.copyToDest = ((filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
-				this.writesOutsideSelection = ((filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
+				copyToDest = ((filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
+				writesOutsideSelection = ((filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
 
 				bool worksWithBlankData = ((filterCaseFlags & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
 
@@ -1564,8 +1564,8 @@ namespace PSFilterHostDll.PSApi
 				CopySourceTransparency();
 			}
 
-			this.descriptorSuite.Aete = pdata.Aete;
-			this.basicSuiteProvider.Aete = pdata.Aete;
+			descriptorSuite.Aete = pdata.Aete;
+			basicSuiteProvider.Aete = pdata.Aete;
 
 			SetupSuites();
 			SetupFilterRecord();
@@ -1696,11 +1696,11 @@ namespace PSFilterHostDll.PSApi
 				{
 					if (basicSuiteProvider.ErrorSuiteMessage != null)
 					{
-						message = this.basicSuiteProvider.ErrorSuiteMessage;
+						message = basicSuiteProvider.ErrorSuiteMessage;
 					}
 					else
 					{
-						message = StringUtil.FromPascalString(this.errorStringPtr, string.Empty);
+						message = StringUtil.FromPascalString(errorStringPtr, string.Empty);
 					}
 				}
 				else
@@ -1708,7 +1708,7 @@ namespace PSFilterHostDll.PSApi
 					switch (error)
 					{
 						case PSError.filterBadMode:
-							message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(this.imageMode));
+							message = string.Format(CultureInfo.CurrentCulture, Resources.FilterBadModeFormat, GetImageModeString(imageMode));
 							break;
 						case PSError.filterBadParameters:
 							message = Resources.FilterBadParameters;
@@ -3702,7 +3702,7 @@ namespace PSFilterHostDll.PSApi
 
 			SafeNativeMethods.memset(mask.Scan0.Pointer, 0, new UIntPtr((ulong)mask.Scan0.Length));
 
-			Rectangle[] scans = this.selectedRegion.GetRegionScansReadOnlyInt();
+			Rectangle[] scans = selectedRegion.GetRegionScansReadOnlyInt();
 
 			for (int i = 0; i < scans.Length; i++)
 			{
@@ -4027,8 +4027,8 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->descriptorParameters = descriptorParametersPtr;
 
 			// The errorStringPtr value is used so the filters cannot corrupt the pointer that we release when the class is disposed.
-			this.errorStringPtr = Memory.Allocate(256L, true);
-			filterRecord->errorString = this.errorStringPtr;
+			errorStringPtr = Memory.Allocate(256L, true);
+			filterRecord->errorString = errorStringPtr;
 
 			filterRecord->channelPortProcs = channelPortsPtr;
 			filterRecord->documentInfo = readDocumentPtr;

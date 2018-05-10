@@ -28,7 +28,7 @@ namespace HostTest
         {
             if (m.Msg == WM_CHAR || m.Msg == WM_SYSKEYCHAR || m.Msg == WM_IME_CHAR)
             {
-                this.escapePressed = (m.WParam == EscapeKey);
+                escapePressed = (m.WParam == EscapeKey);
             }
 
             return false;
@@ -36,12 +36,12 @@ namespace HostTest
 
         public AbortMessageFilter()
         {
-            this.escapePressed = false;
+            escapePressed = false;
         }
 
         public void Reset()
         {
-            this.escapePressed = false;
+            escapePressed = false;
         }
 
         public bool AbortFilterCallback()

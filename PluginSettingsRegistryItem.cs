@@ -41,7 +41,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.values;
+                return values;
             }
         }
 
@@ -55,7 +55,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.isPersistent;
+                return isPersistent;
             }
         }
     }

@@ -26,16 +26,16 @@ namespace HostTest
 
         public ColorToolStripButton()
         {
-            this.imageWidth = 16;
-            this.imageHeight = 16;
+            imageWidth = 16;
+            imageHeight = 16;
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing && image != null)
             {
-                this.image.Dispose();
-                this.image = null;
+                image.Dispose();
+                image = null;
             }
 
             base.Dispose(disposing);
@@ -58,7 +58,7 @@ namespace HostTest
             {
                 if (color != value)
                 {
-                    this.color = value;
+                    color = value;
 
                     DrawImage();
                 }
@@ -84,8 +84,8 @@ namespace HostTest
             {
                 if (imageWidth != value.Width || imageHeight != value.Height)
                 {
-                    this.imageWidth = value.Width;
-                    this.imageHeight = value.Height;
+                    imageWidth = value.Width;
+                    imageHeight = value.Height;
                     DrawImage();
                 }
             }

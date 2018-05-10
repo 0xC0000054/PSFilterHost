@@ -82,9 +82,9 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(resourceData));
 			}
 
-			this.key = resourceKey;
-			this.index = resourceIndex;
-			this.data = (byte[])resourceData.Clone();
+			key = resourceKey;
+			index = resourceIndex;
+			data = (byte[])resourceData.Clone();
 		}
 
 		/// <summary>
@@ -100,9 +100,9 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(existing));
 			}
 
-			this.key = existing.key;
-			this.index = newIndex;
-			this.data = (byte[])existing.data.Clone();
+			key = existing.key;
+			index = newIndex;
+			data = (byte[])existing.data.Clone();
 		}
 
 		/// <summary>
@@ -136,7 +136,7 @@ namespace PSFilterHostDll
 				return false;
 			}
 
-			return (this.key == other.key && this.index == other.index);
+			return (key == other.key && index == other.index);
 		}
 
 		/// <summary>
@@ -147,7 +147,7 @@ namespace PSFilterHostDll
 		/// </returns>
 		public override int GetHashCode()
 		{
-			return HashCodeHelper.GetHashCode(this.key, this.index);
+			return HashCodeHelper.GetHashCode(key, index);
 		}
 
 		/// <summary>
@@ -189,7 +189,7 @@ namespace PSFilterHostDll
 		/// <returns>True if this instance is equal; otherwise false.</returns>
 		internal bool Equals(uint otherKey, int otherIndex)
 		{
-			return (this.key == otherKey && this.index == otherIndex);
+			return (key == otherKey && index == otherIndex);
 		}
 
 		/// <summary>
@@ -199,7 +199,7 @@ namespace PSFilterHostDll
 		/// <returns>True if this instance is equal; otherwise false.</returns>
 		internal bool Equals(uint otherKey)
 		{
-			return (this.key == otherKey);
+			return (key == otherKey);
 		}
 
 		private PSResource(SerializationInfo info, StreamingContext context)
@@ -209,9 +209,9 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(info));
 			}
 
-			this.key = info.GetUInt32("key");
-			this.index = info.GetInt32("index");
-			this.data = (byte[])info.GetValue("data", typeof(byte[]));
+			key = info.GetUInt32("key");
+			index = info.GetInt32("index");
+			data = (byte[])info.GetValue("data", typeof(byte[]));
 		}
 
 		/// <summary>
@@ -231,9 +231,9 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(info));
 			}
 
-			info.AddValue("key", this.key);
-			info.AddValue("index", this.index);
-			info.AddValue("data", this.data, typeof(byte[]));
+			info.AddValue("key", key);
+			info.AddValue("index", index);
+			info.AddValue("data", data, typeof(byte[]));
 		}
 	}
 }

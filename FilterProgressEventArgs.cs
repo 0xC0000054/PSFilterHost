@@ -34,7 +34,7 @@ namespace PSFilterHostDll
 
         internal FilterProgressEventArgs(int progressDone)
         {
-            this.progress = progressDone;
+            progress = progressDone;
         }
 
     }

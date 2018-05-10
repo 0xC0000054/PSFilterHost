@@ -40,8 +40,8 @@ namespace PSFilterHostDll.PSApi
         /// <exception cref="System.IO.FileNotFoundException">The file specified by <paramref name="fileName"/> cannot be found.</exception>
         public PluginModule(string fileName, string entryPoint)
         {
-            this.disposed = false;
-            this.handle = UnsafeNativeMethods.LoadLibraryExW(fileName, IntPtr.Zero, 0U);
+            disposed = false;
+            handle = UnsafeNativeMethods.LoadLibraryExW(fileName, IntPtr.Zero, 0U);
             if (!handle.IsInvalid)
             {
                 IntPtr address = UnsafeNativeMethods.GetProcAddress(handle, entryPoint);
@@ -53,8 +53,8 @@ namespace PSFilterHostDll.PSApi
                 }
                 else
                 {
-                    this.handle.Dispose();
-                    this.handle = null;
+                    handle.Dispose();
+                    handle = null;
 
                     throw new EntryPointNotFoundException(string.Format(CultureInfo.CurrentCulture, Resources.PluginEntryPointNotFound, entryPoint, fileName));
                 }
@@ -98,7 +98,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (!disposed)
             {
-                this.disposed = true;
+                disposed = true;
 
                 if (handle != null && !handle.IsClosed)
                 {

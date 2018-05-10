@@ -45,13 +45,13 @@ namespace PSFilterHostDll.PSApi
 
             this.filterImageProvider = filterImageProvider;
             this.imageMode = imageMode;
-            this.readPixelsProc = new ReadPixelsProc(ReadPixelsProc);
-            this.writeBasePixelsProc = new WriteBasePixelsProc(WriteBasePixels);
-            this.readPortForWritePortProc = new ReadPortForWritePortProc(ReadPortForWritePort);
-            this.scaledChannelSurface = null;
-            this.ditheredChannelSurface = null;
-            this.scaledSelectionMask = null;
-            this.disposed = false;
+            readPixelsProc = new ReadPixelsProc(ReadPixelsProc);
+            writeBasePixelsProc = new WriteBasePixelsProc(WriteBasePixels);
+            readPortForWritePortProc = new ReadPortForWritePortProc(ReadPortForWritePort);
+            scaledChannelSurface = null;
+            ditheredChannelSurface = null;
+            scaledSelectionMask = null;
+            disposed = false;
         }
 
         public unsafe IntPtr CreateChannelPortsSuitePointer()
@@ -385,7 +385,7 @@ namespace PSFilterHostDll.PSApi
             }
             else
             {
-                ImageModes mode = this.imageMode;
+                ImageModes mode = imageMode;
 
                 if (source.BitsPerChannel == 16 && destination.depth == 8)
                 {

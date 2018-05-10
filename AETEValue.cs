@@ -115,8 +115,8 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(info));
 			}
 
-			this.unit = info.GetUInt32("unit");
-			this.value = info.GetDouble("value");
+			unit = info.GetUInt32("unit");
+			value = info.GetDouble("value");
 		}
 
 		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
@@ -126,8 +126,8 @@ namespace PSFilterHostDll
 				throw new ArgumentNullException(nameof(info));
 			}
 
-			info.AddValue("unit", this.unit);
-			info.AddValue("value", this.value);
+			info.AddValue("unit", unit);
+			info.AddValue("value", value);
 		}
 	}
 
@@ -141,7 +141,7 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.type;
+				return type;
 			}
 		}
 
@@ -149,7 +149,7 @@ namespace PSFilterHostDll
 		{
 			get
 			{
-				return this.value;
+				return value;
 			}
 		}
 

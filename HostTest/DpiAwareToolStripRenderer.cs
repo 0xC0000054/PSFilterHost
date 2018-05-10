@@ -26,7 +26,7 @@ namespace HostTest
 
         public DpiAwareToolStripRenderer() : base()
         {
-            this.arrowPoints = new Point[3];
+            arrowPoints = new Point[3];
         }
 
         protected override void OnRenderArrow(ToolStripArrowRenderEventArgs e)
@@ -41,35 +41,35 @@ namespace HostTest
                 {
                     case ArrowDirection.Up:
 
-                        this.arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y + 1);
-                        this.arrowPoints[1] = new Point(center.X + ArrowOffset2X + 1, center.Y + 1);
-                        this.arrowPoints[2] = new Point(center.X, center.Y - ArrowOffset2Y);
+                        arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y + 1);
+                        arrowPoints[1] = new Point(center.X + ArrowOffset2X + 1, center.Y + 1);
+                        arrowPoints[2] = new Point(center.X, center.Y - ArrowOffset2Y);
 
                         break;
                     case ArrowDirection.Left:
 
-                        this.arrowPoints[0] = new Point(center.X + ArrowOffset2X, center.Y - ArrowOffset4Y);
-                        this.arrowPoints[1] = new Point(center.X + ArrowOffset2X, center.Y + ArrowOffset4Y);
-                        this.arrowPoints[2] = new Point(center.X - ArrowOffset2X, center.Y);
+                        arrowPoints[0] = new Point(center.X + ArrowOffset2X, center.Y - ArrowOffset4Y);
+                        arrowPoints[1] = new Point(center.X + ArrowOffset2X, center.Y + ArrowOffset4Y);
+                        arrowPoints[2] = new Point(center.X - ArrowOffset2X, center.Y);
 
                         break;
                     case ArrowDirection.Right:
 
-                        this.arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y - ArrowOffset4Y);
-                        this.arrowPoints[1] = new Point(center.X - ArrowOffset2X, center.Y + ArrowOffset4Y);
-                        this.arrowPoints[2] = new Point(center.X + ArrowOffset2X, center.Y);
+                        arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y - ArrowOffset4Y);
+                        arrowPoints[1] = new Point(center.X - ArrowOffset2X, center.Y + ArrowOffset4Y);
+                        arrowPoints[2] = new Point(center.X + ArrowOffset2X, center.Y);
 
                         break;
                     case ArrowDirection.Down:
                     default:
 
-                        this.arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y - 1);
-                        this.arrowPoints[1] = new Point(center.X + ArrowOffset2X + 1, center.Y - 1);
-                        this.arrowPoints[2] = new Point(center.X, center.Y + ArrowOffset2Y);
+                        arrowPoints[0] = new Point(center.X - ArrowOffset2X, center.Y - 1);
+                        arrowPoints[1] = new Point(center.X + ArrowOffset2X + 1, center.Y - 1);
+                        arrowPoints[2] = new Point(center.X, center.Y + ArrowOffset2Y);
                         break;
                 }
 
-                e.Graphics.FillPolygon(brush, this.arrowPoints);
+                e.Graphics.FillPolygon(brush, arrowPoints);
             }
         }
 

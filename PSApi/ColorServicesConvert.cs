@@ -49,7 +49,7 @@ namespace PSFilterHostDll.PSApi
 				switch (bitsPerChannel)
 				{
 					case BitsPerChannel.Eight:
-						this.maxChannelValue = 255;
+						maxChannelValue = 255;
 						break;
 					default:
 						throw new InvalidEnumArgumentException(nameof(bitsPerChannel), (int)bitsPerChannel, typeof(BitsPerChannel));

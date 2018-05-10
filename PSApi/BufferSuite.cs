@@ -27,7 +27,7 @@ namespace PSFilterHostDll.PSApi
 
 			public BufferIDCollection()
 			{
-				this.items = new List<IntPtr>();
+				items = new List<IntPtr>();
 			}
 
 			public int Count
@@ -42,18 +42,18 @@ namespace PSFilterHostDll.PSApi
 			{
 				get
 				{
-					return this.items[index];
+					return items[index];
 				}
 			}
 
 			public void Add(IntPtr value)
 			{
-				this.items.Add(value);
+				items.Add(value);
 			}
 
 			public void Clear()
 			{
-				this.items.Clear();
+				items.Clear();
 			}
 
 			public bool Contains(IntPtr value)
@@ -63,9 +63,9 @@ namespace PSFilterHostDll.PSApi
 
 			public int IndexOf(IntPtr value)
 			{
-				for (int i = 0; i < this.items.Count; i++)
+				for (int i = 0; i < items.Count; i++)
 				{
-					if (this.items[i] == value)
+					if (items[i] == value)
 					{
 						return i;
 					}
@@ -80,7 +80,7 @@ namespace PSFilterHostDll.PSApi
 
 				if (index >= 0)
 				{
-					this.items.RemoveAt(index);
+					items.RemoveAt(index);
 					return true;
 				}
 
@@ -99,12 +99,12 @@ namespace PSFilterHostDll.PSApi
 
 		private BufferSuite()
 		{
-			this.allocProc = new AllocateBufferProc(AllocateBufferProc);
-			this.freeProc = new FreeBufferProc(BufferFreeProc);
-			this.lockProc = new LockBufferProc(BufferLockProc);
-			this.unlockProc = new UnlockBufferProc(BufferUnlockProc);
-			this.spaceProc = new BufferSpaceProc(BufferSpaceProc);
-			this.bufferIDs = new BufferIDCollection();
+			allocProc = new AllocateBufferProc(AllocateBufferProc);
+			freeProc = new FreeBufferProc(BufferFreeProc);
+			lockProc = new LockBufferProc(BufferLockProc);
+			unlockProc = new UnlockBufferProc(BufferUnlockProc);
+			spaceProc = new BufferSpaceProc(BufferSpaceProc);
+			bufferIDs = new BufferIDCollection();
 		}
 
 		public static BufferSuite Instance
@@ -125,7 +125,7 @@ namespace PSFilterHostDll.PSApi
 
 		public bool AllocatedBySuite(IntPtr buffer)
 		{
-			return this.bufferIDs.Contains(buffer);
+			return bufferIDs.Contains(buffer);
 		}
 
 		public IntPtr CreateBufferProcsPointer()
@@ -137,11 +137,11 @@ namespace PSFilterHostDll.PSApi
 				BufferProcs* bufferProcs = (BufferProcs*)bufferProcsPtr.ToPointer();
 				bufferProcs->bufferProcsVersion = PSConstants.kCurrentBufferProcsVersion;
 				bufferProcs->numBufferProcs = PSConstants.kCurrentBufferProcsCount;
-				bufferProcs->allocateProc = Marshal.GetFunctionPointerForDelegate(this.allocProc);
-				bufferProcs->freeProc = Marshal.GetFunctionPointerForDelegate(this.freeProc);
-				bufferProcs->lockProc = Marshal.GetFunctionPointerForDelegate(this.lockProc);
-				bufferProcs->unlockProc = Marshal.GetFunctionPointerForDelegate(this.unlockProc);
-				bufferProcs->spaceProc = Marshal.GetFunctionPointerForDelegate(this.spaceProc);
+				bufferProcs->allocateProc = Marshal.GetFunctionPointerForDelegate(allocProc);
+				bufferProcs->freeProc = Marshal.GetFunctionPointerForDelegate(freeProc);
+				bufferProcs->lockProc = Marshal.GetFunctionPointerForDelegate(lockProc);
+				bufferProcs->unlockProc = Marshal.GetFunctionPointerForDelegate(unlockProc);
+				bufferProcs->spaceProc = Marshal.GetFunctionPointerForDelegate(spaceProc);
 			}
 
 			return bufferProcsPtr;
@@ -155,11 +155,11 @@ namespace PSFilterHostDll.PSApi
 
 		public void FreeRemainingBuffers()
 		{
-			for (int i = 0; i < this.bufferIDs.Count; i++)
+			for (int i = 0; i < bufferIDs.Count; i++)
 			{
-				Memory.Free(this.bufferIDs[i]);
+				Memory.Free(bufferIDs[i]);
 			}
-			this.bufferIDs.Clear();
+			bufferIDs.Clear();
 		}
 
 		private short AllocateBufferProc(int size, ref IntPtr bufferID)
@@ -177,7 +177,7 @@ namespace PSFilterHostDll.PSApi
 			{
 				bufferID = Memory.Allocate(size, false);
 
-				this.bufferIDs.Add(bufferID);
+				bufferIDs.Add(bufferID);
 			}
 			catch (OutOfMemoryException)
 			{
@@ -201,7 +201,7 @@ namespace PSFilterHostDll.PSApi
 #endif
 			Memory.Free(bufferID);
 
-			this.bufferIDs.Remove(bufferID);
+			bufferIDs.Remove(bufferID);
 		}
 
 		private IntPtr BufferLockProc(IntPtr bufferID, byte moveHigh)

@@ -93,11 +93,11 @@ namespace PSFilterHostDll.BGRASurface
 			this.width = width;
 			this.height = height;
 			this.bytesPerPixel = bytesPerPixel;
-			this.stride = width * bytesPerPixel;
+            stride = width * bytesPerPixel;
 			this.dpiX = dpiX;
 			this.dpiY = dpiY;
-			this.scan0 = new MemoryBlock(stride * height);
-			this.disposed = false;
+            scan0 = new MemoryBlock(stride * height);
+            disposed = false;
 		}
 
 		/// <summary>
@@ -113,16 +113,16 @@ namespace PSFilterHostDll.BGRASurface
 
 		public void CopySurface(SurfaceBase source)
 		{
-			if (this.width == source.width &&
-			   this.height == source.height &&
-			   this.stride == source.stride &&
-			   (this.width * this.bytesPerPixel) == this.stride)
+			if (width == source.width &&
+               height == source.height &&
+               stride == source.stride &&
+			   (width * bytesPerPixel) == stride)
 			{
 				unsafe
 				{
-					BGRASurfaceMemory.Copy(this.scan0.VoidStar,
+					BGRASurfaceMemory.Copy(scan0.VoidStar,
 								source.Scan0.VoidStar,
-								((ulong)(height - 1) * (ulong)stride) + ((ulong)width * (ulong)this.bytesPerPixel));
+								((ulong)(height - 1) * (ulong)stride) + ((ulong)width * (ulong)bytesPerPixel));
 				}
 			}
 			else
@@ -134,7 +134,7 @@ namespace PSFilterHostDll.BGRASurface
 				{
 					for (int y = 0; y < copyHeight; ++y)
 					{
-						BGRASurfaceMemory.Copy(this.GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)this.bytesPerPixel);
+						BGRASurfaceMemory.Copy(GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)bytesPerPixel);
 					}
 				}
 			}
@@ -191,9 +191,9 @@ namespace PSFilterHostDll.BGRASurface
 
 		public unsafe byte* GetPointAddress(int x, int y)
 		{
-			if (x < 0 || y < 0 || x >= this.width || y >= this.Height)
+			if (x < 0 || y < 0 || x >= width || y >= Height)
 			{
-				throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(this.width - 1, this.height - 1).ToString());
+				throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(width - 1, height - 1).ToString());
 			}
 
 			return GetPointAddressUnchecked(x, y);
@@ -232,7 +232,7 @@ namespace PSFilterHostDll.BGRASurface
 												   new Rectangle(right, top, width - right, height - top),
 												   new Rectangle(left, bottom, right - left, height - bottom)
 											   };
-			Rectangle dstRoi = this.Bounds;
+			Rectangle dstRoi = Bounds;
 			for (int i = 0; i < rois.Length; ++i)
 			{
 				rois[i].Intersect(dstRoi);
@@ -284,7 +284,7 @@ namespace PSFilterHostDll.BGRASurface
 
 		public void SetAlphaToOpaque()
 		{
-			SetAlphaToOpaqueImpl(this.Bounds);
+			SetAlphaToOpaqueImpl(Bounds);
 		}
 
 		public void SetAlphaToOpaque(Rectangle[] scans)
@@ -309,11 +309,11 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			if (!disposed && disposing)
 			{
-				this.disposed = true;
+                disposed = true;
 				if (scan0 != null)
 				{
-					this.scan0.Dispose();
-					this.scan0 = null;
+                    scan0.Dispose();
+                    scan0 = null;
 				}
 			}
 		}

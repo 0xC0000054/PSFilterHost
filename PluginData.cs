@@ -48,7 +48,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.fileName;
+                return fileName;
             }
         }
 
@@ -59,7 +59,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.entryPoint;
+                return entryPoint;
             }
         }
 
@@ -70,7 +70,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.category;
+                return category;
             }
         }
 
@@ -81,7 +81,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.title;
+                return title;
             }
         }
 
@@ -92,7 +92,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.filterInfo;
+                return filterInfo;
             }
         }
 
@@ -103,7 +103,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.aete;
+                return aete;
             }
         }
 
@@ -114,11 +114,11 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.moduleEntryPoints;
+                return moduleEntryPoints;
             }
             set
             {
-                this.moduleEntryPoints = value;
+                moduleEntryPoints = value;
             }
         }
 
@@ -132,7 +132,7 @@ namespace PSFilterHostDll
         {
             get
             {
-                return this.hasAboutBox;
+                return hasAboutBox;
             }
         }
 
@@ -144,14 +144,14 @@ namespace PSFilterHostDll
         /// <returns><c>true</c> if the filter can process the image; otherwise <c>false</c>.</returns>
         public bool SupportsImageMode(PixelFormat mode)
         {
-            if (!this.supportedModes.HasValue)
+            if (!supportedModes.HasValue)
             {
                 DetectSupportedModes();
             }
 
             if (mode == PixelFormats.BlackWhite || mode == PixelFormats.Gray2 || mode == PixelFormats.Gray4 || mode == PixelFormats.Gray8)
             {
-                return ((this.supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
+                return ((supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
             }
             else if (mode == PixelFormats.Gray16 || mode == PixelFormats.Gray32Float)
             {
@@ -164,27 +164,27 @@ namespace PSFilterHostDll
             }
             else
             {
-                return ((this.supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor);
+                return ((supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor);
             }
         }
 
         private void DetectSupportedModes()
         {
-            if (!string.IsNullOrEmpty(this.enableInfo))
+            if (!string.IsNullOrEmpty(enableInfo))
             {
-                if (this.enableInfo == "true")
+                if (enableInfo == "true")
                 {
-                    this.supportedModes = ushort.MaxValue; // All modes are supported
+                    supportedModes = ushort.MaxValue; // All modes are supported
                 }
                 else
                 {
                     EnableInfoParser parser = new EnableInfoParser();
-                    this.supportedModes = parser.GetSupportedModes(this.enableInfo);
+                    supportedModes = parser.GetSupportedModes(enableInfo);
                 }
             }
             else
             {
-                this.supportedModes = 0;
+                supportedModes = 0;
             }
         }
 
@@ -197,18 +197,18 @@ namespace PSFilterHostDll
         /// </returns>
         private bool Supports16BitMode(bool grayScale)
         {
-            if (!string.IsNullOrEmpty(this.enableInfo))
+            if (!string.IsNullOrEmpty(enableInfo))
             {
                 EnableInfoParser parser = new EnableInfoParser(grayScale);
-                return parser.Parse(this.enableInfo);
+                return parser.Parse(enableInfo);
             }
 
             if (grayScale)
             {
-                return ((this.supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16);
+                return ((supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16);
             }
 
-            return ((this.supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48);
+            return ((supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48);
         }
 #endif
         /// <summary>
@@ -253,14 +253,14 @@ namespace PSFilterHostDll
             this.aete = aete;
             this.enableInfo = enableInfo;
             this.supportedModes = supportedModes;
-            this.moduleEntryPoints = null;
+            moduleEntryPoints = null;
             this.hasAboutBox = hasAboutBox;
         }
 
         [OnDeserializing]
         private void OnDeserializing(StreamingContext context)
         {
-            this.hasAboutBox = true;
+            hasAboutBox = true;
         }
 
         [OnDeserialized]
@@ -276,7 +276,7 @@ namespace PSFilterHostDll
         /// </returns>
         internal bool IsValid()
         {
-            return (!string.IsNullOrEmpty(this.category) && !string.IsNullOrEmpty(this.title) && !string.IsNullOrEmpty(this.entryPoint));
+            return (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(entryPoint));
         }
 
         /// <summary>
@@ -291,10 +291,10 @@ namespace PSFilterHostDll
 
             unchecked
             {
-                hash = (hash * 127) + (this.fileName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(this.fileName) : 0);
-                hash = (hash * 127) + (this.entryPoint != null ? this.entryPoint.GetHashCode() : 0);
-                hash = (hash * 127) + (this.category != null ? this.category.GetHashCode() : 0);
-                hash = (hash * 127) + (this.title != null ? this.title.GetHashCode() : 0);
+                hash = (hash * 127) + (fileName != null ? StringComparer.OrdinalIgnoreCase.GetHashCode(fileName) : 0);
+                hash = (hash * 127) + (entryPoint != null ? entryPoint.GetHashCode() : 0);
+                hash = (hash * 127) + (category != null ? category.GetHashCode() : 0);
+                hash = (hash * 127) + (title != null ? title.GetHashCode() : 0);
             }
 
             return hash;
@@ -343,10 +343,10 @@ namespace PSFilterHostDll
                 return true;
             }
 
-            return (string.Equals(this.fileName, other.fileName, StringComparison.OrdinalIgnoreCase) &&
-                    string.Equals(this.entryPoint, other.entryPoint, StringComparison.Ordinal) &&
-                    string.Equals(this.category, other.category, StringComparison.Ordinal) &&
-                    string.Equals(this.title, other.title, StringComparison.Ordinal));
+            return (string.Equals(fileName, other.fileName, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(entryPoint, other.entryPoint, StringComparison.Ordinal) &&
+                    string.Equals(category, other.category, StringComparison.Ordinal) &&
+                    string.Equals(title, other.title, StringComparison.Ordinal));
         }
 
         /// <summary>

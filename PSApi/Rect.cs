@@ -39,12 +39,12 @@ namespace PSFilterHostDll.PSApi
         }
         public bool Equals(Rect16 rect)
         {
-            return (this.left == rect.left && this.top == rect.top && this.right == rect.right && this.bottom == rect.bottom);
+            return (left == rect.left && top == rect.top && right == rect.right && bottom == rect.bottom);
         }
 
         public override int GetHashCode()
         {
-            return HashCodeHelper.GetHashCode(this.left, this.top, this.right, this.bottom);
+            return HashCodeHelper.GetHashCode(left, top, right, bottom);
         }
 
         public static bool operator ==(Rect16 left, Rect16 right)
@@ -60,7 +60,7 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
         public override string ToString()
         {
-            return ("Top=" + this.top.ToString() + ",Bottom=" + this.bottom.ToString() + ",Left=" + this.left.ToString() + ",Right=" + this.right.ToString());
+            return ("Top=" + top.ToString() + ",Bottom=" + bottom.ToString() + ",Left=" + left.ToString() + ",Right=" + right.ToString());
         }
 #endif
         public static readonly Rect16 Empty = new Rect16();

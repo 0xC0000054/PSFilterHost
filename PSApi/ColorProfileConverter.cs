@@ -35,11 +35,11 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public ColorProfileConverter()
         {
-            this.documentProfile = null;
-            this.monitorProfile = null;
-            this.transform = null;
-            this.colorCorrectionRequired = false;
-            this.disposed = false;
+            documentProfile = null;
+            monitorProfile = null;
+            transform = null;
+            colorCorrectionRequired = false;
+            disposed = false;
         }
 
         /// <summary>
@@ -54,22 +54,22 @@ namespace PSFilterHostDll.PSApi
                 throw new ArgumentNullException(nameof(colorProfiles));
             }
 
-            int result = OpenColorProfile(colorProfiles.GetDocumentProfileReadOnly(), out this.documentProfile);
+            int result = OpenColorProfile(colorProfiles.GetDocumentProfileReadOnly(), out documentProfile);
             if (result != NativeConstants.ERROR_SUCCESS)
             {
                 HandleError(result, Resources.OpenDocumentColorProfileError);
             }
 
-            result = OpenColorProfile(colorProfiles.GetMonitorProfileReadOnly(), out this.monitorProfile);
+            result = OpenColorProfile(colorProfiles.GetMonitorProfileReadOnly(), out monitorProfile);
             if (result != NativeConstants.ERROR_SUCCESS)
             {
                 HandleError(result, Resources.OpenMonitorColorProfileError);
             }
 
-            this.colorCorrectionRequired = ColorProfilesAreDifferent();
-            if (this.colorCorrectionRequired)
+            colorCorrectionRequired = ColorProfilesAreDifferent();
+            if (colorCorrectionRequired)
             {
-                result = CreateColorTransform(this.documentProfile, this.monitorProfile, out this.transform);
+                result = CreateColorTransform(documentProfile, monitorProfile, out transform);
                 if (result != NativeConstants.ERROR_SUCCESS)
                 {
                     HandleError(result, Resources.CreateTransformError);
@@ -77,11 +77,11 @@ namespace PSFilterHostDll.PSApi
             }
             else
             {
-                this.documentProfile.Dispose();
-                this.documentProfile = null;
+                documentProfile.Dispose();
+                documentProfile = null;
 
-                this.monitorProfile.Dispose();
-                this.monitorProfile = null;
+                monitorProfile.Dispose();
+                monitorProfile = null;
             }
         }
 
@@ -216,16 +216,16 @@ namespace PSFilterHostDll.PSApi
         private bool ColorProfilesAreDifferent()
         {
 #if DEBUG
-            System.Diagnostics.Debug.Assert(this.documentProfile != null && !this.documentProfile.IsInvalid, "Document profile is null or invalid.");
-            System.Diagnostics.Debug.Assert(this.monitorProfile != null && !this.monitorProfile.IsInvalid, "Monitor profile is null or invalid.");
+            System.Diagnostics.Debug.Assert(documentProfile != null && !documentProfile.IsInvalid, "Document profile is null or invalid.");
+            System.Diagnostics.Debug.Assert(monitorProfile != null && !monitorProfile.IsInvalid, "Monitor profile is null or invalid.");
 #endif
             bool result = false;
 
             NativeStructs.Mscms.PROFILEHEADER header1;
             NativeStructs.Mscms.PROFILEHEADER header2;
 
-            if (UnsafeNativeMethods.Mscms.GetColorProfileHeader(this.documentProfile, out header1) &&
-                UnsafeNativeMethods.Mscms.GetColorProfileHeader(this.monitorProfile, out header2))
+            if (UnsafeNativeMethods.Mscms.GetColorProfileHeader(documentProfile, out header1) &&
+                UnsafeNativeMethods.Mscms.GetColorProfileHeader(monitorProfile, out header2))
             {
                 result = (
                     header1.phSize != header2.phSize ||
@@ -274,7 +274,7 @@ namespace PSFilterHostDll.PSApi
         {
             get
             {
-                return this.colorCorrectionRequired;
+                return colorCorrectionRequired;
             }
         }
 
@@ -293,13 +293,13 @@ namespace PSFilterHostDll.PSApi
                 throw new ArgumentNullException(nameof(destSurface));
             }
 
-            if (this.transform == null)
+            if (transform == null)
             {
                 return false;
             }
 
             return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
-                this.transform,
+                transform,
                 srcPtr,
                 NativeEnums.Mscms.BMFORMAT.BM_GRAY,
                 (uint)destSurface.Width,
@@ -335,13 +335,13 @@ namespace PSFilterHostDll.PSApi
                 throw new ArgumentNullException(nameof(destinationSurface));
             }
 
-            if (this.transform == null)
+            if (transform == null)
             {
                 return false;
             }
 
             return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
-                this.transform,
+                transform,
                 sourceSurface.Scan0.Pointer,
                 NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS,
                 (uint)sourceSurface.Width,
@@ -360,25 +360,25 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public void Dispose()
         {
-            if (!this.disposed)
+            if (!disposed)
             {
-                if (this.documentProfile != null)
+                if (documentProfile != null)
                 {
-                    this.documentProfile.Dispose();
-                    this.documentProfile = null;
+                    documentProfile.Dispose();
+                    documentProfile = null;
                 }
-                if (this.monitorProfile != null)
+                if (monitorProfile != null)
                 {
-                    this.monitorProfile.Dispose();
-                    this.monitorProfile = null;
+                    monitorProfile.Dispose();
+                    monitorProfile = null;
                 }
-                if (this.transform != null)
+                if (transform != null)
                 {
-                    this.transform.Dispose();
-                    this.transform = null;
+                    transform.Dispose();
+                    transform = null;
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
         }
     }

@@ -28,7 +28,7 @@ namespace HostTest
 
         public CanvasZoomChangedEventArgs(float scale)
         {
-            this.newScale = scale;
+            newScale = scale;
         }
     }
 }

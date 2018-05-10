@@ -150,11 +150,11 @@ namespace PSFilterHostDll
         /// </summary>
         internal GlobalParameters()
         {
-            this.parameterDataBytes = null;
-            this.parameterDataStorageMethod = DataStorageMethod.HandleSuite;
-            this.parameterDataExecutable = false;
-            this.pluginDataBytes = null;
-            this.pluginDataStorageMethod = DataStorageMethod.HandleSuite;
+            parameterDataBytes = null;
+            parameterDataStorageMethod = DataStorageMethod.HandleSuite;
+            parameterDataExecutable = false;
+            pluginDataBytes = null;
+            pluginDataStorageMethod = DataStorageMethod.HandleSuite;
         }
         private GlobalParameters(SerializationInfo info, StreamingContext context)
         {
@@ -163,13 +163,13 @@ namespace PSFilterHostDll
                 throw new ArgumentNullException(nameof(info));
             }
 
-            this.parameterDataBytes = (byte[])info.GetValue("parameterDataBytes", typeof(byte[]));
-            this.parameterDataStorageMethod = (DataStorageMethod)info.GetValue("parameterDataStorageMethod", typeof(DataStorageMethod));
-            this.parameterDataExecutable = info.GetBoolean("parameterDataExecutable");
+            parameterDataBytes = (byte[])info.GetValue("parameterDataBytes", typeof(byte[]));
+            parameterDataStorageMethod = (DataStorageMethod)info.GetValue("parameterDataStorageMethod", typeof(DataStorageMethod));
+            parameterDataExecutable = info.GetBoolean("parameterDataExecutable");
 
-            this.pluginDataBytes = (byte[])info.GetValue("pluginDataBytes", typeof(byte[]));
-            this.pluginDataStorageMethod = (DataStorageMethod)info.GetValue("pluginDataStorageMethod", typeof(DataStorageMethod));
-            this.pluginDataExecutable = info.GetBoolean("pluginDataExecutable");
+            pluginDataBytes = (byte[])info.GetValue("pluginDataBytes", typeof(byte[]));
+            pluginDataStorageMethod = (DataStorageMethod)info.GetValue("pluginDataStorageMethod", typeof(DataStorageMethod));
+            pluginDataExecutable = info.GetBoolean("pluginDataExecutable");
         }
 
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.SerializationFormatter)]
@@ -180,13 +180,13 @@ namespace PSFilterHostDll
                 throw new ArgumentNullException(nameof(info));
             }
 
-            info.AddValue("parameterDataBytes", this.parameterDataBytes, typeof(byte[]));
-            info.AddValue("parameterDataStorageMethod", this.parameterDataStorageMethod, typeof(DataStorageMethod));
-            info.AddValue("parameterDataExecutable", this.parameterDataExecutable);
+            info.AddValue("parameterDataBytes", parameterDataBytes, typeof(byte[]));
+            info.AddValue("parameterDataStorageMethod", parameterDataStorageMethod, typeof(DataStorageMethod));
+            info.AddValue("parameterDataExecutable", parameterDataExecutable);
 
-            info.AddValue("pluginDataBytes", this.pluginDataBytes, typeof(byte[]));
-            info.AddValue("pluginDataStorageMethod", this.pluginDataStorageMethod, typeof(DataStorageMethod));
-            info.AddValue("pluginDataExecutable", this.pluginDataExecutable);
+            info.AddValue("pluginDataBytes", pluginDataBytes, typeof(byte[]));
+            info.AddValue("pluginDataStorageMethod", pluginDataStorageMethod, typeof(DataStorageMethod));
+            info.AddValue("pluginDataExecutable", pluginDataExecutable);
         }
     }
 }
