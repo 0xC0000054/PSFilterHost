@@ -74,10 +74,14 @@ namespace PSFilterHostDll.Interop
             );
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+#pragma warning disable IDE1006 // Naming Styles
         internal static extern unsafe void memcpy([In()] void* dst, [In()] void* src, [In()] UIntPtr length);
+#pragma warning restore IDE1006 // Naming Styles
 
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+#pragma warning disable IDE1006 // Naming Styles
         internal static extern IntPtr memset([In()] IntPtr dest, [In()] int c, [In()] UIntPtr count);
+#pragma warning restore IDE1006 // Naming Styles
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -140,6 +144,8 @@ namespace PSFilterHostDll.Interop
         internal static extern bool GetMonitorInfoW([In()] IntPtr hMonitor, [In(), Out()] ref NativeStructs.MONITORINFOEX lpmi);
 
         [DllImport("kernel32.dll", ExactSpelling = true)]
+#pragma warning disable IDE1006 // Naming Styles
         internal static extern int lstrlenA([In()] IntPtr ptr);
+#pragma warning restore IDE1006 // Naming Styles
     }
 }
