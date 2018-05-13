@@ -620,12 +620,11 @@ namespace HostTest
 
 						FormatConvertedBitmap convertedImage = null;
 
-						int channelCount = dstImage.Format.Masks.Count;
-						int bitsPerChannel = dstImage.Format.BitsPerPixel / channelCount;
+						int bitsPerChannel = dstImage.Format.GetBitsPerChannel();
 
 						if (bitsPerChannel >= 16)
 						{
-							convertedImage = new FormatConvertedBitmap(dstImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0);
+							convertedImage = new FormatConvertedBitmap(dstImage, dstImage.Format.IsAlphaFormat() ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0);
 						}
 
 						canvas.SuspendPaint();
@@ -892,8 +891,7 @@ namespace HostTest
 				}
 
 				PixelFormat format = srcImage.Format;
-				int channelCount = format.Masks.Count;
-				int bitsPerChannel = format.BitsPerPixel / channelCount;
+				int bitsPerChannel = format.GetBitsPerChannel();
 
 				imageFileName = Path.GetFileName(path);
 
@@ -918,7 +916,7 @@ namespace HostTest
 				if (bitsPerChannel >= 16)
 				{
 					// Convert the image to an 8 bits-per-channel format for display.
-					UpdateCanvasImage(new FormatConvertedBitmap(srcImage, channelCount == 4 ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0));
+					UpdateCanvasImage(new FormatConvertedBitmap(srcImage, format.IsAlphaFormat() ? PixelFormats.Bgra32 : PixelFormats.Bgr24, null, 0.0));
 
 					imageType += "16";
 				}
