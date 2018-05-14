@@ -1413,7 +1413,6 @@ namespace HostTest
 			internal string Path
 			{
 				get;
-				private set;
 			}
 			internal ToolStripMenuItemEx[] Filters
 			{

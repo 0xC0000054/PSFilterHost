@@ -59,7 +59,6 @@ namespace PSFilterHostDll
 		public byte R
 		{
 			get;
-			private set;
 		}
 
 		/// <summary>
@@ -71,7 +70,6 @@ namespace PSFilterHostDll
 		public byte G
 		{
 			get;
-			private set;
 		}
 
 		/// <summary>
@@ -83,7 +81,6 @@ namespace PSFilterHostDll
 		public byte B
 		{
 			get;
-			private set;
 		}
 	}
 }

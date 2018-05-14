@@ -36,7 +36,6 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         public double Hue
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -48,7 +47,6 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         public double Saturation
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -60,7 +58,6 @@ namespace PSFilterHostDll.PSApi.ColorConversion
         public double Brightness
         {
             get;
-            private set;
         }
     }
 }
