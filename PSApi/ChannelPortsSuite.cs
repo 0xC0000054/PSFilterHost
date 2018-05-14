@@ -103,7 +103,6 @@ namespace PSFilterHostDll.PSApi
 
             switch (mode)
             {
-
                 case ImageModes.GrayScale:
 
                     for (int y = srcRect.top; y < srcRect.bottom; y++)
@@ -195,7 +194,6 @@ namespace PSFilterHostDll.PSApi
 
                     break;
             }
-
         }
 
         private static unsafe void FillSelectionMask(PixelMemoryDesc destiniation, SurfaceGray8 source, VRect srcRect)
@@ -306,7 +304,6 @@ namespace PSFilterHostDll.PSApi
                 return PSError.errUnsupportedRowBits;
             }
 
-
             int channel = port.ToInt32();
 
             if (channel < PSConstants.ChannelPorts.Gray || channel > PSConstants.ChannelPorts.SelectionMask)
@@ -381,7 +378,6 @@ namespace PSFilterHostDll.PSApi
 
                     FillSelectionMask(destination, scaledSelectionMask, dstRect);
                 }
-
             }
             else
             {
@@ -457,7 +453,6 @@ namespace PSFilterHostDll.PSApi
                     FillChannelData(channel, destination, scaledChannelSurface, dstRect, mode);
                 }
             }
-
 
             wroteRect = dstRect;
 

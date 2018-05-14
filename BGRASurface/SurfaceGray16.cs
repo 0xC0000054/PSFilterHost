@@ -23,7 +23,6 @@ using System.Drawing;
 
 namespace PSFilterHostDll.BGRASurface
 {
-
     /// <summary>
     /// Surface class for 16 bits per pixel gray scale image data.
     /// </summary>
@@ -508,6 +507,5 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
         }
-
     }
 }

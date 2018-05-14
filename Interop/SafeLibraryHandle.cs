@@ -42,7 +42,6 @@ namespace PSFilterHostDll.Interop
 			return UnsafeNativeMethods.FreeLibrary(handle);
 		}
 	}
-
 }
 
 

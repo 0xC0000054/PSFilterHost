@@ -52,7 +52,5 @@ namespace PSFilterHostDll
             : base(info, context)
         {
         }
-
-
     }
 }

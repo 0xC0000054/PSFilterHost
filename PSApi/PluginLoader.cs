@@ -154,7 +154,6 @@ namespace PSFilterHostDll.PSApi
 									digit = 10 + (hexChar - 'A');
 								}
 
-
 								fieldValue = (fieldValue * 16) + digit;
 
 								offset++;
@@ -765,7 +764,6 @@ namespace PSFilterHostDll.PSApi
 					System.Runtime.CompilerServices.RuntimeHelpers.PrepareConstrainedRegions();
 					try
 					{
-
 						dll.DangerousAddRef(ref needsRelease);
 						IntPtr callback = GCHandle.ToIntPtr(handle);
 						if (UnsafeNativeMethods.EnumResourceNamesW(dll.DangerousGetHandle(), "PiPl", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiPL), callback))
@@ -801,7 +799,6 @@ namespace PSFilterHostDll.PSApi
 							dll.DangerousRelease();
 						}
 					}
-
 				}
 #if DEBUG
 				else

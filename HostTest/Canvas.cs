@@ -115,7 +115,6 @@ namespace HostTest
 			}
 			set
 			{
-
 				if (selectionClass != null)
 				{
 					MouseDown -= selectionClass.MouseDown;
@@ -143,7 +142,6 @@ namespace HostTest
 					selectionClass.CursorChanged += new EventHandler<CursorChangedEventArgs>(OnCursorChanged);
 					selectionClass.SelectedPathChanged += new EventHandler<SelectionPathChangedEventArgs>(OnSelectionPathChanged);
 				}
-
 			}
 		}
 
@@ -196,7 +194,6 @@ namespace HostTest
 					normalizedPath.Dispose();
 					normalizedPath = null;
 				}
-
 			}
 			base.Dispose(disposing);
 		}
@@ -212,7 +209,6 @@ namespace HostTest
 			{
 				RenderSelection(null, true);
 			}
-
 		}
 
 		private void OnCursorChanged(object sender, CursorChangedEventArgs e)
@@ -415,7 +411,6 @@ namespace HostTest
 					g.PixelOffsetMode = oldPOM;
 					g.SmoothingMode = oldSM;
 				}
-
 			}
 
 			base.OnPaint(pe);
@@ -455,7 +450,6 @@ namespace HostTest
 			{
 				checkerBoardBitmap.UnlockBits(bd);
 			}
-
 		}
 
 		private static unsafe bool HasTransparency(Bitmap source)
@@ -508,7 +502,6 @@ namespace HostTest
 				{
 					if ((image == null) || image.Width != value.Width || image.Height != value.Height)
 					{
-
 						if (path != null)
 						{
 							path.Dispose();
@@ -588,8 +581,6 @@ namespace HostTest
 
 					return normalizedPath;
 				}
-
-
 			}
 		}
 
@@ -618,7 +609,6 @@ namespace HostTest
 			{
 				DrawCheckerBoardBitmap(source.Width, source.Height);
 			}
-
 
 			BitmapData srcData = source.LockBits(bounds, ImageLockMode.ReadOnly, source.PixelFormat);
 			BitmapData dstData = image.LockBits(bounds, ImageLockMode.WriteOnly, image.PixelFormat);
@@ -661,7 +651,6 @@ namespace HostTest
 				source.UnlockBits(srcData);
 				image.UnlockBits(dstData);
 			}
-
 		}
 
 		public CanvasHistoryState ToCanvasHistoryState()
@@ -909,7 +898,6 @@ namespace HostTest
 					Update();
 				}
 			}
-
 		}
 
 		/// <summary>
@@ -990,7 +978,6 @@ namespace HostTest
 					ZoomOut();
 				}
 			}
-
 		}
 
 		private void InitializeComponent()
@@ -1001,8 +988,6 @@ namespace HostTest
 			//
 			Name = "Canvas";
 			ResumeLayout(false);
-
 		}
-
 	}
 }

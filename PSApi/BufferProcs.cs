@@ -46,5 +46,4 @@ namespace PSFilterHostDll.PSApi
         public IntPtr freeProc;
         public IntPtr spaceProc;
     }
-
 }

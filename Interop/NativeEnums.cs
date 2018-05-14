@@ -111,6 +111,5 @@ namespace PSFilterHostDll.Interop
                 BM_R16G16B16A16_FLOAT = 1795,
             }
         }
-
     }
 }

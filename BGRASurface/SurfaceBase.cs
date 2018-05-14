@@ -138,7 +138,6 @@ namespace PSFilterHostDll.BGRASurface
 					}
 				}
 			}
-
 		}
 
 		/// <summary>
@@ -275,7 +274,6 @@ namespace PSFilterHostDll.BGRASurface
 		protected unsafe abstract void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
 
 		public unsafe abstract void SuperSampleFitSurface(SurfaceBase source);
-
 
 		public unsafe virtual bool HasTransparency()
 		{

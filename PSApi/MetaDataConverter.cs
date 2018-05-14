@@ -207,7 +207,6 @@ namespace PSFilterHostDll.PSApi
                 // WINCODEC_ERR_INVALIDQUERYREQUEST
             }
 
-
             // Return null if the XMP block does not contain any data.
             if ((xmpData == null) || !xmpData.Any())
             {

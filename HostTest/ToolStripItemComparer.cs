@@ -36,5 +36,4 @@ namespace HostTest
             return StringLogicalComparer.Compare(x.Text, y.Text);
         }
     }
-
 }

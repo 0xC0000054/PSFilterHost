@@ -226,6 +226,5 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 		}
-
 	}
 }

@@ -42,6 +42,5 @@ namespace PSFilterHostDll.PSApi
             SolidColorOnly = true;
             FullOpen = true;
         }
-
     }
 }

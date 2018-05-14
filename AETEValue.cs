@@ -37,7 +37,6 @@ namespace PSFilterHostDll
 			}
 		}
 
-
 		/// <summary>
 		/// Gets the flags.
 		/// </summary>

@@ -64,6 +64,5 @@ namespace PSFilterHostDll.PSApi
         }
 #endif
         public static readonly Rect16 Empty = new Rect16();
-
     }
 }

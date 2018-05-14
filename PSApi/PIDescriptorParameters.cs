@@ -15,7 +15,6 @@
  * All rights reserved.
 */
 
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -215,7 +214,4 @@ namespace PSFilterHostDll.PSApi
         plugInDialogDisplay = 1,
         plugInDialogSilent = 2
     }
-
-
-
 }

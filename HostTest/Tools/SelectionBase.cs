@@ -33,7 +33,6 @@ namespace HostTest.Tools
     [Serializable]
     internal abstract class SelectionBase : IDisposable
     {
-
         [field: NonSerialized]
         public event EventHandler<SelectionPathChangedEventArgs> SelectedPathChanged;
         [field: NonSerialized]
@@ -173,7 +172,6 @@ namespace HostTest.Tools
                     }
                 }
             }
-
         }
 
         protected void OnCursorChanged(Cursor cursor)
@@ -204,8 +202,6 @@ namespace HostTest.Tools
                     disposed = true;
                 }
             }
-
         }
-
     }
 }

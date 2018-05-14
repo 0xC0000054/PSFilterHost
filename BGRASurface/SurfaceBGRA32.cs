@@ -209,7 +209,6 @@ namespace PSFilterHostDll.BGRASurface
         }
 #endif
 
-
         public override unsafe bool HasTransparency()
         {
             for (int y = 0; y < height; y++)
@@ -396,10 +395,8 @@ namespace PSFilterHostDll.BGRASurface
             }
         }
 
-
         protected override unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi)
         {
-
             Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
             IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
@@ -662,6 +659,5 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
         }
-
     }
 }

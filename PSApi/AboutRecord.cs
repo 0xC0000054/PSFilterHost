@@ -17,7 +17,6 @@
 using System;
 using System.Runtime.InteropServices;
 
-
 namespace PSFilterHostDll.PSApi
 {
     [StructLayout(LayoutKind.Sequential)]
@@ -28,5 +27,4 @@ namespace PSFilterHostDll.PSApi
         public IntPtr plugInRef;
         public fixed byte reserved[244];
     }
-
 }

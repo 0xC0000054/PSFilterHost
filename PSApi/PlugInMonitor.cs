@@ -17,7 +17,6 @@
 
 using System.Runtime.InteropServices;
 
-
 namespace PSFilterHostDll.PSApi
 {
     [StructLayout(LayoutKind.Sequential)]
@@ -34,5 +33,4 @@ namespace PSFilterHostDll.PSApi
         public Fixed16 whiteY;
         public Fixed16 ambient;
     }
-
 }

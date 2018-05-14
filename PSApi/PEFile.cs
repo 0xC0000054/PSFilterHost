@@ -125,7 +125,5 @@ namespace PSFilterHostDll.PSApi
 
             return false;
         }
-
-
     }
 }

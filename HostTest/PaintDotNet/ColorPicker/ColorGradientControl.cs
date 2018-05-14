@@ -227,7 +227,6 @@ namespace PaintDotNet
             }
         }
 
-
         private Color minColor;
         public Color MinColor
         {
@@ -296,10 +295,8 @@ namespace PaintDotNet
 
             if (this.customGradient != null && gradientRect.Width > 1 && gradientRect.Height > 1)
             {
-
                 using (Bitmap gradientSurface = new Bitmap(gradientRect.Width, gradientRect.Height, PixelFormat.Format24bppRgb))
                 {
-
                     Rectangle bitmapRect = new Rectangle(0, 0, gradientSurface.Width, gradientSurface.Height);
                     using (Graphics gr = Graphics.FromImage(gradientSurface))
                     {
@@ -310,14 +307,12 @@ namespace PaintDotNet
                     {
                         BitmapData data = gradientSurface.LockBits(bitmapRect, ImageLockMode.WriteOnly, PixelFormat.Format24bppRgb);
 
-
                         try
                         {
                             unsafe
                             {
                                 byte* scan0 = (byte*)data.Scan0.ToPointer();
                                 int stride = data.Stride;
-
 
                                 for (int x = 0; x < gradientSurface.Width; ++x)
                                 {
@@ -362,9 +357,6 @@ namespace PaintDotNet
                                     int gp = Utility.Clamp((int)Math.Round(gt * 255.0), 0, 255);
                                     int bp = Utility.Clamp((int)Math.Round(bt * 255.0), 0, 255);
 
-
-
-
                                     for (int y = 0; y < gradientSurface.Height; ++y)
                                     {
                                         byte* pixel = scan0 + ((y * stride) + (x * 3));
@@ -400,7 +392,6 @@ namespace PaintDotNet
                         throw new InvalidEnumArgumentException();
                     }
                 }
-
             }
             else
             {
@@ -677,7 +668,6 @@ namespace PaintDotNet
                     this.InvalidateTriangle(highlight);
                 }
             }
-
         }
 
         protected override void OnMouseLeave(EventArgs e)

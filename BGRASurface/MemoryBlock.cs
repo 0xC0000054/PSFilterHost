@@ -21,7 +21,6 @@ using System;
 
 namespace PSFilterHostDll.BGRASurface
 {
-
     internal unsafe sealed class MemoryBlock : IDisposable
     {
         // blocks this size or larger are allocated with AllocateLarge (VirtualAlloc) instead of Allocate (HeapAlloc)
@@ -133,7 +132,6 @@ namespace PSFilterHostDll.BGRASurface
                 valid = false;
             }
         }
-
 
         private static IntPtr Allocate(long bytes)
         {

@@ -108,7 +108,6 @@ namespace PSFilterHostDll.PSApi
 		public IntPtr contextInfo;		// A pointer to additional info dependent on context.
 
 		public IntPtr name;		// The name of the channel.
-
 	}
 
 	internal enum ChannelTypes : short
@@ -134,5 +133,4 @@ namespace PSFilterHostDll.PSApi
 		InvertedLayerMask = 18,
 		SelectionMask = 19
 	}
-
 }

@@ -83,7 +83,6 @@ namespace HostTest
 				format == PixelFormats.Prgba64 ||
 				format == PixelFormats.Prgba128Float)
 			{
-
 				int width = image.PixelWidth;
 				int height = image.PixelHeight;
 

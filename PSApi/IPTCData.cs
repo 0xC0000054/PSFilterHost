@@ -148,7 +148,6 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-
         private static unsafe IPTCRecordVersion CreateVersionRecord()
         {
             IPTCRecordVersion record = new IPTCRecordVersion

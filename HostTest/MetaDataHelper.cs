@@ -264,7 +264,6 @@ namespace HostTest
 							tiffMetaData.SetQuery("/ifd/exif" + tag, value);
 						}
 					}
-
 				}
 
 				if (xmp != null)
@@ -407,7 +406,6 @@ namespace HostTest
 						jpegMetaData.SetQuery("/app1/ifd/exif" + tag, value);
 					}
 				}
-
 			}
 
 			if (xmp != null)
@@ -552,7 +550,6 @@ namespace HostTest
 						wmpMetaData.SetQuery("/ifd/exif" + tag, value);
 					}
 				}
-
 			}
 
 			if (xmp != null)

@@ -36,6 +36,5 @@ namespace PSFilterHostDll
         {
             progress = progressDone;
         }
-
     }
 }

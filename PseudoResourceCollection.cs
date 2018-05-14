@@ -16,7 +16,6 @@ using System.Collections.ObjectModel;
 
 namespace PSFilterHostDll
 {
-
     /// <summary>
     /// The collection of Pseudo-Resources used by the filters.
     /// </summary>

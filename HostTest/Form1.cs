@@ -403,7 +403,6 @@ namespace HostTest
 						}
 					}
 				}
-
 			}
 			else
 			{
@@ -413,7 +412,6 @@ namespace HostTest
 					items[i].Enabled = false;
 				}
 			}
-
 		}
 
 		private void RunPhotoshopFilter_Click(object sender, EventArgs e)
@@ -651,9 +649,7 @@ namespace HostTest
 							sessionSettings = host.SessionSettings;
 							setRepeatFilter = true;
 						}
-
 					}
-
 				}
 			}
 			catch (FileNotFoundException ex)
@@ -684,7 +680,6 @@ namespace HostTest
 				}
 				base.BeginInvoke(new Action(() => FilterCompleted(setRepeatFilter)));
 			}
-
 		}
 
 		private void SetRepeatEffectMenuItem()
@@ -1182,7 +1177,6 @@ namespace HostTest
 			Text = string.Format(Resources.TitleStringFormat, new object[] { applicationName, imageFileName, percent, imageType });
 		}
 
-
 		private void undoToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			historyStack.StepBackward(canvas, ref dstImage);
@@ -1567,7 +1561,6 @@ namespace HostTest
 				{
 					color = new ColorPickerResult(dialog.Color);
 				}
-
 			}
 
 			return color;

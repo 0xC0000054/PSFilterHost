@@ -158,7 +158,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-
 		/// <summary>
 		/// Frees the block of memory allocated by AllocateExecutable().
 		/// </summary>

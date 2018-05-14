@@ -10,7 +10,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-
 namespace HostTest.Tools
 {
     /// <summary>
@@ -22,7 +21,5 @@ namespace HostTest.Tools
         public RectangleSelectTool() : base()
         {
         }
-
-
     }
 }

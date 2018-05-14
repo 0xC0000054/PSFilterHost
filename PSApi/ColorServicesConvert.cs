@@ -665,6 +665,4 @@ namespace PSFilterHostDll.PSApi
 			return new ColorResult(l, a, b);
 		}
 	}
-
-
 }

@@ -15,7 +15,6 @@
  * All rights reserved.
 */
 
-
 namespace PSFilterHostDll.PSApi
 {
 // Disable CS0649, Field 'field' is never assigned to, and will always have its default value 'value'
@@ -93,5 +92,4 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		public const uint NoAboutBox = 0x6e61626fU;
 	}
-
 }

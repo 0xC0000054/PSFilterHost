@@ -63,7 +63,6 @@ namespace HostTest
                     DrawImage();
                 }
             }
-
         }
 
         /// <summary>

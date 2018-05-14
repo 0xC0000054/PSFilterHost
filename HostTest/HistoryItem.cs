@@ -88,7 +88,6 @@ namespace HostTest
             }
         }
 
-
         #region IDisposible Members
         private bool disposed;
         /// <summary>
@@ -157,7 +156,6 @@ namespace HostTest
 
                     info.AddValue("image", stream.GetBuffer(), typeof(byte[]));
                 }
-
             }
 
             /// <summary>

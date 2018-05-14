@@ -16,7 +16,6 @@ using System.Security.Permissions;
 
 namespace PSFilterHostDll
 {
-
 	/// <summary>
 	/// Encapsulates the Pseudo–Resources used by the filters.
 	/// </summary>

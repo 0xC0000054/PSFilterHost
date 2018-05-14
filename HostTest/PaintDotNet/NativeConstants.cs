@@ -1,5 +1,4 @@
 ﻿
-
 /////////////////////////////////////////////////////////////////////////////////
 // Paint.NET                                                                   //
 // Copyright (C) dotPDN LLC, Rick Brewster, Tom Jackson, and contributors.     //
@@ -7,7 +6,6 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
-
 
 namespace PaintDotNet.SystemLayer
 {

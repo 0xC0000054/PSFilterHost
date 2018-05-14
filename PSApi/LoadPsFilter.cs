@@ -246,7 +246,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-
 		internal ParameterData ParameterData
 		{
 			get
@@ -598,9 +597,7 @@ namespace PSFilterHostDll.PSApi
 									filterCase = FilterCase.ProtectedTransparencyWithSelection;
 									break;
 							}
-
 						}
-
 					}
 				}
 			}
@@ -737,7 +734,6 @@ namespace PSFilterHostDll.PSApi
 									// Some filters may store executable code in the parameter block.
 									globalParameters.ParameterDataExecutable = IsMemoryExecutable(hPtr);
 								}
-
 							}
 							else
 							{
@@ -758,17 +754,14 @@ namespace PSFilterHostDll.PSApi
 									globalParameters.SetParameterDataBytes(buf);
 									globalParameters.ParameterDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 								}
-
 							}
 						}
 						finally
 						{
 							SafeNativeMethods.GlobalUnlock(filterRecord->parameters);
 						}
-
 					}
 				}
-
 			}
 
 			if (dataPtr != IntPtr.Zero)
@@ -814,7 +807,6 @@ namespace PSFilterHostDll.PSApi
 							globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.OTOFHandle;
 							globalParameters.PluginDataExecutable = IsMemoryExecutable(hPtr);
 						}
-
 					}
 					else if (pluginDataSize > 0)
 					{
@@ -823,13 +815,11 @@ namespace PSFilterHostDll.PSApi
 						globalParameters.SetPluginDataBytes(dataBuf);
 						globalParameters.PluginDataStorageMethod = GlobalParameters.DataStorageMethod.RawBytes;
 					}
-
 				}
 				finally
 				{
 					SafeNativeMethods.GlobalUnlock(pluginData);
 				}
-
 			}
 		}
 
@@ -935,7 +925,6 @@ namespace PSFilterHostDll.PSApi
 						throw new InvalidEnumArgumentException("PluginDataStorageMethod", (int)globalParameters.PluginDataStorageMethod, typeof(GlobalParameters.DataStorageMethod));
 				}
 			}
-
 		}
 
 		private bool PluginAbout(PluginData pdata)
@@ -989,7 +978,6 @@ namespace PSFilterHostDll.PSApi
 					}
 				}
 			}
-
 
 			if (result != PSError.noErr)
 			{
@@ -1087,7 +1075,6 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 			AdvanceStateProc();
-
 
 			result = PSError.noErr;
 
@@ -1266,7 +1253,6 @@ namespace PSFilterHostDll.PSApi
 			filterRecord->inLayerMasks = 0;
 			filterRecord->inInvertedLayerMasks = 0;
 
-
 			filterRecord->outInvertedLayerMasks = filterRecord->inInvertedLayerMasks;
 			filterRecord->outLayerMasks = filterRecord->inLayerMasks;
 
@@ -1291,7 +1277,6 @@ namespace PSFilterHostDll.PSApi
 				filterRecord->inPlaneBytes = 1;
 				filterRecord->outPlaneBytes = 1;
 			}
-
 		}
 
 		private bool PluginPrepare()
@@ -1300,9 +1285,7 @@ namespace PSFilterHostDll.PSApi
 			RestoreParameterHandles();
 			SetFilterRecordValues();
 
-
 			result = PSError.noErr;
-
 
 #if DEBUG
 			DebugUtils.Ping(DebugFlags.Call, "Before filterSelectorPrepare");
@@ -1456,9 +1439,7 @@ namespace PSFilterHostDll.PSApi
 						}
 					}
 				}
-
 			}
-
 		}
 
 		/// <summary>
@@ -1837,7 +1818,6 @@ namespace PSFilterHostDll.PSApi
 				lastMaskRect = Rect16.Empty;
 			}
 
-
 			if (RectNonEmpty(filterRecord->inRect))
 			{
 				if (!lastInRect.Equals(filterRecord->inRect) || (IsSinglePlane(filterRecord->inLoPlane, filterRecord->inHiPlane) && lastInLoPlane != filterRecord->inLoPlane))
@@ -1895,7 +1875,6 @@ namespace PSFilterHostDll.PSApi
 					lastOutLoPlane = filterRecord->outLoPlane;
 					lastOutHiPlane = filterRecord->outHiPlane;
 				}
-
 			}
 			else
 			{
@@ -1979,7 +1958,6 @@ namespace PSFilterHostDll.PSApi
 			}
 		}
 
-
 		/// <summary>
 		/// Fills the input buffer with data from the source image.
 		/// </summary>
@@ -2046,7 +2024,6 @@ namespace PSFilterHostDll.PSApi
 				return PSError.memFullErr;
 			}
 
-
 			short channelOffset = filterRecord->inLoPlane;
 			if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
 			{
@@ -2072,7 +2049,6 @@ namespace PSFilterHostDll.PSApi
 			int left = lockRect.Left;
 			int bottom = Math.Min(lockRect.Bottom, tempSurface.Height);
 			int right = Math.Min(lockRect.Right, tempSurface.Width);
-
 
 			switch (imageMode)
 			{
@@ -2139,7 +2115,6 @@ namespace PSFilterHostDll.PSApi
 									dst[2] = src[0];
 									dst[3] = src[3];
 									break;
-
 							}
 
 							src += 4;
@@ -2177,7 +2152,6 @@ namespace PSFilterHostDll.PSApi
 									dst[2] = src[0];
 									dst[3] = src[3];
 									break;
-
 							}
 
 							src += 4;
@@ -2347,7 +2321,6 @@ namespace PSFilterHostDll.PSApi
 									dst[2] = src[0];
 									dst[3] = src[3];
 									break;
-
 							}
 
 							src += 4;
@@ -2385,7 +2358,6 @@ namespace PSFilterHostDll.PSApi
 									dst[2] = src[0];
 									dst[3] = src[3];
 									break;
-
 							}
 
 							src += 4;
@@ -2608,7 +2580,6 @@ namespace PSFilterHostDll.PSApi
 					}
 				}
 
-
 				void* ptr = outData.ToPointer();
 
 				int top = lockRect.Top;
@@ -2683,7 +2654,6 @@ namespace PSFilterHostDll.PSApi
 										dst[2] = src[0];
 										dst[3] = src[3];
 										break;
-
 								}
 
 								src += nplanes;
@@ -3003,7 +2973,6 @@ namespace PSFilterHostDll.PSApi
 					}
 
 					break;
-
 			}
 			return err;
 		}
@@ -3024,7 +2993,6 @@ namespace PSFilterHostDll.PSApi
 			byte* ptr = (byte*)inData.ToPointer();
 
 			int srcChannelCount = surface.ChannelCount;
-
 
 			if (top > 0)
 			{
@@ -3063,7 +3031,6 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
-
 			if (left > 0)
 			{
 				for (int y = 0; y < height; y++)
@@ -3098,7 +3065,6 @@ namespace PSFilterHostDll.PSApi
 					}
 				}
 			}
-
 
 			if (bottom > 0)
 			{
@@ -3136,7 +3102,6 @@ namespace PSFilterHostDll.PSApi
 						src += srcChannelCount;
 						dst += nplanes;
 					}
-
 				}
 			}
 
@@ -3267,7 +3232,6 @@ namespace PSFilterHostDll.PSApi
 				}
 			}
 
-
 			if (bottom > 0)
 			{
 				col = surface.Height - 1;
@@ -3304,7 +3268,6 @@ namespace PSFilterHostDll.PSApi
 						src += srcChannelCount;
 						dst += nplanes;
 					}
-
 				}
 			}
 
@@ -3394,7 +3357,6 @@ namespace PSFilterHostDll.PSApi
 						SafeNativeMethods.memset(inData, inputPadding, new UIntPtr((ulong)size));
 						break;
 				}
-
 			}
 
 			return PSError.noErr;
@@ -3693,7 +3655,6 @@ namespace PSFilterHostDll.PSApi
 			{
 				checkerBoardBitmap.UnlockBits(bd);
 			}
-
 		}
 
 		private unsafe void DrawSelectionMask()
@@ -3902,7 +3863,6 @@ namespace PSFilterHostDll.PSApi
 			{
 				descriptorParameters->recordInfo = RecordInfo.plugInDialogNone;
 			}
-
 
 			if (scriptingData != null)
 			{

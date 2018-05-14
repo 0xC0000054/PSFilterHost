@@ -622,7 +622,6 @@ namespace PSFilterHostDll.PSApi.PICA
                         return item.flags;
                     }
                 }
-
             }
 
             return 0;
@@ -680,7 +679,6 @@ namespace PSFilterHostDll.PSApi.PICA
 
             return PSError.kSPNoError;
         }
-
 
         private int PutString(IntPtr descriptor, uint key, IntPtr cstrValue)
         {
@@ -1260,7 +1258,6 @@ namespace PSFilterHostDll.PSApi.PICA
 
             return PSError.errMissingParameter;
         }
-
 
         private int GetIntegers(IntPtr descriptor, uint key, uint count, IntPtr data)
         {

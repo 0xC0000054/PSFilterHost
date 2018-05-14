@@ -90,7 +90,6 @@ namespace PSFilterHostDll.PSApi
             return (PluginEntryPoint)Marshal.GetDelegateForFunctionPointer(address, typeof(PluginEntryPoint));
         }
 
-
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>

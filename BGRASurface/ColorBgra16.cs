@@ -22,7 +22,6 @@ using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.BGRASurface
 {
-
     [StructLayout(LayoutKind.Explicit)]
     internal struct ColorBgra16
     {
@@ -37,6 +36,5 @@ namespace PSFilterHostDll.BGRASurface
 
         [FieldOffset(0)]
         public ulong Bgra;
-
     }
 }

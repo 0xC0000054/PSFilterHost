@@ -29,7 +29,6 @@ namespace PSFilterHostDll.BGRASurface
 	/// </summary>
 	internal static class SurfaceFactory
 	{
-
 #if GDIPLUS
 		/// <summary>
 		/// Creates a new surface based on the PixelFormat of the Bitmap.
@@ -204,7 +203,6 @@ namespace PSFilterHostDll.BGRASurface
 
 				return surface;
 			}
-
 		}
 #endif
 

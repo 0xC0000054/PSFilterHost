@@ -21,7 +21,6 @@ using System.Security.Permissions;
 
 namespace PSFilterHostDll
 {
-
 #if NET_40_OR_GREATER
     [SecurityCritical]
 #else
@@ -116,6 +115,5 @@ namespace PSFilterHostDll
 
             return false;
         }
-
     }
 }

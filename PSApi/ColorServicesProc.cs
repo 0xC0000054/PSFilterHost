@@ -76,5 +76,4 @@ namespace PSFilterHostDll.PSApi
         public IntPtr reserved;
         public SelectorParameters selectorParameter;
     }
-
 }

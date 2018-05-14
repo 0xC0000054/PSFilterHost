@@ -47,7 +47,4 @@ namespace PSFilterHostDll.PSApi
         Bilinear,
         Bicubic
     }
-
-
-
 }

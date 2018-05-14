@@ -538,7 +538,6 @@ namespace PSFilterHostDll.PSApi
 #endif
 			AETEValue item = state.items[state.currentKey];
 
-
 			uint type = item.Type;
 
 			try
@@ -758,7 +757,6 @@ namespace PSFilterHostDll.PSApi
 						return item.flags;
 					}
 				}
-
 			}
 
 			return 0;

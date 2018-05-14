@@ -157,7 +157,6 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             else if (value.GetType().Equals(typeof(string[]))) return VarEnum.VT_LPWSTR | VarEnum.VT_VECTOR;
             else if (Value.GetType().Equals(typeof(DateTime))) return VarEnum.VT_FILETIME;
             else if (value.GetType().IsCOMObject) return VarEnum.VT_UNKNOWN;
-
             else throw new NotImplementedException();
         }
 
@@ -301,7 +300,6 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             {
                 return IntPtr.Zero;
             }
-
 
             PropVariantMarshalType marshalType = PropVariantMarshalType.Automatic;
 

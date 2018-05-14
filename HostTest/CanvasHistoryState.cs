@@ -34,8 +34,6 @@ namespace HostTest
             disposed = false;
         }
 
-
-
         public Bitmap Image
         {
             get
@@ -63,6 +61,5 @@ namespace HostTest
                 }
             }
         }
-
     }
 }

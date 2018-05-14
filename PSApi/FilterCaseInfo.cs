@@ -16,7 +16,6 @@
  * All rights reserved.
 */
 
-
 using System;
 using System.Runtime.InteropServices;
 
@@ -63,5 +62,4 @@ namespace PSFilterHostDll.PSApi
 
         public const int SizeOf = 4;
     }
-
 }

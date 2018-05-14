@@ -147,7 +147,6 @@ namespace HostTest
 			}
 		}
 
-
 		#region IDisposible Members
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

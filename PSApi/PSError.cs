@@ -70,5 +70,4 @@ namespace PSFilterHostDll.PSApi
         // Scripting error codes
         public const short errMissingParameter = -1715;
     }
-
 }

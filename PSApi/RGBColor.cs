@@ -25,5 +25,4 @@ namespace PSFilterHostDll.PSApi
         public ushort green;
         public ushort blue;
     }
-
 }

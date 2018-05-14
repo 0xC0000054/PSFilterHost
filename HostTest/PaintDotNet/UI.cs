@@ -152,7 +152,6 @@ namespace PaintDotNet.SystemLayer
                         element = null;
                     }
                 }
-
                 catch (InvalidOperationException)
                 {
                     element = null;
@@ -197,7 +196,6 @@ namespace PaintDotNet.SystemLayer
                     renderer.DrawParentBackground(g, rect, childControl);
                     renderer.DrawBackground(g, rect);
                 }
-
                 catch (Exception)
                 {
                     element = null;
@@ -237,7 +235,6 @@ namespace PaintDotNet.SystemLayer
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
@@ -288,6 +285,5 @@ namespace PaintDotNet.SystemLayer
                 return DetermineVisualStyleClass();
             }
         }
-
     }
 }

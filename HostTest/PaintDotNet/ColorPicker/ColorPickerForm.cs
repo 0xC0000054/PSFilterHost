@@ -146,7 +146,6 @@ namespace HostTest
             }
         }
 
-
         private bool IgnoreChangedEvents
         {
             get
@@ -801,7 +800,6 @@ namespace HostTest
             ((System.ComponentModel.ISupportInitialize)(hueUpDown)).EndInit();
             ResumeLayout(false);
             PerformLayout();
-
         }
         #endregion
 
@@ -838,7 +836,6 @@ namespace HostTest
             Color = color;
 
             PopIgnoreChangedEvents();
-
 
             Update();
         }
@@ -916,7 +913,6 @@ namespace HostTest
                 blue = (int)blueUpDown.Value;
             }
 
-
             Color rgbColor = Color.FromArgb(255, red, green, blue);
             HsvColor hsvColor = HsvColor.FromColor(rgbColor);
 
@@ -991,9 +987,7 @@ namespace HostTest
             string hexText = GetHexNumericUpDownValue(rgbColor.Red, rgbColor.Green, rgbColor.Blue);
             hexBox.Text = hexText;
 
-
             Color = color;
-
 
             Update();
         }
@@ -1090,7 +1084,6 @@ namespace HostTest
                             hexInt = 0;
                             hexBox.Text = "";
                         }
-
                         catch (OverflowException)
                         {
                             hexInt = 16777215;
@@ -1137,7 +1130,6 @@ namespace HostTest
                     }
                 }
                 PopIgnoreChangedEvents();
-
             }
         }
 
@@ -1167,8 +1159,5 @@ namespace HostTest
             DialogResult = System.Windows.Forms.DialogResult.Cancel;
             Close();
         }
-
-
-
     }
 }

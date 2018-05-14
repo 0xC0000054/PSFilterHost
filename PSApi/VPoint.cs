@@ -24,5 +24,4 @@ namespace PSFilterHostDll.PSApi
         public int v;
         public int h;
     }
-
 }

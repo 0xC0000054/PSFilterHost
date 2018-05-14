@@ -370,7 +370,6 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
 
-
             // Set this up so we can cache the R()'s for every row
             double* rRowCache = stackalloc double[4];
 
@@ -680,6 +679,5 @@ namespace PSFilterHostDll.BGRASurface
                 }
             }
         }
-
     }
 }

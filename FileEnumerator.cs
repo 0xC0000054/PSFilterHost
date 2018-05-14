@@ -30,7 +30,6 @@ namespace PSFilterHostDll
     /// </summary>
     internal sealed class FileEnumerator : IEnumerator<string>
     {
-
 #if NET_40_OR_GREATER
         [SecurityCritical()]
 #else

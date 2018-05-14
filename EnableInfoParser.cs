@@ -91,7 +91,6 @@ namespace PSFilterHostDll
 					case TokenType.Or: // the || PSHOP_ImageDepth == 16 case
 						supports16Bit = ParseOr();
 						break;
-
 				}
 			}
 

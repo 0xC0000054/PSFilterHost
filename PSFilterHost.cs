@@ -392,7 +392,6 @@ namespace PSFilterHostDll
 			return new FilterCollection(filters);
 		}
 
-
 #if NET_40_OR_GREATER
 		/// <summary>
 		/// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
