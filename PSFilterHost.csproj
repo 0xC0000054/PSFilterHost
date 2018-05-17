@@ -151,6 +151,8 @@
     <Compile Include="PluginSettingsRegistryItem.cs" />
     <Compile Include="PSApi\ActivePICASuites.cs" />
     <Compile Include="PSApi\BufferSuite.cs" />
+    <Compile Include="PSApi\BuiltInColorPicker.cs" />
+    <Compile Include="PSApi\CallbackColorPicker.cs" />
     <Compile Include="PSApi\ChannelPortsSuite.cs" />
     <Compile Include="PSApi\ColorConversion\CMYK.cs" />
     <Compile Include="PSApi\ColorConversion\ColorConverter.cs" />
@@ -159,13 +161,13 @@
     <Compile Include="PSApi\ColorConversion\Lab.cs" />
     <Compile Include="PSApi\ColorConversion\RGB.cs" />
     <Compile Include="PSApi\ColorConversion\XYZ.cs" />
-    <Compile Include="PSApi\ColorPickerManager.cs" />
     <Compile Include="PSApi\ColorProfileConverter.cs" />
     <Compile Include="PSApi\DebugUtils.cs" />
     <Compile Include="PSApi\DescriptorSuite.cs" />
     <Compile Include="PSApi\DoubleExtensions.cs" />
     <Compile Include="PSApi\Fixed16.cs" />
     <Compile Include="PSApi\HandleSuite.cs" />
+    <Compile Include="PSApi\IColorPicker.cs" />
     <Compile Include="PSApi\IFilterImageProvider.cs" />
     <Compile Include="PSApi\ImageMetaData.cs" />
     <Compile Include="PSApi\ImageServicesSuite.cs" />

@@ -75,6 +75,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly CSConvert csConvert16to8;
         private readonly CSConvertToMonitorRGB csConvertToMonitorRGB;
         private readonly IASZStringSuite zstringSuite;
+        private readonly IColorPicker colorPicker;
 
         private Dictionary<IntPtr, Color> colors;
         private int colorsIndex;
@@ -85,12 +86,17 @@ namespace PSFilterHostDll.PSApi.PICA
         /// Initializes a new instance of the <see cref="PICAColorSpaceSuite"/> class.
         /// </summary>
         /// <param name="zstringSuite">The ASZString suite.</param>
+        /// <param name="colorPicker">The color picker.</param>
         /// <exception cref="ArgumentNullException"><paramref name="zstringSuite"/> is null.</exception>
-        public PICAColorSpaceSuite(IASZStringSuite zstringSuite)
+        public PICAColorSpaceSuite(IASZStringSuite zstringSuite, IColorPicker colorPicker)
         {
             if (zstringSuite == null)
             {
                 throw new ArgumentNullException(nameof(zstringSuite));
+            }
+            if (colorPicker == null)
+            {
+                throw new ArgumentNullException(nameof(colorPicker));
             }
 
             csMake = new CSMake(Make);
@@ -114,6 +120,7 @@ namespace PSFilterHostDll.PSApi.PICA
             lookup16To8 = null;
             lookup8To16 = null;
             this.zstringSuite = zstringSuite;
+            this.colorPicker = colorPicker;
         }
 
         private static bool IsValidColorSpace(ColorSpace colorSpace)
@@ -348,7 +355,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 byte green = 0;
                 byte blue = 0;
 
-                if (ColorPickerManager.ShowColorPickerDialog(prompt, ref red, ref green, ref blue))
+                if (colorPicker.ShowDialog(prompt, ref red, ref green, ref blue))
                 {
                     error = Make(ref colorID);
                     if (error == PSError.kSPNoError)

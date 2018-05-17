@@ -39,6 +39,7 @@ namespace PSFilterHostDll.PSApi
 		private ASZStringSuite zstringSuite;
 
 		private ActivePICASuites activePICASuites;
+		private IColorPicker colorPicker;
 		private string pluginName;
 		private IntPtr descriptorHandle;
 		private Dictionary<uint, AETEValue> scriptingData;
@@ -53,7 +54,7 @@ namespace PSFilterHostDll.PSApi
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="picaSuiteData"/> is null.
 		/// </exception>
-		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData) : this(picaSuiteData, null)
+		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData) : this(picaSuiteData, null, null)
 		{
 		}
 
@@ -62,10 +63,11 @@ namespace PSFilterHostDll.PSApi
 		/// </summary>
 		/// <param name="picaSuiteData">The filter record provider.</param>
 		/// <param name="propertySuite">The property suite.</param>
+		/// <param name="colorPicker">The color picker.</param>
 		/// <exception cref="ArgumentNullException">
 		/// <paramref name="picaSuiteData"/> is null.
 		/// </exception>
-		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData, IPropertySuite propertySuite)
+		public SPBasicSuiteProvider(IPICASuiteDataProvider picaSuiteData, IPropertySuite propertySuite, IColorPicker colorPicker)
 		{
 			if (picaSuiteData == null)
 			{
@@ -74,6 +76,7 @@ namespace PSFilterHostDll.PSApi
 
 			this.picaSuiteData = picaSuiteData;
 			this.propertySuite = propertySuite;
+			this.colorPicker = colorPicker;
 			spAcquireSuite = new SPBasicAcquireSuite(SPBasicAcquireSuite);
 			spReleaseSuite = new SPBasicReleaseSuite(SPBasicReleaseSuite);
 			spIsEqual = new SPBasicIsEqual(SPBasicIsEqual);
@@ -121,6 +124,26 @@ namespace PSFilterHostDll.PSApi
 			set
 			{
 				aete = value;
+			}
+		}
+
+		/// <summary>
+		/// Sets the color picker.
+		/// </summary>
+		/// <value>
+		/// The color picker.
+		/// </value>
+		/// <exception cref="ArgumentNullException">value is null.</exception>
+		public IColorPicker ColorPicker
+		{
+			set
+			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("value");
+				}
+
+				colorPicker = value;
 			}
 		}
 
@@ -416,14 +439,15 @@ namespace PSFilterHostDll.PSApi
 				}
 				else if (suiteName.Equals(PSConstants.PICA.ColorSpaceSuite, StringComparison.Ordinal))
 				{
-					if (version != 1)
+					// The color picker can be null when the filter is showing its about box.
+					if (colorPicker == null || version != 1)
 					{
 						return PSError.kSPSuiteNotFoundError;
 					}
 
 					if (colorSpaceSuite == null)
 					{
-						colorSpaceSuite = new PICAColorSpaceSuite(ASZStringSuite);
+						colorSpaceSuite = new PICAColorSpaceSuite(ASZStringSuite, colorPicker);
 					}
 
 					PSColorSpaceSuite1 csSuite = colorSpaceSuite.CreateColorSpaceSuite1();

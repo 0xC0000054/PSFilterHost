@@ -133,6 +133,7 @@ namespace PSFilterHostDll.PSApi
 		private bool useChannelPorts;
 		private ColorProfileConverter colorProfileConverter;
 		private byte[] documentColorProfile;
+		private IColorPicker colorPicker;
 
 		private ChannelPortsSuite channelPortsSuite;
 		private DescriptorSuite descriptorSuite;
@@ -197,7 +198,8 @@ namespace PSFilterHostDll.PSApi
 				throw new ArgumentNullException(nameof(value));
 			}
 
-			ColorPickerManager.SetPickColorCallback(value);
+			colorPicker = new CallbackColorPicker(value);
+			basicSuiteProvider.ColorPicker = colorPicker;
 		}
 
 		/// <summary>
@@ -353,7 +355,7 @@ namespace PSFilterHostDll.PSApi
 
 			abortFunc = null;
 			progressFunc = null;
-			ColorPickerManager.SetPickColorCallback(null);
+			colorPicker = new BuiltInColorPicker();
 			descriptorSuite = new DescriptorSuite();
 			resourceSuite = new ResourceSuite();
 
@@ -388,7 +390,7 @@ namespace PSFilterHostDll.PSApi
 			imageServicesSuite = new ImageServicesSuite();
 			propertySuite = new PropertySuite(sourceImage, imageMode);
 			readImageDocument = new ReadImageDocument(source.Width, source.Height, source.DpiX, source.DpiY, imageMode);
-			basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite);
+			basicSuiteProvider = new SPBasicSuiteProvider(this, propertySuite, colorPicker);
 
 			selectedRegion = null;
 
@@ -2864,7 +2866,7 @@ namespace PSFilterHostDll.PSApi
 					byte green = (byte)info.colorComponents[1];
 					byte blue = (byte)info.colorComponents[2];
 
-					if (ColorPickerManager.ShowColorPickerDialog(prompt, ref red, ref green, ref blue))
+					if (colorPicker.ShowDialog(prompt, ref red, ref green, ref blue))
 					{
 						info.colorComponents[0] = red;
 						info.colorComponents[1] = green;
