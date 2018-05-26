@@ -29,9 +29,9 @@ namespace HostTest
 
 		public HistoryStack()
 		{
-            historyList = new List<HistoryItem>();
-            index = -1;
-            disposed = false;
+			historyList = new List<HistoryItem>();
+			index = -1;
+			disposed = false;
 		}
 
 		/// <summary>
@@ -43,11 +43,11 @@ namespace HostTest
 		{
 			if (index < (historyList.Count - 1))
 			{
-                historyList.RemoveRange(index + 1, (historyList.Count - 1) - index);
+				historyList.RemoveRange(index + 1, (historyList.Count - 1) - index);
 			}
 
-            historyList.Add(new HistoryItem(historyState, image));
-            index = historyList.Count - 1;
+			historyList.Add(new HistoryItem(historyState, image));
+			index = historyList.Count - 1;
 
 			OnHistoryChanged();
 		}
@@ -69,11 +69,11 @@ namespace HostTest
 
 			for (int i = 0; i < count; i++)
 			{
-                historyList[i].Dispose();
+				historyList[i].Dispose();
 			}
 
-            historyList.Clear();
-            index = -1;
+			historyList.Clear();
+			index = -1;
 
 			OnHistoryChanged();
 		}
@@ -87,14 +87,14 @@ namespace HostTest
 		{
 			if (CanUndo)
 			{
-                index--;
+				index--;
 
-                historyList[index].ToMemory();
+				historyList[index].ToMemory();
 
 				surface.CopyFromHistoryState(historyList[index].CanvasHistory);
 				image = historyList[index].Image;
 
-                historyList[index].ToDisk();
+				historyList[index].ToDisk();
 
 				surface.IsDirty = index > 0;
 			}
@@ -108,14 +108,14 @@ namespace HostTest
 		{
 			if (CanRedo)
 			{
-                index++;
+				index++;
 
-                historyList[index].ToMemory();
+				historyList[index].ToMemory();
 
 				surface.CopyFromHistoryState(historyList[index].CanvasHistory);
 				image = historyList[index].Image;
 
-                historyList[index].ToDisk();
+				historyList[index].ToDisk();
 
 				surface.IsDirty = true;
 			}
@@ -157,10 +157,10 @@ namespace HostTest
 			{
 				for (int i = 0; i < historyList.Count; i++)
 				{
-                    historyList[i].Dispose();
+					historyList[i].Dispose();
 				}
-                historyList = null;
-                disposed = true;
+				historyList = null;
+				disposed = true;
 			}
 		}
 		#endregion
