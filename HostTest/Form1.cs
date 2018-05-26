@@ -320,9 +320,9 @@ namespace HostTest
 
 		private void ShowErrorMessage(string message)
 		{
-			if (base.InvokeRequired)
+			if (InvokeRequired)
 			{
-				base.Invoke(new Action<string>(delegate(string error)
+				Invoke(new Action<string>(delegate(string error)
 					{
 						MessageBox.Show(this, error, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}), new object[] { message });
@@ -563,7 +563,7 @@ namespace HostTest
 				// save the srcImage to a temporary file on the UI thread and load it on this thread to fix the cross threading issues.
 				if (string.IsNullOrEmpty(srcImageTempFileName))
 				{
-					base.Invoke(new Action(SaveImageOnUIThread));
+					Invoke(new Action(SaveImageOnUIThread));
 				}
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Open, FileAccess.Read))
@@ -580,7 +580,7 @@ namespace HostTest
 			}
 			hostInfo.HighDpi = highDPIMode;
 
-			IntPtr owner = (IntPtr)base.Invoke(new Func<IntPtr>(delegate() { return Handle; }));
+			IntPtr owner = (IntPtr)Invoke(new Func<IntPtr>(delegate() { return Handle; }));
 			bool setRepeatFilter = false;
 
 			try
@@ -678,7 +678,7 @@ namespace HostTest
 					selection.Dispose();
 					selection = null;
 				}
-				base.BeginInvoke(new Action(() => FilterCompleted(setRepeatFilter)));
+				BeginInvoke(new Action(() => FilterCompleted(setRepeatFilter)));
 			}
 		}
 
@@ -725,9 +725,9 @@ namespace HostTest
 
 		private void SetApplyFilterText()
 		{
-			if (base.InvokeRequired)
+			if (InvokeRequired)
 			{
-				base.Invoke(new Action<string>(delegate(string text)
+				Invoke(new Action<string>(delegate(string text)
 				{
 					toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, filterName);
 					toolStripProgressBar1.Visible = true;
@@ -748,9 +748,9 @@ namespace HostTest
 				setFilterApplyText = true;
 			}
 
-			if (base.InvokeRequired)
+			if (InvokeRequired)
 			{
-				base.Invoke(new Action<int>(delegate(int value)
+				Invoke(new Action<int>(delegate(int value)
 				{
 					toolStripProgressBar1.Value = value;
 				}), new object[] { e.Progress });
@@ -827,9 +827,9 @@ namespace HostTest
 				enc.Frames.Add(BitmapFrame.Create(colorCorrectedImage ?? image, null, null, null));
 				enc.Save(stream);
 
-				if (base.InvokeRequired)
+				if (InvokeRequired)
 				{
-					base.Invoke(new Action<MemoryStream>(delegate (MemoryStream ms)
+					Invoke(new Action<MemoryStream>(delegate (MemoryStream ms)
 					{
 						canvas.Surface = new Bitmap(ms);
 					}), new object[] { stream });
@@ -1197,9 +1197,9 @@ namespace HostTest
 
 		private void historyStack_HistoryChanged(object sender, EventArgs e)
 		{
-			if (base.InvokeRequired)
+			if (InvokeRequired)
 			{
-				base.Invoke(new Action(delegate()
+				Invoke(new Action(delegate()
 				{
 					EnableUndoButtons();
 				}));
@@ -1282,7 +1282,7 @@ namespace HostTest
 		{
 			base.OnResize(e);
 
-			if (base.WindowState == FormWindowState.Maximized && canvas.IsActualSize)
+			if (WindowState == FormWindowState.Maximized && canvas.IsActualSize)
 			{
 				// If the window is maximized with the canvas at 100% do not resize the canvas.
 				return;

@@ -292,9 +292,9 @@ namespace HostTest
 
 			if (suspendPaintCounter == 0)
 			{
-				if (base.InvokeRequired)
+				if (InvokeRequired)
 				{
-					base.BeginInvoke(new Action(delegate()
+					BeginInvoke(new Action(delegate()
 						{
 							Invalidate();
 							Update();
