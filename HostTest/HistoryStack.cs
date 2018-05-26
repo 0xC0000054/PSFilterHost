@@ -139,12 +139,7 @@ namespace HostTest
 
 		private void OnHistoryChanged()
 		{
-			EventHandler historyChanged = HistoryChanged;
-
-			if (historyChanged != null)
-			{
-				historyChanged.Invoke(this, EventArgs.Empty);
-			}
+			HistoryChanged?.Invoke(this, EventArgs.Empty);
 		}
 
 		#region IDisposible Members

@@ -99,10 +99,7 @@ namespace HostTest
 				{
 					isDirty = value;
 
-					if (DirtyChanged != null)
-					{
-						DirtyChanged.Invoke(this, new CanvasDirtyChangedEventArgs(value));
-					}
+					DirtyChanged?.Invoke(this, new CanvasDirtyChangedEventArgs(value));
 				}
 			}
 		}
@@ -831,10 +828,7 @@ namespace HostTest
 
 		private void OnZoomChanged()
 		{
-			if (ZoomChanged != null)
-			{
-				ZoomChanged.Invoke(this, new CanvasZoomChangedEventArgs(zoomFactor));
-			}
+			ZoomChanged?.Invoke(this, new CanvasZoomChangedEventArgs(zoomFactor));
 		}
 
 		private void ZoomCanvas()

@@ -104,12 +104,7 @@ namespace PSFilterHostDll.PSApi
 		{
 			get
 			{
-				if (errorSuite == null || !errorSuite.HasErrorMessage)
-				{
-					return null;
-				}
-
-				return errorSuite.ErrorMessage;
+				return errorSuite?.ErrorMessage;
 			}
 		}
 

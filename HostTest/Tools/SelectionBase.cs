@@ -165,10 +165,7 @@ namespace HostTest.Tools
                     }
                     finally
                     {
-                        if (path != null)
-                        {
-                            path.Dispose();
-                        }
+                        path?.Dispose();
                     }
                 }
             }
@@ -194,10 +191,7 @@ namespace HostTest.Tools
             {
                 if (disposing)
                 {
-                    if (selectPoints != null)
-                    {
-                        selectPoints.Clear();
-                    }
+                    selectPoints?.Clear();
 
                     disposed = true;
                 }
