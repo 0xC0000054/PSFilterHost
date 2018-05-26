@@ -308,7 +308,7 @@ namespace HostTest
 			}
 		}
 
-		protected override void OnPaint(PaintEventArgs pe)
+		protected override void OnPaint(PaintEventArgs e)
 		{
 #if DEBUG
 			System.Diagnostics.Debug.Assert(suspendPaintCounter == 0);
@@ -316,10 +316,10 @@ namespace HostTest
 
 			if (resetClip)
 			{
-				if (imageBounds.Width < pe.ClipRectangle.Width && imageBounds.Height < pe.ClipRectangle.Height)
+				if (imageBounds.Width < e.ClipRectangle.Width && imageBounds.Height < e.ClipRectangle.Height)
 				{
-					pe.Graphics.ResetClip();
-					pe.Graphics.SetClip(imageBounds);
+					e.Graphics.ResetClip();
+					e.Graphics.SetClip(imageBounds);
 				}
 
 				resetClip = false;
@@ -327,25 +327,25 @@ namespace HostTest
 
 			if (image != null)
 			{
-				CompositingMode oldCM = pe.Graphics.CompositingMode;
+				CompositingMode oldCM = e.Graphics.CompositingMode;
 
-				pe.Graphics.CompositingMode = CompositingMode.SourceCopy;
+				e.Graphics.CompositingMode = CompositingMode.SourceCopy;
 				if (checkerBoardBitmap != null)
 				{
-					pe.Graphics.DrawImage(checkerBoardBitmap, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
-					pe.Graphics.CompositingMode = CompositingMode.SourceOver;
+					e.Graphics.DrawImage(checkerBoardBitmap, e.ClipRectangle, e.ClipRectangle, GraphicsUnit.Pixel);
+					e.Graphics.CompositingMode = CompositingMode.SourceOver;
 				}
 
 				if (scaledImage != null)
 				{
-					pe.Graphics.DrawImage(scaledImage, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
+					e.Graphics.DrawImage(scaledImage, e.ClipRectangle, e.ClipRectangle, GraphicsUnit.Pixel);
 				}
 				else
 				{
-					pe.Graphics.DrawImage(image, pe.ClipRectangle, pe.ClipRectangle, GraphicsUnit.Pixel);
+					e.Graphics.DrawImage(image, e.ClipRectangle, e.ClipRectangle, GraphicsUnit.Pixel);
 				}
 
-				pe.Graphics.CompositingMode = oldCM;
+				e.Graphics.CompositingMode = oldCM;
 
 				if (selectionRegion != null)
 				{
@@ -376,7 +376,7 @@ namespace HostTest
 						};
 					}
 
-					Graphics g = pe.Graphics;
+					Graphics g = e.Graphics;
 
 					PixelOffsetMode oldPOM = g.PixelOffsetMode;
 					g.PixelOffsetMode = PixelOffsetMode.None;
@@ -413,7 +413,7 @@ namespace HostTest
 				}
 			}
 
-			base.OnPaint(pe);
+			base.OnPaint(e);
 		}
 
 		/// <summary>
