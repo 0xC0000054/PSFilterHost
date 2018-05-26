@@ -38,20 +38,6 @@ namespace PSFilterHostDll.PSApi.PICA
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance has an error message.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance has an error message; otherwise, <c>false</c>.
-        /// </value>
-        public bool HasErrorMessage
-        {
-            get
-            {
-                return errorMessage != null;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ErrorSuite"/> class.
         /// </summary>
         /// <param name="zstringSuite">The ASZString suite.</param>
