@@ -23,6 +23,7 @@ namespace HostTest
 	{
 		private List<HistoryItem> historyList;
 		private int index;
+		private TempDirectory tempDirectory;
 		private bool disposed;
 
 		public event EventHandler HistoryChanged;
@@ -31,6 +32,7 @@ namespace HostTest
 		{
 			historyList = new List<HistoryItem>();
 			index = -1;
+			tempDirectory = new TempDirectory();
 			disposed = false;
 		}
 
@@ -46,7 +48,7 @@ namespace HostTest
 				historyList.RemoveRange(index + 1, (historyList.Count - 1) - index);
 			}
 
-			historyList.Add(new HistoryItem(historyState, image));
+			historyList.Add(new HistoryItem(tempDirectory.GetRandomFileName(), historyState, image));
 			index = historyList.Count - 1;
 
 			OnHistoryChanged();
@@ -155,6 +157,7 @@ namespace HostTest
 					historyList[i].Dispose();
 				}
 				historyList = null;
+				tempDirectory?.Dispose();
 				disposed = true;
 			}
 		}

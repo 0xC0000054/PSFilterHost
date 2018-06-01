@@ -46,9 +46,9 @@ namespace HostTest
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItem"/> class.
         /// </summary>
-        public HistoryItem(CanvasHistoryState historyCanvas, BitmapSource currentImage)
+        public HistoryItem(string file, CanvasHistoryState historyCanvas, BitmapSource currentImage)
         {
-            backingFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            backingFile = file;
             state = HistoryItemState.Memory;
             chunk = new HistoryChunk(historyCanvas, currentImage);
 

@@ -195,6 +195,7 @@
     <Compile Include="PaintDotNet\TaskDialog\TaskDialog.cs" />
     <Compile Include="PaintDotNet\UI.cs" />
     <Compile Include="PaintDotNet\VisualStyleClass.cs" />
+    <Compile Include="TempDirectory.cs" />
     <Compile Include="ToolStripItemCollectionExtensions.cs" />
     <Compile Include="ToolStripMenuItemEx.cs">
       <SubType>Component</SubType>
