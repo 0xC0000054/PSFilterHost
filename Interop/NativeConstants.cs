@@ -43,5 +43,11 @@ namespace PSFilterHostDll.Interop
         internal const int STGM_READ = 0;
 
         internal const int S_OK = 0;
+
+        internal const string CLSID_ShellLink = "00021401-0000-0000-C000-000000000046";
+
+        internal const string IID_IPersist = "0000010c-0000-0000-c000-000000000046";
+        internal const string IID_IPersistFile = "0000010b-0000-0000-C000-000000000046";
+        internal const string IID_IShellLinkW = "000214F9-0000-0000-C000-000000000046";
     }
 }

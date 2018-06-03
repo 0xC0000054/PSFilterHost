@@ -25,7 +25,7 @@ namespace PSFilterHostDll
         private NativeInterfaces.IShellLinkW shellLink;
         private bool disposed;
 
-        [ComImport(), Guid("00021401-0000-0000-C000-000000000046")]
+        [ComImport(), Guid(NativeConstants.CLSID_ShellLink)]
         private class ShellLinkCoClass
         {
         }
