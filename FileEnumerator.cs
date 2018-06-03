@@ -28,13 +28,13 @@ namespace PSFilterHostDll
     /// <summary>
     /// Enumerates through a directory using the native API.
     /// </summary>
+#if NET_40_OR_GREATER
+    [SecurityCritical()]
+#else
+    [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+#endif
     internal sealed class FileEnumerator : IEnumerator<string>
     {
-#if NET_40_OR_GREATER
-        [SecurityCritical()]
-#else
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-#endif
         private sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
             private SafeFindHandle() : base(true) { }
