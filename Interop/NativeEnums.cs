@@ -16,6 +16,7 @@ namespace PSFilterHostDll.Interop
 {
     internal static class NativeEnums
     {
+        [Flags]
         internal enum FileShare : uint
         {
             None = 0,
