@@ -140,10 +140,10 @@
     <Compile Include="Interop\NativeEnums.cs" />
     <Compile Include="Interop\NativeInterfaces.cs" />
     <Compile Include="Interop\NativeStructs.cs" />
-    <Compile Include="Interop\SafeLibraryHandle.cs" />
+    <Compile Include="Interop\SafeHandles\SafeLibraryHandle.cs" />
     <Compile Include="Interop\SafeNativeMethods.cs" />
-    <Compile Include="Interop\SafeProfileHandle.cs" />
-    <Compile Include="Interop\SafeTransformHandle.cs" />
+    <Compile Include="Interop\SafeHandles\SafeProfileHandle.cs" />
+    <Compile Include="Interop\SafeHandles\SafeTransformHandle.cs" />
     <Compile Include="Interop\UnsafeNativeMethods.cs" />
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
