@@ -39,5 +39,9 @@ namespace PSFilterHostDll.Interop
 
         internal const int CMM_FROM_PROFILE = 0;
         internal const int ERROR_SUCCESS = 0;
+
+        internal const int STGM_READ = 0;
+
+        internal const int S_OK = 0;
     }
 }
