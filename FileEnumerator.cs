@@ -495,8 +495,6 @@ namespace PSFilterHostDll
                         {
                             searchData = searchDirectories.Dequeue();
 
-                            string demandPath = GetPermissionPath(searchData.path, false);
-                            new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
                             string searchPath = Path.Combine(searchData.path, "*");
                             handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, infoLevel, findData, NativeEnums.FindExSearchOp.NameMatch, IntPtr.Zero, additionalFlags);
 
