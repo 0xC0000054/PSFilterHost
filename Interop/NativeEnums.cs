@@ -25,7 +25,7 @@ namespace PSFilterHostDll.Interop
             Delete = 4
         }
 
-        internal enum CreateDisposition : uint
+        internal enum CreationDisposition : uint
         {
             CreateNew = 1,
             CreateAlways = 2,

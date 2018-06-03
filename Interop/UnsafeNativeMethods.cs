@@ -85,7 +85,7 @@ namespace PSFilterHostDll.Interop
                 [In()] ref NativeStructs.Mscms.PROFILE profile,
                 [In()] NativeEnums.Mscms.ProfileAccess desiredAccess,
                 [In()] NativeEnums.FileShare shareMode,
-                [In()] NativeEnums.CreateDisposition creationMode
+                [In()] NativeEnums.CreationDisposition creationMode
                 );
 
             [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]

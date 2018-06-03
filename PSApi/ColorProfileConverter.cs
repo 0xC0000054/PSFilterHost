@@ -117,7 +117,7 @@ namespace PSFilterHostDll.PSApi
                         ref profile,
                         NativeEnums.Mscms.ProfileAccess.Read,
                         NativeEnums.FileShare.Read,
-                        NativeEnums.CreateDisposition.OpenExisting
+                        NativeEnums.CreationDisposition.OpenExisting
                         );
 
                     if (handle == null || handle.IsInvalid)
