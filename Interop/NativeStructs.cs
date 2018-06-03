@@ -103,6 +103,13 @@ namespace PSFilterHostDll.Interop
             public string szDeviceName;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct FILETIME
+        {
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
+        }
+
         internal static class Mscms
         {
             [StructLayout(LayoutKind.Sequential)]

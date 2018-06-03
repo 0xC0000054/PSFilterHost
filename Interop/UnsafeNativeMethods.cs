@@ -51,6 +51,33 @@ namespace PSFilterHostDll.Interop
         [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false)]
         internal static extern IntPtr GetProcAddress([In()] SafeLibraryHandle hModule, [In(), MarshalAs(UnmanagedType.LPStr)] string lpProcName);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        internal static extern SafeFindHandle FindFirstFileExW(
+                [In(), MarshalAs(UnmanagedType.LPWStr)] string fileName,
+                [In()] NativeEnums.FindExInfoLevel infoLevel,
+                [Out()] WIN32_FIND_DATAW data,
+                [In()] NativeEnums.FindExSearchOp searchOp,
+                [In()] IntPtr searchFilter,
+                [In()] NativeEnums.FindExAdditionalFlags flags);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, [Out()] WIN32_FIND_DATAW lpFindFileData);
+
+        [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool FindClose([In()] IntPtr handle);
+
+        [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
+        internal static extern uint GetFileAttributesW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        internal static extern uint SetErrorMode([In()] uint uMode);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetThreadErrorMode([In()] uint dwNewMode, [Out()] out uint lpOldMode);
+
         internal static class Mscms
         {
             [DllImport("mscms.dll", ExactSpelling = true, SetLastError = true)]

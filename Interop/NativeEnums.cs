@@ -32,6 +32,27 @@ namespace PSFilterHostDll.Interop
             TruncateExisting = 5
         }
 
+        internal enum FindExInfoLevel : int
+        {
+            Standard = 0,
+            Basic
+        }
+
+        internal enum FindExSearchOp : int
+        {
+            NameMatch = 0,
+            LimitToDirectories,
+            LimitToDevices
+        }
+
+        [Flags]
+        internal enum FindExAdditionalFlags : uint
+        {
+            None = 0U,
+            CaseSensitive = 1U,
+            LargeFetch = 2U
+        }
+
         internal static class Mscms
         {
             internal enum ProfileType : uint

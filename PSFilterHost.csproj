@@ -140,11 +140,13 @@
     <Compile Include="Interop\NativeEnums.cs" />
     <Compile Include="Interop\NativeInterfaces.cs" />
     <Compile Include="Interop\NativeStructs.cs" />
+    <Compile Include="Interop\SafeHandles\SafeFindHandle.cs" />
     <Compile Include="Interop\SafeHandles\SafeLibraryHandle.cs" />
     <Compile Include="Interop\SafeNativeMethods.cs" />
     <Compile Include="Interop\SafeHandles\SafeProfileHandle.cs" />
     <Compile Include="Interop\SafeHandles\SafeTransformHandle.cs" />
     <Compile Include="Interop\UnsafeNativeMethods.cs" />
+    <Compile Include="Interop\Win32FindData.cs" />
     <Compile Include="OS.cs" />
     <Compile Include="PickColor.cs" />
     <Compile Include="PluginSettingsRegistry.cs" />

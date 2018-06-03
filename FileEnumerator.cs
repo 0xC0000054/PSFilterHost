@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using Microsoft.Win32.SafeHandles;
+using PSFilterHostDll.Interop;
 using PSFilterHostDll.Properties;
 using System;
 using System.Collections;
@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Permissions;
@@ -35,106 +34,6 @@ namespace PSFilterHostDll
 #endif
     internal sealed class FileEnumerator : IEnumerator<string>
     {
-        private sealed class SafeFindHandle : SafeHandleZeroOrMinusOneIsInvalid
-        {
-            private SafeFindHandle() : base(true) { }
-
-            protected override bool ReleaseHandle()
-            {
-                return UnsafeNativeMethods.FindClose(handle);
-            }
-        }
-
-        private enum FindExInfoLevel : int
-        {
-            Standard = 0,
-            Basic
-        }
-
-        private enum FindExSearchOp : int
-        {
-            NameMatch = 0,
-            LimitToDirectories,
-            LimitToDevices
-        }
-
-        [Flags]
-        private enum FindExAdditionalFlags : uint
-        {
-            None = 0U,
-            CaseSensitive = 1U,
-            LargeFetch = 2U
-        }
-
-        [SuppressUnmanagedCodeSecurity]
-        private static class UnsafeNativeMethods
-        {
-            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
-            internal static extern SafeFindHandle FindFirstFileExW(
-                [In(), MarshalAs(UnmanagedType.LPWStr)] string fileName,
-                [In()] FindExInfoLevel infoLevel,
-                [Out()] WIN32_FIND_DATAW data,
-                [In()] FindExSearchOp searchOp,
-                [In()] IntPtr searchFilter,
-                [In()] FindExAdditionalFlags flags);
-
-            [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool FindNextFileW([In()] SafeFindHandle hndFindFile, [Out()] WIN32_FIND_DATAW lpFindFileData);
-
-            [DllImport("kernel32.dll", ExactSpelling = true), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool FindClose([In()] IntPtr handle);
-
-            [DllImport("kernel32.dll", ExactSpelling = true, SetLastError = true)]
-            internal static extern uint GetFileAttributesW([In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
-
-            [DllImport("kernel32.dll", ExactSpelling = true)]
-            internal static extern uint SetErrorMode([In()] uint uMode);
-
-            [DllImport("kernel32.dll", ExactSpelling = true)]
-            [return: MarshalAs(UnmanagedType.Bool)]
-            internal static extern bool SetThreadErrorMode([In()] uint dwNewMode, [Out()] out uint lpOldMode);
-        }
-
-        private static class NativeConstants
-        {
-            internal const uint FILE_ATTRIBUTE_DIRECTORY = 16U;
-            internal const uint FILE_ATTRIBUTE_REPARSE_POINT = 1024U;
-            internal const uint INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
-            internal const int ERROR_FILE_NOT_FOUND = 2;
-            internal const int ERROR_PATH_NOT_FOUND = 3;
-            internal const int ERROR_ACCESS_DENIED = 5;
-            internal const int ERROR_NO_MORE_FILES = 18;
-            internal const int ERROR_DIRECTORY = 267;
-            internal const uint SEM_FAILCRITICALERRORS = 1U;
-        }
-
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        [BestFitMapping(false)]
-        private sealed class WIN32_FIND_DATAW
-        {
-            public uint dwFileAttributes;
-            public FILETIME ftCreationTime;
-            public FILETIME ftLastAccessTime;
-            public FILETIME ftLastWriteTime;
-            public uint nFileSizeHigh;
-            public uint nFileSizeLow;
-            public uint dwReserved0;
-            public uint dwReserved1;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
-            public string cFileName;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
-            public string cAlternateFileName;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        private struct FILETIME
-        {
-            public uint dwLowDateTime;
-            public uint dwHighDateTime;
-        }
-
         private sealed class SearchData
         {
             public readonly string path;
@@ -262,8 +161,8 @@ namespace PSFilterHostDll
         private bool needsPathDiscoveryDemand;
         private string shellLinkTarget;
 
-        private readonly FindExInfoLevel infoLevel;
-        private readonly FindExAdditionalFlags additionalFlags;
+        private readonly NativeEnums.FindExInfoLevel infoLevel;
+        private readonly NativeEnums.FindExAdditionalFlags additionalFlags;
         private readonly string fileExtension;
         private readonly SearchOption searchOption;
         private readonly bool dereferenceLinks;
@@ -330,13 +229,13 @@ namespace PSFilterHostDll
             if (OS.IsWindows7OrLater)
             {
                 // Suppress the querying of short filenames and use a larger buffer on Windows 7 and later.
-                infoLevel = FindExInfoLevel.Basic;
-                additionalFlags = FindExAdditionalFlags.LargeFetch;
+                infoLevel = NativeEnums.FindExInfoLevel.Basic;
+                additionalFlags = NativeEnums.FindExAdditionalFlags.LargeFetch;
             }
             else
             {
-                infoLevel = FindExInfoLevel.Standard;
-                additionalFlags = FindExAdditionalFlags.None;
+                infoLevel = NativeEnums.FindExInfoLevel.Standard;
+                additionalFlags = NativeEnums.FindExAdditionalFlags.None;
             }
             oldErrorMode = SetErrorModeWrapper(NativeConstants.SEM_FAILCRITICALERRORS);
             state = -1;
@@ -376,7 +275,7 @@ namespace PSFilterHostDll
         {
             WIN32_FIND_DATAW findData = new WIN32_FIND_DATAW();
             string searchPath = Path.Combine(searchData.path, "*");
-            handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, infoLevel, findData, FindExSearchOp.NameMatch, IntPtr.Zero, additionalFlags);
+            handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, infoLevel, findData, NativeEnums.FindExSearchOp.NameMatch, IntPtr.Zero, additionalFlags);
 
             if (handle.IsInvalid)
             {
@@ -599,7 +498,7 @@ namespace PSFilterHostDll
                             string demandPath = GetPermissionPath(searchData.path, false);
                             new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
                             string searchPath = Path.Combine(searchData.path, "*");
-                            handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, infoLevel, findData, FindExSearchOp.NameMatch, IntPtr.Zero, additionalFlags);
+                            handle = UnsafeNativeMethods.FindFirstFileExW(searchPath, infoLevel, findData, NativeEnums.FindExSearchOp.NameMatch, IntPtr.Zero, additionalFlags);
 
                             if (handle.IsInvalid)
                             {

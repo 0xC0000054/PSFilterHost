@@ -14,6 +14,13 @@ namespace PSFilterHostDll.Interop
 {
     internal static class NativeConstants
     {
+        internal const uint FILE_ATTRIBUTE_DIRECTORY = 16U;
+        internal const uint FILE_ATTRIBUTE_REPARSE_POINT = 1024U;
+
+        internal const uint INVALID_FILE_ATTRIBUTES = 0xFFFFFFFF;
+
+        internal const uint SEM_FAILCRITICALERRORS = 1U;
+
         internal const int GPTR = 64;
 
         internal const int LOAD_LIBRARY_AS_DATAFILE = 2;
@@ -38,7 +45,13 @@ namespace PSFilterHostDll.Interop
         internal const uint MONITOR_DEFAULTTOPRIMARY = 1;
 
         internal const int CMM_FROM_PROFILE = 0;
+
         internal const int ERROR_SUCCESS = 0;
+        internal const int ERROR_FILE_NOT_FOUND = 2;
+        internal const int ERROR_PATH_NOT_FOUND = 3;
+        internal const int ERROR_ACCESS_DENIED = 5;
+        internal const int ERROR_NO_MORE_FILES = 18;
+        internal const int ERROR_DIRECTORY = 267;
 
         internal const int STGM_READ = 0;
 
