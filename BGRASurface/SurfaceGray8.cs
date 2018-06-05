@@ -209,10 +209,10 @@ namespace PSFilterHostDll.BGRASurface
                         double w2 = rColCache[2] * rRowCache[n];
                         double w3 = rColCache[3] * rRowCache[n];
 
-                        double a0 = 255.0;
-                        double a1 = 255.0;
-                        double a2 = 255.0;
-                        double a3 = 255.0;
+                        const double a0 = 255.0;
+                        const double a1 = 255.0;
+                        const double a2 = 255.0;
+                        const double a3 = 255.0;
 
                         alphaSum += (a0 * w0) + (a1 * w1) + (a2 * w2) + (a3 * w3);
                         totalWeight += w0 + w1 + w2 + w3;
@@ -404,7 +404,7 @@ namespace PSFilterHostDll.BGRASurface
 
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         blueSum += srcLeftPtr[0] * srcLeftWeight * a;
                         alphaSum += a * srcLeftWeight;
                         srcLeftPtr = (srcLeftPtr + srcStride);
@@ -414,7 +414,7 @@ namespace PSFilterHostDll.BGRASurface
                     byte* srcRightPtr = source.GetPointAddressUnchecked(srcRightInt, srcTopInt + 1);
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         blueSum += srcRightPtr[0] * srcRightWeight * a;
                         alphaSum += a * srcRightWeight;
                         srcRightPtr = (srcRightPtr + srcStride);
@@ -424,7 +424,7 @@ namespace PSFilterHostDll.BGRASurface
                     byte* srcTopPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcTopInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         blueSum += srcTopPtr[0] * srcTopWeight * a;
                         alphaSum += a * srcTopWeight;
                         ++srcTopPtr;
@@ -434,7 +434,7 @@ namespace PSFilterHostDll.BGRASurface
                     byte* srcBottomPtr = source.GetPointAddressUnchecked(srcLeftInt + 1, srcBottomInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         blueSum += srcBottomPtr[0] * srcBottomWeight * a;
                         alphaSum += 255.0 * srcBottomWeight;
                         ++srcBottomPtr;
@@ -455,22 +455,22 @@ namespace PSFilterHostDll.BGRASurface
 
                     // four corner pixels
                     byte srcTL = *source.GetPointAddress(srcLeftInt, srcTopInt);
-                    double srcTLA = 255.0;
+                    const double srcTLA = 255.0;
                     blueSum += srcTL * (srcTopWeight * srcLeftWeight) * srcTLA;
                     alphaSum += srcTLA * (srcTopWeight * srcLeftWeight);
 
                     byte srcTR = *source.GetPointAddress(srcRightInt, srcTopInt);
-                    double srcTRA = 255.0;
+                    const double srcTRA = 255.0;
                     blueSum += srcTR * (srcTopWeight * srcRightWeight) * srcTRA;
                     alphaSum += srcTRA * (srcTopWeight * srcRightWeight);
 
                     byte srcBL = *source.GetPointAddress(srcLeftInt, srcBottomInt);
-                    double srcBLA = 255.0;
+                    const double srcBLA = 255.0;
                     blueSum += srcBL * (srcBottomWeight * srcLeftWeight) * srcBLA;
                     alphaSum += srcBLA * (srcBottomWeight * srcLeftWeight);
 
                     byte srcBR = *source.GetPointAddress(srcRightInt, srcBottomInt);
-                    double srcBRA = 255.0;
+                    const double srcBRA = 255.0;
                     blueSum += srcBR * (srcBottomWeight * srcRightWeight) * srcBRA;
                     alphaSum += srcBRA * (srcBottomWeight * srcRightWeight);
 

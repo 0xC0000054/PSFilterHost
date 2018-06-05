@@ -656,8 +656,8 @@ namespace PSFilterHostDll.PSApi
 
 			l *= 255.0;
 
-			// Add the midpoint to scale the a and b components from [-128, 127] to [0, 255].
-			double offset = 128.0;
+            // Add the midpoint to scale the a and b components from [-128, 127] to [0, 255].
+            const double offset = 128.0;
 
 			a += offset;
 			b += offset;

@@ -80,7 +80,7 @@ namespace PSFilterHostDll.BGRASurface
         {
             Bitmap image = null;
 
-            System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format16bppGrayScale;
+            const System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format16bppGrayScale;
 
             using (Bitmap temp = new Bitmap(width, height, format))
             {
@@ -219,10 +219,10 @@ namespace PSFilterHostDll.BGRASurface
                         double w2 = rColCache[2] * rRowCache[n];
                         double w3 = rColCache[3] * rRowCache[n];
 
-                        double a0 = 255.0;
-                        double a1 = 255.0;
-                        double a2 = 255.0;
-                        double a3 = 255.0;
+                        const double a0 = 255.0;
+                        const double a1 = 255.0;
+                        const double a2 = 255.0;
+                        const double a3 = 255.0;
 
                         alphaSum += (a0 * w0) + (a1 * w1) + (a2 * w2) + (a3 * w3);
                         totalWeight += w0 + w1 + w2 + w3;
@@ -415,7 +415,7 @@ namespace PSFilterHostDll.BGRASurface
 
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         graySum += srcLeftPtr[0] * srcLeftWeight * a;
                         alphaSum += a * srcLeftWeight;
                         srcLeftPtr = (ushort*)(srcLeftPtr + srcStride);
@@ -425,7 +425,7 @@ namespace PSFilterHostDll.BGRASurface
                     ushort* srcRightPtr = (ushort*)source.GetPointAddressUnchecked(srcRightInt, srcTopInt + 1);
                     for (int srcY = srcTopInt + 1; srcY < srcBottomInt; ++srcY)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         graySum += srcRightPtr[0] * srcRightWeight * a;
                         alphaSum += a * srcRightWeight;
                         srcRightPtr = (ushort*)(srcRightPtr + srcStride);
@@ -435,7 +435,7 @@ namespace PSFilterHostDll.BGRASurface
                     ushort* srcTopPtr = (ushort*)source.GetPointAddressUnchecked(srcLeftInt + 1, srcTopInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         graySum += srcTopPtr[0] * srcTopWeight * a;
                         alphaSum += a * srcTopWeight;
                         ++srcTopPtr;
@@ -445,7 +445,7 @@ namespace PSFilterHostDll.BGRASurface
                     ushort* srcBottomPtr = (ushort*)source.GetPointAddressUnchecked(srcLeftInt + 1, srcBottomInt);
                     for (int srcX = srcLeftInt + 1; srcX < srcRightInt; ++srcX)
                     {
-                        double a = 255.0;
+                        const double a = 255.0;
                         graySum += srcBottomPtr[0] * srcBottomWeight * a;
                         alphaSum += 255.0 * srcBottomWeight;
                         ++srcBottomPtr;
@@ -466,22 +466,22 @@ namespace PSFilterHostDll.BGRASurface
 
                     // four corner pixels
                     ushort srcTL = *(ushort*)source.GetPointAddress(srcLeftInt, srcTopInt);
-                    double srcTLA = 255.0;
+                    const double srcTLA = 255.0;
                     graySum += srcTL * (srcTopWeight * srcLeftWeight) * srcTLA;
                     alphaSum += srcTLA * (srcTopWeight * srcLeftWeight);
 
                     ushort srcTR = *(ushort*)source.GetPointAddress(srcRightInt, srcTopInt);
-                    double srcTRA = 255.0;
+                    const double srcTRA = 255.0;
                     graySum += srcTR * (srcTopWeight * srcRightWeight) * srcTRA;
                     alphaSum += srcTRA * (srcTopWeight * srcRightWeight);
 
                     ushort srcBL = *(ushort*)source.GetPointAddress(srcLeftInt, srcBottomInt);
-                    double srcBLA = 255.0;
+                    const double srcBLA = 255.0;
                     graySum += srcBL * (srcBottomWeight * srcLeftWeight) * srcBLA;
                     alphaSum += srcBLA * (srcBottomWeight * srcLeftWeight);
 
                     ushort srcBR = *(ushort*)source.GetPointAddress(srcRightInt, srcBottomInt);
-                    double srcBRA = 255.0;
+                    const double srcBRA = 255.0;
                     graySum += srcBR * (srcBottomWeight * srcRightWeight) * srcBRA;
                     alphaSum += srcBRA * (srcBottomWeight * srcRightWeight);
 

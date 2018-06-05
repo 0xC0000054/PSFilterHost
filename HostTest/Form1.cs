@@ -568,7 +568,7 @@ namespace HostTest
 
 				using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Open, FileAccess.Read))
 				{
-					BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+					const BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
 					image = BitmapFrame.Create(stream, createOptions, BitmapCacheOption.OnLoad);
 				}
 
@@ -846,7 +846,7 @@ namespace HostTest
 			Cursor = Cursors.WaitCursor;
 			try
 			{
-				BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
+				const BitmapCreateOptions createOptions = BitmapCreateOptions.PreservePixelFormat | BitmapCreateOptions.IgnoreColorProfile;
 				BitmapFrame frame = BitmapFrame.Create(new Uri(path), createOptions, BitmapCacheOption.None);
 
 				PixelFormat actualFormat = frame.DetectDishonestAlphaFormat();

@@ -54,7 +54,7 @@ namespace HostTest
 			{
 				bool rightToLeft = RightToLeft == System.Windows.Forms.RightToLeft.Yes;
 
-				int arrowWidth = 10;
+                const int arrowWidth = 10;
 				ArrowDirection direction = rightToLeft ? ArrowDirection.Left : ArrowDirection.Right;
 
 				// See the TextPadding field in the System.Windows.Forms.ToolStripDropDownMenu static constructor.
