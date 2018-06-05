@@ -34,119 +34,6 @@ namespace PSFilterHostDll
 #endif
     internal sealed class FileEnumerator : IEnumerator<string>
     {
-        private sealed class SearchData
-        {
-            public readonly string path;
-            public readonly bool isShortcut;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SearchData"/> class.
-            /// </summary>
-            /// <param name="path">The path.</param>
-            /// <param name="isShortcut"><c>true</c> if the path is the target of a shortcut; otherwise, <c>false</c>.</param>
-            /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
-            public SearchData(string path, bool isShortcut)
-            {
-                if (path == null)
-                {
-                    throw new ArgumentNullException(nameof(path));
-                }
-
-                this.path = path;
-                this.isShortcut = isShortcut;
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="SearchData"/> class with a sub directory of the parent <c>SearchData</c>.
-            /// </summary>
-            /// <param name="parent">The SearchData containing the current path.</param>
-            /// <param name="subDirectoryName">The name of the sub directory within the path of the parent SearchData.</param>
-            /// <exception cref="ArgumentNullException">
-            /// <paramref name="parent"/> is null.
-            /// or
-            /// <paramref name="subDirectoryName"/> is null.
-            /// </exception>
-            public SearchData(SearchData parent, string subDirectoryName)
-            {
-                if (parent == null)
-                {
-                    throw new ArgumentNullException(nameof(parent));
-                }
-                if (subDirectoryName == null)
-                {
-                    throw new ArgumentNullException(nameof(subDirectoryName));
-                }
-
-                path = Path.Combine(parent.path, subDirectoryName);
-                isShortcut = parent.isShortcut;
-            }
-        }
-
-        /// <summary>
-        /// Gets the demand path for the FileIOPermission.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <param name="includeSubDirectories">if set to <c>true</c> include the sub directories of <paramref name="path"/>.</param>
-        /// <returns></returns>
-        private static string GetPermissionPath(string path, bool includeSubDirectories)
-        {
-            char end = path[path.Length - 1];
-
-            if (!includeSubDirectories)
-            {
-                if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
-                {
-                    return path + ".";
-                }
-
-                return path + Path.DirectorySeparatorChar + "."; // Demand permission for the current directory only
-            }
-
-            if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
-            {
-                return path;
-            }
-
-            return path + Path.DirectorySeparatorChar; // Demand permission for the current directory and all subdirectories.
-        }
-
-        /// <summary>
-        /// Performs a FileIOPermission demand for PathDiscovery on the specified directory.
-        /// </summary>
-        /// <param name="directory">The path.</param>
-        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-        private static void DoDemand(string directory)
-        {
-            string demandPath = GetPermissionPath(directory, false);
-            new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
-        }
-
-        private static string GetWin32ErrorMessage(int error)
-        {
-            return new Win32Exception(error).Message;
-        }
-
-        private static int MakeHRFromWin32Error(int error)
-        {
-            return unchecked(((int)0x80070000) | (error & 0xffff));
-        }
-
-        private static uint SetErrorModeWrapper(uint newMode)
-        {
-            uint oldMode;
-
-            if (OS.IsWindows7OrLater)
-            {
-                UnsafeNativeMethods.SetThreadErrorMode(newMode, out oldMode);
-            }
-            else
-            {
-                oldMode = UnsafeNativeMethods.SetErrorMode(newMode);
-            }
-
-            return oldMode;
-        }
-
         private const int STATE_INIT = 0;
         private const int STATE_FIND_FILES = 1;
         private const int STATE_FINISH = 2;
@@ -242,6 +129,71 @@ namespace PSFilterHostDll
             current = null;
             disposed = false;
             Init();
+        }
+
+        /// <summary>
+        /// Gets the demand path for the FileIOPermission.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="includeSubDirectories">if set to <c>true</c> include the sub directories of <paramref name="path"/>.</param>
+        /// <returns></returns>
+        private static string GetPermissionPath(string path, bool includeSubDirectories)
+        {
+            char end = path[path.Length - 1];
+
+            if (!includeSubDirectories)
+            {
+                if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
+                {
+                    return path + ".";
+                }
+
+                return path + Path.DirectorySeparatorChar + "."; // Demand permission for the current directory only
+            }
+
+            if (end == Path.DirectorySeparatorChar || end == Path.AltDirectorySeparatorChar)
+            {
+                return path;
+            }
+
+            return path + Path.DirectorySeparatorChar; // Demand permission for the current directory and all subdirectories.
+        }
+
+        /// <summary>
+        /// Performs a FileIOPermission demand for PathDiscovery on the specified directory.
+        /// </summary>
+        /// <param name="directory">The path.</param>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        private static void DoDemand(string directory)
+        {
+            string demandPath = GetPermissionPath(directory, false);
+            new FileIOPermission(FileIOPermissionAccess.PathDiscovery, demandPath).Demand();
+        }
+
+        private static string GetWin32ErrorMessage(int error)
+        {
+            return new Win32Exception(error).Message;
+        }
+
+        private static int MakeHRFromWin32Error(int error)
+        {
+            return unchecked(((int)0x80070000) | (error & 0xffff));
+        }
+
+        private static uint SetErrorModeWrapper(uint newMode)
+        {
+            uint oldMode;
+
+            if (OS.IsWindows7OrLater)
+            {
+                UnsafeNativeMethods.SetThreadErrorMode(newMode, out oldMode);
+            }
+            else
+            {
+                oldMode = UnsafeNativeMethods.SetErrorMode(newMode);
+            }
+
+            return oldMode;
         }
 
         private bool FileMatchesFilter(string file)
@@ -558,6 +510,54 @@ namespace PSFilterHostDll
         void IEnumerator.Reset()
         {
             throw new NotSupportedException();
+        }
+
+        private sealed class SearchData
+        {
+            public readonly string path;
+            public readonly bool isShortcut;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SearchData"/> class.
+            /// </summary>
+            /// <param name="path">The path.</param>
+            /// <param name="isShortcut"><c>true</c> if the path is the target of a shortcut; otherwise, <c>false</c>.</param>
+            /// <exception cref="System.ArgumentNullException"><paramref name="path"/> is null.</exception>
+            public SearchData(string path, bool isShortcut)
+            {
+                if (path == null)
+                {
+                    throw new ArgumentNullException(nameof(path));
+                }
+
+                this.path = path;
+                this.isShortcut = isShortcut;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="SearchData"/> class with a sub directory of the parent <c>SearchData</c>.
+            /// </summary>
+            /// <param name="parent">The SearchData containing the current path.</param>
+            /// <param name="subDirectoryName">The name of the sub directory within the path of the parent SearchData.</param>
+            /// <exception cref="ArgumentNullException">
+            /// <paramref name="parent"/> is null.
+            /// or
+            /// <paramref name="subDirectoryName"/> is null.
+            /// </exception>
+            public SearchData(SearchData parent, string subDirectoryName)
+            {
+                if (parent == null)
+                {
+                    throw new ArgumentNullException(nameof(parent));
+                }
+                if (subDirectoryName == null)
+                {
+                    throw new ArgumentNullException(nameof(subDirectoryName));
+                }
+
+                path = Path.Combine(parent.path, subDirectoryName);
+                isShortcut = parent.isShortcut;
+            }
         }
     }
 }
