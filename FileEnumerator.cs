@@ -354,14 +354,7 @@ namespace PSFilterHostDll
 
         private string CreateFilePath(WIN32_FIND_DATAW findData)
         {
-            if (shellLinkTarget != null)
-            {
-                return shellLinkTarget;
-            }
-            else
-            {
-                return Path.Combine(searchData.path, findData.cFileName);
-            }
+            return shellLinkTarget ?? Path.Combine(searchData.path, findData.cFileName);
         }
 
         /// <summary>

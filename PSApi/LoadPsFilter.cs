@@ -1677,15 +1677,8 @@ namespace PSFilterHostDll.PSApi
 			{
 				if (error == PSError.errReportString)
 				{
-					if (basicSuiteProvider.ErrorSuiteMessage != null)
-					{
-						message = basicSuiteProvider.ErrorSuiteMessage;
-					}
-					else
-					{
-						message = StringUtil.FromPascalString(errorStringPtr, string.Empty);
-					}
-				}
+                    message = basicSuiteProvider.ErrorSuiteMessage ?? StringUtil.FromPascalString(errorStringPtr, string.Empty);
+                }
 				else
 				{
 					switch (error)
