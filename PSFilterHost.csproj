@@ -113,6 +113,9 @@
     <Reference Include="WindowsBase" Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0'" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Framework Replacements\CoreFx\BitHelper.cs" />
+    <Compile Include="Framework Replacements\CoreFx\HashHelpers.cs" />
+    <Compile Include="Framework Replacements\CoreFx\HashSet.cs" />
     <Compile Include="Framework Replacements\Enumerable.cs" />
     <Compile Include="Framework Replacements\ExtensionAttribute.cs" />
     <Compile Include="BGRASurface\BGRASurfaceMemory.cs" />
