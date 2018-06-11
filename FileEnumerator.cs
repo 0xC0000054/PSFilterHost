@@ -310,8 +310,11 @@ namespace PSFilterHostDll
 
             // FILE_FLAG_BACKUP_SEMANTICS is required to open a directory handle.
             // See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365258(v=vs.85).aspx
-            using (SafeFileHandle directoryHandle = UnsafeNativeMethods.CreateFileW(path, NativeConstants.GENERIC_READ, NativeEnums.FileShare.Read,
-                   IntPtr.Zero, NativeEnums.CreationDisposition.OpenExisting, NativeConstants.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero))
+            // The directory handle is opened with write and delete permissions so that other processes
+            // can change the files and subdirectories it contains.
+            using (SafeFileHandle directoryHandle = UnsafeNativeMethods.CreateFileW(path, NativeConstants.GENERIC_READ,
+                   NativeEnums.FileShare.Read | NativeEnums.FileShare.Write | NativeEnums.FileShare.Delete, IntPtr.Zero,
+                   NativeEnums.CreationDisposition.OpenExisting, NativeConstants.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero))
             {
                 if (!directoryHandle.IsInvalid)
                 {
