@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using Microsoft.Win32.SafeHandles;
 using PSFilterHostDll.Interop;
 using PSFilterHostDll.Properties;
 using System;
@@ -47,6 +48,7 @@ namespace PSFilterHostDll
         private string current;
         private bool needsPathDiscoveryDemand;
         private string shellLinkTarget;
+        private HashSet<DirectoryIdentifier> visitedDirectories;
 
         private readonly NativeEnums.FindExInfoLevel infoLevel;
         private readonly NativeEnums.FindExAdditionalFlags additionalFlags;
@@ -112,6 +114,7 @@ namespace PSFilterHostDll
                 this.dereferenceLinks = false;
             }
             shellLinkTarget = null;
+            visitedDirectories = new HashSet<DirectoryIdentifier>();
 
             if (OS.IsWindows7OrLater)
             {
@@ -246,6 +249,7 @@ namespace PSFilterHostDll
             }
             else
             {
+                AddToVisitedDirectories(searchData.path);
                 state = STATE_INIT;
                 if (FirstFileIncluded(findData))
                 {
@@ -295,13 +299,71 @@ namespace PSFilterHostDll
             return null;
         }
 
+        /// <summary>
+        /// Adds the specified path to the directories that have been processed.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns><c>true</c> if <paramref name="path"/> is a new directory; otherwise, <c>false</c>.</returns>
+        private bool AddToVisitedDirectories(string path)
+        {
+            bool result = false;
+
+            // FILE_FLAG_BACKUP_SEMANTICS is required to open a directory handle.
+            // See https://msdn.microsoft.com/en-us/library/windows/desktop/aa365258(v=vs.85).aspx
+            using (SafeFileHandle directoryHandle = UnsafeNativeMethods.CreateFileW(path, NativeConstants.GENERIC_READ, NativeEnums.FileShare.Read,
+                   IntPtr.Zero, NativeEnums.CreationDisposition.OpenExisting, NativeConstants.FILE_FLAG_BACKUP_SEMANTICS, IntPtr.Zero))
+            {
+                if (!directoryHandle.IsInvalid)
+                {
+                    NativeStructs.BY_HANDLE_FILE_INFORMATION fileInfo;
+
+                    if (UnsafeNativeMethods.GetFileInformationByHandle(directoryHandle, out fileInfo))
+                    {
+                        // BY_HANDLE_FILE_INFORMATION contains fields that uniquely identify a file or directory.
+                        // This information is used to track the directories that have been processed and prevent
+                        // an infinite loop if a recursive NTFS junction point or directory shortcut is encountered.
+
+                        result = visitedDirectories.Add(new DirectoryIdentifier(fileInfo.dwVolumeSerialNumber, fileInfo.nFileIndexHigh, fileInfo.nFileIndexLow));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Determines whether the specified path has not been searched.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified path has not been searched; otherwise, <c>false</c>.
+        /// </returns>
+        private bool IsNewDirectory(string path)
+        {
+            return AddToVisitedDirectories(path);
+        }
+
+        /// <summary>
+        /// Adds the directory to search list if it has not already been searched.
+        /// </summary>
+        /// <param name="findData">The find data.</param>
+        private void AddDirectoryToSearchList(WIN32_FIND_DATAW findData)
+        {
+            string path = Path.Combine(searchData.path, findData.cFileName);
+
+            if (IsNewDirectory(path))
+            {
+                searchDirectories.Enqueue(new SearchData(path, false));
+            }
+        }
+
         private bool FirstFileIncluded(WIN32_FIND_DATAW findData)
         {
             if ((findData.dwFileAttributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY)
             {
                 if (searchOption == SearchOption.AllDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
                 {
-                    searchDirectories.Enqueue(new SearchData(searchData, findData.cFileName));
+                    AddDirectoryToSearchList(findData);
                 }
             }
             else
@@ -326,8 +388,11 @@ namespace PSFilterHostDll
                     {
                         if (isDirectory)
                         {
-                            // If the shortcut target is a directory, add it to the search list.
-                            searchDirectories.Enqueue(new SearchData(target, true));
+                            if (IsNewDirectory(target))
+                            {
+                                // If the shortcut target is a directory, add it to the search list.
+                                searchDirectories.Enqueue(new SearchData(target, true));
+                            }
                         }
                         else if (FileMatchesFilter(target))
                         {
@@ -478,7 +543,7 @@ namespace PSFilterHostDll
                             }
                             else if (searchOption == SearchOption.AllDirectories && !findData.cFileName.Equals(".") && !findData.cFileName.Equals(".."))
                             {
-                                searchDirectories.Enqueue(new SearchData(searchData, findData.cFileName));
+                                AddDirectoryToSearchList(findData);
                             }
                         }
 
@@ -503,6 +568,61 @@ namespace PSFilterHostDll
         void IEnumerator.Reset()
         {
             throw new NotSupportedException();
+        }
+
+        private struct DirectoryIdentifier : IEquatable<DirectoryIdentifier>
+        {
+            public readonly uint volumeSerialNumber;
+            public readonly uint fileIndexHigh;
+            public readonly uint fileIndexLow;
+
+            public DirectoryIdentifier(uint volumeSerialNumber, uint fileIndexHigh, uint fileIndexLow)
+            {
+                this.volumeSerialNumber = volumeSerialNumber;
+                this.fileIndexHigh = fileIndexHigh;
+                this.fileIndexLow = fileIndexLow;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj is DirectoryIdentifier identifier)
+                {
+                    return Equals(identifier);
+                }
+
+                return false;
+            }
+
+            public bool Equals(DirectoryIdentifier other)
+            {
+                return volumeSerialNumber == other.volumeSerialNumber &&
+                       fileIndexHigh == other.fileIndexHigh &&
+                       fileIndexLow == other.fileIndexLow;
+            }
+
+            public override int GetHashCode()
+            {
+                int hashCode = -1532359432;
+
+                unchecked
+                {
+                    hashCode = (hashCode * -1521134295) + volumeSerialNumber.GetHashCode();
+                    hashCode = (hashCode * -1521134295) + fileIndexHigh.GetHashCode();
+                    hashCode = (hashCode * -1521134295) + fileIndexLow.GetHashCode();
+                }
+
+                return hashCode;
+            }
+
+            public static bool operator ==(DirectoryIdentifier file1, DirectoryIdentifier file2)
+            {
+                return file1.Equals(file2);
+            }
+
+            public static bool operator !=(DirectoryIdentifier file1, DirectoryIdentifier file2)
+            {
+                return !file1.Equals(file2);
+            }
         }
 
         private sealed class SearchData

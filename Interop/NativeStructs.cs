@@ -110,6 +110,21 @@ namespace PSFilterHostDll.Interop
             public uint dwHighDateTime;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct BY_HANDLE_FILE_INFORMATION
+        {
+            public uint dwFileAttributes;
+            public FILETIME ftCreationTime;
+            public FILETIME ftLastAccessTime;
+            public FILETIME ftLastWriteTime;
+            public uint dwVolumeSerialNumber;
+            public uint nFileSizeHigh;
+            public uint nFileSizeLow;
+            public uint nNumberOfLinks;
+            public uint nFileIndexHigh;
+            public uint nFileIndexLow;
+        }
+
         internal static class Mscms
         {
             [StructLayout(LayoutKind.Sequential)]

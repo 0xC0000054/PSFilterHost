@@ -10,6 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
@@ -77,6 +78,20 @@ namespace PSFilterHostDll.Interop
         [DllImport("kernel32.dll", ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetThreadErrorMode([In()] uint dwNewMode, [Out()] out uint lpOldMode);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        internal static extern SafeFileHandle CreateFileW(
+              [In(), MarshalAs(UnmanagedType.LPWStr)] string lpFileName,
+              [In()] uint dwDesiredAccess,
+              [In()] NativeEnums.FileShare dwShareMode,
+              [In()] IntPtr lpSecurityAttributes,
+              [In()] NativeEnums.CreationDisposition dwCreationDisposition,
+              [In()] uint dwFlagsAndAttributes,
+              [In()] IntPtr hTemplateFile);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetFileInformationByHandle([In()] SafeFileHandle hFile, [Out()] out NativeStructs.BY_HANDLE_FILE_INFORMATION lpFileInformation);
 
         internal static class Mscms
         {
