@@ -93,6 +93,14 @@ namespace PSFilterHostDll.Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetFileInformationByHandle([In()] SafeFileHandle hFile, [Out()] out NativeStructs.BY_HANDLE_FILE_INFORMATION lpFileInformation);
 
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern unsafe bool GetFileInformationByHandleEx(
+            [In()] SafeFileHandle hFile,
+            [In()] NativeEnums.FILE_INFO_BY_HANDLE_CLASS infoClass,
+            [Out()] void* lpFileInformation,
+            [In()] uint dwBufferSize);
+
         internal static class Mscms
         {
             [DllImport("mscms.dll", ExactSpelling = true, SetLastError = true)]

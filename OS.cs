@@ -17,7 +17,9 @@ namespace PSFilterHostDll
     internal static class OS
     {
         private static volatile bool checkedIsWindows7OrLater;
+        private static volatile bool checkedIsWindows8OrLater;
         private static volatile bool isWindows7OrLater;
+        private static volatile bool isWindows8OrLater;
 
         public static bool IsWindows7OrLater
         {
@@ -31,6 +33,21 @@ namespace PSFilterHostDll
                 }
 
                 return isWindows7OrLater;
+            }
+        }
+
+        public static bool IsWindows8OrLater
+        {
+            get
+            {
+                if (!checkedIsWindows8OrLater)
+                {
+                    OperatingSystem os = Environment.OSVersion;
+                    isWindows8OrLater = (os.Platform == PlatformID.Win32NT && ((os.Version.Major == 6 && os.Version.Minor >= 2) || os.Version.Major > 6));
+                    checkedIsWindows8OrLater = true;
+                }
+
+                return isWindows8OrLater;
             }
         }
     }
