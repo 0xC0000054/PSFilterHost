@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="PSFilterHost" Description="The rule set for the PSFilterHost solution" ToolsVersion="15.0">
+  <IncludeAll Action="Warning" />
+  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp.Features" RuleNamespace="Microsoft.CodeAnalysis.CSharp.Features">
+    <Rule Id="IDE0002" Action="Info" />
+    <Rule Id="IDE0005" Action="Info" />
+    <Rule Id="IDE0008" Action="Info" />
+    <Rule Id="IDE0011" Action="Warning" />
+    <Rule Id="IDE0012" Action="Info" />
+    <Rule Id="IDE0013" Action="Info" />
+    <Rule Id="IDE0014" Action="Info" />
+    <Rule Id="IDE0015" Action="Info" />
+    <Rule Id="IDE0017" Action="Info" />
+    <Rule Id="IDE0028" Action="Info" />
+    <Rule Id="IDE0029" Action="Info" />
+    <Rule Id="IDE0030" Action="Info" />
+    <Rule Id="IDE0031" Action="Info" />
+    <Rule Id="IDE0034WithoutSuggestion" Action="Info" />
+    <Rule Id="IDE0036" Action="Info" />
+    <Rule Id="IDE0040" Action="Info" />
+    <Rule Id="IDE0041" Action="Info" />
+    <Rule Id="IDE0044" Action="Info" />
+    <Rule Id="IDE1005" Action="Info" />
+  </Rules>
+  <Rules AnalyzerId="Roslynator.CSharp.Analyzers" RuleNamespace="Roslynator.CSharp.Analyzers">
+    <Rule Id="RCS1013" Action="Warning" />
+    <Rule Id="RCS1029" Action="None" />
+    <Rule Id="RCS1032" Action="None" />
+    <Rule Id="RCS1032FadeOut" Action="None" />
+    <Rule Id="RCS1042" Action="None" />
+    <Rule Id="RCS1057" Action="None" />
+    <Rule Id="RCS1069" Action="None" />
+    <Rule Id="RCS1070" Action="Info" />
+    <Rule Id="RCS1071" Action="Info" />
+    <Rule Id="RCS1085" Action="None" />
+    <Rule Id="RCS1085FadeOut" Action="None" />
+    <Rule Id="RCS1097" Action="None" />
+    <Rule Id="RCS1126" Action="Warning" />
+    <Rule Id="RCS1146" Action="None" />
+    <Rule Id="RCS1169" Action="None" />
+    <Rule Id="RCS1221" Action="None" />
+  </Rules>
+</RuleSet>

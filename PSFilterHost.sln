@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{794553C9-1604-4582-83B2-3112FF80D5B1}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		PSFilterHost.ruleset = PSFilterHost.ruleset
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostTest", "HostTest\HostTest.csproj", "{A181C7AE-5434-4A56-9976-03A8B82F63B8}"
