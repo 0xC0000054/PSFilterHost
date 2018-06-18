@@ -106,6 +106,7 @@ namespace HostTest
 		/// Steps the <see cref="HostTest.Canvas"/> forward to the next state.
 		/// </summary>
 		/// <param name="surface">The canvas to step forward.</param>
+		/// <param name="image">The destination image for the current item.</param>
 		public void StepForward(Canvas surface, ref BitmapSource image)
 		{
 			if (CanRedo)
