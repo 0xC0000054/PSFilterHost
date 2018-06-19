@@ -69,6 +69,7 @@ namespace HostTest
 
 		public Canvas()
 		{
+			InitializeComponent();
 			DoubleBuffered = true;
 			base.SetStyle(ControlStyles.UserPaint, true);
 			base.SetStyle(ControlStyles.Selectable, true);
