@@ -729,7 +729,7 @@ namespace HostTest
 			{
 				Invoke(new Action<string>(delegate(string text)
 				{
-					toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, filterName);
+					toolStripStatusLabel1.Text = string.Format(Resources.ApplyFilterStatusFormat, text);
 					toolStripProgressBar1.Visible = true;
 				}), new object[] { filterName });
 			}
