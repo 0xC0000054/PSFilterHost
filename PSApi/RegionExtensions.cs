@@ -92,7 +92,7 @@ namespace PSFilterHostDll.PSApi
 			return scans;
 		}
 
-		private unsafe static void GetRegionScans(IntPtr hRgn, out Rectangle[] scans)
+		private static unsafe void GetRegionScans(IntPtr hRgn, out Rectangle[] scans)
 		{
 			uint bytes = 0;
 			int countdown = 100;

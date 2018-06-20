@@ -32,7 +32,7 @@ namespace PSFilterHostDll
         private static class SafeNativeMethods
         {
             [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-            internal extern static IntPtr GetModuleHandleW([In()] string moduleName);
+            internal static extern IntPtr GetModuleHandleW([In()] string moduleName);
 
             [DllImport("kernel32.dll", CharSet = CharSet.Ansi, ExactSpelling = true, BestFitMapping = false)]
             internal static extern IntPtr GetProcAddress([In()] IntPtr hModule, [In(), MarshalAs(UnmanagedType.LPStr)] string lpProcName);

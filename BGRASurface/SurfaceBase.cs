@@ -179,9 +179,9 @@ namespace PSFilterHostDll.BGRASurface
 			return (ushort)value;
 		}
 
-		public unsafe abstract Bitmap ToGdipBitmap();
+		public abstract unsafe Bitmap ToGdipBitmap();
 #if !GDIPLUS
-		public unsafe abstract System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
+		public abstract unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
 #endif
 		public unsafe byte* GetRowAddressUnchecked(int y)
 		{
@@ -270,12 +270,12 @@ namespace PSFilterHostDll.BGRASurface
 			return (CubeClamped(x + 2) - (4 * CubeClamped(x + 1)) + (6 * CubeClamped(x)) - (4 * CubeClamped(x - 1))) / 6;
 		}
 
-		protected unsafe abstract void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
-		protected unsafe abstract void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
+		protected abstract unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
+		protected abstract unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
 
-		public unsafe abstract void SuperSampleFitSurface(SurfaceBase source);
+		public abstract unsafe void SuperSampleFitSurface(SurfaceBase source);
 
-		public unsafe virtual bool HasTransparency()
+		public virtual unsafe bool HasTransparency()
 		{
 			return false;
 		}
@@ -298,7 +298,7 @@ namespace PSFilterHostDll.BGRASurface
 			}
 		}
 
-		protected unsafe virtual void SetAlphaToOpaqueImpl(Rectangle rect)
+		protected virtual unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
 		{
 
 		}

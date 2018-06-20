@@ -104,7 +104,7 @@ namespace PSFilterHostDll.Interop
         internal static extern bool GlobalUnlock([In()] IntPtr hMem);
 
         [DllImport("gdi32.dll", ExactSpelling = true)]
-        internal unsafe static extern uint GetRegionData([In()] IntPtr hrgn, [In()] uint nCount, [Out()] NativeStructs.RGNDATA* lpRgnData);
+        internal static extern unsafe uint GetRegionData([In()] IntPtr hrgn, [In()] uint nCount, [Out()] NativeStructs.RGNDATA* lpRgnData);
 
         [DllImport("gdi32.dll", ExactSpelling = true)]
         internal static extern IntPtr CreateCompatibleDC([In()] IntPtr hdc);

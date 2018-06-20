@@ -21,7 +21,7 @@ using System;
 
 namespace PSFilterHostDll.BGRASurface
 {
-    internal unsafe sealed class MemoryBlock : IDisposable
+    internal sealed unsafe class MemoryBlock : IDisposable
     {
         // blocks this size or larger are allocated with AllocateLarge (VirtualAlloc) instead of Allocate (HeapAlloc)
         private const long largeBlockThreshold = 65536;

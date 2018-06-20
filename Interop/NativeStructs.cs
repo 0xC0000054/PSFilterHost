@@ -70,7 +70,7 @@ namespace PSFilterHostDll.Interop
         {
             internal RGNDATAHEADER rdh;
 
-            internal unsafe static RECT* GetRectsPointer(RGNDATA* me)
+            internal static unsafe RECT* GetRectsPointer(RGNDATA* me)
             {
                 return (RECT*)((byte*)me + sizeof(RGNDATAHEADER));
             }
