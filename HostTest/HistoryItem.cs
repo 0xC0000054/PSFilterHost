@@ -23,7 +23,7 @@ namespace HostTest
     /// </summary>
     internal sealed class HistoryItem : IDisposable
     {
-        private string backingFile;
+        private readonly string backingFile;
         private HistoryChunk chunk;
         private HistoryItemState state;
 
