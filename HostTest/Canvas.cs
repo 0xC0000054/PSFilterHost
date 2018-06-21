@@ -71,8 +71,8 @@ namespace HostTest
 		{
 			InitializeComponent();
 			DoubleBuffered = true;
-			base.SetStyle(ControlStyles.UserPaint, true);
-			base.SetStyle(ControlStyles.Selectable, true);
+            SetStyle(ControlStyles.UserPaint, true);
+            SetStyle(ControlStyles.Selectable, true);
 
 			imageBounds = Rectangle.Empty;
 			selectionRegion = null;
