@@ -16,6 +16,9 @@ namespace PSFilterHostDll.Interop
 {
     internal static class NativeEnums
     {
+#pragma warning disable RCS1154 // Sort enum members.
+#pragma warning disable RCS1191 // Declare enum value as combination of names.
+
         [Flags]
         internal enum FileShare : uint
         {
@@ -159,5 +162,8 @@ namespace PSFilterHostDll.Interop
                 BM_R16G16B16A16_FLOAT = 1795,
             }
         }
+
+#pragma warning restore RCS1154 // Sort enum members.
+#pragma warning restore RCS1191 // Declare enum value as combination of names.
     }
 }
