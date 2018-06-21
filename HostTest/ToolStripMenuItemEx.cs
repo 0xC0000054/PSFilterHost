@@ -52,7 +52,7 @@ namespace HostTest
 			// of a disabled item when the mouse hovers over it.
 			if (!Enabled && DropDownItems.Count > 0)
 			{
-				bool rightToLeft = RightToLeft == System.Windows.Forms.RightToLeft.Yes;
+				bool rightToLeft = RightToLeft == RightToLeft.Yes;
 
                 const int arrowWidth = 10;
 				ArrowDirection direction = rightToLeft ? ArrowDirection.Left : ArrowDirection.Right;

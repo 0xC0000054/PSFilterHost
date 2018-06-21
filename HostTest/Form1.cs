@@ -335,7 +335,7 @@ namespace HostTest
 
 		private void loadFiltersMenuItem_Click(object sender, EventArgs e)
 		{
-			if (folderBrowserDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+			if (folderBrowserDialog1.ShowDialog(this) == DialogResult.OK)
 			{
 				QueryDirectory(folderBrowserDialog1.SelectedPath);
 			}
@@ -763,7 +763,7 @@ namespace HostTest
 
 		private void openToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (openFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+			if (openFileDialog1.ShowDialog(this) == DialogResult.OK)
 			{
 				try
 				{
@@ -1002,7 +1002,7 @@ namespace HostTest
 				}
 				saveFileDialog1.FileName = Path.ChangeExtension(imageFileName, null);
 
-				if (saveFileDialog1.ShowDialog(this) == System.Windows.Forms.DialogResult.OK)
+				if (saveFileDialog1.ShowDialog(this) == DialogResult.OK)
 				{
 					string path = saveFileDialog1.FileName;
 					BitmapEncoder encoder = null;
@@ -1556,7 +1556,7 @@ namespace HostTest
 			{
 				dialog.Color = System.Drawing.Color.FromArgb(defaultRed, defaultGreen, defaultBlue);
 
-				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				if (dialog.ShowDialog() == DialogResult.OK)
 				{
 					color = new ColorPickerResult(dialog.Color);
 				}
