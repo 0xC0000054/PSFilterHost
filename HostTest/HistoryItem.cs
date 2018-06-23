@@ -46,6 +46,9 @@ namespace HostTest
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItem"/> class.
         /// </summary>
+        /// <param name="file">The backing file.</param>
+        /// <param name="historyCanvas">The history canvas.</param>
+        /// <param name="currentImage">The current image.</param>
         public HistoryItem(string file, CanvasHistoryState historyCanvas, BitmapSource currentImage)
         {
             backingFile = file;
