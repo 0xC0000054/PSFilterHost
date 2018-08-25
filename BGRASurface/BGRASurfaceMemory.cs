@@ -59,7 +59,10 @@ namespace PSFilterHostDll.BGRASurface
 				CreateHeap();
 			}
 
-			IntPtr block = SafeNativeMethods.HeapAlloc(hHeap, 0, new UIntPtr(bytes));
+			// Always initialize the memory to zero.
+			// This ensures that the behavior of Allocate is the same as AllocateLarge.
+			// AllocateLarge uses VirtualAlloc which is documented to initialize the allocated memory to zero.
+			IntPtr block = SafeNativeMethods.HeapAlloc(hHeap, NativeConstants.HEAP_ZERO_MEMORY, new UIntPtr(bytes));
 
 			if (block == IntPtr.Zero)
 			{
