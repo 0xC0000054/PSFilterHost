@@ -11,13 +11,64 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Globalization;
 using System.IO;
+using System.Text;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace HostTest
 {
 	internal static class MetaDataHelper
 	{
+		private enum ImageOrientation : ushort
+		{
+			/// <summary>
+			/// The orientation is not specified.
+			/// </summary>
+			None = 0,
+
+			/// <summary>
+			/// The 0th row is at the visual top of the image, and the 0th column is the visual left-hand side
+			/// </summary>
+			TopLeft = 1,
+
+			/// <summary>
+			/// The 0th row is at the visual top of the image, and the 0th column is the visual right-hand side.
+			/// </summary>
+			TopRight = 2,
+
+			/// <summary>
+			/// The 0th row represents the visual bottom of the image, and the 0th column represents the visual right-hand side.
+			/// </summary>
+			BottomRight = 3,
+
+			/// <summary>
+			/// The 0th row represents the visual bottom of the image, and the 0th column represents the visual left-hand side.
+			/// </summary>
+			BottomLeft = 4,
+
+			/// <summary>
+			/// The 0th row represents the visual left-hand side of the image, and the 0th column represents the visual top.
+			/// </summary>
+			LeftTop = 5,
+
+			/// <summary>
+			/// The 0th row represents the visual right-hand side of the image, and the 0th column represents the visual top.
+			/// </summary>
+			RightTop = 6,
+
+			/// <summary>
+			/// The 0th row represents the visual right-hand side of the image, and the 0th column represents the visual bottom.
+			/// </summary>
+			RightBottom = 7,
+
+			/// <summary>
+			/// The 0th row represents the visual left-hand side of the image, and the 0th column represents the visual bottom.
+			/// </summary>
+			LeftBottom = 8
+		}
+
 		private static void CopySubIFDRecursive(ref BitmapMetadata parent, BitmapMetadata ifd, string query)
 		{
 			if (!parent.ContainsQuery(query))
@@ -370,6 +421,173 @@ namespace HostTest
 			return null;
 		}
 
+		/// <summary>
+		/// Gets the orientation transform.
+		/// </summary>
+		/// <param name="metaData">The meta data.</param>
+		/// <returns>The orientation transform.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="metaData"/> is null.</exception>
+		internal static Transform GetOrientationTransform(BitmapMetadata metaData)
+		{
+			if (metaData == null)
+			{
+				throw new ArgumentNullException(nameof(metaData));
+			}
+
+			Transform transform = null;
+
+			string format = string.Empty;
+
+			try
+			{
+				format = metaData.Format; // Some WIC codecs do not implement the format property.
+			}
+			catch (ArgumentException)
+			{
+			}
+			catch (NotSupportedException)
+			{
+			}
+
+			ImageOrientation orientation = GetImageOrientation(metaData, format);
+
+			if (orientation != ImageOrientation.None)
+			{
+				switch (orientation)
+				{
+					case ImageOrientation.TopLeft:
+						// Do nothing
+						break;
+					case ImageOrientation.TopRight:
+						// Flip horizontally.
+						transform = new ScaleTransform() { ScaleX = -1 };
+						break;
+					case ImageOrientation.BottomRight:
+						// Rotate 180 degrees.
+						transform = new RotateTransform(180);
+						break;
+					case ImageOrientation.BottomLeft:
+						// Flip vertically.
+						transform = new ScaleTransform { ScaleY = -1 };
+						break;
+					case ImageOrientation.LeftTop:
+						transform = new TransformGroup()
+						{
+							Children = new TransformCollection(2)
+								{
+									// Rotate 90 degrees clockwise and flip horizontally.
+									new RotateTransform(90),
+									new ScaleTransform { ScaleX = -1 }
+								}
+						};
+						break;
+					case ImageOrientation.RightTop:
+						// Rotate 90 degrees clockwise.
+						transform = new RotateTransform(90);
+						break;
+					case ImageOrientation.RightBottom:
+						transform = new TransformGroup()
+						{
+							// Rotate 270 degrees clockwise and flip horizontally.
+							Children = new TransformCollection(2)
+								{
+									new RotateTransform(270),
+									new ScaleTransform { ScaleX = -1 }
+								}
+						};
+						break;
+					case ImageOrientation.LeftBottom:
+						// Rotate 270 degrees clockwise.
+						transform = new RotateTransform(270);
+						break;
+				}
+			}
+
+			return transform;
+		}
+
+		/// <summary>
+		/// Sets the image orientation to indicate the origin is the top left corner.
+		/// </summary>
+		/// <param name="metaData">The meta data.</param>
+		/// <returns>The modified meta data.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="metaData"/> is null.</exception>
+		internal static BitmapMetadata SetOrientationToTopLeft(BitmapMetadata metaData)
+		{
+			if (metaData == null)
+			{
+				throw new ArgumentNullException(nameof(metaData));
+			}
+
+			string format = string.Empty;
+
+			try
+			{
+				format = metaData.Format; // Some WIC codecs do not implement the format property.
+			}
+			catch (ArgumentException)
+			{
+			}
+			catch (NotSupportedException)
+			{
+			}
+
+			BitmapMetadata newMetaData = metaData.Clone();
+
+			try
+			{
+				if (format == "jpg")
+				{
+					if (metaData.ContainsQuery("/app1/ifd"))
+					{
+						newMetaData.SetQuery("/app1/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
+					}
+
+					if (metaData.ContainsQuery("/xmp"))
+					{
+						newMetaData.SetQuery("/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
+					}
+				}
+				else if (format == "png")
+				{
+					BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+
+					if (xmp != null)
+					{
+						xmp.SetQuery("/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
+
+						if (string.Equals(metaData.GetQuery("/iTXt/Keyword") as string, "XML:com.adobe.xmp", StringComparison.Ordinal))
+						{
+							byte[] packet = ExtractXMPPacket(xmp);
+
+							if (packet != null)
+							{
+								newMetaData.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
+							}
+						}
+					}
+				}
+				else if (format != "gif")
+				{
+					if (metaData.ContainsQuery("/ifd"))
+					{
+						newMetaData.SetQuery("/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
+
+						if (metaData.ContainsQuery("/ifd/xmp"))
+						{
+							newMetaData.SetQuery("/ifd/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
+						}
+					}
+				}
+			}
+			catch (IOException)
+			{
+				// WINCODEC_ERR_INVALIDQUERYREQUEST
+			}
+
+			return newMetaData;
+		}
+
 		#region Save format conversion
 
 		private static BitmapMetadata ConvertMetaDataToJPEG(BitmapMetadata metaData, string format)
@@ -681,6 +899,76 @@ namespace HostTest
 			}
 
 			return null;
+		}
+
+		private static ImageOrientation GetImageOrientation(BitmapMetadata metaData, string format)
+		{
+			ImageOrientation orientation = ImageOrientation.None;
+
+			object orientationObject = null;
+
+			try
+			{
+				if (format == "jpg")
+				{
+					orientationObject = metaData.GetQuery("/app1/ifd/{ushort=274}");
+				}
+				else if (format != "gif" && format != "png")
+				{
+					orientationObject = metaData.GetQuery("/ifd/{ushort=274}");
+				}
+			}
+			catch (IOException)
+			{
+				// WINCODEC_ERR_INVALIDQUERYREQUEST
+			}
+
+			if (orientationObject == null)
+			{
+				BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+
+				if (xmp != null)
+				{
+					try
+					{
+						orientationObject = xmp.GetQuery("/tiff:Orientation");
+					}
+					catch (IOException)
+					{
+						// WINCODEC_ERR_INVALIDQUERYREQUEST
+					}
+				}
+			}
+
+			if (orientationObject != null)
+			{
+				ushort? nullableValue = null;
+
+				if (orientationObject is ushort result)
+				{
+					nullableValue = result;
+				}
+				else
+				{
+					// WIC treats the XMP tiff:Orientation property as a string.
+					if (ushort.TryParse(orientationObject as string, NumberStyles.Integer, CultureInfo.InvariantCulture, out ushort value))
+					{
+						nullableValue = value;
+					}
+				}
+
+				if (nullableValue.HasValue)
+				{
+					ushort value = nullableValue.Value;
+
+					if (value >= (ushort)ImageOrientation.TopLeft && value <= (ushort)ImageOrientation.LeftBottom)
+					{
+						orientation = (ImageOrientation)value;
+					}
+				}
+			}
+
+			return orientation;
 		}
 
 		private static class TiffReader

@@ -841,6 +841,44 @@ namespace HostTest
 			}
 		}
 
+		/// <summary>
+		/// Adjusts the image orientation based in the meta data.
+		/// </summary>
+		/// <param name="frame">The source image.</param>
+		/// <returns>The adjusted image.</returns>
+		/// <exception cref="ArgumentNullException"><paramref name="frame"/> is null.</exception>
+		private static BitmapFrame AdjustImageOrientation(BitmapFrame frame)
+		{
+			if (frame == null)
+			{
+				throw new ArgumentNullException(nameof(frame));
+			}
+
+			BitmapMetadata metaData = null;
+
+			try
+			{
+				metaData = frame.Metadata as BitmapMetadata;
+			}
+			catch (NotSupportedException)
+			{
+			}
+
+			if (metaData != null)
+			{
+				Transform transform = MetaDataHelper.GetOrientationTransform(metaData);
+
+				if (transform != null)
+				{
+					TransformedBitmap transformedBitmap = new TransformedBitmap(frame, transform);
+
+					return BitmapFrame.Create(transformedBitmap, null, MetaDataHelper.SetOrientationToTopLeft(metaData), null);
+				}
+			}
+
+			return BitmapFrame.Create(frame.Clone(), null, metaData?.Clone(), null);
+		}
+
 		private void OpenFile(string path)
 		{
 			Cursor = Cursors.WaitCursor;
@@ -866,12 +904,12 @@ namespace HostTest
 					{
 					}
 
-					srcImage = BitmapFrame.Create(convertedBitmap, null, metaData, null);
+					srcImage = AdjustImageOrientation(BitmapFrame.Create(convertedBitmap, null, metaData, null));
 					srcImage.Freeze();
 				}
 				else
 				{
-					srcImage = frame.Clone();
+					srcImage = AdjustImageOrientation(frame);
 					srcImage.Freeze();
 				}
 
