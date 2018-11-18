@@ -93,11 +93,11 @@ namespace PSFilterHostDll.BGRASurface
 			this.width = width;
 			this.height = height;
 			this.bytesPerPixel = bytesPerPixel;
-            stride = width * bytesPerPixel;
+			stride = width * bytesPerPixel;
 			this.dpiX = dpiX;
 			this.dpiY = dpiY;
-            scan0 = new MemoryBlock(stride * height);
-            disposed = false;
+			scan0 = new MemoryBlock(stride * height);
+			disposed = false;
 		}
 
 		/// <summary>
@@ -114,8 +114,8 @@ namespace PSFilterHostDll.BGRASurface
 		public void CopySurface(SurfaceBase source)
 		{
 			if (width == source.width &&
-               height == source.height &&
-               stride == source.stride &&
+			   height == source.height &&
+			   stride == source.stride &&
 			   (width * bytesPerPixel) == stride)
 			{
 				unsafe
@@ -288,9 +288,9 @@ namespace PSFilterHostDll.BGRASurface
 		public void SetAlphaToOpaque(Rectangle[] scans)
 		{
 			if (scans == null)
-            {
-                throw new ArgumentNullException(nameof(scans));
-            }
+			{
+				throw new ArgumentNullException(nameof(scans));
+			}
 
 			for (int i = 0; i < scans.Length; i++)
 			{
@@ -307,11 +307,11 @@ namespace PSFilterHostDll.BGRASurface
 		{
 			if (!disposed && disposing)
 			{
-                disposed = true;
+				disposed = true;
 				if (scan0 != null)
 				{
-                    scan0.Dispose();
-                    scan0 = null;
+					scan0.Dispose();
+					scan0 = null;
 				}
 			}
 		}
