@@ -134,9 +134,9 @@ namespace HostTest
 				// so we have to save it to a dummy tiff and grab the XMP meta-data on load.
 				BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
 				tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-				tiffMetaData.SetQuery("/ifd/xmp", System.Text.Encoding.UTF8.GetBytes(xmp));
+				tiffMetaData.SetQuery("/ifd/xmp", Encoding.UTF8.GetBytes(xmp));
 
-				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, PixelFormats.Gray8, null, new byte[] { 255 }, 1);
 				TiffBitmapEncoder encoder = new TiffBitmapEncoder();
 				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
 				encoder.Save(stream);
@@ -697,7 +697,7 @@ namespace HostTest
 			using (MemoryStream stream = new MemoryStream())
 			{
 				// Create a dummy tiff to extract the XMP packet from.
-				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, System.Windows.Media.PixelFormats.Gray8, null, new byte[] { 255 }, 1);
+				BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, PixelFormats.Gray8, null, new byte[] { 255 }, 1);
 				TiffBitmapEncoder encoder = new TiffBitmapEncoder();
 				encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
 				encoder.Save(stream);
@@ -725,7 +725,7 @@ namespace HostTest
 					char[] keyWordChars = "XML:com.adobe.xmp".ToCharArray();
 					pngMetaData.SetQuery("/iTXt/Keyword", keyWordChars);
 
-					pngMetaData.SetQuery("/iTXt/TextEntry", System.Text.Encoding.UTF8.GetString(packet));
+					pngMetaData.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
 
 					return pngMetaData;
 				}
