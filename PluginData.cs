@@ -25,7 +25,7 @@ namespace PSFilterHostDll
     /// Represents the information used to load and execute a Photoshop-compatible filter plug-in.
     /// </summary>
     /// <threadsafety static="true" instance="false" />
-    [DebuggerTypeProxy(typeof(PluginDataDebugView))] 
+    [DebuggerTypeProxy(typeof(PluginDataDebugView))]
     [Serializable]
     public sealed class PluginData : IEquatable<PluginData>
     {

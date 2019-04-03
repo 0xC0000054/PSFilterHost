@@ -20,5 +20,5 @@ using System.Runtime.InteropServices;
 namespace PSFilterHostDll.PSApi
 {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short DisplayPixelsProc([In()] ref PSPixelMap source, [In()] ref VRect srcRect, [In()] int dstRow, [In()] int dstCol,[In()] System.IntPtr platformContext);
+    internal delegate short DisplayPixelsProc([In()] ref PSPixelMap source, [In()] ref VRect srcRect, [In()] int dstRow, [In()] int dstCol, [In()] System.IntPtr platformContext);
 }

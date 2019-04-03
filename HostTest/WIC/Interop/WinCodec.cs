@@ -518,7 +518,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
         public IntPtr Mask;
         [MarshalAs(UnmanagedType.Bool)]
         public bool EndOfStream;
-    }  ;
+    };
 
     internal enum WICBitmapInterpolationMode : uint
     {

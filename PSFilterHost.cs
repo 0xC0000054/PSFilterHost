@@ -29,761 +29,761 @@ using System.Security.Permissions;
 
 namespace PSFilterHostDll
 {
-	/// <summary>
-	/// Loads and runs Photoshop-compatible filters.
-	/// </summary>
-	/// <threadsafety static="true" instance="false" />
-	public sealed class PSFilterHost : IDisposable
-	{
+    /// <summary>
+    /// Loads and runs Photoshop-compatible filters.
+    /// </summary>
+    /// <threadsafety static="true" instance="false" />
+    public sealed class PSFilterHost : IDisposable
+    {
 #if GDIPLUS
-		private Bitmap source;
-		private Bitmap dest;
-		private Color primaryColor;
-		private Color secondaryColor;
+        private Bitmap source;
+        private Bitmap dest;
+        private Color primaryColor;
+        private Color secondaryColor;
 #else
-		private BitmapSource source;
-		private BitmapSource dest;
-		private System.Windows.Media.Color primaryColor;
-		private System.Windows.Media.Color secondaryColor;
+        private BitmapSource source;
+        private BitmapSource dest;
+        private System.Windows.Media.Color primaryColor;
+        private System.Windows.Media.Color secondaryColor;
 #endif
-		private bool disposed;
-		private ParameterData filterParameters;
-		private Region selectedRegion;
-		private IntPtr owner;
-		private AbortFunc abortFunc;
-		private PseudoResourceCollection pseudoResources;
-		private HostInformation hostInfo;
-		private PickColor pickColor;
-		private HostColorManagement hostColorProfiles;
-		private PluginSettingsRegistry sessionSettings;
+        private bool disposed;
+        private ParameterData filterParameters;
+        private Region selectedRegion;
+        private IntPtr owner;
+        private AbortFunc abortFunc;
+        private PseudoResourceCollection pseudoResources;
+        private HostInformation hostInfo;
+        private PickColor pickColor;
+        private HostColorManagement hostColorProfiles;
+        private PluginSettingsRegistry sessionSettings;
 
-		/// <summary>
-		/// The event fired when the filter updates it's progress.
-		/// </summary>
-		public event EventHandler<FilterProgressEventArgs> UpdateProgress;
+        /// <summary>
+        /// The event fired when the filter updates it's progress.
+        /// </summary>
+        public event EventHandler<FilterProgressEventArgs> UpdateProgress;
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
-		/// </summary>
-		/// <param name="sourceImage">The image to filter.</param>
-		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
-		/// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
-		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
-		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
+        /// </summary>
+        /// <param name="sourceImage">The image to filter.</param>
+        /// <param name="parentWindowHandle">The main window handle of the host application.</param>
+        /// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
+        /// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
+        /// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
-		/// </summary>
-		/// <param name="sourceImage">The image to filter.</param>
-		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
-		/// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
-		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
-		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
+        /// </summary>
+        /// <param name="sourceImage">The image to filter.</param>
+        /// <param name="parentWindowHandle">The main window handle of the host application.</param>
+        /// <overloads>Initializes a new instance of the <see cref="PSFilterHost"/> class.</overloads>
+        /// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
+        /// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 
 #if GDIPLUS
-		public PSFilterHost(Bitmap sourceImage, IntPtr parentWindowHandle) : this(sourceImage, Color.Black, Color.White, null, parentWindowHandle)
-		{
-		}
+        public PSFilterHost(Bitmap sourceImage, IntPtr parentWindowHandle) : this(sourceImage, Color.Black, Color.White, null, parentWindowHandle)
+        {
+        }
 #else
-		public PSFilterHost(BitmapSource sourceImage, IntPtr parentWindowHandle) : this(sourceImage, System.Windows.Media.Colors.Black, System.Windows.Media.Colors.White, null, parentWindowHandle)
-		{
-		}
+        public PSFilterHost(BitmapSource sourceImage, IntPtr parentWindowHandle) : this(sourceImage, System.Windows.Media.Colors.Black, System.Windows.Media.Colors.White, null, parentWindowHandle)
+        {
+        }
 #endif
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
-		/// </summary>
-		/// <param name="sourceImage">The image to filter.</param>
-		/// <param name="primary">The primary (foreground) color of the host application.</param>
-		/// <param name="secondary">The secondary (background) color of the host application.</param>
-		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
-		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
-		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
+        /// </summary>
+        /// <param name="sourceImage">The image to filter.</param>
+        /// <param name="primary">The primary (foreground) color of the host application.</param>
+        /// <param name="secondary">The secondary (background) color of the host application.</param>
+        /// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+        /// <param name="parentWindowHandle">The main window handle of the host application.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
+        /// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
-		/// </summary>
-		/// <param name="sourceImage">The image to filter.</param>
-		/// <param name="primary">The primary (foreground) color of the host application.</param>
-		/// <param name="secondary">The secondary (background) color of the host application.</param>
-		/// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
-		/// <param name="parentWindowHandle">The main window handle of the host application.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
-		/// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
+        /// </summary>
+        /// <param name="sourceImage">The image to filter.</param>
+        /// <param name="primary">The primary (foreground) color of the host application.</param>
+        /// <param name="secondary">The secondary (background) color of the host application.</param>
+        /// <param name="selectedRegion">The <see cref="System.Drawing.Region"/> defining the shape of the selection.</param>
+        /// <param name="parentWindowHandle">The main window handle of the host application.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="sourceImage"/> is null.</exception>
+        /// <exception cref="ImageSizeTooLargeException">The <paramref name="sourceImage"/> is greater that 32000 pixels in width or height.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
 
 #if GDIPLUS
-		public PSFilterHost(Bitmap sourceImage, Color primary, Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
+        public PSFilterHost(Bitmap sourceImage, Color primary, Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
 #else
-		public PSFilterHost(BitmapSource sourceImage,  System.Windows.Media.Color primary,  System.Windows.Media.Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
+        public PSFilterHost(BitmapSource sourceImage, System.Windows.Media.Color primary, System.Windows.Media.Color secondary, Region selectedRegion, IntPtr parentWindowHandle)
 #endif
-		{
-			if (sourceImage == null)
-			{
-				throw new ArgumentNullException(nameof(sourceImage));
-			}
+        {
+            if (sourceImage == null)
+            {
+                throw new ArgumentNullException(nameof(sourceImage));
+            }
 
-			int imageWidth = 0;
-			int imageHeight = 0;
+            int imageWidth = 0;
+            int imageHeight = 0;
 
 #if GDIPLUS
-			imageWidth = sourceImage.Width;
-			imageHeight = sourceImage.Height;
+            imageWidth = sourceImage.Width;
+            imageHeight = sourceImage.Height;
 #else
-			imageWidth = sourceImage.PixelWidth;
-			imageHeight = sourceImage.PixelHeight;
+            imageWidth = sourceImage.PixelWidth;
+            imageHeight = sourceImage.PixelHeight;
 #endif
 
-			if (imageWidth > 32000 || imageHeight > 32000)
-			{
-				string message = string.Empty;
-				if (imageWidth > 32000 && imageHeight > 32000)
-				{
-					message = Resources.ImageSizeTooLarge;
-				}
-				else
-				{
-					if (imageWidth > 32000)
-					{
-						message = Resources.ImageWidthTooLarge;
-					}
-					else
-					{
-						message = Resources.ImageHeightTooLarge;
-					}
-				}
+            if (imageWidth > 32000 || imageHeight > 32000)
+            {
+                string message = string.Empty;
+                if (imageWidth > 32000 && imageHeight > 32000)
+                {
+                    message = Resources.ImageSizeTooLarge;
+                }
+                else
+                {
+                    if (imageWidth > 32000)
+                    {
+                        message = Resources.ImageWidthTooLarge;
+                    }
+                    else
+                    {
+                        message = Resources.ImageHeightTooLarge;
+                    }
+                }
 
-				throw new ImageSizeTooLargeException(message);
-			}
+                throw new ImageSizeTooLargeException(message);
+            }
 
 #if GDIPLUS
-			source = (Bitmap)sourceImage.Clone();
+            source = (Bitmap)sourceImage.Clone();
 #else
-			source = sourceImage.Clone();
+            source = sourceImage.Clone();
 #endif
-			disposed = false;
-			dest = null;
-			filterParameters = null;
-			primaryColor = primary;
-			secondaryColor = secondary;
-			if (selectedRegion != null)
-			{
-				this.selectedRegion = selectedRegion.Clone();
-			}
-			else
-			{
-				this.selectedRegion = null;
-			}
-			owner = parentWindowHandle;
-			pseudoResources = null;
-			abortFunc = null;
-			hostInfo = null;
-			hostColorProfiles = null;
-			sessionSettings = null;
-		}
+            disposed = false;
+            dest = null;
+            filterParameters = null;
+            primaryColor = primary;
+            secondaryColor = secondary;
+            if (selectedRegion != null)
+            {
+                this.selectedRegion = selectedRegion.Clone();
+            }
+            else
+            {
+                this.selectedRegion = null;
+            }
+            owner = parentWindowHandle;
+            pseudoResources = null;
+            abortFunc = null;
+            hostInfo = null;
+            hostColorProfiles = null;
+            sessionSettings = null;
+        }
 
 #if GDIPLUS
-		/// <summary>
-		/// Gets the destination image.
-		/// </summary>
-		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-		public Bitmap Dest
-		{
-			get
-			{
-				if (disposed)
-				{
-					throw new ObjectDisposedException("PSFilterHost");
-				}
+        /// <summary>
+        /// Gets the destination image.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+        public Bitmap Dest
+        {
+            get
+            {
+                if (disposed)
+                {
+                    throw new ObjectDisposedException("PSFilterHost");
+                }
 
-				return dest;
-			}
-		}
+                return dest;
+            }
+        }
 #else
-		/// <summary>
-		/// Gets the destination image.
-		/// </summary>
-		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-		public BitmapSource Dest
-		{
-			get
-			{
-				if (disposed)
-				{
-					throw new ObjectDisposedException(nameof(PSFilterHost));
-				}
+        /// <summary>
+        /// Gets the destination image.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+        public BitmapSource Dest
+        {
+            get
+            {
+                if (disposed)
+                {
+                    throw new ObjectDisposedException(nameof(PSFilterHost));
+                }
 
-				return dest;
-			}
-		}
+                return dest;
+            }
+        }
 #endif
 
-		/// <summary>
-		/// Gets or sets the <see cref="ParameterData"/> used to apply the filter with the previous settings.
-		/// </summary>
-		/// <value>
-		/// The filter parameters to use.
-		/// </value>
-		public ParameterData FilterParameters
-		{
-			get
-			{
-				return filterParameters;
-			}
-			set
-			{
-				filterParameters = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the <see cref="ParameterData"/> used to apply the filter with the previous settings.
+        /// </summary>
+        /// <value>
+        /// The filter parameters to use.
+        /// </value>
+        public ParameterData FilterParameters
+        {
+            get
+            {
+                return filterParameters;
+            }
+            set
+            {
+                filterParameters = value;
+            }
+        }
 
-		/// <summary>
-		/// Gets or sets the host information used by the filters.
-		/// </summary>
-		/// <value>
-		/// The host information.
-		/// </value>
-		public HostInformation HostInfo
-		{
-			get
-			{
-				return hostInfo;
-			}
-			set
-			{
-				hostInfo = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the host information used by the filters.
+        /// </summary>
+        /// <value>
+        /// The host information.
+        /// </value>
+        public HostInformation HostInfo
+        {
+            get
+            {
+                return hostInfo;
+            }
+            set
+            {
+                hostInfo = value;
+            }
+        }
 
-		/// <summary>
-		/// Gets or sets the Pseudo-Resources used by the plug-ins.
-		/// </summary>
-		/// <value>
-		/// The pseudo resources.
-		/// </value>
-		public PseudoResourceCollection PseudoResources
-		{
-			get
-			{
-				return pseudoResources;
-			}
-			set
-			{
-				pseudoResources = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets the Pseudo-Resources used by the plug-ins.
+        /// </summary>
+        /// <value>
+        /// The pseudo resources.
+        /// </value>
+        public PseudoResourceCollection PseudoResources
+        {
+            get
+            {
+                return pseudoResources;
+            }
+            set
+            {
+                pseudoResources = value;
+            }
+        }
 
-		/// <summary>
-		/// Gets or sets plug-in settings for the current session.
-		/// </summary>
-		/// <value>
-		/// The plug-in settings for the current session.
-		/// </value>
-		public PluginSettingsRegistry SessionSettings
-		{
-			get
-			{
-				return sessionSettings;
-			}
-			set
-			{
-				sessionSettings = value;
-			}
-		}
+        /// <summary>
+        /// Gets or sets plug-in settings for the current session.
+        /// </summary>
+        /// <value>
+        /// The plug-in settings for the current session.
+        /// </value>
+        public PluginSettingsRegistry SessionSettings
+        {
+            get
+            {
+                return sessionSettings;
+            }
+            set
+            {
+                sessionSettings = value;
+            }
+        }
 
-		/// <summary>
-		/// Sets the abort function callback delegate.
-		/// </summary>
-		/// <param name="abortCallback">The abort callback.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="abortCallback"/> is null.</exception>
-		public void SetAbortCallback(AbortFunc abortCallback)
-		{
-			if (abortCallback == null)
-			{
-				throw new ArgumentNullException(nameof(abortCallback));
-			}
+        /// <summary>
+        /// Sets the abort function callback delegate.
+        /// </summary>
+        /// <param name="abortCallback">The abort callback.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="abortCallback"/> is null.</exception>
+        public void SetAbortCallback(AbortFunc abortCallback)
+        {
+            if (abortCallback == null)
+            {
+                throw new ArgumentNullException(nameof(abortCallback));
+            }
 
-			abortFunc = abortCallback;
-		}
+            abortFunc = abortCallback;
+        }
 
-		/// <summary>
-		/// Sets the pick color function callback delegate.
-		/// </summary>
-		/// <param name="pickerCallback">The color picker callback.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="pickerCallback"/> is null.</exception>
-		public void SetPickColorCallback(PickColor pickerCallback)
-		{
-			if (pickerCallback == null)
-			{
-				throw new ArgumentNullException(nameof(pickerCallback));
-			}
+        /// <summary>
+        /// Sets the pick color function callback delegate.
+        /// </summary>
+        /// <param name="pickerCallback">The color picker callback.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="pickerCallback"/> is null.</exception>
+        public void SetPickColorCallback(PickColor pickerCallback)
+        {
+            if (pickerCallback == null)
+            {
+                throw new ArgumentNullException(nameof(pickerCallback));
+            }
 
-			pickColor = pickerCallback;
-		}
+            pickColor = pickerCallback;
+        }
 
-		/// <summary>
-		/// Sets the information used to provide color correction when previewing the result of a filter.
-		/// </summary>
-		/// <param name="colorProfiles">The color management information.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="colorProfiles"/> is null.</exception>
-		public void SetColorProfiles(HostColorManagement colorProfiles)
-		{
-			if (colorProfiles == null)
-			{
-				throw new ArgumentNullException(nameof(colorProfiles));
-			}
+        /// <summary>
+        /// Sets the information used to provide color correction when previewing the result of a filter.
+        /// </summary>
+        /// <param name="colorProfiles">The color management information.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="colorProfiles"/> is null.</exception>
+        public void SetColorProfiles(HostColorManagement colorProfiles)
+        {
+            if (colorProfiles == null)
+            {
+                throw new ArgumentNullException(nameof(colorProfiles));
+            }
 
-			hostColorProfiles = colorProfiles;
-		}
+            hostColorProfiles = colorProfiles;
+        }
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Queries the directory for filters to load.
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
-		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Queries the directory for filters to load.
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+        /// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Queries the directory for filters to load.
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
-		/// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Queries the directory for filters to load.
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+        /// <returns>A new <see cref="FilterCollection"/> containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
-		{
-			if (path == null)
-			{
-				throw new ArgumentNullException(nameof(path));
-			}
+        public static FilterCollection QueryDirectory(string path, bool searchSubdirectories)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
 
-			var filters = EnumerateFilters(path, searchSubdirectories);
+            var filters = EnumerateFilters(path, searchSubdirectories);
 
-			return new FilterCollection(filters);
-		}
+            return new FilterCollection(filters);
+        }
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
-		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
-		/// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+        /// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+        /// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
-		/// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
-		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchSubdirectories"><c>true</c> if the search operation should include all subdirectories; otherwise <c>false</c> to include only the current directory.</param>
+        /// <overloads>Returns an enumerable collection of filters found in the specified path.</overloads>
+        /// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="DirectoryNotFoundException">The directory specified by <paramref name="path"/> does not exist.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
-		{
-			return EnumerateFilters(path, searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-		}
+        public static IEnumerable<PluginData> EnumerateFilters(string path, bool searchSubdirectories)
+        {
+            return EnumerateFilters(path, searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+        }
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
-		/// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
-		/// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+        /// <returns>An enumerable collection containing the filters found in the directory specified by <paramref name="path"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
+        /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
-		/// </summary>
-		/// <param name="path">The directory to search.</param>
-		/// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
-		/// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
-		/// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
-		/// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
-		/// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
-		/// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
-		/// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
-		/// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
-		/// <exception cref="SecurityException">The caller does not have the required permission.</exception>
-		/// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
+        /// </summary>
+        /// <param name="path">The directory to search.</param>
+        /// <param name="searchOption">One of the <see cref="SearchOption"/> values that specifies whether the search operation should include only the current directory or should include all subdirectories.</param>
+        /// <returns>An enumerable collection containing the filters found  in the directory specified by <paramref name="path"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="path"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is a 0 length string, or contains only white-space, or contains one or more invalid characters.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="searchOption"/> is not a valid <see cref="SearchOption"/> value.</exception>
+        /// <exception cref="DirectoryNotFoundException"><paramref name="path"/> is invalid, such as referring to an unmapped drive.</exception>
+        /// <exception cref="IOException"><paramref name="path"/> is a file name.</exception>
+        /// <exception cref="PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
+        /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+        /// <exception cref="UnauthorizedAccessException">The caller does not have the required permission.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static IEnumerable<PluginData> EnumerateFilters(string path, SearchOption searchOption)
-		{
-			if (path == null)
-			{
-				throw new ArgumentNullException(nameof(path));
-			}
+        public static IEnumerable<PluginData> EnumerateFilters(string path, SearchOption searchOption)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
 
-			if (searchOption < SearchOption.TopDirectoryOnly || searchOption > SearchOption.AllDirectories)
-			{
-				throw new ArgumentOutOfRangeException(nameof(searchOption));
-			}
+            if (searchOption < SearchOption.TopDirectoryOnly || searchOption > SearchOption.AllDirectories)
+            {
+                throw new ArgumentOutOfRangeException(nameof(searchOption));
+            }
 
-			using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchOption, true))
-			{
-				while (enumerator.MoveNext())
-				{
-					foreach (var item in PluginLoader.LoadFiltersFromFile(enumerator.Current))
-					{
-						yield return item;
-					}
-				}
-			}
-		}
+            using (FileEnumerator enumerator = new FileEnumerator(path, ".8bf", searchOption, true))
+            {
+                while (enumerator.MoveNext())
+                {
+                    foreach (var item in PluginLoader.LoadFiltersFromFile(enumerator.Current))
+                    {
+                        yield return item;
+                    }
+                }
+            }
+        }
 
-		/// <summary>
-		/// Executes the specified filter.
-		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
-		/// <returns>
-		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
-		/// </returns>
-		/// <overloads>Executes the specified filter.</overloads>
-		/// <remarks>
-		/// <para>
-		/// When the <see cref="FilterParameters"/> have been set to execute a filter with settings from a previous session this method will not display the user interface.
-		/// The <see cref="RunFilter(PluginData, bool)" /> overload must be used if the host wants the filter to display its user interface.
-		/// </para>
-		/// </remarks>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
-		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		public bool RunFilter(PluginData pluginData)
-		{
-			return RunFilter(pluginData, filterParameters == null);
-		}
+        /// <summary>
+        /// Executes the specified filter.
+        /// </summary>
+        /// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
+        /// <returns>
+        /// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
+        /// </returns>
+        /// <overloads>Executes the specified filter.</overloads>
+        /// <remarks>
+        /// <para>
+        /// When the <see cref="FilterParameters"/> have been set to execute a filter with settings from a previous session this method will not display the user interface.
+        /// The <see cref="RunFilter(PluginData, bool)" /> overload must be used if the host wants the filter to display its user interface.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
+        /// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+        /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+        /// <exception cref="FilterRunException">The filter returns an error.</exception>
+        public bool RunFilter(PluginData pluginData)
+        {
+            return RunFilter(pluginData, filterParameters == null);
+        }
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Executes the specified filter, optionally displaying the user interface.
-		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
-		/// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
-		/// <returns>
-		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
-		/// </returns>
-		/// <remarks>
-		/// <para>
-		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
-		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
-		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
-		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
-		/// </para>
-		/// </remarks>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
-		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
-		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Executes the specified filter, optionally displaying the user interface.
+        /// </summary>
+        /// <param name="pluginData">The <see cref="PluginData" /> of the filter to run.</param>
+        /// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
+        /// <returns>
+        /// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
+        /// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
+        /// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
+        /// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
+        /// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
+        /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+        /// <exception cref="FilterRunException">The filter returns an error.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Executes the specified filter, optionally displaying the user interface.
-		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
-		/// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
-		/// <returns>
-		/// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
-		/// </returns>
-		/// <remarks>
-		/// <para>
-		/// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
-		/// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
-		/// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
-		/// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
-		/// </para>
-		/// </remarks>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
-		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
-		/// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Executes the specified filter, optionally displaying the user interface.
+        /// </summary>
+        /// <param name="pluginData">The <see cref="PluginData"/> of the filter to run.</param>
+        /// <param name="showUI"><c>true</c> if the filter should display its user interface; otherwise, <c>false</c>.</param>
+        /// <returns>
+        /// <c>true</c> if the filter completed processing; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <paramref name="showUI"/> allows the host to control whether a filter should display its user interface when the <see cref="FilterParameters"/> have been set from a previous session.
+        /// <note type="note">An exception will be thrown if <paramref name="showUI"/> is <c>false</c> and the <c>FilterParameters</c> are <see langword="null"/>.</note>
+        /// The host should set <paramref name="showUI"/> to <c>false</c> if the filter was invoked through a 'Repeat Filter' command; otherwise, set <paramref name="showUI"/>
+        /// to <c>true</c> and the filter should display its user interface initialized to the last used settings.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="pluginData" /> is null.</exception>
+        /// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+        /// <exception cref="InvalidOperationException">The <see cref="FilterParameters"/> property is <c>null</c> (<c>Nothing</c> in Visual Basic) when running a filter without its UI.</exception>
+        /// <exception cref="ObjectDisposedException">The object has been disposed.</exception>
+        /// <exception cref="FilterRunException">The filter returns an error.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public bool RunFilter(PluginData pluginData, bool showUI)
-		{
-			if (pluginData == null)
-			{
-				throw new ArgumentNullException(nameof(pluginData));
-			}
+        public bool RunFilter(PluginData pluginData, bool showUI)
+        {
+            if (pluginData == null)
+            {
+                throw new ArgumentNullException(nameof(pluginData));
+            }
 
-			if (disposed)
-			{
-				throw new ObjectDisposedException(nameof(PSFilterHost));
-			}
+            if (disposed)
+            {
+                throw new ObjectDisposedException(nameof(PSFilterHost));
+            }
 
-			if (!showUI && filterParameters == null)
-			{
-				throw new InvalidOperationException(Resources.ParametersNotSet);
-			}
+            if (!showUI && filterParameters == null)
+            {
+                throw new InvalidOperationException(Resources.ParametersNotSet);
+            }
 
-			bool result = false;
+            bool result = false;
 
-			using (LoadPsFilter lps = new LoadPsFilter(source, primaryColor, secondaryColor, selectedRegion, owner))
-			{
-				if (abortFunc != null)
-				{
-					lps.SetAbortFunc(abortFunc);
-				}
+            using (LoadPsFilter lps = new LoadPsFilter(source, primaryColor, secondaryColor, selectedRegion, owner))
+            {
+                if (abortFunc != null)
+                {
+                    lps.SetAbortFunc(abortFunc);
+                }
 
-				if (pickColor != null)
-				{
-					lps.SetPickColor(pickColor);
-				}
+                if (pickColor != null)
+                {
+                    lps.SetPickColor(pickColor);
+                }
 
-				if (UpdateProgress != null)
-				{
-					lps.SetProgressFunc(new ProgressProc(OnFilterReportProgress));
-				}
+                if (UpdateProgress != null)
+                {
+                    lps.SetProgressFunc(new ProgressProc(OnFilterReportProgress));
+                }
 
-				if (filterParameters != null)
-				{
-					lps.ParameterData = filterParameters;
-					lps.ShowUI = showUI;
-				}
+                if (filterParameters != null)
+                {
+                    lps.ParameterData = filterParameters;
+                    lps.ShowUI = showUI;
+                }
 
-				if (pseudoResources != null)
-				{
-					lps.PseudoResources = pseudoResources;
-				}
+                if (pseudoResources != null)
+                {
+                    lps.PseudoResources = pseudoResources;
+                }
 
-				if (hostInfo != null)
-				{
-					lps.HostInformation = hostInfo;
-				}
+                if (hostInfo != null)
+                {
+                    lps.HostInformation = hostInfo;
+                }
 
-				if (hostColorProfiles != null)
-				{
-					lps.SetColorProfiles(hostColorProfiles);
-				}
+                if (hostColorProfiles != null)
+                {
+                    lps.SetColorProfiles(hostColorProfiles);
+                }
 
-				if (sessionSettings != null)
-				{
-					lps.SetPluginSettings(sessionSettings);
-				}
+                if (sessionSettings != null)
+                {
+                    lps.SetPluginSettings(sessionSettings);
+                }
 
-				try
-				{
-					result = lps.RunPlugin(pluginData);
-				}
-				catch (FileNotFoundException)
-				{
-					throw;
-				}
-				catch (SecurityException)
-				{
-					throw;
-				}
-				catch (Exception ex)
-				{
-					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
-					{
-						throw;
-					}
+                try
+                {
+                    result = lps.RunPlugin(pluginData);
+                }
+                catch (FileNotFoundException)
+                {
+                    throw;
+                }
+                catch (SecurityException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
+                    {
+                        throw;
+                    }
 
-					throw new FilterRunException(ex.Message, ex);
-				}
+                    throw new FilterRunException(ex.Message, ex);
+                }
 
-				if (result)
-				{
+                if (result)
+                {
 #if GDIPLUS
-					dest = lps.Dest.ToGdipBitmap();
+                    dest = lps.Dest.ToGdipBitmap();
 #else
-					dest = lps.Dest.ToBitmapSource();
-					dest.Freeze();
+                    dest = lps.Dest.ToBitmapSource();
+                    dest.Freeze();
 #endif
 
-					filterParameters = lps.ParameterData;
-					pseudoResources = lps.PseudoResources;
-					hostInfo = lps.HostInformation;
-					sessionSettings = lps.GetPluginSettings();
-				}
-				else if (!string.IsNullOrEmpty(lps.ErrorMessage))
-				{
-					throw new FilterRunException(lps.ErrorMessage);
-				}
-			}
+                    filterParameters = lps.ParameterData;
+                    pseudoResources = lps.PseudoResources;
+                    hostInfo = lps.HostInformation;
+                    sessionSettings = lps.GetPluginSettings();
+                }
+                else if (!string.IsNullOrEmpty(lps.ErrorMessage))
+                {
+                    throw new FilterRunException(lps.ErrorMessage);
+                }
+            }
 
-			return result;
-		}
+            return result;
+        }
 
 #if NET_40_OR_GREATER
-		/// <summary>
-		/// Displays the about box of the specified filter.
-		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
-		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		/// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
-		[SecurityCritical()]
+        /// <summary>
+        /// Displays the about box of the specified filter.
+        /// </summary>
+        /// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
+        /// <param name="parentWindowHandle">The parent window handle.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
+        /// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+        /// <exception cref="FilterRunException">The filter returns an error.</exception>
+        /// <permission cref="SecurityCriticalAttribute">requires full trust for the immediate caller. This member cannot be used by partially trusted or transparent code.</permission>
+        [SecurityCritical()]
 #else
-		/// <summary>
-		/// Displays the about box of the specified filter.
-		/// </summary>
-		/// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
-		/// <param name="parentWindowHandle">The parent window handle.</param>
-		/// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
-		/// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
-		/// <exception cref="FilterRunException">The filter returns an error.</exception>
-		/// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
-		[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        /// <summary>
+        /// Displays the about box of the specified filter.
+        /// </summary>
+        /// <param name="pluginData">The <see cref="PluginData"/> of the filter.</param>
+        /// <param name="parentWindowHandle">The parent window handle.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="pluginData"/> is null.</exception>
+        /// <exception cref="FileNotFoundException">The filter cannot be found.</exception>
+        /// <exception cref="FilterRunException">The filter returns an error.</exception>
+        /// <permission cref="SecurityPermission"> for unmanaged code permission. <para>Associated enumeration: <see cref="SecurityPermissionFlag.UnmanagedCode"/> Security action: <see cref="SecurityAction.LinkDemand"/></para></permission>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-		public static void ShowAboutDialog(PluginData pluginData, IntPtr parentWindowHandle)
-		{
-			if (pluginData == null)
-			{
-				throw new ArgumentNullException(nameof(pluginData));
-			}
+        public static void ShowAboutDialog(PluginData pluginData, IntPtr parentWindowHandle)
+        {
+            if (pluginData == null)
+            {
+                throw new ArgumentNullException(nameof(pluginData));
+            }
 
-			if (pluginData.HasAboutBox)
-			{
-				string errorMessage = string.Empty;
+            if (pluginData.HasAboutBox)
+            {
+                string errorMessage = string.Empty;
 
-				bool result;
+                bool result;
 
-				try
-				{
-					result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
-				}
-				catch (FileNotFoundException)
-				{
-					throw;
-				}
-				catch (SecurityException)
-				{
-					throw;
-				}
-				catch (Exception ex)
-				{
-					if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
-					{
-						throw;
-					}
+                try
+                {
+                    result = LoadPsFilter.ShowAboutDialog(pluginData, parentWindowHandle, out errorMessage);
+                }
+                catch (FileNotFoundException)
+                {
+                    throw;
+                }
+                catch (SecurityException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is OutOfMemoryException || ex is StackOverflowException || ex is ThreadAbortException)
+                    {
+                        throw;
+                    }
 
-					throw new FilterRunException(ex.Message, ex);
-				}
+                    throw new FilterRunException(ex.Message, ex);
+                }
 
-				if (!result && !string.IsNullOrEmpty(errorMessage))
-				{
-					throw new FilterRunException(errorMessage);
-				}
-			}
-		}
+                if (!result && !string.IsNullOrEmpty(errorMessage))
+                {
+                    throw new FilterRunException(errorMessage);
+                }
+            }
+        }
 
-		private void OnFilterReportProgress(int done, int total)
-		{
-			double progress = ((double)done / (double)total) * 100.0;
+        private void OnFilterReportProgress(int done, int total)
+        {
+            double progress = ((double)done / (double)total) * 100.0;
 
-			if (progress < 0.0)
-			{
-				progress = 0.0;
-			}
-			else if (progress > 100.0)
-			{
-				progress = 100.0;
-			}
+            if (progress < 0.0)
+            {
+                progress = 0.0;
+            }
+            else if (progress > 100.0)
+            {
+                progress = 100.0;
+            }
 
-			EventHandler<FilterProgressEventArgs> handler = UpdateProgress;
-			if (handler != null)
-			{
-				handler(this, new FilterProgressEventArgs((int)progress));
-			}
-		}
+            EventHandler<FilterProgressEventArgs> handler = UpdateProgress;
+            if (handler != null)
+            {
+                handler(this, new FilterProgressEventArgs((int)progress));
+            }
+        }
 
-		/// <summary>
-		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-		/// </summary>
-		public void Dispose()
-		{
-			if (!disposed)
-			{
-				disposed = true;
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
 
 #if GDIPLUS
-				if (source != null)
-				{
-					source.Dispose();
-					source = null;
-				}
+                if (source != null)
+                {
+                    source.Dispose();
+                    source = null;
+                }
 
-				if (dest != null)
-				{
-					dest.Dispose();
-					dest = null;
-				}
+                if (dest != null)
+                {
+                    dest.Dispose();
+                    dest = null;
+                }
 #endif
 
-				if (selectedRegion != null)
-				{
-					selectedRegion.Dispose();
-					selectedRegion = null;
-				}
-			}
-		}
-	}
+                if (selectedRegion != null)
+                {
+                    selectedRegion.Dispose();
+                    selectedRegion = null;
+                }
+            }
+        }
+    }
 }

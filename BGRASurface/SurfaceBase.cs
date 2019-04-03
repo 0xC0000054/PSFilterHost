@@ -24,302 +24,302 @@ using System.Drawing;
 
 namespace PSFilterHostDll.BGRASurface
 {
-	internal abstract class SurfaceBase : IDisposable
-	{
-		protected readonly int width;
-		protected readonly int height;
-		protected readonly long stride;
-		protected readonly double dpiX;
-		protected readonly double dpiY;
-		protected MemoryBlock scan0;
-		private readonly int bytesPerPixel;
-		private bool disposed;
+    internal abstract class SurfaceBase : IDisposable
+    {
+        protected readonly int width;
+        protected readonly int height;
+        protected readonly long stride;
+        protected readonly double dpiX;
+        protected readonly double dpiY;
+        protected MemoryBlock scan0;
+        private readonly int bytesPerPixel;
+        private bool disposed;
 
-		public int Width
-		{
-			get { return width; }
-		}
+        public int Width
+        {
+            get { return width; }
+        }
 
-		public int Height
-		{
-			get { return height; }
-		}
+        public int Height
+        {
+            get { return height; }
+        }
 
-		public unsafe MemoryBlock Scan0
-		{
-			get { return scan0; }
-		}
+        public unsafe MemoryBlock Scan0
+        {
+            get { return scan0; }
+        }
 
-		public long Stride
-		{
-			get { return stride; }
-		}
+        public long Stride
+        {
+            get { return stride; }
+        }
 
-		public Rectangle Bounds
-		{
-			get { return new Rectangle(0, 0, width, height); }
-		}
+        public Rectangle Bounds
+        {
+            get { return new Rectangle(0, 0, width, height); }
+        }
 
-		public double DpiX
-		{
-			get { return dpiX; }
-		}
+        public double DpiX
+        {
+            get { return dpiX; }
+        }
 
-		public double DpiY
-		{
-			get { return dpiY; }
-		}
+        public double DpiY
+        {
+            get { return dpiY; }
+        }
 
-		public abstract int ChannelCount
-		{
-			get;
-		}
+        public abstract int ChannelCount
+        {
+            get;
+        }
 
-		public abstract int BitsPerChannel
-		{
-			get;
-		}
+        public abstract int BitsPerChannel
+        {
+            get;
+        }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SurfaceBase"/> class.
-		/// </summary>
-		/// <param name="width">The width.</param>
-		/// <param name="height">The height.</param>
-		/// <param name="bytesPerPixel">The bytes per pixel.</param>
-		/// <param name="dpiX">The horizontal resolution of the surface.</param>
-		/// <param name="dpiY">The vertical resolution of the surface.</param>
-		public SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY)
-		{
-			this.width = width;
-			this.height = height;
-			this.bytesPerPixel = bytesPerPixel;
-			stride = width * bytesPerPixel;
-			this.dpiX = dpiX;
-			this.dpiY = dpiY;
-			scan0 = new MemoryBlock(stride * height);
-			disposed = false;
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SurfaceBase"/> class.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <param name="bytesPerPixel">The bytes per pixel.</param>
+        /// <param name="dpiX">The horizontal resolution of the surface.</param>
+        /// <param name="dpiY">The vertical resolution of the surface.</param>
+        public SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY)
+        {
+            this.width = width;
+            this.height = height;
+            this.bytesPerPixel = bytesPerPixel;
+            stride = width * bytesPerPixel;
+            this.dpiX = dpiX;
+            this.dpiY = dpiY;
+            scan0 = new MemoryBlock(stride * height);
+            disposed = false;
+        }
 
-		/// <summary>
-		/// Determines if the requested pixel coordinate is within bounds.
-		/// </summary>
-		/// <param name="x">The x coordinate.</param>
-		/// <param name="y">The y coordinate.</param>
-		/// <returns>true if (x,y) is in bounds, false if it's not.</returns>
-		public bool IsVisible(int x, int y)
-		{
-			return x >= 0 && x < width && y >= 0 && y < height;
-		}
+        /// <summary>
+        /// Determines if the requested pixel coordinate is within bounds.
+        /// </summary>
+        /// <param name="x">The x coordinate.</param>
+        /// <param name="y">The y coordinate.</param>
+        /// <returns>true if (x,y) is in bounds, false if it's not.</returns>
+        public bool IsVisible(int x, int y)
+        {
+            return x >= 0 && x < width && y >= 0 && y < height;
+        }
 
-		public void CopySurface(SurfaceBase source)
-		{
-			if (width == source.width &&
-			   height == source.height &&
-			   stride == source.stride &&
-			   (width * bytesPerPixel) == stride)
-			{
-				unsafe
-				{
-					BGRASurfaceMemory.Copy(scan0.VoidStar,
-								source.Scan0.VoidStar,
-								((ulong)(height - 1) * (ulong)stride) + ((ulong)width * (ulong)bytesPerPixel));
-				}
-			}
-			else
-			{
-				int copyWidth = Math.Min(width, source.Width);
-				int copyHeight = Math.Min(height, source.Height);
+        public void CopySurface(SurfaceBase source)
+        {
+            if (width == source.width &&
+               height == source.height &&
+               stride == source.stride &&
+               (width * bytesPerPixel) == stride)
+            {
+                unsafe
+                {
+                    BGRASurfaceMemory.Copy(scan0.VoidStar,
+                                source.Scan0.VoidStar,
+                                ((ulong)(height - 1) * (ulong)stride) + ((ulong)width * (ulong)bytesPerPixel));
+                }
+            }
+            else
+            {
+                int copyWidth = Math.Min(width, source.Width);
+                int copyHeight = Math.Min(height, source.Height);
 
-				unsafe
-				{
-					for (int y = 0; y < copyHeight; ++y)
-					{
-						BGRASurfaceMemory.Copy(GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)bytesPerPixel);
-					}
-				}
-			}
-		}
+                unsafe
+                {
+                    for (int y = 0; y < copyHeight; ++y)
+                    {
+                        BGRASurfaceMemory.Copy(GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)bytesPerPixel);
+                    }
+                }
+            }
+        }
 
-		/// <summary>
-		/// Creates a lookup table for mapping the 16-bit pixel data from [0, 65535] to the internal 16 bit range used by Adobe(R) Photoshop(R).
-		/// </summary>
-		/// <returns>The resulting lookup table.</returns>
-		protected static ushort[] CreatePhotoshopRangeLookupTable()
-		{
-			ushort[] table = new ushort[65536];
+        /// <summary>
+        /// Creates a lookup table for mapping the 16-bit pixel data from [0, 65535] to the internal 16 bit range used by Adobe(R) Photoshop(R).
+        /// </summary>
+        /// <returns>The resulting lookup table.</returns>
+        protected static ushort[] CreatePhotoshopRangeLookupTable()
+        {
+            ushort[] table = new ushort[65536];
 
-			// According to the Photoshop SDK 16-bit image data is stored in the range of [0, 32768].
-			for (int i = 0; i < table.Length; i++)
-			{
-				table[i] = (ushort)(((i * 32768) + 32767) / 65535);
-			}
+            // According to the Photoshop SDK 16-bit image data is stored in the range of [0, 32768].
+            for (int i = 0; i < table.Length; i++)
+            {
+                table[i] = (ushort)(((i * 32768) + 32767) / 65535);
+            }
 
-			return table;
-		}
+            return table;
+        }
 
-		/// <summary>
-		/// Normalizes the 16-bit image data to [0, 65535] from the internal 16 bit range used by Adobe(R) Photoshop(R).
-		/// </summary>
-		/// <param name="x">The value to normalize.</param>
-		/// <returns>The normalized value.</returns>
-		protected static ushort Fix16BitRange(ushort x)
-		{
-			int value = x * 2; // double the value and clamp between 0 and 65535.
+        /// <summary>
+        /// Normalizes the 16-bit image data to [0, 65535] from the internal 16 bit range used by Adobe(R) Photoshop(R).
+        /// </summary>
+        /// <param name="x">The value to normalize.</param>
+        /// <returns>The normalized value.</returns>
+        protected static ushort Fix16BitRange(ushort x)
+        {
+            int value = x * 2; // double the value and clamp between 0 and 65535.
 
-			if (value < 0)
-			{
-				return 0;
-			}
+            if (value < 0)
+            {
+                return 0;
+            }
 
-			if (value > 65535)
-			{
-				return 65535;
-			}
+            if (value > 65535)
+            {
+                return 65535;
+            }
 
-			return (ushort)value;
-		}
+            return (ushort)value;
+        }
 
-		public abstract unsafe Bitmap ToGdipBitmap();
+        public abstract unsafe Bitmap ToGdipBitmap();
 #if !GDIPLUS
-		public abstract unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
+        public abstract unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
 #endif
-		public unsafe byte* GetRowAddressUnchecked(int y)
-		{
-			return ((byte*)scan0.VoidStar + (y * stride));
-		}
+        public unsafe byte* GetRowAddressUnchecked(int y)
+        {
+            return ((byte*)scan0.VoidStar + (y * stride));
+        }
 
-		public unsafe byte* GetPointAddress(int x, int y)
-		{
-			if (x < 0 || y < 0 || x >= width || y >= Height)
-			{
-				throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(width - 1, height - 1).ToString());
-			}
+        public unsafe byte* GetPointAddress(int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= width || y >= Height)
+            {
+                throw new ArgumentOutOfRangeException("(x,y)", new Point(x, y), "Coordinates out of range, max=" + new Size(width - 1, height - 1).ToString());
+            }
 
-			return GetPointAddressUnchecked(x, y);
-		}
+            return GetPointAddressUnchecked(x, y);
+        }
 
-		public unsafe byte* GetPointAddressUnchecked(int x, int y)
-		{
-			return (((byte*)scan0.VoidStar + (y * stride)) + (x * bytesPerPixel));
-		}
+        public unsafe byte* GetPointAddressUnchecked(int x, int y)
+        {
+            return (((byte*)scan0.VoidStar + (y * stride)) + (x * bytesPerPixel));
+        }
 
-		/// <summary>
-		/// Fits the source surface to this surface using bicubic interpolation.
-		/// </summary>
-		/// <param name="source">The Surface to read pixels from.</param>
-		/// <remarks>
-		/// This method was implemented with correctness, not performance, in mind.
-		/// Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
-		///           http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
-		/// </remarks>
-		public void BicubicFitSurface(SurfaceBase source)
-		{
-			float leftF = (1 * (float)(width - 1)) / (float)(source.width - 1);
-			float topF = (1 * (height - 1)) / (float)(source.height - 1);
-			float rightF = ((float)(source.width - 3) * (float)(width - 1)) / (float)(source.width - 1);
-			float bottomF = ((float)(source.Height - 3) * (float)(height - 1)) / (float)(source.height - 1);
+        /// <summary>
+        /// Fits the source surface to this surface using bicubic interpolation.
+        /// </summary>
+        /// <param name="source">The Surface to read pixels from.</param>
+        /// <remarks>
+        /// This method was implemented with correctness, not performance, in mind.
+        /// Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
+        ///           http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
+        /// </remarks>
+        public void BicubicFitSurface(SurfaceBase source)
+        {
+            float leftF = (1 * (float)(width - 1)) / (float)(source.width - 1);
+            float topF = (1 * (height - 1)) / (float)(source.height - 1);
+            float rightF = ((float)(source.width - 3) * (float)(width - 1)) / (float)(source.width - 1);
+            float bottomF = ((float)(source.Height - 3) * (float)(height - 1)) / (float)(source.height - 1);
 
-			int left = (int)Math.Ceiling((double)leftF);
-			int top = (int)Math.Ceiling((double)topF);
-			int right = (int)Math.Floor((double)rightF);
-			int bottom = (int)Math.Floor((double)bottomF);
+            int left = (int)Math.Ceiling((double)leftF);
+            int top = (int)Math.Ceiling((double)topF);
+            int right = (int)Math.Floor((double)rightF);
+            int bottom = (int)Math.Floor((double)bottomF);
 
-			Rectangle[] rois = new Rectangle[] {
-												   Rectangle.FromLTRB(left, top, right, bottom),
-												   new Rectangle(0, 0, width, top),
-												   new Rectangle(0, top, left, height - top),
-												   new Rectangle(right, top, width - right, height - top),
-												   new Rectangle(left, bottom, right - left, height - bottom)
-											   };
-			Rectangle dstRoi = Bounds;
-			for (int i = 0; i < rois.Length; ++i)
-			{
-				rois[i].Intersect(dstRoi);
+            Rectangle[] rois = new Rectangle[] {
+                                                   Rectangle.FromLTRB(left, top, right, bottom),
+                                                   new Rectangle(0, 0, width, top),
+                                                   new Rectangle(0, top, left, height - top),
+                                                   new Rectangle(right, top, width - right, height - top),
+                                                   new Rectangle(left, bottom, right - left, height - bottom)
+                                               };
+            Rectangle dstRoi = Bounds;
+            for (int i = 0; i < rois.Length; ++i)
+            {
+                rois[i].Intersect(dstRoi);
 
-				if (rois[i].Width > 0 && rois[i].Height > 0)
-				{
-					if (i == 0)
-					{
-						BicubicFitSurfaceUnchecked(source, rois[i]);
-					}
-					else
-					{
-						BicubicFitSurfaceChecked(source, rois[i]);
-					}
-				}
-			}
-		}
+                if (rois[i].Width > 0 && rois[i].Height > 0)
+                {
+                    if (i == 0)
+                    {
+                        BicubicFitSurfaceUnchecked(source, rois[i]);
+                    }
+                    else
+                    {
+                        BicubicFitSurfaceChecked(source, rois[i]);
+                    }
+                }
+            }
+        }
 
-		protected static double CubeClamped(double x)
-		{
-			if (x >= 0)
-			{
-				return x * x * x;
-			}
-			else
-			{
-				return 0;
-			}
-		}
+        protected static double CubeClamped(double x)
+        {
+            if (x >= 0)
+            {
+                return x * x * x;
+            }
+            else
+            {
+                return 0;
+            }
+        }
 
-		/// <summary>
-		/// Implements R() as defined at http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
-		/// </summary>
-		protected static double R(double x)
-		{
-			return (CubeClamped(x + 2) - (4 * CubeClamped(x + 1)) + (6 * CubeClamped(x)) - (4 * CubeClamped(x - 1))) / 6;
-		}
+        /// <summary>
+        /// Implements R() as defined at http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
+        /// </summary>
+        protected static double R(double x)
+        {
+            return (CubeClamped(x + 2) - (4 * CubeClamped(x + 1)) + (6 * CubeClamped(x)) - (4 * CubeClamped(x - 1))) / 6;
+        }
 
-		protected abstract unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
-		protected abstract unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
+        protected abstract unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
+        protected abstract unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
 
-		public abstract unsafe void SuperSampleFitSurface(SurfaceBase source);
+        public abstract unsafe void SuperSampleFitSurface(SurfaceBase source);
 
-		public virtual unsafe bool HasTransparency()
-		{
-			return false;
-		}
+        public virtual unsafe bool HasTransparency()
+        {
+            return false;
+        }
 
-		public void SetAlphaToOpaque()
-		{
-			SetAlphaToOpaqueImpl(Bounds);
-		}
+        public void SetAlphaToOpaque()
+        {
+            SetAlphaToOpaqueImpl(Bounds);
+        }
 
-		public void SetAlphaToOpaque(Rectangle[] scans)
-		{
-			if (scans == null)
-			{
-				throw new ArgumentNullException(nameof(scans));
-			}
+        public void SetAlphaToOpaque(Rectangle[] scans)
+        {
+            if (scans == null)
+            {
+                throw new ArgumentNullException(nameof(scans));
+            }
 
-			for (int i = 0; i < scans.Length; i++)
-			{
-				SetAlphaToOpaqueImpl(scans[i]);
-			}
-		}
+            for (int i = 0; i < scans.Length; i++)
+            {
+                SetAlphaToOpaqueImpl(scans[i]);
+            }
+        }
 
-		protected virtual unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
-		{
+        protected virtual unsafe void SetAlphaToOpaqueImpl(Rectangle rect)
+        {
 
-		}
+        }
 
-		private void Dispose(bool disposing)
-		{
-			if (!disposed && disposing)
-			{
-				disposed = true;
-				if (scan0 != null)
-				{
-					scan0.Dispose();
-					scan0 = null;
-				}
-			}
-		}
+        private void Dispose(bool disposing)
+        {
+            if (!disposed && disposing)
+            {
+                disposed = true;
+                if (scan0 != null)
+                {
+                    scan0.Dispose();
+                    scan0 = null;
+                }
+            }
+        }
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-	}
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+    }
 }

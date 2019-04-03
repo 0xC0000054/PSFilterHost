@@ -69,9 +69,9 @@ namespace PaintDotNet
             double max;
             double delta;
 
-            double r = (double) Red / 255;
-            double g = (double) Green / 255;
-            double b = (double) Blue / 255;
+            double r = (double)Red / 255;
+            double g = (double)Green / 255;
+            double b = (double)Blue / 255;
 
             double h;
             double s;
@@ -124,7 +124,7 @@ namespace PaintDotNet
             return new HsvColor((int)h, (int)(s * 100), (int)(v * 100));
         }
 
-        public override string  ToString()
+        public override string ToString()
         {
             return String.Format("({0}, {1}, {2})", Red, Green, Blue);
         }

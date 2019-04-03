@@ -76,7 +76,7 @@ namespace PSFilterHostDll
             }
 
             globalParameters = (GlobalParameters)info.GetValue("globalParameters", typeof(GlobalParameters));
-            scriptingData =  (Dictionary<uint, AETEValue>)info.GetValue("scriptingData", typeof(Dictionary<uint, AETEValue>));
+            scriptingData = (Dictionary<uint, AETEValue>)info.GetValue("scriptingData", typeof(Dictionary<uint, AETEValue>));
         }
 
         /// <summary>

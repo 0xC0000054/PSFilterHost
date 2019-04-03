@@ -15,18 +15,18 @@ using System.Collections.ObjectModel;
 
 namespace PSFilterHostDll
 {
-	/// <summary>
-	/// A collection containing the results of searching a directory for filters.
-	/// </summary>
-	/// <threadsafety static="true" instance="false" />
-	public sealed class FilterCollection : ReadOnlyCollection<PluginData>
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FilterCollection"/> class.
-		/// </summary>
-		/// <param name="pluginData">The data.</param>
-		internal FilterCollection(IEnumerable<PluginData> pluginData) : base(new List<PluginData>(pluginData))
-		{
-		}
-	}
+    /// <summary>
+    /// A collection containing the results of searching a directory for filters.
+    /// </summary>
+    /// <threadsafety static="true" instance="false" />
+    public sealed class FilterCollection : ReadOnlyCollection<PluginData>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FilterCollection"/> class.
+        /// </summary>
+        /// <param name="pluginData">The data.</param>
+        internal FilterCollection(IEnumerable<PluginData> pluginData) : base(new List<PluginData>(pluginData))
+        {
+        }
+    }
 }

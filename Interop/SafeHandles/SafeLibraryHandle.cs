@@ -23,25 +23,25 @@ using System.Security.Permissions;
 namespace PSFilterHostDll.Interop
 {
 #if NET_40_OR_GREATER
-	[System.Security.SecurityCritical()]
+    [System.Security.SecurityCritical()]
 #else
-	[SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+    [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
 #endif
-	internal sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
-	{
-		/// <summary>
-		/// Create safe library handle
-		/// </summary>
-		private SafeLibraryHandle() : base(true) { }
+    internal sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
+    {
+        /// <summary>
+        /// Create safe library handle
+        /// </summary>
+        private SafeLibraryHandle() : base(true) { }
 
-		/// <summary>
-		/// Release handle
-		/// </summary>
-		protected override bool ReleaseHandle()
-		{
-			return UnsafeNativeMethods.FreeLibrary(handle);
-		}
-	}
+        /// <summary>
+        /// Release handle
+        /// </summary>
+        protected override bool ReleaseHandle()
+        {
+            return UnsafeNativeMethods.FreeLibrary(handle);
+        }
+    }
 }
 
 

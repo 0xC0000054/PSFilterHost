@@ -15,147 +15,147 @@ using System.Runtime.Serialization;
 
 namespace PSFilterHostDll
 {
-	/// <summary>
-	/// The class that encapsulates an AETE scripting parameter.
-	/// </summary>
-	[Serializable]
-	internal sealed class AETEValue
-	{
-		private uint type;
-		private int flags;
-		private int size;
-		private object value;
+    /// <summary>
+    /// The class that encapsulates an AETE scripting parameter.
+    /// </summary>
+    [Serializable]
+    internal sealed class AETEValue
+    {
+        private uint type;
+        private int flags;
+        private int size;
+        private object value;
 
-		/// <summary>
-		/// Gets the type of data.
-		/// </summary>
-		public uint Type
-		{
-			get
-			{
-				return type;
-			}
-		}
+        /// <summary>
+        /// Gets the type of data.
+        /// </summary>
+        public uint Type
+        {
+            get
+            {
+                return type;
+            }
+        }
 
-		/// <summary>
-		/// Gets the flags.
-		/// </summary>
-		public int Flags
-		{
-			get
-			{
-				return flags;
-			}
-		}
+        /// <summary>
+        /// Gets the flags.
+        /// </summary>
+        public int Flags
+        {
+            get
+            {
+                return flags;
+            }
+        }
 
-		/// <summary>
-		/// Gets the size.
-		/// </summary>
-		public int Size
-		{
-			get
-			{
-				return size;
-			}
-		}
+        /// <summary>
+        /// Gets the size.
+        /// </summary>
+        public int Size
+        {
+            get
+            {
+                return size;
+            }
+        }
 
-		/// <summary>
-		/// Gets the value.
-		/// </summary>
-		public object Value
-		{
-			get
-			{
-				return value;
-			}
-		}
+        /// <summary>
+        /// Gets the value.
+        /// </summary>
+        public object Value
+        {
+            get
+            {
+                return value;
+            }
+        }
 
-		internal AETEValue(uint type, int flags, int size, object value)
-		{
-			this.type = type;
-			this.flags = flags;
-			this.size = size;
-			this.value = value;
-		}
-	}
+        internal AETEValue(uint type, int flags, int size, object value)
+        {
+            this.type = type;
+            this.flags = flags;
+            this.size = size;
+            this.value = value;
+        }
+    }
 
-	[Serializable]
-	internal sealed class UnitFloat : ISerializable
-	{
-		private readonly uint unit;
-		private readonly double value;
+    [Serializable]
+    internal sealed class UnitFloat : ISerializable
+    {
+        private readonly uint unit;
+        private readonly double value;
 
-		public uint Unit
-		{
-			get
-			{
-				return unit;
-			}
-		}
+        public uint Unit
+        {
+            get
+            {
+                return unit;
+            }
+        }
 
-		public double Value
-		{
-			get
-			{
-				return value;
-			}
-		}
+        public double Value
+        {
+            get
+            {
+                return value;
+            }
+        }
 
-		public UnitFloat(uint unit, double value)
-		{
-			this.unit = unit;
-			this.value = value;
-		}
+        public UnitFloat(uint unit, double value)
+        {
+            this.unit = unit;
+            this.value = value;
+        }
 
-		private UnitFloat(SerializationInfo info, StreamingContext context)
-		{
-			if (info == null)
-			{
-				throw new ArgumentNullException(nameof(info));
-			}
+        private UnitFloat(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
 
-			unit = info.GetUInt32("unit");
-			value = info.GetDouble("value");
-		}
+            unit = info.GetUInt32("unit");
+            value = info.GetDouble("value");
+        }
 
-		void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-		{
-			if (info == null)
-			{
-				throw new ArgumentNullException(nameof(info));
-			}
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null)
+            {
+                throw new ArgumentNullException(nameof(info));
+            }
 
-			info.AddValue("unit", unit);
-			info.AddValue("value", value);
-		}
-	}
+            info.AddValue("unit", unit);
+            info.AddValue("value", value);
+        }
+    }
 
-	[Serializable]
-	internal sealed class EnumeratedValue
-	{
-		private readonly uint type;
-		private readonly uint value;
+    [Serializable]
+    internal sealed class EnumeratedValue
+    {
+        private readonly uint type;
+        private readonly uint value;
 
-		public uint Type
-		{
-			get
-			{
-				return type;
-			}
-		}
+        public uint Type
+        {
+            get
+            {
+                return type;
+            }
+        }
 
-		public uint Value
-		{
-			get
-			{
-				return value;
-			}
-		}
+        public uint Value
+        {
+            get
+            {
+                return value;
+            }
+        }
 
-		public EnumeratedValue(uint type, uint value)
-		{
-			this.type = type;
-			this.value = value;
-		}
-	}
+        public EnumeratedValue(uint type, uint value)
+        {
+            this.type = type;
+            this.value = value;
+        }
+    }
 }

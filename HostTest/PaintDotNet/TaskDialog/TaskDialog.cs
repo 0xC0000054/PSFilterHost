@@ -297,7 +297,7 @@ namespace HostTest
                 this.auxButton.FlatStyle = FlatStyle.System;
                 this.auxButton.Visible = false;
                 this.auxButton.Click +=
-                    delegate(object sender, EventArgs e)
+                    delegate (object sender, EventArgs e)
                     {
                         OnAuxButtonClick();
                     };
