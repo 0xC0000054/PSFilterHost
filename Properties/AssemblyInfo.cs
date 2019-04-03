@@ -4,7 +4,7 @@
 // https://github.com/0xC0000054/PSFilterHost
 //
 // This software is provided under the Microsoft Public License:
-//   Copyright (C) 2012-2018 Nicholas Hayes
+//   Copyright (C) 2012-2019 Nicholas Hayes
 //
 // See LICENSE.txt for complete licensing and attribution information.
 //
@@ -21,7 +21,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("PSFilterHost Team")]
 [assembly: AssemblyProduct("PSFilterHost Library")]
-[assembly: AssemblyCopyright("Copyright © 2012-2018 Nicholas Hayes")]
+[assembly: AssemblyCopyright("Copyright © 2012-2019 Nicholas Hayes")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -67,7 +67,7 @@
     <WorkingPath />
     <BuildAssemblerVerbosity>OnlyWarningsAndErrors</BuildAssemblerVerbosity>
     <FooterText>&amp;lt%3bi&amp;gt%3b&amp;lt%3bfont size=&amp;quot%3b1&amp;quot%3b color=&amp;quot%3b#808080&amp;quot%3b&amp;gt%3bAdobe and Photoshop are either registered trademarks or trademarks of Adobe Systems Incorporated in the United States and/or other countries.&amp;lt%3b/font&amp;gt%3b&amp;lt%3b/i&amp;gt%3b&amp;lt%3bbr/&amp;gt%3b</FooterText>
-    <CopyrightText>Copyright \xA9 2012-2018 Nicholas Hayes</CopyrightText>
+    <CopyrightText>Copyright \xA9 2012-2019 Nicholas Hayes</CopyrightText>
     <CopyrightHref>http://psfilterhost.codeplex.com</CopyrightHref>
     <HeaderText>
     </HeaderText>
