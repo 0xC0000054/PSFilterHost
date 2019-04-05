@@ -89,12 +89,6 @@ namespace PSFilterHostDll.PSApi
             // TODO: CMYK and XYZ conversions are different than Photoshop
             if (sourceSpace != resultSpace)
             {
-                if (resultSpace == ColorSpace.ChosenSpace)
-                {
-                    resultSpace = sourceSpace;
-                    return PSError.noErr;
-                }
-
                 if (resultSpace < ColorSpace.RGBSpace || resultSpace > ColorSpace.XYZSpace)
                 {
                     return PSError.paramErr;
@@ -228,12 +222,6 @@ namespace PSFilterHostDll.PSApi
 
             if (sourceSpace != resultSpace)
             {
-                if (resultSpace == ColorSpace.ChosenSpace)
-                {
-                    resultSpace = sourceSpace;
-                    return PSError.kSPNoError;
-                }
-
                 if (resultSpace < ColorSpace.RGBSpace || resultSpace > ColorSpace.XYZSpace)
                 {
                     return PSError.kSPBadParameterError;
