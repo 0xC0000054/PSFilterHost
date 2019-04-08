@@ -475,8 +475,8 @@ namespace HostTest
                         {
                             Children = new TransformCollection(2)
                                 {
-									// Rotate 90 degrees clockwise and flip horizontally.
-									new RotateTransform(90),
+                                    // Rotate 90 degrees clockwise and flip horizontally.
+                                    new RotateTransform(90),
                                     new ScaleTransform { ScaleX = -1 }
                                 }
                         };
