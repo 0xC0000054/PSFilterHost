@@ -15,7 +15,7 @@ using System.Windows.Forms;
 
 namespace HostTest.Tools
 {
-    class CursorChangedEventArgs : EventArgs, IDisposable
+    internal class CursorChangedEventArgs : EventArgs, IDisposable
     {
         private Cursor cursor;
         public CursorChangedEventArgs(Cursor newCursor)

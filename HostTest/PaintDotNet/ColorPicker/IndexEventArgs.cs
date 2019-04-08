@@ -17,7 +17,7 @@ namespace PaintDotNet
     internal sealed class IndexEventArgs
         : EventArgs
     {
-        int index;
+        private int index;
 
         public int Index
         {

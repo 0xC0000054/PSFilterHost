@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace PaintDotNet
 {
-    static class Utility
+    internal static class Utility
     {
         public static int Clamp(int x, int min, int max)
         {

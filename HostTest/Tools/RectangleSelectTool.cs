@@ -16,7 +16,7 @@ namespace HostTest.Tools
     /// The rectangle selection tool class.
     /// </summary>
     [System.Serializable]
-    class RectangleSelectTool : SelectionBase
+    internal class RectangleSelectTool : SelectionBase
     {
         public RectangleSelectTool() : base()
         {

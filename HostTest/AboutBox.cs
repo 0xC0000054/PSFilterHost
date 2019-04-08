@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace HostTest
 {
-    partial class AboutBox : Form
+    internal partial class AboutBox : Form
     {
         public AboutBox()
         {

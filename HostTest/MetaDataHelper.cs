@@ -973,7 +973,7 @@ namespace HostTest
 
         private static class TiffReader
         {
-            enum DataType : ushort
+            private enum DataType : ushort
             {
                 Byte = 1,
                 Ascii = 2,
@@ -989,7 +989,7 @@ namespace HostTest
                 Double = 12
             }
 
-            struct IFD
+            private struct IFD
             {
                 public readonly ushort tag;
                 public readonly DataType type;

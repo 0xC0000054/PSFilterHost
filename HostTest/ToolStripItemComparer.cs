@@ -16,7 +16,7 @@ using System.Windows.Forms;
 
 namespace HostTest
 {
-    class ToolStripItemComparer : IComparer<ToolStripItem>
+    internal class ToolStripItemComparer : IComparer<ToolStripItem>
     {
         public int Compare(ToolStripItem x, ToolStripItem y)
         {

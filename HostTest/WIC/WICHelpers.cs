@@ -25,7 +25,8 @@ namespace HostTest
     internal static class WICHelpers
     {
         private static readonly char[] SplitChars = new char[] { ' ', ',' };
-        delegate uint GetStringMethod(uint cch, StringBuilder wz);
+
+        private delegate uint GetStringMethod(uint cch, StringBuilder wz);
 
         private static string GetString(GetStringMethod method)
         {

@@ -16,7 +16,7 @@ using System.Text;
 
 namespace PSFilterHostDll.Interop
 {
-    static class NativeInterfaces
+    internal static class NativeInterfaces
     {
         /// <summary>The IShellLink interface allows Shell links to be created, modified, and resolved</summary>
         [ComImport(), Guid(NativeConstants.IID_IShellLinkW), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

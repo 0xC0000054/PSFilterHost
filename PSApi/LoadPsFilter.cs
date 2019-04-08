@@ -38,7 +38,7 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class LoadPsFilter : IDisposable, IFilterImageProvider, IPICASuiteDataProvider
     {
-        static bool RectNonEmpty(Rect16 rect)
+        private static bool RectNonEmpty(Rect16 rect)
         {
             return (rect.left < rect.right && rect.top < rect.bottom);
         }

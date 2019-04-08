@@ -18,7 +18,7 @@ namespace PSFilterHostDll
 {
     internal sealed class EnableInfoParser
     {
-        enum TokenType
+        private enum TokenType
         {
             None,
             InFunction,
@@ -31,7 +31,7 @@ namespace PSFilterHostDll
             RParen
         }
 
-        class Token
+        private class Token
         {
             public string value;
             public int intValue;

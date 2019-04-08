@@ -12,7 +12,7 @@
 
 namespace PSFilterHostDll.PSApi
 {
-    interface IPropertySuite
+    internal interface IPropertySuite
     {
         /// <summary>
         /// Creates the property suite structure.

@@ -19,8 +19,8 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
         [StructLayout(LayoutKind.Sequential)]
         public struct CY
         {
-            uint Lo;
-            long Hi;
+            private uint Lo;
+            private long Hi;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -521,7 +521,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             }
         }
 
-        static string[] GetArrayOfStrings(IntPtr ptr, int count, Converter<IntPtr, string> converter)
+        private static string[] GetArrayOfStrings(IntPtr ptr, int count, Converter<IntPtr, string> converter)
         {
             return Array.ConvertAll<IntPtr, string>(ToArrayOf<IntPtr>(ptr, count), converter);
         }

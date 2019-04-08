@@ -15,7 +15,7 @@ namespace HostTest
     /// <summary>
     /// The enum that defines the possible states of a HistoryItem.
     /// </summary>
-    enum HistoryItemState
+    internal enum HistoryItemState
     {
         Disk,
         Memory,
