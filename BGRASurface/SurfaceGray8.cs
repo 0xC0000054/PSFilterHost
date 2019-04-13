@@ -37,21 +37,9 @@ namespace PSFilterHostDll.BGRASurface
         {
         }
 
-        public override int ChannelCount
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        public override int ChannelCount => 1;
 
-        public override int BitsPerChannel
-        {
-            get
-            {
-                return 8;
-            }
-        }
+        public override int BitsPerChannel => 8;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
                     "Microsoft.Design",

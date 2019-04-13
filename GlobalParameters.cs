@@ -63,14 +63,8 @@ namespace PSFilterHostDll
         /// </value>
         internal DataStorageMethod ParameterDataStorageMethod
         {
-            get
-            {
-                return parameterDataStorageMethod;
-            }
-            set
-            {
-                parameterDataStorageMethod = value;
-            }
+            get => parameterDataStorageMethod;
+            set => parameterDataStorageMethod = value;
         }
 
         /// <summary>
@@ -81,14 +75,8 @@ namespace PSFilterHostDll
         /// </value>
         internal bool ParameterDataExecutable
         {
-            get
-            {
-                return parameterDataExecutable;
-            }
-            set
-            {
-                parameterDataExecutable = value;
-            }
+            get => parameterDataExecutable;
+            set => parameterDataExecutable = value;
         }
 
         /// <summary>
@@ -117,14 +105,8 @@ namespace PSFilterHostDll
         /// </value>
         internal DataStorageMethod PluginDataStorageMethod
         {
-            get
-            {
-                return pluginDataStorageMethod;
-            }
-            set
-            {
-                pluginDataStorageMethod = value;
-            }
+            get => pluginDataStorageMethod;
+            set => pluginDataStorageMethod = value;
         }
 
         /// <summary>
@@ -135,14 +117,8 @@ namespace PSFilterHostDll
         /// </value>
         internal bool PluginDataExecutable
         {
-            get
-            {
-                return pluginDataExecutable;
-            }
-            set
-            {
-                pluginDataExecutable = value;
-            }
+            get => pluginDataExecutable;
+            set => pluginDataExecutable = value;
         }
 
         /// <summary>

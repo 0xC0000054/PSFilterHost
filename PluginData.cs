@@ -44,82 +44,40 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the filename of the filter.
         /// </summary>
-        public string FileName
-        {
-            get
-            {
-                return fileName;
-            }
-        }
+        public string FileName => fileName;
 
         /// <summary>
         /// Gets the entry point of the filter.
         /// </summary>
-        public string EntryPoint
-        {
-            get
-            {
-                return entryPoint;
-            }
-        }
+        public string EntryPoint => entryPoint;
 
         /// <summary>
         /// Gets the category of the filter.
         /// </summary>
-        public string Category
-        {
-            get
-            {
-                return category;
-            }
-        }
+        public string Category => category;
 
         /// <summary>
         /// Gets the title of the filter.
         /// </summary>
-        public string Title
-        {
-            get
-            {
-                return title;
-            }
-        }
+        public string Title => title;
 
         /// <summary>
         /// Gets the filter information that describes how images with transparency should be processed.
         /// </summary>
-        internal FilterCaseInfo[] FilterInfo
-        {
-            get
-            {
-                return filterInfo;
-            }
-        }
+        internal FilterCaseInfo[] FilterInfo => filterInfo;
 
         /// <summary>
         /// Gets the scripting information used by the plug-in.
         /// </summary>
-        internal PluginAETE Aete
-        {
-            get
-            {
-                return aete;
-            }
-        }
+        internal PluginAETE Aete => aete;
 
         /// <summary>
         /// Gets or sets the entry points used to show the about box for a module containing multiple plug-ins.
         /// </summary>
         internal string[] ModuleEntryPoints
         {
-            get
-            {
-                return moduleEntryPoints;
-            }
-            set
-            {
-                moduleEntryPoints = value;
-            }
+            get => moduleEntryPoints;
+            set => moduleEntryPoints = value;
         }
 
         /// <summary>
@@ -128,13 +86,7 @@ namespace PSFilterHostDll
         /// <value>
         /// 	<c>true</c> if this filter has an about box; otherwise, <c>false</c>.
         /// </value>
-        public bool HasAboutBox
-        {
-            get
-            {
-                return hasAboutBox;
-            }
-        }
+        public bool HasAboutBox => hasAboutBox;
 
 #if !GDIPLUS
         /// <summary>
@@ -399,45 +351,15 @@ namespace PSFilterHostDll
                 this.pluginData = pluginData;
             }
 
-            public string FileName
-            {
-                get
-                {
-                    return pluginData.FileName;
-                }
-            }
+            public string FileName => pluginData.FileName;
 
-            public string EntryPoint
-            {
-                get
-                {
-                    return pluginData.EntryPoint;
-                }
-            }
+            public string EntryPoint => pluginData.EntryPoint;
 
-            public string Category
-            {
-                get
-                {
-                    return pluginData.Category;
-                }
-            }
+            public string Category => pluginData.Category;
 
-            public string Title
-            {
-                get
-                {
-                    return pluginData.Title;
-                }
-            }
+            public string Title => pluginData.Title;
 
-            public bool HasAboutBox
-            {
-                get
-                {
-                    return pluginData.HasAboutBox;
-                }
-            }
+            public bool HasAboutBox => pluginData.HasAboutBox;
         }
     }
 }

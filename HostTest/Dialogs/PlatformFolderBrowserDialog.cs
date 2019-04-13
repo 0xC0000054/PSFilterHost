@@ -78,14 +78,8 @@ namespace HostTest
         [Localizable(true)]
         public string ClassicFolderBrowserDescription
         {
-            get
-            {
-                return classicFolderBrowserDescription == null ? string.Empty : classicFolderBrowserDescription;
-            }
-            set
-            {
-                classicFolderBrowserDescription = value;
-            }
+            get => classicFolderBrowserDescription == null ? string.Empty : classicFolderBrowserDescription;
+            set => classicFolderBrowserDescription = value;
         }
 
         /// <summary>
@@ -104,14 +98,8 @@ namespace HostTest
         [Localizable(true)]
         public string VistaFolderBrowserTitle
         {
-            get
-            {
-                return vistaFolderBrowserTitle == null ? string.Empty : vistaFolderBrowserTitle;
-            }
-            set
-            {
-                vistaFolderBrowserTitle = value;
-            }
+            get => vistaFolderBrowserTitle == null ? string.Empty : vistaFolderBrowserTitle;
+            set => vistaFolderBrowserTitle = value;
         }
 
         /// <summary>
@@ -130,10 +118,7 @@ namespace HostTest
         [Localizable(false)]
         public Environment.SpecialFolder RootFolder
         {
-            get
-            {
-                return rootFolder;
-            }
+            get => rootFolder;
             set
             {
                 if (!Enum.IsDefined(typeof(Environment.SpecialFolder), value))
@@ -158,14 +143,8 @@ namespace HostTest
         [Localizable(false)]
         public string SelectedPath
         {
-            get
-            {
-                return selectedPath == null ? string.Empty : selectedPath;
-            }
-            set
-            {
-                selectedPath = value;
-            }
+            get => selectedPath == null ? string.Empty : selectedPath;
+            set => selectedPath = value;
         }
 
         /// <summary>

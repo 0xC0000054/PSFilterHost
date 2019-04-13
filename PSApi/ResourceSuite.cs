@@ -35,10 +35,7 @@ namespace PSFilterHostDll.PSApi
 
         public PseudoResourceCollection PseudoResources
         {
-            get
-            {
-                return new PseudoResourceCollection(pseudoResources);
-            }
+            get => new PseudoResourceCollection(pseudoResources);
             set
             {
                 if (value == null)

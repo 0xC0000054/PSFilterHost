@@ -83,14 +83,8 @@ namespace HostTest
         [Localizable(true)]
         public string Title
         {
-            get
-            {
-                return title == null ? string.Empty : title;
-            }
-            set
-            {
-                title = value;
-            }
+            get => title == null ? string.Empty : title;
+            set => title = value;
         }
 
         /// <summary>
@@ -105,14 +99,8 @@ namespace HostTest
         [Localizable(false)]
         public string DefaultFolder
         {
-            get
-            {
-                return defaultFolder == null ? string.Empty : defaultFolder;
-            }
-            set
-            {
-                defaultFolder = value;
-            }
+            get => defaultFolder == null ? string.Empty : defaultFolder;
+            set => defaultFolder = value;
         }
 
         /// <summary>
@@ -127,14 +115,8 @@ namespace HostTest
         [Localizable(false)]
         public string SelectedPath
         {
-            get
-            {
-                return selectedPath == null ? string.Empty : selectedPath;
-            }
-            set
-            {
-                selectedPath = value;
-            }
+            get => selectedPath == null ? string.Empty : selectedPath;
+            set => selectedPath = value;
         }
 
         /// <summary>
@@ -149,14 +131,8 @@ namespace HostTest
         [Localizable(false)]
         public bool AddToRecentDocuments
         {
-            get
-            {
-                return addToRecentDocuments;
-            }
-            set
-            {
-                addToRecentDocuments = value;
-            }
+            get => addToRecentDocuments;
+            set => addToRecentDocuments = value;
         }
 
         private static bool CreateShellItemFromPath(string path, out NativeInterfaces.IShellItem item)

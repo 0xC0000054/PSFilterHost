@@ -18,13 +18,7 @@ namespace HostTest
     {
         private readonly float newScale;
 
-        public float NewZoom
-        {
-            get
-            {
-                return newScale;
-            }
-        }
+        public float NewZoom => newScale;
 
         public CanvasZoomChangedEventArgs(float scale)
         {

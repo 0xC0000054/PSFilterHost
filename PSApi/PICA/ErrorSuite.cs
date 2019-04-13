@@ -29,13 +29,7 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <value>
         /// The error message.
         /// </value>
-        public string ErrorMessage
-        {
-            get
-            {
-                return errorMessage;
-            }
-        }
+        public string ErrorMessage => errorMessage;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorSuite"/> class.

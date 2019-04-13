@@ -152,8 +152,8 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
 
         public VarEnum vt
         {
-            get { return (VarEnum)_vt; }
-            set { _vt = (short)value; }
+            get => (VarEnum)_vt;
+            set => _vt = (short)value;
         }
     };
 

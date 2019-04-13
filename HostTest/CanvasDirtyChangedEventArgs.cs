@@ -18,13 +18,7 @@ namespace HostTest
     {
         private readonly bool dirty;
 
-        public bool Dirty
-        {
-            get
-            {
-                return dirty;
-            }
-        }
+        public bool Dirty => dirty;
 
         public CanvasDirtyChangedEventArgs(bool isDirty)
         {

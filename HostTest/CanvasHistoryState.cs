@@ -34,13 +34,7 @@ namespace HostTest
             disposed = false;
         }
 
-        public Bitmap Image
-        {
-            get
-            {
-                return image;
-            }
-        }
+        public Bitmap Image => image;
 
         private bool disposed;
         public void Dispose()

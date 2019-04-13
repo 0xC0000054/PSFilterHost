@@ -30,24 +30,12 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the filter's global parameters.
         /// </summary>
-        internal GlobalParameters GlobalParameters
-        {
-            get
-            {
-                return globalParameters;
-            }
-        }
+        internal GlobalParameters GlobalParameters => globalParameters;
 
         /// <summary>
         /// Gets the filter's AETE scripting values.
         /// </summary>
-        internal Dictionary<uint, AETEValue> ScriptingData
-        {
-            get
-            {
-                return scriptingData;
-            }
-        }
+        internal Dictionary<uint, AETEValue> ScriptingData => scriptingData;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterData"/> class.

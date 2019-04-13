@@ -100,13 +100,7 @@ namespace PSFilterHostDll.PSApi
         /// <value>
         /// The error suite message.
         /// </value>
-        public string ErrorSuiteMessage
-        {
-            get
-            {
-                return errorSuite?.ErrorMessage;
-            }
-        }
+        public string ErrorSuiteMessage => errorSuite?.ErrorMessage;
 
         /// <summary>
         /// Sets the scripting information used by the plug-in.
@@ -116,10 +110,7 @@ namespace PSFilterHostDll.PSApi
         /// </value>
         public PluginAETE Aete
         {
-            set
-            {
-                aete = value;
-            }
+            set => aete = value;
         }
 
         /// <summary>

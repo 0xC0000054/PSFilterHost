@@ -26,10 +26,7 @@ namespace HostTest
         {
         }
 
-        public static IComparer Default
-        {
-            get { return _default; }
-        }
+        public static IComparer Default => _default;
 
         public int Compare(object x, object y)
         {

@@ -24,13 +24,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the progress of the render.
         /// </summary>
-        public int Progress
-        {
-            get
-            {
-                return progress;
-            }
-        }
+        public int Progress => progress;
 
         internal FilterProgressEventArgs(int progressDone)
         {

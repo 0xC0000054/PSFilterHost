@@ -113,10 +113,7 @@ namespace PSFilterHostDll.PSApi
 
         public PluginAETE Aete
         {
-            set
-            {
-                aete = value;
-            }
+            set => aete = value;
         }
 
         public DescriptorSuite()

@@ -43,13 +43,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 keys = new List<uint>(cloneMe.keys);
             }
 
-            public int Count
-            {
-                get
-                {
-                    return parameters.Count;
-                }
-            }
+            public int Count => parameters.Count;
 
             public void Add(uint key, AETEValue value)
             {

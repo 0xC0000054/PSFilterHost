@@ -115,15 +115,9 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
             GetUnmanagedType();
         }
 
-        public object Value
-        {
-            get { return value; }
-        }
+        public object Value => value;
 
-        public PropVariantMarshalType MarshalType
-        {
-            get { return marshalType; }
-        }
+        public PropVariantMarshalType MarshalType => marshalType;
 
         public VarEnum GetUnmanagedType()
         {

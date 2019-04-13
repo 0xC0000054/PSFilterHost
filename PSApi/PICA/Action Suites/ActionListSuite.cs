@@ -23,13 +23,7 @@ namespace PSFilterHostDll.PSApi.PICA
     {
         private ReadOnlyCollection<ActionListSuite.ActionListItem> items;
 
-        public ReadOnlyCollection<ActionListSuite.ActionListItem> Items
-        {
-            get
-            {
-                return items;
-            }
-        }
+        public ReadOnlyCollection<ActionListSuite.ActionListItem> Items => items;
 
         public ActionDescriptorList(IList<ActionListSuite.ActionListItem> collection)
         {
@@ -45,21 +39,9 @@ namespace PSFilterHostDll.PSApi.PICA
             private readonly uint type;
             private readonly object value;
 
-            public uint Type
-            {
-                get
-                {
-                    return type;
-                }
-            }
+            public uint Type => type;
 
-            public object Value
-            {
-                get
-                {
-                    return value;
-                }
-            }
+            public object Value => value;
 
             public ActionListItem(uint type, object value)
             {
@@ -74,21 +56,9 @@ namespace PSFilterHostDll.PSApi.PICA
             private readonly uint type;
             private readonly ReadOnlyDictionary<uint, AETEValue> descriptorValues;
 
-            public uint Type
-            {
-                get
-                {
-                    return type;
-                }
-            }
+            public uint Type => type;
 
-            public ReadOnlyDictionary<uint, AETEValue> DescriptorValues
-            {
-                get
-                {
-                    return descriptorValues;
-                }
-            }
+            public ReadOnlyDictionary<uint, AETEValue> DescriptorValues => descriptorValues;
 
             public ActionListDescriptor(uint type, ReadOnlyDictionary<uint, AETEValue> descriptorValues)
             {

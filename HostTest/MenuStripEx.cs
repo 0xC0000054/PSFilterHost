@@ -38,14 +38,8 @@ namespace HostTest
         [Description("Determines whether the MenuStrip honors item clicks when its containing form does not have input focus."), Category("Behavior"), DefaultValue(false)]
         public bool ClickThrough
         {
-            get
-            {
-                return clickThrough;
-            }
-            set
-            {
-                clickThrough = value;
-            }
+            get => clickThrough;
+            set => clickThrough = value;
         }
 
         protected override void WndProc(ref Message m)

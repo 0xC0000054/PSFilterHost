@@ -50,10 +50,7 @@ namespace HostTest
         [Description("Specifies the color displayed as the image of the button.")]
         public Color Color
         {
-            get
-            {
-                return color;
-            }
+            get => color;
             set
             {
                 if (color != value)
@@ -75,10 +72,7 @@ namespace HostTest
         [DefaultValue(typeof(Size), "16,16")]
         public Size ImageSize
         {
-            get
-            {
-                return new Size(imageWidth, imageHeight);
-            }
+            get => new Size(imageWidth, imageHeight);
             set
             {
                 if (imageWidth != value.Width || imageHeight != value.Height)
@@ -117,28 +111,10 @@ namespace HostTest
             Invalidate();
         }
 
-        public override Image BackgroundImage
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public override Image BackgroundImage => null;
 
-        public override ToolStripItemDisplayStyle DisplayStyle
-        {
-            get
-            {
-                return ToolStripItemDisplayStyle.Image;
-            }
-        }
+        public override ToolStripItemDisplayStyle DisplayStyle => ToolStripItemDisplayStyle.Image;
 
-        public override Image Image
-        {
-            get
-            {
-                return image;
-            }
-        }
+        public override Image Image => image;
     }
 }

@@ -440,13 +440,7 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the element in the collection at the current position of the enumerator.
         /// </summary>
-        public string Current
-        {
-            get
-            {
-                return current;
-            }
-        }
+        public string Current => current;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

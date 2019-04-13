@@ -270,13 +270,7 @@ namespace PSFilterHostDll.PSApi
         /// <value>
         /// <c>true</c> if color correction is required; otherwise, <c>false</c>.
         /// </value>
-        public bool ColorCorrectionRequired
-        {
-            get
-            {
-                return colorCorrectionRequired;
-            }
-        }
+        public bool ColorCorrectionRequired => colorCorrectionRequired;
 
         /// <summary>
         /// Performs color correction on the specified 8-bit gray scale image data and converts it to RGB.

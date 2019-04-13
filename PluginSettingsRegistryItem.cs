@@ -37,13 +37,7 @@ namespace PSFilterHostDll
         /// <value>
         /// The values.
         /// </value>
-        internal ReadOnlyDictionary<uint, AETEValue> Values
-        {
-            get
-            {
-                return values;
-            }
-        }
+        internal ReadOnlyDictionary<uint, AETEValue> Values => values;
 
         /// <summary>
         /// Gets a value indicating whether this <see cref="PluginSettingsRegistryItem"/> is persisted across host sessions.
@@ -51,12 +45,6 @@ namespace PSFilterHostDll
         /// <value>
         ///   <c>true</c> if this item is persisted across host sessions; otherwise, <c>false</c>.
         /// </value>
-        internal bool IsPersistent
-        {
-            get
-            {
-                return isPersistent;
-            }
-        }
+        internal bool IsPersistent => isPersistent;
     }
 }

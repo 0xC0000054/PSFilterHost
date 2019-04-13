@@ -27,21 +27,9 @@ namespace HostTest
         private HistoryChunk chunk;
         private HistoryItemState state;
 
-        public CanvasHistoryState CanvasHistory
-        {
-            get
-            {
-                return chunk.canvas;
-            }
-        }
+        public CanvasHistoryState CanvasHistory => chunk.canvas;
 
-        public BitmapSource Image
-        {
-            get
-            {
-                return chunk.image;
-            }
-        }
+        public BitmapSource Image => chunk.image;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HistoryItem"/> class.

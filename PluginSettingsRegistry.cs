@@ -74,14 +74,8 @@ namespace PSFilterHostDll
         /// </value>
         public bool Dirty
         {
-            get
-            {
-                return dirty;
-            }
-            set
-            {
-                dirty = value;
-            }
+            get => dirty;
+            set => dirty = value;
         }
 
         /// <summary>
@@ -90,13 +84,7 @@ namespace PSFilterHostDll
         /// <value>
         /// The values that are persisted between host sessions.
         /// </value>
-        internal ReadOnlyDictionary<string, PluginSettingsRegistryItem> PersistedValues
-        {
-            get
-            {
-                return persistedValues;
-            }
-        }
+        internal ReadOnlyDictionary<string, PluginSettingsRegistryItem> PersistedValues => persistedValues;
 
         /// <summary>
         /// Gets the values that are stored for the current session.
@@ -104,12 +92,6 @@ namespace PSFilterHostDll
         /// <value>
         /// The values that are stored for the current session.
         /// </value>
-        internal ReadOnlyDictionary<string, PluginSettingsRegistryItem> SessionValues
-        {
-            get
-            {
-                return sessionValues;
-            }
-        }
+        internal ReadOnlyDictionary<string, PluginSettingsRegistryItem> SessionValues => sessionValues;
     }
 }

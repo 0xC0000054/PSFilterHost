@@ -54,13 +54,7 @@ namespace HostTest
             OnHistoryChanged();
         }
 
-        public int Count
-        {
-            get
-            {
-                return historyList.Count;
-            }
-        }
+        public int Count => historyList.Count;
 
         /// <summary>
         /// Clears the undo history.
@@ -124,21 +118,9 @@ namespace HostTest
             }
         }
 
-        public bool CanUndo
-        {
-            get
-            {
-                return (index > 0);
-            }
-        }
+        public bool CanUndo => (index > 0);
 
-        public bool CanRedo
-        {
-            get
-            {
-                return (index < (historyList.Count - 1));
-            }
-        }
+        public bool CanRedo => (index < (historyList.Count - 1));
 
         private void OnHistoryChanged()
         {

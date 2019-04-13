@@ -90,10 +90,7 @@ namespace HostTest
 
         public bool IsDirty
         {
-            get
-            {
-                return isDirty;
-            }
+            get => isDirty;
             set
             {
                 if (isDirty != value)
@@ -107,10 +104,7 @@ namespace HostTest
 
         public SelectionBase SelectionType
         {
-            get
-            {
-                return selectionClass;
-            }
+            get => selectionClass;
             set
             {
                 if (selectionClass != null)
@@ -490,10 +484,7 @@ namespace HostTest
 
         public Bitmap Surface
         {
-            get
-            {
-                return image;
-            }
+            get => image;
             set
             {
                 if (value != null)
@@ -819,13 +810,7 @@ namespace HostTest
             return (zoomFactor != 1f);
         }
 
-        public bool IsActualSize
-        {
-            get
-            {
-                return (zoomFactor == 1f);
-            }
-        }
+        public bool IsActualSize => (zoomFactor == 1f);
 
         private void OnZoomChanged()
         {

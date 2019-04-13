@@ -24,13 +24,7 @@ namespace HostTest.Tools
             disposed = false;
         }
 
-        public Cursor NewCursor
-        {
-            get
-            {
-                return cursor;
-            }
-        }
+        public Cursor NewCursor => cursor;
 
         private bool disposed;
         public void Dispose()

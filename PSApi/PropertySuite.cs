@@ -70,13 +70,7 @@ namespace PSFilterHostDll.PSApi
         /// <value>
         /// The get property callback pointer.
         /// </value>
-        public IntPtr GetPropertyCallback
-        {
-            get
-            {
-                return Marshal.GetFunctionPointerForDelegate(getPropertyProc);
-            }
-        }
+        public IntPtr GetPropertyCallback => Marshal.GetFunctionPointerForDelegate(getPropertyProc);
 
         /// <summary>
         /// Gets or sets the host information.
@@ -87,10 +81,7 @@ namespace PSFilterHostDll.PSApi
         /// <exception cref="ArgumentNullException">Value is null.</exception>
         public HostInformation HostInformation
         {
-            get
-            {
-                return hostInfo;
-            }
+            get => hostInfo;
             set
             {
                 if (value == null)

@@ -33,13 +33,7 @@ namespace HostTest.Tools
             }
         }
 
-        public GraphicsPath SelectedPath
-        {
-            get
-            {
-                return selectedPath;
-            }
-        }
+        public GraphicsPath SelectedPath => selectedPath;
 
         public void Dispose()
         {

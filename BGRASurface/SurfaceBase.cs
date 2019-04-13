@@ -35,40 +35,19 @@ namespace PSFilterHostDll.BGRASurface
         private readonly int bytesPerPixel;
         private bool disposed;
 
-        public int Width
-        {
-            get { return width; }
-        }
+        public int Width => width;
 
-        public int Height
-        {
-            get { return height; }
-        }
+        public int Height => height;
 
-        public unsafe MemoryBlock Scan0
-        {
-            get { return scan0; }
-        }
+        public unsafe MemoryBlock Scan0 => scan0;
 
-        public long Stride
-        {
-            get { return stride; }
-        }
+        public long Stride => stride;
 
-        public Rectangle Bounds
-        {
-            get { return new Rectangle(0, 0, width, height); }
-        }
+        public Rectangle Bounds => new Rectangle(0, 0, width, height);
 
-        public double DpiX
-        {
-            get { return dpiX; }
-        }
+        public double DpiX => dpiX;
 
-        public double DpiY
-        {
-            get { return dpiY; }
-        }
+        public double DpiY => dpiY;
 
         public abstract int ChannelCount
         {

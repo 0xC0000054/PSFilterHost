@@ -23,13 +23,7 @@ namespace PSFilterHostDll.PSApi.PICA
     {
         private ReadOnlyCollection<ActionReferenceSuite.ActionReferenceItem> references;
 
-        public ReadOnlyCollection<ActionReferenceSuite.ActionReferenceItem> References
-        {
-            get
-            {
-                return references;
-            }
-        }
+        public ReadOnlyCollection<ActionReferenceSuite.ActionReferenceItem> References => references;
 
         internal ActionDescriptorReference(IList<ActionReferenceSuite.ActionReferenceItem> items)
         {
@@ -58,29 +52,11 @@ namespace PSFilterHostDll.PSApi.PICA
             private readonly uint desiredClass;
             private readonly object value;
 
-            public ActionReferenceForm Form
-            {
-                get
-                {
-                    return form;
-                }
-            }
+            public ActionReferenceForm Form => form;
 
-            public uint DesiredClass
-            {
-                get
-                {
-                    return desiredClass;
-                }
-            }
+            public uint DesiredClass => desiredClass;
 
-            public object Value
-            {
-                get
-                {
-                    return value;
-                }
-            }
+            public object Value => value;
 
             public ActionReferenceItem(ActionReferenceForm form, uint desiredClass, object value)
             {

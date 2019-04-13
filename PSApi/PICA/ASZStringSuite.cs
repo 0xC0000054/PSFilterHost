@@ -23,13 +23,7 @@ namespace PSFilterHostDll.PSApi.PICA
     {
         private readonly string value;
 
-        public string Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public string Value => value;
 
         public ActionDescriptorZString(string value)
         {
@@ -68,14 +62,8 @@ namespace PSFilterHostDll.PSApi.PICA
             /// </value>
             public int RefCount
             {
-                get
-                {
-                    return refCount;
-                }
-                set
-                {
-                    refCount = value;
-                }
+                get => refCount;
+                set => refCount = value;
             }
 
             /// <summary>
@@ -86,14 +74,8 @@ namespace PSFilterHostDll.PSApi.PICA
             /// </value>
             public string Data
             {
-                get
-                {
-                    return data;
-                }
-                set
-                {
-                    data = value;
-                }
+                get => data;
+                set => data = value;
             }
 
             private static unsafe string PtrToStringPascal(IntPtr ptr, int length)

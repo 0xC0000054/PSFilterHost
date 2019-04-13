@@ -30,24 +30,12 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the resource key.
         /// </summary>
-        public long Key
-        {
-            get
-            {
-                return key;
-            }
-        }
+        public long Key => key;
 
         /// <summary>
         /// Gets the resource index.
         /// </summary>
-        public int Index
-        {
-            get
-            {
-                return index;
-            }
-        }
+        public int Index => index;
 
         /// <summary>
         /// Gets the resource data.

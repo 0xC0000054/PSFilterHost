@@ -32,21 +32,9 @@ namespace PSFilterHostDll.PSApi
                 items = new List<IntPtr>();
             }
 
-            public int Count
-            {
-                get
-                {
-                    return items.Count;
-                }
-            }
+            public int Count => items.Count;
 
-            public IntPtr this[int index]
-            {
-                get
-                {
-                    return items[index];
-                }
-            }
+            public IntPtr this[int index] => items[index];
 
             public void Add(IntPtr value)
             {
@@ -109,21 +97,9 @@ namespace PSFilterHostDll.PSApi
             bufferIDs = new BufferIDCollection();
         }
 
-        public static BufferSuite Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
+        public static BufferSuite Instance => instance;
 
-        public int AvailableSpace
-        {
-            get
-            {
-                return BufferSpaceProc();
-            }
-        }
+        public int AvailableSpace => BufferSpaceProc();
 
         public bool AllocatedBySuite(IntPtr buffer)
         {

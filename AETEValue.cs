@@ -29,46 +29,22 @@ namespace PSFilterHostDll
         /// <summary>
         /// Gets the type of data.
         /// </summary>
-        public uint Type
-        {
-            get
-            {
-                return type;
-            }
-        }
+        public uint Type => type;
 
         /// <summary>
         /// Gets the flags.
         /// </summary>
-        public int Flags
-        {
-            get
-            {
-                return flags;
-            }
-        }
+        public int Flags => flags;
 
         /// <summary>
         /// Gets the size.
         /// </summary>
-        public int Size
-        {
-            get
-            {
-                return size;
-            }
-        }
+        public int Size => size;
 
         /// <summary>
         /// Gets the value.
         /// </summary>
-        public object Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public object Value => value;
 
         internal AETEValue(uint type, int flags, int size, object value)
         {
@@ -85,21 +61,9 @@ namespace PSFilterHostDll
         private readonly uint unit;
         private readonly double value;
 
-        public uint Unit
-        {
-            get
-            {
-                return unit;
-            }
-        }
+        public uint Unit => unit;
 
-        public double Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public double Value => value;
 
         public UnitFloat(uint unit, double value)
         {
@@ -136,21 +100,9 @@ namespace PSFilterHostDll
         private readonly uint type;
         private readonly uint value;
 
-        public uint Type
-        {
-            get
-            {
-                return type;
-            }
-        }
+        public uint Type => type;
 
-        public uint Value
-        {
-            get
-            {
-                return value;
-            }
-        }
+        public uint Value => value;
 
         public EnumeratedValue(uint type, uint value)
         {

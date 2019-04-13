@@ -238,14 +238,8 @@ namespace PSFilterHostDll
         /// </value>
         public ParameterData FilterParameters
         {
-            get
-            {
-                return filterParameters;
-            }
-            set
-            {
-                filterParameters = value;
-            }
+            get => filterParameters;
+            set => filterParameters = value;
         }
 
         /// <summary>
@@ -256,14 +250,8 @@ namespace PSFilterHostDll
         /// </value>
         public HostInformation HostInfo
         {
-            get
-            {
-                return hostInfo;
-            }
-            set
-            {
-                hostInfo = value;
-            }
+            get => hostInfo;
+            set => hostInfo = value;
         }
 
         /// <summary>
@@ -274,14 +262,8 @@ namespace PSFilterHostDll
         /// </value>
         public PseudoResourceCollection PseudoResources
         {
-            get
-            {
-                return pseudoResources;
-            }
-            set
-            {
-                pseudoResources = value;
-            }
+            get => pseudoResources;
+            set => pseudoResources = value;
         }
 
         /// <summary>
@@ -292,14 +274,8 @@ namespace PSFilterHostDll
         /// </value>
         public PluginSettingsRegistry SessionSettings
         {
-            get
-            {
-                return sessionSettings;
-            }
-            set
-            {
-                sessionSettings = value;
-            }
+            get => sessionSettings;
+            set => sessionSettings = value;
         }
 
         /// <summary>

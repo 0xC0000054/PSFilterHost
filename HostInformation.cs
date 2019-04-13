@@ -37,14 +37,8 @@ namespace PSFilterHostDll
         /// </value>
         public string Title
         {
-            get
-            {
-                return title;
-            }
-            set
-            {
-                title = value;
-            }
+            get => title;
+            set => title = value;
         }
 
         /// <summary>
@@ -58,14 +52,8 @@ namespace PSFilterHostDll
         /// </remarks>
         public string Caption
         {
-            get
-            {
-                return caption;
-            }
-            set
-            {
-                caption = value;
-            }
+            get => caption;
+            set => caption = value;
         }
 
         /// <summary>
@@ -79,14 +67,8 @@ namespace PSFilterHostDll
         /// </remarks>
         public Uri Url
         {
-            get
-            {
-                return url;
-            }
-            set
-            {
-                url = value;
-            }
+            get => url;
+            set => url = value;
         }
 
         /// <summary>
@@ -100,14 +82,8 @@ namespace PSFilterHostDll
         /// </remarks>
         public bool Copyright
         {
-            get
-            {
-                return copyRight;
-            }
-            set
-            {
-                copyRight = value;
-            }
+            get => copyRight;
+            set => copyRight = value;
         }
 
         /// <summary>
@@ -121,14 +97,8 @@ namespace PSFilterHostDll
         /// </remarks>
         public bool Watermark
         {
-            get
-            {
-                return waterMark;
-            }
-            set
-            {
-                waterMark = value;
-            }
+            get => waterMark;
+            set => waterMark = value;
         }
 
         /// <summary>
@@ -142,10 +112,7 @@ namespace PSFilterHostDll
         /// </exception>
         public HostRulerUnit RulerUnit
         {
-            get
-            {
-                return rulerUnit;
-            }
+            get => rulerUnit;
             set
             {
                 if (value < HostRulerUnit.Pixels || value > HostRulerUnit.Percent)
@@ -165,14 +132,8 @@ namespace PSFilterHostDll
         /// </value>
         public bool HighDpi
         {
-            get
-            {
-                return highDpi;
-            }
-            set
-            {
-                highDpi = value;
-            }
+            get => highDpi;
+            set => highDpi = value;
         }
 
         /// <summary>

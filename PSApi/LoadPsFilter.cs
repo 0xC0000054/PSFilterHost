@@ -148,13 +148,7 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         private const uint HostSignature = 0x2e4e4554;
 
-        public SurfaceBase Dest
-        {
-            get
-            {
-                return dest;
-            }
-        }
+        public SurfaceBase Dest => dest;
 
         /// <summary>
         /// Sets the filter progress callback.
@@ -240,20 +234,11 @@ namespace PSFilterHostDll.PSApi
             basicSuiteProvider.SetPluginSettings(value);
         }
 
-        public string ErrorMessage
-        {
-            get
-            {
-                return errorMessage;
-            }
-        }
+        public string ErrorMessage => errorMessage;
 
         internal ParameterData ParameterData
         {
-            get
-            {
-                return new ParameterData(globalParameters, scriptingData);
-            }
+            get => new ParameterData(globalParameters, scriptingData);
             set
             {
                 if (value == null)
@@ -274,18 +259,12 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         internal bool ShowUI
         {
-            set
-            {
-                showUI = value;
-            }
+            set => showUI = value;
         }
 
         internal PseudoResourceCollection PseudoResources
         {
-            get
-            {
-                return resourceSuite.PseudoResources;
-            }
+            get => resourceSuite.PseudoResources;
             set
             {
                 if (value == null)
@@ -299,10 +278,7 @@ namespace PSFilterHostDll.PSApi
 
         internal HostInformation HostInformation
         {
-            get
-            {
-                return propertySuite.HostInformation;
-            }
+            get => propertySuite.HostInformation;
             set
             {
                 if (value == null)
@@ -459,69 +435,21 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        SurfaceBase IFilterImageProvider.Source
-        {
-            get
-            {
-                return source;
-            }
-        }
+        SurfaceBase IFilterImageProvider.Source => source;
 
-        SurfaceBase IFilterImageProvider.Destination
-        {
-            get
-            {
-                return dest;
-            }
-        }
+        SurfaceBase IFilterImageProvider.Destination => dest;
 
-        SurfaceGray8 IFilterImageProvider.Mask
-        {
-            get
-            {
-                return mask;
-            }
-        }
+        SurfaceGray8 IFilterImageProvider.Mask => mask;
 
-        IntPtr IPICASuiteDataProvider.ParentWindowHandle
-        {
-            get
-            {
-                return parentWindowHandle;
-            }
-        }
+        IntPtr IPICASuiteDataProvider.ParentWindowHandle => parentWindowHandle;
 
-        DisplayPixelsProc IPICASuiteDataProvider.DisplayPixels
-        {
-            get
-            {
-                return displayPixelsProc;
-            }
-        }
+        DisplayPixelsProc IPICASuiteDataProvider.DisplayPixels => displayPixelsProc;
 
-        ProcessEventProc IPICASuiteDataProvider.ProcessEvent
-        {
-            get
-            {
-                return processEventProc;
-            }
-        }
+        ProcessEventProc IPICASuiteDataProvider.ProcessEvent => processEventProc;
 
-        ProgressProc IPICASuiteDataProvider.Progress
-        {
-            get
-            {
-                return progressProc;
-            }
-        }
+        ProgressProc IPICASuiteDataProvider.Progress => progressProc;
 
-        TestAbortProc IPICASuiteDataProvider.TestAbort
-        {
-            get
-            {
-                return abortProc;
-            }
-        }
+        TestAbortProc IPICASuiteDataProvider.TestAbort => abortProc;
 
         private void SetFilterTransparencyMode(PluginData data)
         {
