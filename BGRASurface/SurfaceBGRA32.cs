@@ -134,9 +134,9 @@ namespace PSFilterHostDll.BGRASurface
         {
             System.Windows.Media.PixelFormat format;
 
-            IntPtr buffer = IntPtr.Zero;
-            int bufferSize = 0;
-            int destStride = 0;
+            IntPtr buffer;
+            int bufferSize;
+            int destStride;
 
             if (HasTransparency())
             {

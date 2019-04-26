@@ -252,12 +252,9 @@ namespace PaintDotNet
             if (textBrush != null)
             {
                 textBrush.Dispose();
-                textBrush = null;
             }
 
             stringFormat.Dispose();
-            stringFormat = null;
-
             Size layoutSize = new Size(ClientSize.Width, descriptionTextRect.Bottom + marginYBottom);
             return layoutSize;
         }

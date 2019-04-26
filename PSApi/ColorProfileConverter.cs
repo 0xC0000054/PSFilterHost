@@ -99,7 +99,6 @@ namespace PSFilterHostDll.PSApi
                 throw new ArgumentNullException(nameof(profileBytes));
             }
 
-            handle = null;
             int error = NativeConstants.ERROR_SUCCESS;
 
             unsafe

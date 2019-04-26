@@ -69,7 +69,7 @@ namespace PSFilterHostDll.PSApi
 
                 FilterCaseInfo[] info = new FilterCaseInfo[7];
                 int offset = 0;
-                int bytesRead = 0;
+                int bytesRead;
                 bool filterInfoValid = true;
 
                 for (int i = 0; i < info.Length; i++)
@@ -218,7 +218,7 @@ namespace PSFilterHostDll.PSApi
                 ptr += 2;
                 byte* propPtr = ptr;
 
-                int stringLength = 0;
+                int stringLength;
 
                 if (suiteCount == 1) // There should only be one vendor suite
                 {

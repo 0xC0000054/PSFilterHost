@@ -55,7 +55,7 @@ namespace PSFilterHostDll
                 {
                     if (SafeNativeMethods.GetProcAddress(hMod, "IsWow64Process") != IntPtr.Zero)
                     {
-                        bool isWow64 = false;
+                        bool isWow64;
                         if (SafeNativeMethods.IsWow64Process(SafeNativeMethods.GetCurrentProcess(), out isWow64))
                         {
                             return isWow64;

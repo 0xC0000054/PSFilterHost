@@ -84,7 +84,7 @@ namespace HostTest
                 throw new Win32Exception();
             }
 
-            Uri path = null;
+            Uri path;
 
             string profile = builder.ToString();
             // GetStandardColorSpace may return a relative path to the system color directory.

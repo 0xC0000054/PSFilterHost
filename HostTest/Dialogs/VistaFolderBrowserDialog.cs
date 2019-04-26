@@ -252,7 +252,6 @@ namespace HostTest
                 if (dialog != null)
                 {
                     Marshal.ReleaseComObject(dialog);
-                    dialog = null;
                 }
             }
 
@@ -279,7 +278,6 @@ namespace HostTest
                 if (resultShellItem != null)
                 {
                     Marshal.ReleaseComObject(resultShellItem);
-                    resultShellItem = null;
                 }
             }
 

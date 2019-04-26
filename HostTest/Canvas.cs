@@ -925,7 +925,6 @@ namespace HostTest
                     if (temp != null)
                     {
                         temp.Dispose();
-                        temp = null;
                     }
                 }
 

@@ -678,7 +678,7 @@ namespace PSFilterHostDll
 
             if (pluginData.HasAboutBox)
             {
-                string errorMessage = string.Empty;
+                string errorMessage;
 
                 bool result;
 

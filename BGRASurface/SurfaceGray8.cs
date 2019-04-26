@@ -478,8 +478,6 @@ namespace PSFilterHostDll.BGRASurface
 
                     // add 0.5 so that rounding goes in the direction we want it to
                     blue += 0.5;
-                    alpha += 0.5;
-
                     dstPtr[0] = (byte)blue;
                     ++dstPtr;
                 }

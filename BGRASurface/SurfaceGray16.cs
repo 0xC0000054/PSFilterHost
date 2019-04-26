@@ -232,7 +232,6 @@ namespace PSFilterHostDll.BGRASurface
                     {
                         gray = graySum / alphaSum;
                         // add 0.5 to ensure truncation to uint results in rounding
-                        alpha += 0.5;
                         gray += 0.5;
                     }
 

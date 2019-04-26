@@ -128,7 +128,7 @@ namespace PSFilterHostDll.BGRASurface
                      format == PixelFormats.Prgba64)
             {
                 int bpp, stride;
-                ushort[] pixels = null;
+                ushort[] pixels;
                 if (format == PixelFormats.Rgba128Float ||
                     format == PixelFormats.Rgb128Float ||
                     format == PixelFormats.Prgba128Float ||

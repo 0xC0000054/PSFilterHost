@@ -1532,7 +1532,7 @@ namespace PSFilterHostDll.PSApi
 
         private static string GetImageModeString(ImageModes mode)
         {
-            string imageMode = string.Empty;
+            string imageMode;
             switch (mode)
             {
                 case ImageModes.RGB:

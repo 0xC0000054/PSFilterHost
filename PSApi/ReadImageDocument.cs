@@ -168,7 +168,6 @@ namespace PSFilterHostDll.PSApi
                 if (readDocumentPtr != IntPtr.Zero)
                 {
                     Memory.Free(readDocumentPtr);
-                    readDocumentPtr = IntPtr.Zero;
                 }
 
                 throw;
@@ -206,7 +205,6 @@ namespace PSFilterHostDll.PSApi
                 if (namePtr != IntPtr.Zero)
                 {
                     Marshal.FreeHGlobal(namePtr);
-                    namePtr = IntPtr.Zero;
                 }
                 throw;
             }

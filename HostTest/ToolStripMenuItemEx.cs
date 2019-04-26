@@ -60,7 +60,7 @@ namespace HostTest
                 // See the TextPadding field in the System.Windows.Forms.ToolStripDropDownMenu static constructor.
                 int textPadding = direction == ArrowDirection.Right ? 8 : 9;
 
-                int arrowX = 0;
+                int arrowX;
 
                 if (rightToLeft)
                 {

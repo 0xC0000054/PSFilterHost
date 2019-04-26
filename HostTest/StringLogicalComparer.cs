@@ -87,7 +87,7 @@ namespace HostTest
 
             char c1, c2;
             int i1 = 0, i2 = 0;
-            int r = 0;
+            int r;
             bool letter1, letter2;
 
             while (true)

@@ -1202,7 +1202,7 @@ namespace HostTest
             zoomToActualSizeBtn.Enabled = canvas.CanZoomToActualSize();
             zoomToWindowBtn.Enabled = canvas.CanZoomToWindow(panelClientSize);
 
-            int percent = 0;
+            int percent;
             if (e.NewZoom < 0.10f)
             {
                 percent = (int)Math.Round(e.NewZoom * 1000f);

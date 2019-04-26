@@ -102,7 +102,6 @@ namespace PSFilterHostDll.PSApi
                 tag.type = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
                 tag.length = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
             }
 
             /// <summary>
@@ -143,7 +142,6 @@ namespace PSFilterHostDll.PSApi
                     *((ushort*)ptr) = SwapUInt16(tag.type);
                     ptr += 2;
                     *((ushort*)ptr) = SwapUInt16(tag.length);
-                    ptr += 2;
                 }
             }
         }
