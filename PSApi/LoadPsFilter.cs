@@ -3754,8 +3754,7 @@ namespace PSFilterHostDll.PSApi
             if (useChannelPorts)
             {
                 channelPortsPtr = channelPortsSuite.CreateChannelPortsSuitePointer();
-                bool ignoreTransparency = filterCase != FilterCase.EditableTransparencyNoSelection && filterCase != FilterCase.EditableTransparencyWithSelection;
-                readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(ignoreTransparency, selectedRegion != null);
+                readDocumentPtr = readImageDocument.CreateReadImageDocumentPointer(filterCase, selectedRegion != null);
             }
             else
             {

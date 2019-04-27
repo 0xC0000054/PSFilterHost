@@ -87,7 +87,7 @@ namespace PSFilterHostDll.PSApi
             disposed = false;
         }
 
-        public unsafe IntPtr CreateReadImageDocumentPointer(bool ignoreAlpha, bool hasSelection)
+        public unsafe IntPtr CreateReadImageDocumentPointer(FilterCase filterCase, bool hasSelection)
         {
             IntPtr readDocumentPtr = Memory.Allocate(Marshal.SizeOf(typeof(ReadImageDocumentDesc)), true);
 
@@ -145,7 +145,7 @@ namespace PSFilterHostDll.PSApi
 
                     doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
 
-                    if (!ignoreAlpha)
+                    if (filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection)
                     {
                         IntPtr alphaPtr = CreateReadChannelDesc(PSConstants.ChannelPorts.Alpha, Resources.AlphaChannelName, doc->depth, doc->bounds);
                         doc->targetTransparency = doc->mergedTransparency = alphaPtr;
