@@ -85,8 +85,6 @@ namespace PSFilterHostDll.PSApi
         private readonly BufferSpaceProc spaceProc;
         private readonly BufferIDCollection bufferIDs;
 
-        private static readonly BufferSuite instance = new BufferSuite();
-
         private BufferSuite()
         {
             allocProc = new AllocateBufferProc(AllocateBufferProc);
@@ -97,7 +95,7 @@ namespace PSFilterHostDll.PSApi
             bufferIDs = new BufferIDCollection();
         }
 
-        public static BufferSuite Instance => instance;
+        public static BufferSuite Instance { get; } = new BufferSuite();
 
         public int AvailableSpace => BufferSpaceProc();
 

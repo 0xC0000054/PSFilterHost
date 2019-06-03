@@ -25,13 +25,11 @@ namespace PSFilterHostDll.PSApi
     /// <seealso cref="IEqualityComparer{T}"/>
     internal sealed class IntPtrEqualityComparer : IEqualityComparer<IntPtr>
     {
-        private static readonly IntPtrEqualityComparer instance = new IntPtrEqualityComparer();
-
         private IntPtrEqualityComparer()
         {
         }
 
-        public static IntPtrEqualityComparer Instance => instance;
+        public static IntPtrEqualityComparer Instance { get; } = new IntPtrEqualityComparer();
 
         public bool Equals(IntPtr x, IntPtr y)
         {

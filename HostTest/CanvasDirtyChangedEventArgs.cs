@@ -16,13 +16,11 @@ namespace HostTest
 {
     internal sealed class CanvasDirtyChangedEventArgs : EventArgs
     {
-        private readonly bool dirty;
-
-        public bool Dirty => dirty;
+        public bool Dirty { get; }
 
         public CanvasDirtyChangedEventArgs(bool isDirty)
         {
-            dirty = isDirty;
+            Dirty = isDirty;
         }
     }
 }

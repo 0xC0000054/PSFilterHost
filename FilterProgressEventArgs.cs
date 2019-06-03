@@ -19,16 +19,14 @@ namespace PSFilterHostDll
     /// </summary>
     public sealed class FilterProgressEventArgs : EventArgs
     {
-        private int progress;
-
         /// <summary>
         /// Gets the progress of the render.
         /// </summary>
-        public int Progress => progress;
+        public int Progress { get; }
 
         internal FilterProgressEventArgs(int progressDone)
         {
-            progress = progressDone;
+            Progress = progressDone;
         }
     }
 }

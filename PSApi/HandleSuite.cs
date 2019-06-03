@@ -19,14 +19,12 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class HandleDisposedEventArgs : EventArgs
     {
-        private readonly IntPtr handle;
-
         public HandleDisposedEventArgs(IntPtr handle)
         {
-            this.handle = handle;
+            this.Handle = handle;
         }
 
-        public IntPtr Handle => handle;
+        public IntPtr Handle { get; }
     }
 
     // This class is a singleton because plug-ins can use it to allocate memory for pointers embedded
@@ -88,8 +86,6 @@ namespace PSFilterHostDll.PSApi
         private readonly DisposeRegularPIHandleProc handleDisposeRegularProc;
         private readonly Dictionary<IntPtr, HandleEntry> handles;
 
-        private static readonly HandleSuite instance = new HandleSuite();
-
         private HandleSuite()
         {
             handleNewProc = new NewPIHandleProc(NewHandle);
@@ -108,7 +104,7 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         public event EventHandler<HandleDisposedEventArgs> SuiteHandleDisposed;
 
-        public static HandleSuite Instance => instance;
+        public static HandleSuite Instance { get; } = new HandleSuite();
 
         public HandleProcs CreateHandleProcs()
         {

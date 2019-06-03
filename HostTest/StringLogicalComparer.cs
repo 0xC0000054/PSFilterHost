@@ -20,13 +20,11 @@ namespace HostTest
 {
     internal sealed class StringLogicalComparer : IComparer
     {
-        private static readonly IComparer _default = new StringLogicalComparer();
-
         private StringLogicalComparer()
         {
         }
 
-        public static IComparer Default => _default;
+        public static IComparer Default { get; } = new StringLogicalComparer();
 
         public int Compare(object x, object y)
         {

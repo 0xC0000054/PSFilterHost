@@ -16,13 +16,11 @@ namespace HostTest
 {
     internal sealed class CanvasZoomChangedEventArgs : EventArgs
     {
-        private readonly float newScale;
-
-        public float NewZoom => newScale;
+        public float NewZoom { get; }
 
         public CanvasZoomChangedEventArgs(float scale)
         {
-            newScale = scale;
+            NewZoom = scale;
         }
     }
 }
