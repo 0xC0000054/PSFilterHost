@@ -95,13 +95,13 @@ namespace PSFilterHostDll.PSApi
                         {
                             ushort machineType = ReadUInt16(stream);
 
-                            if (machineType == IMAGE_FILE_MACHINE_I386)
+                            if (IntPtr.Size == 4)
                             {
-                                return (IntPtr.Size == 4);
+                                return machineType == IMAGE_FILE_MACHINE_I386;
                             }
-                            else if (machineType == IMAGE_FILE_MACHINE_AMD64)
+                            else if (IntPtr.Size == 8)
                             {
-                                return (IntPtr.Size == 8);
+                                return machineType == IMAGE_FILE_MACHINE_AMD64;
                             }
                         }
                     }
