@@ -21,6 +21,7 @@ namespace PSFilterHostDll
     /// <threadsafety static="true" instance="false" />
     public sealed class HostInformation
     {
+#pragma warning disable IDE0032 // Use auto property
         private string title;
         private string caption;
         private Uri url;
@@ -28,6 +29,7 @@ namespace PSFilterHostDll
         private bool waterMark;
         private HostRulerUnit rulerUnit;
         private bool highDpi;
+#pragma warning restore IDE0032 // Use auto property
 
         /// <summary>
         /// Gets or sets the title of the document.
