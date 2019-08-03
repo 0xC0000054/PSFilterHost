@@ -24,7 +24,7 @@ namespace PSFilterHostDll.PSApi
         private readonly ImageModes imageMode;
         private readonly int documentWidth;
         private readonly int documentHeight;
-        private ImageMetaData imageMetaData;
+        private ImageMetadata imageMetadata;
         private HostInformation hostInfo;
         private int numberOfChannels;
         private string hostSerial;
@@ -57,7 +57,7 @@ namespace PSFilterHostDll.PSApi
             documentWidth = source.PixelWidth;
             documentHeight = source.PixelHeight;
 #endif
-            imageMetaData = new ImageMetaData(source);
+            imageMetadata = new ImageMetadata(source);
             hostInfo = new HostInformation();
             numberOfChannels = 0;
             hostSerial = "0";
@@ -150,10 +150,10 @@ namespace PSFilterHostDll.PSApi
             {
                 disposed = true;
 
-                if (imageMetaData != null)
+                if (imageMetadata != null)
                 {
-                    imageMetaData.Dispose();
-                    imageMetaData = null;
+                    imageMetadata.Dispose();
+                    imageMetadata = null;
                 }
             }
         }
@@ -258,7 +258,7 @@ namespace PSFilterHostDll.PSApi
                     case PSProperties.EXIFData:
                     case PSProperties.XMPData:
 
-                        if (imageMetaData.Extract(out bytes, key == PSProperties.EXIFData))
+                        if (imageMetadata.Extract(out bytes, key == PSProperties.EXIFData))
                         {
                             complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
                             if (complexProperty != IntPtr.Zero)

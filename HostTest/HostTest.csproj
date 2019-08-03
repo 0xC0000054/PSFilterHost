@@ -150,7 +150,7 @@
     <Compile Include="MenuStripEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MetaDataHelper.cs" />
+    <Compile Include="MetadataHelper.cs" />
     <Compile Include="NativeConstants.cs" />
     <Compile Include="NativeEnums.cs" />
     <Compile Include="NativeInterfaces.cs" />

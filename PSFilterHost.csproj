@@ -174,14 +174,14 @@
     <Compile Include="PSApi\HandleSuite.cs" />
     <Compile Include="PSApi\IColorPicker.cs" />
     <Compile Include="PSApi\IFilterImageProvider.cs" />
-    <Compile Include="PSApi\ImageMetaData.cs" />
+    <Compile Include="PSApi\ImageMetadata.cs" />
     <Compile Include="PSApi\ImageServicesSuite.cs" />
     <Compile Include="PSApi\IntPtrEqualityComparer.cs" />
     <Compile Include="PSApi\IntPtrExtensions.cs" />
     <Compile Include="PSApi\IPICASuiteDataProvider.cs" />
     <Compile Include="PSApi\IPropertySuite.cs" />
     <Compile Include="PSApi\IPTCData.cs" />
-    <Compile Include="PSApi\MetaDataConverter.cs" />
+    <Compile Include="PSApi\MetadataConverter.cs" />
     <Compile Include="PSApi\PEFile.cs" />
     <Compile Include="PSApi\PICA\Action Suites\ActionDescriptorSuite.cs" />
     <Compile Include="PSApi\PICA\Action Suites\ActionListSuite.cs" />

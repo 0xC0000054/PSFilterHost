@@ -22,7 +22,7 @@ using System.Windows.Media.Imaging;
 
 namespace PSFilterHostDll.PSApi
 {
-    internal sealed class ImageMetaData : IDisposable
+    internal sealed class ImageMetadata : IDisposable
     {
 #if GDIPLUS
         private Bitmap image;
@@ -36,14 +36,14 @@ namespace PSFilterHostDll.PSApi
         private bool disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImageMetaData"/> class.
+        /// Initializes a new instance of the <see cref="ImageMetadata"/> class.
         /// </summary>
         /// <param name="image">The image that contains the meta data.</param>
         /// <exception cref="System.ArgumentNullException"><paramref name="image"/> is null.</exception>
 #if GDIPLUS
-        public ImageMetaData(Bitmap image)
+        public ImageMetadata(Bitmap image)
 #else
-        public ImageMetaData(BitmapSource image)
+        public ImageMetadata(BitmapSource image)
 #endif
         {
             if (image == null)
@@ -74,7 +74,7 @@ namespace PSFilterHostDll.PSApi
         {
             if (disposed)
             {
-                throw new ObjectDisposedException(nameof(ImageMetaData));
+                throw new ObjectDisposedException(nameof(ImageMetadata));
             }
 
             bytes = null;
@@ -98,17 +98,17 @@ namespace PSFilterHostDll.PSApi
             }
 
 #if !GDIPLUS
-            BitmapMetadata metaData = null;
+            BitmapMetadata metadata = null;
 
             try
             {
-                metaData = image.Metadata as BitmapMetadata;
+                metadata = image.Metadata as BitmapMetadata;
             }
             catch (NotSupportedException)
             {
             }
 
-            if (metaData == null)
+            if (metadata == null)
             {
                 extractedExif = true;
                 extractedXMP = true;
@@ -118,27 +118,27 @@ namespace PSFilterHostDll.PSApi
 
             if (exif)
             {
-                BitmapMetadata exifMetaData = MetaDataConverter.GetEXIFMetaData(metaData);
+                BitmapMetadata exifMetadata = MetadataConverter.GetEXIFMetadata(metadata);
 
-                if (exifMetaData == null)
+                if (exifMetadata == null)
                 {
                     extractedExif = true;
 
                     return false;
                 }
-                metaData = exifMetaData;
+                metadata = exifMetadata;
             }
             else
             {
-                BitmapMetadata xmpMetaData = MetaDataConverter.GetXMPMetaData(metaData);
+                BitmapMetadata xmpMetadata = MetadataConverter.GetXMPMetadata(metadata);
 
-                if (xmpMetaData == null)
+                if (xmpMetadata == null)
                 {
                     extractedXMP = true;
 
                     return false;
                 }
-                metaData = xmpMetaData;
+                metadata = xmpMetadata;
             }
 #endif
 
@@ -150,7 +150,7 @@ namespace PSFilterHostDll.PSApi
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
 #else
                     JpegBitmapEncoder enc = new JpegBitmapEncoder();
-                    enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
+                    enc.Frames.Add(BitmapFrame.Create(image, null, metadata, null));
                     enc.Save(ms);
 #endif
                     exifBytes = JpegReader.ExtractEXIF(ms.GetBuffer());
@@ -166,7 +166,7 @@ namespace PSFilterHostDll.PSApi
                     image.Save(ms, System.Drawing.Imaging.ImageFormat.Tiff);
 #else
                     TiffBitmapEncoder enc = new TiffBitmapEncoder();
-                    enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
+                    enc.Frames.Add(BitmapFrame.Create(image, null, metadata, null));
                     enc.Save(ms);
 #endif
                     xmpBytes = TiffReader.ExtractXMP(ms);

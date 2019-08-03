@@ -49,7 +49,7 @@ namespace HostTest
         private string srcImageTempFileName;
         private string currentPluginDirectory;
         private HostInformation hostInfo;
-        private BitmapMetadata srcMetaData;
+        private BitmapMetadata srcMetadata;
         private readonly bool highDPIMode;
         private ColorContext srcColorContext;
         private ColorContext monitorColorContext;
@@ -80,7 +80,7 @@ namespace HostTest
             srcImageTempFileName = string.Empty;
             currentPluginDirectory = string.Empty;
             hostInfo = new HostInformation();
-            srcMetaData = null;
+            srcMetadata = null;
             srcColorContext = null;
             monitorColorContext = null;
             monitorColorProfilePath = null;
@@ -486,27 +486,27 @@ namespace HostTest
 
                 srcImageTempFileName = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".tif");
 
-                BitmapMetadata metaData = null;
+                BitmapMetadata metadata = null;
 
                 try
                 {
-                    metaData = srcImage.Metadata as BitmapMetadata;
+                    metadata = srcImage.Metadata as BitmapMetadata;
                 }
                 catch (NotSupportedException)
                 {
                 }
 
-                srcMetaData = null;
-                if (metaData != null)
+                srcMetadata = null;
+                if (metadata != null)
                 {
                     // As WIC does not automatically convert between meta-data formats we have to do it manually.
-                    BitmapMetadata convertedMetaData = MetaDataHelper.ConvertMetaDataToTIFF(metaData);
-                    if (convertedMetaData != null)
+                    BitmapMetadata convertedMetadata = MetadataHelper.ConvertMetadataToTIFF(metadata);
+                    if (convertedMetadata != null)
                     {
-                        srcMetaData = convertedMetaData.Clone();
-                        srcMetaData.Freeze();
+                        srcMetadata = convertedMetadata.Clone();
+                        srcMetadata.Freeze();
                     }
-                    metaData = convertedMetaData;
+                    metadata = convertedMetadata;
                 }
 
                 hostColorProfiles = null;
@@ -535,7 +535,7 @@ namespace HostTest
                 using (FileStream stream = new FileStream(srcImageTempFileName, FileMode.Create, FileAccess.Write))
                 {
                     TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-                    encoder.Frames.Add(BitmapFrame.Create(srcImage, null, metaData, null));
+                    encoder.Frames.Add(BitmapFrame.Create(srcImage, null, metadata, null));
                     encoder.Save(stream);
                 }
             }
@@ -571,11 +571,11 @@ namespace HostTest
                     image = BitmapFrame.Create(stream, createOptions, BitmapCacheOption.OnLoad);
                 }
 
-                hostInfo.Caption = MetaDataHelper.GetIPTCCaption(image);
+                hostInfo.Caption = MetadataHelper.GetIPTCCaption(image);
             }
             else
             {
-                image = BitmapFrame.Create(dstImage, null, srcMetaData, null); // Create a new BitmapFrame so the source image's meta-data is available to the filters.
+                image = BitmapFrame.Create(dstImage, null, srcMetadata, null); // Create a new BitmapFrame so the source image's meta-data is available to the filters.
             }
             hostInfo.HighDpi = highDPIMode;
 
@@ -853,29 +853,29 @@ namespace HostTest
                 throw new ArgumentNullException(nameof(frame));
             }
 
-            BitmapMetadata metaData = null;
+            BitmapMetadata metadata = null;
 
             try
             {
-                metaData = frame.Metadata as BitmapMetadata;
+                metadata = frame.Metadata as BitmapMetadata;
             }
             catch (NotSupportedException)
             {
             }
 
-            if (metaData != null)
+            if (metadata != null)
             {
-                Transform transform = MetaDataHelper.GetOrientationTransform(metaData);
+                Transform transform = MetadataHelper.GetOrientationTransform(metadata);
 
                 if (transform != null)
                 {
                     TransformedBitmap transformedBitmap = new TransformedBitmap(frame, transform);
 
-                    return BitmapFrame.Create(transformedBitmap, null, MetaDataHelper.SetOrientationToTopLeft(metaData), null);
+                    return BitmapFrame.Create(transformedBitmap, null, MetadataHelper.SetOrientationToTopLeft(metadata), null);
                 }
             }
 
-            return BitmapFrame.Create(frame.Clone(), null, metaData?.Clone(), null);
+            return BitmapFrame.Create(frame.Clone(), null, metadata?.Clone(), null);
         }
 
         private void OpenFile(string path)
@@ -893,17 +893,17 @@ namespace HostTest
                     // Convert the image to a non-alpha format if it does not have transparency.
                     FormatConvertedBitmap convertedBitmap = new FormatConvertedBitmap(frame, actualFormat, null, 0.0);
 
-                    BitmapMetadata metaData = null;
+                    BitmapMetadata metadata = null;
 
                     try
                     {
-                        metaData = frame.Metadata as BitmapMetadata;
+                        metadata = frame.Metadata as BitmapMetadata;
                     }
                     catch (NotSupportedException)
                     {
                     }
 
-                    srcImage = AdjustImageOrientation(BitmapFrame.Create(convertedBitmap, null, metaData, null));
+                    srcImage = AdjustImageOrientation(BitmapFrame.Create(convertedBitmap, null, metadata, null));
                     srcImage.Freeze();
                 }
                 else
@@ -1070,19 +1070,19 @@ namespace HostTest
                             break;
                     }
 
-                    BitmapMetadata metaData = null;
+                    BitmapMetadata metadata = null;
 
                     try
                     {
-                        metaData = srcImage.Metadata as BitmapMetadata;
+                        metadata = srcImage.Metadata as BitmapMetadata;
                     }
                     catch (NotSupportedException)
                     {
                     }
 
-                    if (metaData != null)
+                    if (metadata != null)
                     {
-                        metaData = MetaDataHelper.ConvertSaveMetaDataFormat(metaData, encoder);
+                        metadata = MetadataHelper.ConvertSaveMetadataFormat(metadata, encoder);
                     }
 
                     ReadOnlyCollection<ColorContext> colorContexts = null;
@@ -1091,7 +1091,7 @@ namespace HostTest
                         colorContexts = Array.AsReadOnly(new ColorContext[] { srcColorContext });
                     }
 
-                    encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metaData, colorContexts));
+                    encoder.Frames.Add(BitmapFrame.Create(dstImage, null, metadata, colorContexts));
 
                     try
                     {

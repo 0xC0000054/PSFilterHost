@@ -19,7 +19,7 @@ using System.Windows.Media.Imaging;
 
 namespace HostTest
 {
-    internal static class MetaDataHelper
+    internal static class MetadataHelper
     {
         private enum ImageOrientation : ushort
         {
@@ -93,7 +93,7 @@ namespace HostTest
             }
         }
 
-        private static BitmapMetadata GetEXIFMetaData(BitmapMetadata metaData, string format)
+        private static BitmapMetadata GetEXIFMetadata(BitmapMetadata metadata, string format)
         {
             BitmapMetadata exif = null;
             // GIF and PNG files do not contain EXIF meta data.
@@ -103,11 +103,11 @@ namespace HostTest
                 {
                     if (format == "jpg")
                     {
-                        exif = metaData.GetQuery("/app1/ifd/exif") as BitmapMetadata;
+                        exif = metadata.GetQuery("/app1/ifd/exif") as BitmapMetadata;
                     }
                     else
                     {
-                        exif = metaData.GetQuery("/ifd/exif") as BitmapMetadata;
+                        exif = metadata.GetQuery("/ifd/exif") as BitmapMetadata;
                     }
                 }
                 catch (IOException)
@@ -124,7 +124,7 @@ namespace HostTest
         /// </summary>
         /// <param name="xmp">The XMP string to load.</param>
         /// <returns>The loaded XMP block, or null.</returns>
-        private static BitmapMetadata LoadPNGMetaData(string xmp)
+        private static BitmapMetadata LoadPNGMetadata(string xmp)
         {
             BitmapMetadata xmpData = null;
 
@@ -132,13 +132,13 @@ namespace HostTest
             {
                 // PNG stores the XMP meta-data in an iTXt chunk as an UTF8 encoded string,
                 // so we have to save it to a dummy tiff and grab the XMP meta-data on load.
-                BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-                tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
-                tiffMetaData.SetQuery("/ifd/xmp", Encoding.UTF8.GetBytes(xmp));
+                BitmapMetadata tiffMetadata = new BitmapMetadata("tiff");
+                tiffMetadata.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+                tiffMetadata.SetQuery("/ifd/xmp", Encoding.UTF8.GetBytes(xmp));
 
                 BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, PixelFormats.Gray8, null, new byte[] { 255 }, 1);
                 TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+                encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetadata, null));
                 encoder.Save(stream);
 
                 TiffBitmapDecoder dec = new TiffBitmapDecoder(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
@@ -156,7 +156,7 @@ namespace HostTest
             return xmpData;
         }
 
-        private static BitmapMetadata GetXMPMetaData(BitmapMetadata metaData, string format)
+        private static BitmapMetadata GetXMPMetadata(BitmapMetadata metadata, string format)
         {
             BitmapMetadata xmp = null;
 
@@ -167,7 +167,7 @@ namespace HostTest
                 {
                     if (format == "png")
                     {
-                        BitmapMetadata textChunk = metaData.GetQuery("/iTXt") as BitmapMetadata;
+                        BitmapMetadata textChunk = metadata.GetQuery("/iTXt") as BitmapMetadata;
 
                         if (textChunk != null)
                         {
@@ -179,20 +179,20 @@ namespace HostTest
 
                                 if (!string.IsNullOrEmpty(data))
                                 {
-                                    xmp = LoadPNGMetaData(data);
+                                    xmp = LoadPNGMetadata(data);
                                 }
                             }
                         }
                     }
                     else if (format == "jpg")
                     {
-                        xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
+                        xmp = metadata.GetQuery("/xmp") as BitmapMetadata;
                     }
                     else
                     {
                         try
                         {
-                            xmp = metaData.GetQuery("/ifd/xmp") as BitmapMetadata;
+                            xmp = metadata.GetQuery("/ifd/xmp") as BitmapMetadata;
                         }
                         catch (IOException)
                         {
@@ -202,7 +202,7 @@ namespace HostTest
                         if (xmp == null)
                         {
                             // Some codecs may store the XMP data outside of the IFD block.
-                            xmp = metaData.GetQuery("/xmp") as BitmapMetadata;
+                            xmp = metadata.GetQuery("/xmp") as BitmapMetadata;
                         }
                     }
                 }
@@ -215,7 +215,7 @@ namespace HostTest
             return xmp;
         }
 
-        private static BitmapMetadata GetIPTCMetaData(BitmapMetadata metaData, string format)
+        private static BitmapMetadata GetIPTCMetadata(BitmapMetadata metadata, string format)
         {
             BitmapMetadata iptc = null;
             // GIF and PNG files do not contain IPTC meta data.
@@ -225,13 +225,13 @@ namespace HostTest
                 {
                     if (format == "jpg")
                     {
-                        iptc = metaData.GetQuery("/app13/irb/8bimiptc/iptc") as BitmapMetadata;
+                        iptc = metadata.GetQuery("/app13/irb/8bimiptc/iptc") as BitmapMetadata;
                     }
                     else
                     {
                         try
                         {
-                            iptc = metaData.GetQuery("/ifd/iptc") as BitmapMetadata;
+                            iptc = metadata.GetQuery("/ifd/iptc") as BitmapMetadata;
                         }
                         catch (IOException)
                         {
@@ -240,7 +240,7 @@ namespace HostTest
 
                         if (iptc == null)
                         {
-                            iptc = metaData.GetQuery("/ifd/irb/8bimiptc/iptc") as BitmapMetadata;
+                            iptc = metadata.GetQuery("/ifd/irb/8bimiptc/iptc") as BitmapMetadata;
                         }
                     }
                 }
@@ -256,23 +256,23 @@ namespace HostTest
         /// <summary>
         /// Converts the meta-data to TIFF format.
         /// </summary>
-        /// <param name="metaData">The meta data.</param>
+        /// <param name="metadata">The meta data.</param>
         /// <returns>The converted meta data or null</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="metaData"/> is null.
+        /// <paramref name="metadata"/> is null.
         /// </exception>
-        internal static BitmapMetadata ConvertMetaDataToTIFF(BitmapMetadata metaData)
+        internal static BitmapMetadata ConvertMetadataToTIFF(BitmapMetadata metadata)
         {
-            if (metaData == null)
+            if (metadata == null)
             {
-                throw new ArgumentNullException(nameof(metaData));
+                throw new ArgumentNullException(nameof(metadata));
             }
 
             string format = string.Empty;
 
             try
             {
-                format = metaData.Format; // Some WIC codecs do not implement the format property.
+                format = metadata.Format; // Some WIC codecs do not implement the format property.
             }
             catch (ArgumentException)
             {
@@ -283,20 +283,20 @@ namespace HostTest
 
             if (format != "tiff")
             {
-                BitmapMetadata exif = GetEXIFMetaData(metaData, format);
-                BitmapMetadata xmp = GetXMPMetaData(metaData, format);
-                BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
+                BitmapMetadata exif = GetEXIFMetadata(metadata, format);
+                BitmapMetadata xmp = GetXMPMetadata(metadata, format);
+                BitmapMetadata iptc = GetIPTCMetadata(metadata, format);
 
                 if (exif == null && xmp == null && iptc == null)
                 {
                     return null;
                 }
 
-                BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
+                BitmapMetadata tiffMetadata = new BitmapMetadata("tiff");
 
                 if (exif != null)
                 {
-                    tiffMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
+                    tiffMetadata.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
 
                     foreach (var tag in exif)
                     {
@@ -308,18 +308,18 @@ namespace HostTest
                         {
                             string baseQuery = "/ifd/exif" + tag;
 
-                            CopySubIFDRecursive(ref tiffMetaData, exifSub, baseQuery);
+                            CopySubIFDRecursive(ref tiffMetadata, exifSub, baseQuery);
                         }
                         else
                         {
-                            tiffMetaData.SetQuery("/ifd/exif" + tag, value);
+                            tiffMetadata.SetQuery("/ifd/exif" + tag, value);
                         }
                     }
                 }
 
                 if (xmp != null)
                 {
-                    tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+                    tiffMetadata.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
                     foreach (var tag in xmp)
                     {
@@ -329,18 +329,18 @@ namespace HostTest
 
                         if (xmpSub != null)
                         {
-                            CopySubIFDRecursive(ref tiffMetaData, xmpSub, "/ifd/xmp" + tag);
+                            CopySubIFDRecursive(ref tiffMetadata, xmpSub, "/ifd/xmp" + tag);
                         }
                         else
                         {
-                            tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
+                            tiffMetadata.SetQuery("/ifd/xmp" + tag, value);
                         }
                     }
                 }
 
                 if (iptc != null)
                 {
-                    tiffMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
+                    tiffMetadata.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
 
                     foreach (var tag in iptc)
                     {
@@ -350,19 +350,19 @@ namespace HostTest
 
                         if (iptcSub != null)
                         {
-                            CopySubIFDRecursive(ref tiffMetaData, iptcSub, "/ifd/iptc" + tag);
+                            CopySubIFDRecursive(ref tiffMetadata, iptcSub, "/ifd/iptc" + tag);
                         }
                         else
                         {
-                            tiffMetaData.SetQuery("/ifd/iptc" + tag, value);
+                            tiffMetadata.SetQuery("/ifd/iptc" + tag, value);
                         }
                     }
                 }
 
-                return tiffMetaData;
+                return tiffMetadata;
             }
 
-            return metaData;
+            return metadata;
         }
 
         /// <summary>
@@ -380,23 +380,23 @@ namespace HostTest
                 throw new ArgumentNullException(nameof(image));
             }
 
-            BitmapMetadata metaData = null;
+            BitmapMetadata metadata = null;
 
             try
             {
-                metaData = image.Metadata as BitmapMetadata;
+                metadata = image.Metadata as BitmapMetadata;
             }
             catch (NotSupportedException)
             {
             }
 
-            if (metaData != null)
+            if (metadata != null)
             {
                 string iptcCaption = null;
 
                 try
                 {
-                    iptcCaption = metaData.GetQuery("/ifd/iptc/{str=Caption}") as string;
+                    iptcCaption = metadata.GetQuery("/ifd/iptc/{str=Caption}") as string;
                 }
                 catch (IOException)
                 {
@@ -407,7 +407,7 @@ namespace HostTest
                 {
                     try
                     {
-                        iptcCaption = metaData.GetQuery("/ifd/xmp/dc:description/x-default") as string;
+                        iptcCaption = metadata.GetQuery("/ifd/xmp/dc:description/x-default") as string;
                     }
                     catch (IOException)
                     {
@@ -424,14 +424,14 @@ namespace HostTest
         /// <summary>
         /// Gets the orientation transform.
         /// </summary>
-        /// <param name="metaData">The meta data.</param>
+        /// <param name="metadata">The meta data.</param>
         /// <returns>The orientation transform.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="metaData"/> is null.</exception>
-        internal static Transform GetOrientationTransform(BitmapMetadata metaData)
+        /// <exception cref="ArgumentNullException"><paramref name="metadata"/> is null.</exception>
+        internal static Transform GetOrientationTransform(BitmapMetadata metadata)
         {
-            if (metaData == null)
+            if (metadata == null)
             {
-                throw new ArgumentNullException(nameof(metaData));
+                throw new ArgumentNullException(nameof(metadata));
             }
 
             Transform transform = null;
@@ -440,7 +440,7 @@ namespace HostTest
 
             try
             {
-                format = metaData.Format; // Some WIC codecs do not implement the format property.
+                format = metadata.Format; // Some WIC codecs do not implement the format property.
             }
             catch (ArgumentException)
             {
@@ -449,7 +449,7 @@ namespace HostTest
             {
             }
 
-            ImageOrientation orientation = GetImageOrientation(metaData, format);
+            ImageOrientation orientation = GetImageOrientation(metadata, format);
 
             if (orientation != ImageOrientation.None)
             {
@@ -509,21 +509,21 @@ namespace HostTest
         /// <summary>
         /// Sets the image orientation to indicate the origin is the top left corner.
         /// </summary>
-        /// <param name="metaData">The meta data.</param>
+        /// <param name="metadata">The meta data.</param>
         /// <returns>The modified meta data.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="metaData"/> is null.</exception>
-        internal static BitmapMetadata SetOrientationToTopLeft(BitmapMetadata metaData)
+        /// <exception cref="ArgumentNullException"><paramref name="metadata"/> is null.</exception>
+        internal static BitmapMetadata SetOrientationToTopLeft(BitmapMetadata metadata)
         {
-            if (metaData == null)
+            if (metadata == null)
             {
-                throw new ArgumentNullException(nameof(metaData));
+                throw new ArgumentNullException(nameof(metadata));
             }
 
             string format = string.Empty;
 
             try
             {
-                format = metaData.Format; // Some WIC codecs do not implement the format property.
+                format = metadata.Format; // Some WIC codecs do not implement the format property.
             }
             catch (ArgumentException)
             {
@@ -532,50 +532,50 @@ namespace HostTest
             {
             }
 
-            BitmapMetadata newMetaData = metaData.Clone();
+            BitmapMetadata newMetadata = metadata.Clone();
 
             try
             {
                 if (format == "jpg")
                 {
-                    if (metaData.ContainsQuery("/app1/ifd"))
+                    if (metadata.ContainsQuery("/app1/ifd"))
                     {
-                        newMetaData.SetQuery("/app1/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
+                        newMetadata.SetQuery("/app1/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
                     }
 
-                    if (metaData.ContainsQuery("/xmp"))
+                    if (metadata.ContainsQuery("/xmp"))
                     {
-                        newMetaData.SetQuery("/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
+                        newMetadata.SetQuery("/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
                     }
                 }
                 else if (format == "png")
                 {
-                    BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+                    BitmapMetadata xmp = GetXMPMetadata(metadata, format);
 
                     if (xmp != null)
                     {
                         xmp.SetQuery("/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
 
-                        if (string.Equals(metaData.GetQuery("/iTXt/Keyword") as string, "XML:com.adobe.xmp", StringComparison.Ordinal))
+                        if (string.Equals(metadata.GetQuery("/iTXt/Keyword") as string, "XML:com.adobe.xmp", StringComparison.Ordinal))
                         {
                             byte[] packet = ExtractXMPPacket(xmp);
 
                             if (packet != null)
                             {
-                                newMetaData.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
+                                newMetadata.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
                             }
                         }
                     }
                 }
                 else if (format != "gif")
                 {
-                    if (metaData.ContainsQuery("/ifd"))
+                    if (metadata.ContainsQuery("/ifd"))
                     {
-                        newMetaData.SetQuery("/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
+                        newMetadata.SetQuery("/ifd/{ushort=274}", (ushort)ImageOrientation.TopLeft);
 
-                        if (metaData.ContainsQuery("/ifd/xmp"))
+                        if (metadata.ContainsQuery("/ifd/xmp"))
                         {
-                            newMetaData.SetQuery("/ifd/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
+                            newMetadata.SetQuery("/ifd/xmp/tiff:Orientation", ((ushort)ImageOrientation.TopLeft).ToString(CultureInfo.InvariantCulture));
                         }
                     }
                 }
@@ -585,27 +585,27 @@ namespace HostTest
                 // WINCODEC_ERR_INVALIDQUERYREQUEST
             }
 
-            return newMetaData;
+            return newMetadata;
         }
 
         #region Save format conversion
 
-        private static BitmapMetadata ConvertMetaDataToJPEG(BitmapMetadata metaData, string format)
+        private static BitmapMetadata ConvertMetadataToJPEG(BitmapMetadata metadata, string format)
         {
-            BitmapMetadata exif = GetEXIFMetaData(metaData, format);
-            BitmapMetadata xmp = GetXMPMetaData(metaData, format);
-            BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
+            BitmapMetadata exif = GetEXIFMetadata(metadata, format);
+            BitmapMetadata xmp = GetXMPMetadata(metadata, format);
+            BitmapMetadata iptc = GetIPTCMetadata(metadata, format);
 
             if (exif == null && xmp == null && iptc == null)
             {
                 return null;
             }
 
-            BitmapMetadata jpegMetaData = new BitmapMetadata("jpg");
+            BitmapMetadata jpegMetadata = new BitmapMetadata("jpg");
 
             if (exif != null)
             {
-                jpegMetaData.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
+                jpegMetadata.SetQuery("/app1/ifd/exif", new BitmapMetadata("exif"));
 
                 foreach (var tag in exif)
                 {
@@ -617,18 +617,18 @@ namespace HostTest
                     {
                         string baseQuery = "/app1/ifd/exif" + tag;
 
-                        CopySubIFDRecursive(ref jpegMetaData, exifSub, baseQuery);
+                        CopySubIFDRecursive(ref jpegMetadata, exifSub, baseQuery);
                     }
                     else
                     {
-                        jpegMetaData.SetQuery("/app1/ifd/exif" + tag, value);
+                        jpegMetadata.SetQuery("/app1/ifd/exif" + tag, value);
                     }
                 }
             }
 
             if (xmp != null)
             {
-                jpegMetaData.SetQuery("/xmp", new BitmapMetadata("xmp"));
+                jpegMetadata.SetQuery("/xmp", new BitmapMetadata("xmp"));
 
                 foreach (var tag in xmp)
                 {
@@ -638,18 +638,18 @@ namespace HostTest
 
                     if (xmpSub != null)
                     {
-                        CopySubIFDRecursive(ref jpegMetaData, xmpSub, "/xmp" + tag);
+                        CopySubIFDRecursive(ref jpegMetadata, xmpSub, "/xmp" + tag);
                     }
                     else
                     {
-                        jpegMetaData.SetQuery("/xmp" + tag, value);
+                        jpegMetadata.SetQuery("/xmp" + tag, value);
                     }
                 }
             }
 
             if (iptc != null)
             {
-                jpegMetaData.SetQuery("/app13/irb/8bimiptc/iptc", new BitmapMetadata("iptc"));
+                jpegMetadata.SetQuery("/app13/irb/8bimiptc/iptc", new BitmapMetadata("iptc"));
 
                 foreach (var tag in iptc)
                 {
@@ -659,22 +659,22 @@ namespace HostTest
 
                     if (iptcSub != null)
                     {
-                        CopySubIFDRecursive(ref jpegMetaData, iptcSub, "/app13/irb/8bimiptc/iptc" + tag);
+                        CopySubIFDRecursive(ref jpegMetadata, iptcSub, "/app13/irb/8bimiptc/iptc" + tag);
                     }
                     else
                     {
-                        jpegMetaData.SetQuery("/app13/irb/8bimiptc/iptc" + tag, value);
+                        jpegMetadata.SetQuery("/app13/irb/8bimiptc/iptc" + tag, value);
                     }
                 }
             }
 
-            return jpegMetaData;
+            return jpegMetadata;
         }
 
         private static byte[] ExtractXMPPacket(BitmapMetadata xmp)
         {
-            BitmapMetadata tiffMetaData = new BitmapMetadata("tiff");
-            tiffMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+            BitmapMetadata tiffMetadata = new BitmapMetadata("tiff");
+            tiffMetadata.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
             foreach (var tag in xmp)
             {
@@ -684,11 +684,11 @@ namespace HostTest
 
                 if (xmpSub != null)
                 {
-                    CopySubIFDRecursive(ref tiffMetaData, xmpSub, "/ifd/xmp" + tag);
+                    CopySubIFDRecursive(ref tiffMetadata, xmpSub, "/ifd/xmp" + tag);
                 }
                 else
                 {
-                    tiffMetaData.SetQuery("/ifd/xmp" + tag, value);
+                    tiffMetadata.SetQuery("/ifd/xmp" + tag, value);
                 }
             }
 
@@ -699,7 +699,7 @@ namespace HostTest
                 // Create a dummy tiff to extract the XMP packet from.
                 BitmapSource source = BitmapSource.Create(1, 1, 96.0, 96.0, PixelFormats.Gray8, null, new byte[] { 255 }, 1);
                 TiffBitmapEncoder encoder = new TiffBitmapEncoder();
-                encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetaData, null));
+                encoder.Frames.Add(BitmapFrame.Create(source, null, tiffMetadata, null));
                 encoder.Save(stream);
 
                 xmpBytes = TiffReader.ExtractXMP(stream);
@@ -708,9 +708,9 @@ namespace HostTest
             return xmpBytes;
         }
 
-        private static BitmapMetadata ConvertMetaDataToPNG(BitmapMetadata metaData, string format)
+        private static BitmapMetadata ConvertMetadataToPNG(BitmapMetadata metadata, string format)
         {
-            BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+            BitmapMetadata xmp = GetXMPMetadata(metadata, format);
 
             if (xmp != null)
             {
@@ -718,38 +718,38 @@ namespace HostTest
 
                 if (packet != null)
                 {
-                    BitmapMetadata pngMetaData = new BitmapMetadata("png");
-                    pngMetaData.SetQuery("/iTXt", new BitmapMetadata("iTXt"));
+                    BitmapMetadata pngMetadata = new BitmapMetadata("png");
+                    pngMetadata.SetQuery("/iTXt", new BitmapMetadata("iTXt"));
 
                     // The Keyword property is an ANSI string (VT_LPSTR), which must passed as a char array in order for it to be marshaled correctly.
                     char[] keyWordChars = "XML:com.adobe.xmp".ToCharArray();
-                    pngMetaData.SetQuery("/iTXt/Keyword", keyWordChars);
+                    pngMetadata.SetQuery("/iTXt/Keyword", keyWordChars);
 
-                    pngMetaData.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
+                    pngMetadata.SetQuery("/iTXt/TextEntry", Encoding.UTF8.GetString(packet));
 
-                    return pngMetaData;
+                    return pngMetadata;
                 }
             }
 
             return null;
         }
 
-        private static BitmapMetadata ConvertMetaDataToWMPhoto(BitmapMetadata metaData, string format)
+        private static BitmapMetadata ConvertMetadataToWMPhoto(BitmapMetadata metadata, string format)
         {
-            BitmapMetadata exif = GetEXIFMetaData(metaData, format);
-            BitmapMetadata xmp = GetXMPMetaData(metaData, format);
-            BitmapMetadata iptc = GetIPTCMetaData(metaData, format);
+            BitmapMetadata exif = GetEXIFMetadata(metadata, format);
+            BitmapMetadata xmp = GetXMPMetadata(metadata, format);
+            BitmapMetadata iptc = GetIPTCMetadata(metadata, format);
 
             if (exif == null && xmp == null && iptc == null)
             {
                 return null;
             }
 
-            BitmapMetadata wmpMetaData = new BitmapMetadata("wmphoto");
+            BitmapMetadata wmpMetadata = new BitmapMetadata("wmphoto");
 
             if (exif != null)
             {
-                wmpMetaData.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
+                wmpMetadata.SetQuery("/ifd/exif", new BitmapMetadata("exif"));
 
                 foreach (var tag in exif)
                 {
@@ -761,18 +761,18 @@ namespace HostTest
                     {
                         string baseQuery = "/ifd/exif" + tag;
 
-                        CopySubIFDRecursive(ref wmpMetaData, exifSub, baseQuery);
+                        CopySubIFDRecursive(ref wmpMetadata, exifSub, baseQuery);
                     }
                     else
                     {
-                        wmpMetaData.SetQuery("/ifd/exif" + tag, value);
+                        wmpMetadata.SetQuery("/ifd/exif" + tag, value);
                     }
                 }
             }
 
             if (xmp != null)
             {
-                wmpMetaData.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
+                wmpMetadata.SetQuery("/ifd/xmp", new BitmapMetadata("xmp"));
 
                 foreach (var tag in xmp)
                 {
@@ -782,18 +782,18 @@ namespace HostTest
 
                     if (xmpSub != null)
                     {
-                        CopySubIFDRecursive(ref wmpMetaData, xmpSub, "/ifd/xmp" + tag);
+                        CopySubIFDRecursive(ref wmpMetadata, xmpSub, "/ifd/xmp" + tag);
                     }
                     else
                     {
-                        wmpMetaData.SetQuery("/ifd/xmp" + tag, value);
+                        wmpMetadata.SetQuery("/ifd/xmp" + tag, value);
                     }
                 }
             }
 
             if (iptc != null)
             {
-                wmpMetaData.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
+                wmpMetadata.SetQuery("/ifd/iptc", new BitmapMetadata("iptc"));
 
                 foreach (var tag in iptc)
                 {
@@ -803,35 +803,35 @@ namespace HostTest
 
                     if (iptcSub != null)
                     {
-                        CopySubIFDRecursive(ref wmpMetaData, iptcSub, "/ifd/iptc" + tag);
+                        CopySubIFDRecursive(ref wmpMetadata, iptcSub, "/ifd/iptc" + tag);
                     }
                     else
                     {
-                        wmpMetaData.SetQuery("/ifd/iptc" + tag, value);
+                        wmpMetadata.SetQuery("/ifd/iptc" + tag, value);
                     }
                 }
             }
 
-            return wmpMetaData;
+            return wmpMetadata;
         }
         #endregion
 
         /// <summary>
         /// Converts the meta-data to the encoder format.
         /// </summary>
-        /// <param name="metaData">The meta-data.</param>
+        /// <param name="metadata">The meta-data.</param>
         /// <param name="encoder">The encoder.</param>
         /// <returns>The converted meta-data, or null.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="metaData"/> is null.
+        /// <paramref name="metadata"/> is null.
         /// or
         /// <paramref name="encoder"/> is null.
         /// </exception>
-        internal static BitmapMetadata ConvertSaveMetaDataFormat(BitmapMetadata metaData, BitmapEncoder encoder)
+        internal static BitmapMetadata ConvertSaveMetadataFormat(BitmapMetadata metadata, BitmapEncoder encoder)
         {
-            if (metaData == null)
+            if (metadata == null)
             {
-                throw new ArgumentNullException(nameof(metaData));
+                throw new ArgumentNullException(nameof(metadata));
             }
             if (encoder == null)
             {
@@ -842,7 +842,7 @@ namespace HostTest
 
             try
             {
-                format = metaData.Format; // Some WIC codecs do not implement the format property.
+                format = metadata.Format; // Some WIC codecs do not implement the format property.
             }
             catch (ArgumentException)
             {
@@ -857,51 +857,51 @@ namespace HostTest
             {
                 if (format == "tiff")
                 {
-                    return metaData;
+                    return metadata;
                 }
                 else
                 {
-                    return ConvertMetaDataToTIFF(metaData);
+                    return ConvertMetadataToTIFF(metadata);
                 }
             }
             else if (encoderType == typeof(JpegBitmapEncoder))
             {
                 if (format == "jpg")
                 {
-                    return metaData;
+                    return metadata;
                 }
                 else
                 {
-                    return ConvertMetaDataToJPEG(metaData, format);
+                    return ConvertMetadataToJPEG(metadata, format);
                 }
             }
             else if (encoderType == typeof(PngBitmapEncoder))
             {
                 if (format == "png")
                 {
-                    return metaData;
+                    return metadata;
                 }
                 else
                 {
-                    return ConvertMetaDataToPNG(metaData, format);
+                    return ConvertMetadataToPNG(metadata, format);
                 }
             }
             else if (encoderType == typeof(WmpBitmapEncoder))
             {
                 if (format == "wmphoto")
                 {
-                    return metaData;
+                    return metadata;
                 }
                 else
                 {
-                    return ConvertMetaDataToWMPhoto(metaData, format);
+                    return ConvertMetadataToWMPhoto(metadata, format);
                 }
             }
 
             return null;
         }
 
-        private static ImageOrientation GetImageOrientation(BitmapMetadata metaData, string format)
+        private static ImageOrientation GetImageOrientation(BitmapMetadata metadata, string format)
         {
             ImageOrientation orientation = ImageOrientation.None;
 
@@ -911,11 +911,11 @@ namespace HostTest
             {
                 if (format == "jpg")
                 {
-                    orientationObject = metaData.GetQuery("/app1/ifd/{ushort=274}");
+                    orientationObject = metadata.GetQuery("/app1/ifd/{ushort=274}");
                 }
                 else if (format != "gif" && format != "png")
                 {
-                    orientationObject = metaData.GetQuery("/ifd/{ushort=274}");
+                    orientationObject = metadata.GetQuery("/ifd/{ushort=274}");
                 }
             }
             catch (IOException)
@@ -925,7 +925,7 @@ namespace HostTest
 
             if (orientationObject == null)
             {
-                BitmapMetadata xmp = GetXMPMetaData(metaData, format);
+                BitmapMetadata xmp = GetXMPMetadata(metadata, format);
 
                 if (xmp != null)
                 {

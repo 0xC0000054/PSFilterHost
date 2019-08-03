@@ -131,18 +131,18 @@ namespace HostTest
                 using (MemoryStream stream = new MemoryStream())
                 {
                     // Set the meta data manually as some codecs may not implement all the properties required for BitmapMetadata.Clone() to succeed.
-                    BitmapMetadata metaData = null;
+                    BitmapMetadata metadata = null;
 
                     try
                     {
-                        metaData = image.Metadata as BitmapMetadata;
+                        metadata = image.Metadata as BitmapMetadata;
                     }
                     catch (NotSupportedException)
                     {
                     }
 
                     PngBitmapEncoder enc = new PngBitmapEncoder();
-                    enc.Frames.Add(BitmapFrame.Create(image, null, metaData, null));
+                    enc.Frames.Add(BitmapFrame.Create(image, null, metadata, null));
                     enc.Save(stream);
 
                     info.AddValue("image", stream.GetBuffer(), typeof(byte[]));
