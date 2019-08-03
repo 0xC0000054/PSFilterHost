@@ -81,7 +81,6 @@ namespace HostTest
             currentPluginDirectory = string.Empty;
             hostInfo = new HostInformation();
             srcMetaData = null;
-            srcMetaData = null;
             srcColorContext = null;
             monitorColorContext = null;
             monitorColorProfilePath = null;
