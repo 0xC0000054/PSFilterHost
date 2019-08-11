@@ -132,7 +132,7 @@ namespace PSFilterHostDll.BGRASurface
             else
             {
 #if REPORTLEAKS
-				throw new InvalidOperationException("memory leak! check the debug output for more info, and http://blogs.msdn.com/ricom/archive/2004/12/10/279612.aspx to track it down");
+                throw new InvalidOperationException("memory leak! check the debug output for more info, and http://blogs.msdn.com/ricom/archive/2004/12/10/279612.aspx to track it down");
 #endif
             }
         }
