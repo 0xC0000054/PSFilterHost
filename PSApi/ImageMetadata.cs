@@ -12,7 +12,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 
 #if GDIPLUS
 using System.Drawing;
@@ -153,7 +152,7 @@ namespace PSFilterHostDll.PSApi
                     enc.Frames.Add(BitmapFrame.Create(image, null, metadata, null));
                     enc.Save(ms);
 #endif
-                    exifBytes = JpegReader.ExtractEXIF(ms.GetBuffer());
+                    exifBytes = JpegReader.ExtractEXIF(ms);
                     extractedExif = true;
                     bytes = exifBytes;
                 }
@@ -208,82 +207,80 @@ namespace PSFilterHostDll.PSApi
             }
 
             private const int EXIFSignatureLength = 6;
-            private const int EXIFSegmentHeaderLength = sizeof(ushort) + EXIFSignatureLength;
-
-            private static ushort ReadUInt16BigEndian(byte[] buffer, int startIndex)
-            {
-                return (ushort)((buffer[startIndex] << 8) | buffer[startIndex + 1]);
-            }
 
             /// <summary>
             /// Extracts the EXIF data from a JPEG image.
             /// </summary>
-            /// <param name="jpegBytes">The JPEG image bytes.</param>
+            /// <param name="stream">The JPEG image.</param>
             /// <returns>The extracted EXIF data, or null.</returns>
-            internal static byte[] ExtractEXIF(byte[] jpegBytes)
+            internal static byte[] ExtractEXIF(Stream stream)
             {
+                byte[] exifData = null;
+
+                stream.Position = 0L;
+
                 try
                 {
-                    if (jpegBytes.Length > 2)
+                    using (EndianBinaryReader reader = new EndianBinaryReader(stream, Endianess.Big, true))
                     {
-                        ushort marker = ReadUInt16BigEndian(jpegBytes, 0);
-
-                        // Check the file signature.
-                        if (marker == JpegMarkers.StartOfImage)
-                        {
-                            int index = 2;
-                            int length = jpegBytes.Length;
-
-                            while (index < length)
-                            {
-                                marker = ReadUInt16BigEndian(jpegBytes, index);
-                                if (marker == 0xFFFF)
-                                {
-                                    // Skip the first padding byte and read the marker again.
-                                    index++;
-                                    continue;
-                                }
-                                else
-                                {
-                                    index += 2;
-                                }
-
-                                if (marker == JpegMarkers.StartOfScan || marker == JpegMarkers.EndOfImage)
-                                {
-                                    // The application data segments always come before these markers.
-                                    break;
-                                }
-
-                                // The segment length field includes its own length in the total.
-                                // The index is not incremented after reading it to avoid having to subtract
-                                // 2 bytes from the length when skipping a segment.
-                                ushort segmentLength = ReadUInt16BigEndian(jpegBytes, index);
-
-                                if (marker == JpegMarkers.App1 && segmentLength >= EXIFSegmentHeaderLength)
-                                {
-                                    string sig = Encoding.UTF8.GetString(jpegBytes, index + 2, EXIFSignatureLength);
-                                    if (sig.Equals("Exif\0\0", StringComparison.Ordinal))
-                                    {
-                                        int exifDataSize = segmentLength - EXIFSegmentHeaderLength;
-                                        byte[] exifData = null;
-
-                                        if (exifDataSize > 0)
-                                        {
-                                            exifData = new byte[exifDataSize];
-                                            Buffer.BlockCopy(jpegBytes, index + EXIFSegmentHeaderLength, exifData, 0, exifDataSize);
-                                        }
-
-                                        return exifData;
-                                    }
-                                }
-
-                                index += segmentLength;
-                            }
-                        }
+                        exifData = ExtractEXIFBlob(reader);
                     }
                 }
-                catch (IndexOutOfRangeException)
+                catch (EndOfStreamException)
                 {
+                }
+
+                return exifData;
+            }
+
+            private static byte[] ExtractEXIFBlob(EndianBinaryReader reader)
+            {
+                ushort marker = reader.ReadUInt16();
+
+                // Check the file signature.
+                if (marker == JpegMarkers.StartOfImage)
+                {
+                    while (reader.Position < reader.Length)
+                    {
+                        marker = reader.ReadUInt16();
+                        if (marker == 0xFFFF)
+                        {
+                            // Skip the first padding byte and read the marker again.
+                            reader.Position++;
+                            continue;
+                        }
+
+                        if (marker == JpegMarkers.StartOfScan || marker == JpegMarkers.EndOfImage)
+                        {
+                            // The application data segments always come before these markers.
+                            break;
+                        }
+
+                        ushort segmentLength = reader.ReadUInt16();
+
+                        // The segment length field includes its own length in the total.
+                        segmentLength -= sizeof(ushort);
+
+                        if (marker == JpegMarkers.App1 && segmentLength >= EXIFSignatureLength)
+                        {
+                            string sig = reader.ReadAsciiString(EXIFSignatureLength);
+                            if (sig.Equals("Exif\0\0", StringComparison.Ordinal))
+                            {
+                                int exifDataSize = segmentLength - EXIFSignatureLength;
+
+                                byte[] exifBytes = null;
+
+                                if (exifDataSize > 0)
+                                {
+                                    exifBytes = reader.ReadBytes(exifDataSize);
+                                }
+
+                                return exifBytes;
+                            }
+                        }
+
+                        reader.Position += segmentLength;
+                    }
                 }
 
                 return null;
@@ -315,76 +312,43 @@ namespace PSFilterHostDll.PSApi
                 public uint count;
                 public uint offset;
 
-                public IFD(Stream stream, bool littleEndian)
+                public IFD(EndianBinaryReader reader)
                 {
-                    tag = ReadShort(stream, littleEndian);
-                    type = (DataType)ReadShort(stream, littleEndian);
-                    count = ReadLong(stream, littleEndian);
-                    offset = ReadLong(stream, littleEndian);
+                    tag = reader.ReadUInt16();
+                    type = (DataType)reader.ReadUInt16();
+                    count = reader.ReadUInt32();
+                    offset = reader.ReadUInt32();
                 }
             }
 
-            private static ushort ReadShort(Stream stream, bool littleEndian)
+            private static Endianess? TryDetectTiffByteOrder(Stream stream)
             {
                 int byte1 = stream.ReadByte();
                 if (byte1 == -1)
                 {
-                    throw new EndOfStreamException();
+                    return null;
                 }
 
                 int byte2 = stream.ReadByte();
                 if (byte2 == -1)
                 {
-                    throw new EndOfStreamException();
+                    return null;
                 }
 
-                if (littleEndian)
+                if (byte1 == 0x4D && byte2 == 0x4D)
                 {
-                    return (ushort)(byte1 | (byte2 << 8));
+                    return Endianess.Big;
+                }
+                else if (byte1 == 0x49 && byte2 == 0x49)
+                {
+                    return Endianess.Little;
                 }
                 else
                 {
-                    return (ushort)((byte1 << 8) | byte2);
+                    return null;
                 }
             }
 
-            private static uint ReadLong(Stream stream, bool littleEndian)
-            {
-                int byte1 = stream.ReadByte();
-                if (byte1 == -1)
-                {
-                    throw new EndOfStreamException();
-                }
-
-                int byte2 = stream.ReadByte();
-                if (byte2 == -1)
-                {
-                    throw new EndOfStreamException();
-                }
-
-                int byte3 = stream.ReadByte();
-                if (byte3 == -1)
-                {
-                    throw new EndOfStreamException();
-                }
-
-                int byte4 = stream.ReadByte();
-                if (byte4 == -1)
-                {
-                    throw new EndOfStreamException();
-                }
-
-                if (littleEndian)
-                {
-                    return (uint)(byte1 | (((byte2 << 8) | (byte3 << 16)) | (byte4 << 24)));
-                }
-                else
-                {
-                    return (uint)((((byte1 << 24) | (byte2 << 16)) | (byte3 << 8)) | byte4);
-                }
-            }
-
-            private const ushort LittleEndianByteOrder = 0x4949;
             private const ushort TIFFSignature = 42;
             private const ushort XmpTag = 700;
 
@@ -395,51 +359,63 @@ namespace PSFilterHostDll.PSApi
             /// <returns>The extracted XMP packet, or null.</returns>
             internal static byte[] ExtractXMP(Stream stream)
             {
+                byte[] xmpBytes = null;
+
                 stream.Position = 0L;
 
                 try
                 {
-                    ushort byteOrder = ReadShort(stream, false);
+                    Endianess? byteOrder = TryDetectTiffByteOrder(stream);
 
-                    bool littleEndian = byteOrder == LittleEndianByteOrder;
-
-                    ushort signature = ReadShort(stream, littleEndian);
-
-                    if (signature == TIFFSignature)
+                    if (byteOrder.HasValue)
                     {
-                        uint ifdOffset = ReadLong(stream, littleEndian);
-                        stream.Seek(ifdOffset, SeekOrigin.Begin);
-
-                        int ifdCount = ReadShort(stream, littleEndian);
-
-                        for (int i = 0; i < ifdCount; i++)
+                        using (EndianBinaryReader reader = new EndianBinaryReader(stream, byteOrder.Value, true))
                         {
-                            IFD ifd = new IFD(stream, littleEndian);
-
-                            if (ifd.tag == XmpTag && (ifd.type == DataType.Byte || ifd.type == DataType.Undefined))
-                            {
-                                stream.Seek(ifd.offset, SeekOrigin.Begin);
-
-                                int count = (int)ifd.count;
-
-                                byte[] xmpBytes = new byte[count];
-
-                                int numBytesToRead = count;
-                                int numBytesRead = 0;
-                                do
-                                {
-                                    int n = stream.Read(xmpBytes, numBytesRead, numBytesToRead);
-                                    numBytesRead += n;
-                                    numBytesToRead -= n;
-                                } while (numBytesToRead > 0);
-
-                                return xmpBytes;
-                            }
+                            xmpBytes = ExtractXMPPacket(reader);
                         }
                     }
                 }
                 catch (EndOfStreamException)
                 {
+                }
+
+                return xmpBytes;
+            }
+
+            /// <summary>
+            /// Extracts the XMP packet.
+            /// </summary>
+            /// <param name="reader">The reader.</param>
+            /// <returns>The extracted XMP packet.</returns>
+            /// <exception cref="EndOfStreamException">The end of the stream has been reached.</exception>
+            private static byte[] ExtractXMPPacket(EndianBinaryReader reader)
+            {
+                ushort signature = reader.ReadUInt16();
+
+                if (signature == TIFFSignature)
+                {
+                    uint ifdOffset = reader.ReadUInt32();
+                    reader.Position = ifdOffset;
+
+                    int ifdCount = reader.ReadUInt16();
+
+                    for (int i = 0; i < ifdCount; i++)
+                    {
+                        IFD ifd = new IFD(reader);
+
+                        if (ifd.tag == XmpTag && (ifd.type == DataType.Byte || ifd.type == DataType.Undefined))
+                        {
+                            if (ifd.count > int.MaxValue)
+                            {
+                                // The .NET Framework does not support arrays larger than 2 GB.
+                                return null;
+                            }
+
+                            reader.Position = ifd.offset;
+
+                            return reader.ReadBytes((int)ifd.count);
+                        }
+                    }
                 }
 
                 return null;

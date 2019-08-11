@@ -18,52 +18,6 @@ namespace PSFilterHostDll.PSApi
 {
     internal static class PEFile
     {
-        private static uint ReadUInt32(Stream stream)
-        {
-            int byte1 = stream.ReadByte();
-            if (byte1 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            int byte2 = stream.ReadByte();
-            if (byte2 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            int byte3 = stream.ReadByte();
-            if (byte3 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            int byte4 = stream.ReadByte();
-            if (byte4 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            return (uint)(byte1 | (byte2 << 8) | (byte3 << 16) | (byte4 << 24));
-        }
-
-        private static ushort ReadUInt16(Stream stream)
-        {
-            int byte1 = stream.ReadByte();
-            if (byte1 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            int byte2 = stream.ReadByte();
-            if (byte2 == -1)
-            {
-                throw new EndOfStreamException();
-            }
-
-            return (ushort)(byte1 | (byte2 << 8));
-        }
-
         private const ushort IMAGE_DOS_SIGNATURE = 0x5A4D; // MZ
         private const uint IMAGE_NT_SIGNATURE = 0x00004550; // PE00
         private const ushort IMAGE_FILE_MACHINE_I386 = 0x14C;
@@ -77,34 +31,17 @@ namespace PSFilterHostDll.PSApi
         /// <returns><c>true</c> if the processor architecture matches the current process; otherwise <c>false</c>.</returns>
         internal static bool CheckProcessorArchitecture(string fileName)
         {
+            FileStream stream = null;
+
             try
             {
-                using (FileStream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+                using (EndianBinaryReader reader = new EndianBinaryReader(stream, Endianess.Little))
                 {
-                    ushort dosSignature = ReadUInt16(stream);
-                    if (dosSignature == IMAGE_DOS_SIGNATURE)
-                    {
-                        stream.Seek(NTSignatureOffsetLocation, SeekOrigin.Begin);
+                    stream = null;
 
-                        uint ntSignatureOffset = ReadUInt32(stream);
-
-                        stream.Seek(ntSignatureOffset, SeekOrigin.Begin);
-
-                        uint ntSignature = ReadUInt32(stream);
-                        if (ntSignature == IMAGE_NT_SIGNATURE)
-                        {
-                            ushort machineType = ReadUInt16(stream);
-
-                            if (IntPtr.Size == 4)
-                            {
-                                return machineType == IMAGE_FILE_MACHINE_I386;
-                            }
-                            else if (IntPtr.Size == 8)
-                            {
-                                return machineType == IMAGE_FILE_MACHINE_AMD64;
-                            }
-                        }
-                    }
+                    return CheckProcessorArchitectureImpl(reader);
                 }
             }
             catch (ArgumentException)
@@ -121,6 +58,44 @@ namespace PSFilterHostDll.PSApi
             }
             catch (UnauthorizedAccessException)
             {
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                    stream = null;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CheckProcessorArchitectureImpl(EndianBinaryReader reader)
+        {
+            ushort dosSignature = reader.ReadUInt16();
+            if (dosSignature == IMAGE_DOS_SIGNATURE)
+            {
+                reader.Position = NTSignatureOffsetLocation;
+
+                uint ntSignatureOffset = reader.ReadUInt32();
+
+                reader.Position = ntSignatureOffset;
+
+                uint ntSignature = reader.ReadUInt32();
+                if (ntSignature == IMAGE_NT_SIGNATURE)
+                {
+                    ushort machineType = reader.ReadUInt16();
+
+                    if (IntPtr.Size == 4)
+                    {
+                        return machineType == IMAGE_FILE_MACHINE_I386;
+                    }
+                    else if (IntPtr.Size == 8)
+                    {
+                        return machineType == IMAGE_FILE_MACHINE_AMD64;
+                    }
+                }
             }
 
             return false;
