@@ -21,7 +21,7 @@
 using System;
 using System.Drawing;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     /// <summary>
     /// Surface class for 32 bits per pixel BGRA image data. Each channel is allocated 8 bits per pixel.
@@ -387,7 +387,7 @@ namespace PSFilterHostDll.BGRASurface
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
-            IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
+            IntPtr rColCacheIP = ImageSurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
 
             int srcHeight = source.Height;
@@ -496,14 +496,14 @@ namespace PSFilterHostDll.BGRASurface
                 } // for (dstX...
             } // for (dstY...
 
-            BGRASurfaceMemory.Free(rColCacheIP);
+            ImageSurfaceMemory.Free(rColCacheIP);
         }
 
         protected override unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi)
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
-            IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
+            IntPtr rColCacheIP = ImageSurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
 
             int srcHeight = source.Height;
@@ -625,7 +625,7 @@ namespace PSFilterHostDll.BGRASurface
                 } // for (dstX...
             } // for (dstY...
 
-            BGRASurfaceMemory.Free(rColCacheIP);
+            ImageSurfaceMemory.Free(rColCacheIP);
         }
 
         protected override unsafe void SetAlphaToOpaqueImpl(Rectangle rect)

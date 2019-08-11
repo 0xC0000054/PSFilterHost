@@ -18,32 +18,23 @@
 // See License-pdn.txt for full licensing and attribution details.             //
 //                                                                             //
 /////////////////////////////////////////////////////////////////////////////////
-
-using System;
 using System.Runtime.InteropServices;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     [StructLayout(LayoutKind.Explicit)]
-    internal struct ColorBgra8
+    internal struct ColorBgra16
     {
         [FieldOffset(0)]
-        public byte B;
-
-        [FieldOffset(1)]
-        public byte G;
-
+        public ushort B;
         [FieldOffset(2)]
-        public byte R;
+        public ushort G;
+        [FieldOffset(4)]
+        public ushort R;
+        [FieldOffset(6)]
+        public ushort A;
 
-        [FieldOffset(3)]
-        public byte A;
-
-        /// <summary>
-        /// Lets you change B, G, R, and A at the same time.
-        /// </summary>
-        [NonSerialized]
         [FieldOffset(0)]
-        public uint Bgra;
+        public ulong Bgra;
     }
 }

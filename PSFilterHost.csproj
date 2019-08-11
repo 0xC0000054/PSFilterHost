@@ -118,18 +118,6 @@
     <Compile Include="Framework Replacements\CoreFx\HashSet.cs" />
     <Compile Include="Framework Replacements\Enumerable.cs" />
     <Compile Include="Framework Replacements\ExtensionAttribute.cs" />
-    <Compile Include="BGRASurface\BGRASurfaceMemory.cs" />
-    <Compile Include="BGRASurface\ColorBgra16.cs" />
-    <Compile Include="BGRASurface\ColorBgra8.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="BGRASurface\MemoryBlock.cs" />
-    <Compile Include="BGRASurface\SurfaceBase.cs" />
-    <Compile Include="BGRASurface\SurfaceBGRA32.cs" />
-    <Compile Include="BGRASurface\SurfaceBGRA64.cs" />
-    <Compile Include="BGRASurface\SurfaceFactory.cs" />
-    <Compile Include="BGRASurface\SurfaceGray16.cs" />
-    <Compile Include="BGRASurface\SurfaceGray8.cs" />
     <Compile Include="ColorPickerResult.cs" />
     <Compile Include="ColorProfileHelper.cs" />
     <Compile Include="EnableInfoParser.cs" />
@@ -139,6 +127,16 @@
     <Compile Include="HostColorManagement.cs" />
     <Compile Include="HostInformation.cs" />
     <Compile Include="HostRulerUnit.cs" />
+    <Compile Include="Imaging\ColorBgra16.cs" />
+    <Compile Include="Imaging\ColorBgra8.cs" />
+    <Compile Include="Imaging\ImageSurfaceMemory.cs" />
+    <Compile Include="Imaging\MemoryBlock.cs" />
+    <Compile Include="Imaging\SurfaceBase.cs" />
+    <Compile Include="Imaging\SurfaceBGRA32.cs" />
+    <Compile Include="Imaging\SurfaceBGRA64.cs" />
+    <Compile Include="Imaging\SurfaceFactory.cs" />
+    <Compile Include="Imaging\SurfaceGray16.cs" />
+    <Compile Include="Imaging\SurfaceGray8.cs" />
     <Compile Include="Interop\NativeConstants.cs" />
     <Compile Include="Interop\NativeEnums.cs" />
     <Compile Include="Interop\NativeInterfaces.cs" />

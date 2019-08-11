@@ -19,7 +19,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 using System;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     internal sealed unsafe class MemoryBlock : IDisposable
     {
@@ -119,11 +119,11 @@ namespace PSFilterHostDll.BGRASurface
                 {
                     if (length >= largeBlockThreshold)
                     {
-                        BGRASurfaceMemory.FreeLarge(new IntPtr(voidStar), (ulong)length);
+                        ImageSurfaceMemory.FreeLarge(new IntPtr(voidStar), (ulong)length);
                     }
                     else
                     {
-                        BGRASurfaceMemory.Free(new IntPtr(voidStar));
+                        ImageSurfaceMemory.Free(new IntPtr(voidStar));
                     }
                 }
 
@@ -146,11 +146,11 @@ namespace PSFilterHostDll.BGRASurface
             {
                 if (bytes >= largeBlockThreshold)
                 {
-                    block = BGRASurfaceMemory.AllocateLarge((ulong)bytes);
+                    block = ImageSurfaceMemory.AllocateLarge((ulong)bytes);
                 }
                 else
                 {
-                    block = BGRASurfaceMemory.Allocate((ulong)bytes);
+                    block = ImageSurfaceMemory.Allocate((ulong)bytes);
                 }
             }
             catch (OutOfMemoryException)

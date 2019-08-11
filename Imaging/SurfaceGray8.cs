@@ -22,7 +22,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     /// <summary>
     /// Surface class for 8 bits per pixel gray scale image data.
@@ -136,7 +136,7 @@ namespace PSFilterHostDll.BGRASurface
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
-            IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
+            IntPtr rColCacheIP = ImageSurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
 
             int srcWidth = source.Width;
@@ -231,14 +231,14 @@ namespace PSFilterHostDll.BGRASurface
                 } // for (dstX...
             } // for (dstY...
 
-            BGRASurfaceMemory.Free(rColCacheIP);
+            ImageSurfaceMemory.Free(rColCacheIP);
         }
 
         protected override unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi)
         {
             Rectangle roi = Rectangle.Intersect(dstRoi, Bounds);
 
-            IntPtr rColCacheIP = BGRASurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
+            IntPtr rColCacheIP = ImageSurfaceMemory.Allocate(4 * (ulong)roi.Width * (ulong)sizeof(double));
             double* rColCache = (double*)rColCacheIP.ToPointer();
 
             int srcWidth = source.Width;
@@ -347,7 +347,7 @@ namespace PSFilterHostDll.BGRASurface
                 } // for (dstX...
             } // for (dstY...
 
-            BGRASurfaceMemory.Free(rColCacheIP);
+            ImageSurfaceMemory.Free(rColCacheIP);
         }
 
         public override unsafe void SuperSampleFitSurface(SurfaceBase source)

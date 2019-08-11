@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using PSFilterHostDll.BGRASurface;
+using PSFilterHostDll.Imaging;
 using PSFilterHostDll.Interop;
 using PSFilterHostDll.Properties;
 using System;

@@ -22,7 +22,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 #endif
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     /// <summary>
     /// Factory for the classes derived from SurfaceBase.

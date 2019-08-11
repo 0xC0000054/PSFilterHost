@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using PSFilterHostDll.BGRASurface;
+using PSFilterHostDll.Imaging;
 
 namespace PSFilterHostDll.PSApi
 {

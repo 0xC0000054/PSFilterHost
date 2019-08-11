@@ -22,9 +22,9 @@ using System;
 using System.Globalization;
 using PSFilterHostDll.Interop;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
-    internal static class BGRASurfaceMemory
+    internal static class ImageSurfaceMemory
     {
         private static IntPtr hHeap;
 

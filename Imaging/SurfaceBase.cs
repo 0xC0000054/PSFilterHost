@@ -22,7 +22,7 @@
 using System;
 using System.Drawing;
 
-namespace PSFilterHostDll.BGRASurface
+namespace PSFilterHostDll.Imaging
 {
     internal abstract class SurfaceBase : IDisposable
     {
@@ -99,7 +99,7 @@ namespace PSFilterHostDll.BGRASurface
             {
                 unsafe
                 {
-                    BGRASurfaceMemory.Copy(scan0.VoidStar,
+                    ImageSurfaceMemory.Copy(scan0.VoidStar,
                                 source.Scan0.VoidStar,
                                 ((ulong)(height - 1) * (ulong)stride) + ((ulong)width * (ulong)bytesPerPixel));
                 }
@@ -113,7 +113,7 @@ namespace PSFilterHostDll.BGRASurface
                 {
                     for (int y = 0; y < copyHeight; ++y)
                     {
-                        BGRASurfaceMemory.Copy(GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)bytesPerPixel);
+                        ImageSurfaceMemory.Copy(GetRowAddressUnchecked(y), source.GetRowAddressUnchecked(y), (ulong)copyWidth * (ulong)bytesPerPixel);
                     }
                 }
             }

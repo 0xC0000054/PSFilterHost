@@ -26,7 +26,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using PSFilterHostDll.BGRASurface;
+using PSFilterHostDll.Imaging;
 using PSFilterHostDll.Properties;
 using PSFilterHostDll.Interop;
 
@@ -4260,7 +4260,7 @@ namespace PSFilterHostDll.PSApi
 
                 BufferSuite.Instance.FreeRemainingBuffers();
                 HandleSuite.Instance.FreeRemainingHandles();
-                BGRASurfaceMemory.DestroyHeap();
+                ImageSurfaceMemory.DestroyHeap();
             }
         }
 
