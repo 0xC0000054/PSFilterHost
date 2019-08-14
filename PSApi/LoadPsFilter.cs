@@ -1864,7 +1864,7 @@ namespace PSFilterHostDll.PSApi
                 if (scaleFactor > 1) // Filter preview
                 {
                     tempSurface = SurfaceFactory.CreateFromImageMode(scaleWidth, scaleHeight, imageMode);
-                    tempSurface.SuperSampleFitSurface(source);
+                    tempSurface.FitSurface(source);
                 }
                 else
                 {
@@ -2338,7 +2338,7 @@ namespace PSFilterHostDll.PSApi
                 if (scaleFactor > 1)
                 {
                     tempMask = new SurfaceGray8(scaleWidth, scaleHeight);
-                    tempMask.SuperSampleFitSurface(mask);
+                    tempMask.FitSurface(mask);
                 }
                 else
                 {

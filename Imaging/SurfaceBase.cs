@@ -183,16 +183,15 @@ namespace PSFilterHostDll.Imaging
         }
 
         /// <summary>
-        /// Fits the source surface to this surface using bicubic interpolation.
+        /// Fits the source surface to this surface.
         /// </summary>
         /// <param name="source">The Surface to read pixels from.</param>
-        /// <remarks>
-        /// This method was implemented with correctness, not performance, in mind.
-        /// Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
-        ///           http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
-        /// </remarks>
-        public void BicubicFitSurface(SurfaceBase source)
+        public void FitSurface(SurfaceBase source)
         {
+            // This method was implemented with correctness, not performance, in mind.
+            // Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
+            // http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
+
             float leftF = (1 * (float)(width - 1)) / (float)(source.width - 1);
             float topF = (1 * (height - 1)) / (float)(source.height - 1);
             float rightF = ((float)(source.width - 3) * (float)(width - 1)) / (float)(source.width - 1);
@@ -251,8 +250,6 @@ namespace PSFilterHostDll.Imaging
 
         protected abstract unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
         protected abstract unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
-
-        public abstract unsafe void SuperSampleFitSurface(SurfaceBase source);
 
         public virtual unsafe bool HasTransparency()
         {

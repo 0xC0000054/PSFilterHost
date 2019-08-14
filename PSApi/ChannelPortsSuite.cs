@@ -345,7 +345,7 @@ namespace PSFilterHostDll.PSApi
                         try
                         {
                             scaledSelectionMask = new SurfaceGray8(dstWidth, dstHeight);
-                            scaledSelectionMask.SuperSampleFitSurface(filterImageProvider.Mask);
+                            scaledSelectionMask.FitSurface(filterImageProvider.Mask);
                         }
                         catch (OutOfMemoryException)
                         {
@@ -368,7 +368,7 @@ namespace PSFilterHostDll.PSApi
                         try
                         {
                             scaledSelectionMask = new SurfaceGray8(dstWidth, dstHeight);
-                            scaledSelectionMask.BicubicFitSurface(filterImageProvider.Mask);
+                            scaledSelectionMask.FitSurface(filterImageProvider.Mask);
                         }
                         catch (OutOfMemoryException)
                         {
@@ -413,7 +413,7 @@ namespace PSFilterHostDll.PSApi
                         try
                         {
                             scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, mode);
-                            scaledChannelSurface.SuperSampleFitSurface(ditheredChannelSurface ?? source);
+                            scaledChannelSurface.FitSurface(ditheredChannelSurface ?? source);
                         }
                         catch (OutOfMemoryException)
                         {
@@ -436,7 +436,7 @@ namespace PSFilterHostDll.PSApi
                         try
                         {
                             scaledChannelSurface = SurfaceFactory.CreateFromImageMode(dstWidth, dstHeight, mode);
-                            scaledChannelSurface.BicubicFitSurface(ditheredChannelSurface ?? source);
+                            scaledChannelSurface.FitSurface(ditheredChannelSurface ?? source);
                         }
                         catch (OutOfMemoryException)
                         {
