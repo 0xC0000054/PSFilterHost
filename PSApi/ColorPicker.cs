@@ -18,7 +18,7 @@ namespace PSFilterHostDll.PSApi
 {
     internal sealed class ColorPicker : ColorDialog
     {
-        private string title = string.Empty;
+        private readonly string title = string.Empty;
         private const int WM_INITDIALOG = 0x0110;
 
         protected override IntPtr HookProc(IntPtr hWnd, int msg, IntPtr wparam, IntPtr lparam)
