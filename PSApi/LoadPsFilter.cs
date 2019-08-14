@@ -1284,13 +1284,6 @@ namespace PSFilterHostDll.PSApi
                         }
                     }
                 }
-
-#if DEBUG
-                using (Bitmap dst = dest.ToGdipBitmap())
-                {
-
-                }
-#endif
             }
         }
 
@@ -2103,10 +2096,6 @@ namespace PSFilterHostDll.PSApi
 #if DEBUG
             DebugUtils.Ping(DebugFlags.AdvanceState, string.Format("outRowBytes: {0}, Rect: {1}, loplane: {2}, hiplane: {3}", new object[] { filterRecord->outRowBytes, filterRecord->outRect, filterRecord->outLoPlane,
                 filterRecord->outHiPlane }));
-
-            using (Bitmap dst = dest.ToGdipBitmap())
-            {
-            }
 #endif
             Rect16 outRect = filterRecord->outRect;
             int nplanes = filterRecord->outHiPlane - filterRecord->outLoPlane + 1;
@@ -2623,12 +2612,6 @@ namespace PSFilterHostDll.PSApi
 
                         break;
                 }
-
-#if DEBUG
-                using (Bitmap bmp = dest.ToGdipBitmap())
-                {
-                }
-#endif
             }
         }
 

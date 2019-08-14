@@ -41,6 +41,7 @@ namespace PSFilterHostDll.Imaging
 
         public override int BitsPerChannel => 8;
 
+#if GDIPLUS
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
                     "Microsoft.Design",
                     "CA1031:DoNotCatchGeneralExceptionTypes",
@@ -102,7 +103,7 @@ namespace PSFilterHostDll.Imaging
             return image;
         }
 
-#if !GDIPLUS
+#else
         public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
             System.Windows.Media.PixelFormat format = System.Windows.Media.PixelFormats.Gray8;

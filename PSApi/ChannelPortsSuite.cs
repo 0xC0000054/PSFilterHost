@@ -419,12 +419,6 @@ namespace PSFilterHostDll.PSApi
                         {
                             return PSError.memFullErr;
                         }
-
-#if DEBUG
-                        using (System.Drawing.Bitmap bmp = scaledChannelSurface.ToGdipBitmap())
-                        {
-                        }
-#endif
                     }
 
                     FillChannelData(channel, destination, scaledChannelSurface, dstRect, mode);

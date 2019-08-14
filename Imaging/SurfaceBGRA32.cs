@@ -45,6 +45,7 @@ namespace PSFilterHostDll.Imaging
             return new Bitmap(width, height, (int)stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb, scan0.Pointer);
         }
 
+#if GDIPLUS
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Microsoft.Design",
             "CA1031:DoNotCatchGeneralExceptionTypes",
@@ -129,7 +130,7 @@ namespace PSFilterHostDll.Imaging
             return image;
         }
 
-#if !GDIPLUS
+#else
         public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
             System.Windows.Media.PixelFormat format;

@@ -157,9 +157,9 @@ namespace PSFilterHostDll.Imaging
 
             return (ushort)value;
         }
-
+#if GDIPLUS
         public abstract unsafe Bitmap ToGdipBitmap();
-#if !GDIPLUS
+#else
         public abstract unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource();
 #endif
         public unsafe byte* GetRowAddressUnchecked(int y)
