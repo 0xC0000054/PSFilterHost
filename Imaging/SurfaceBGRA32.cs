@@ -133,68 +133,87 @@ namespace PSFilterHostDll.Imaging
 #else
         public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
-            System.Windows.Media.PixelFormat format;
-
-            IntPtr buffer;
-            int bufferSize;
-            int destStride;
+            System.Windows.Media.Imaging.WriteableBitmap bitmap;
 
             if (HasTransparency())
             {
-                format = System.Windows.Media.PixelFormats.Bgra32;
-                destStride = ((width * format.BitsPerPixel) + 7) / 8;
-                bufferSize = destStride * height;
+                bitmap = new System.Windows.Media.Imaging.WriteableBitmap(
+                    width,
+                    height,
+                    dpiX,
+                    dpiY,
+                    System.Windows.Media.PixelFormats.Bgra32,
+                    null);
 
-                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
-
-                byte* destScan0 = (byte*)buffer;
-
-                for (int y = 0; y < height; y++)
+                bitmap.Lock();
+                try
                 {
-                    ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
-                    byte* dst = destScan0 + (y * destStride);
+                    byte* destScan0 = (byte*)bitmap.BackBuffer;
+                    int destStride = bitmap.BackBufferStride;
 
-                    for (int x = 0; x < width; x++)
+                    for (int y = 0; y < height; y++)
                     {
-                        dst[0] = src->R;
-                        dst[1] = src->G;
-                        dst[2] = src->B;
-                        dst[3] = src->A;
+                        ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                        byte* dst = destScan0 + (y * destStride);
 
-                        src++;
-                        dst += 4;
+                        for (int x = 0; x < width; x++)
+                        {
+                            dst[0] = src->B;
+                            dst[1] = src->G;
+                            dst[2] = src->R;
+                            dst[3] = src->A;
+
+                            src++;
+                            dst += 4;
+                        }
                     }
+                }
+                finally
+                {
+                    bitmap.Unlock();
                 }
             }
             else
             {
-                format = System.Windows.Media.PixelFormats.Bgr24;
-                destStride = ((width * format.BitsPerPixel) + 7) / 8;
+                bitmap = new System.Windows.Media.Imaging.WriteableBitmap(
+                    width,
+                    height,
+                    dpiX,
+                    dpiY,
+                    System.Windows.Media.PixelFormats.Bgr24,
+                    null);
 
-                bufferSize = destStride * height;
-
-                buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
-
-                byte* destScan0 = (byte*)buffer;
-
-                for (int y = 0; y < height; y++)
+                bitmap.Lock();
+                try
                 {
-                    ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
-                    byte* dst = destScan0 + (y * destStride);
+                    byte* destScan0 = (byte*)bitmap.BackBuffer;
+                    int destStride = bitmap.BackBufferStride;
 
-                    for (int x = 0; x < width; x++)
+                    for (int y = 0; y < height; y++)
                     {
-                        dst[0] = src->R;
-                        dst[1] = src->G;
-                        dst[2] = src->B;
+                        ColorBgra8* src = (ColorBgra8*)GetRowAddressUnchecked(y);
+                        byte* dst = destScan0 + (y * destStride);
 
-                        src++;
-                        dst += 3;
+                        for (int x = 0; x < width; x++)
+                        {
+                            dst[0] = src->B;
+                            dst[1] = src->G;
+                            dst[2] = src->R;
+
+                            src++;
+                            dst += 3;
+                        }
                     }
+                }
+                finally
+                {
+                    bitmap.Unlock();
                 }
             }
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, dpiX, dpiY, format, null, buffer, bufferSize, destStride);
+            bitmap.Freeze();
+
+            return bitmap;
         }
 #endif
 

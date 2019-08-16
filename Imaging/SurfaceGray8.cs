@@ -106,30 +106,43 @@ namespace PSFilterHostDll.Imaging
 #else
         public override unsafe System.Windows.Media.Imaging.BitmapSource ToBitmapSource()
         {
-            System.Windows.Media.PixelFormat format = System.Windows.Media.PixelFormats.Gray8;
+            System.Windows.Media.Imaging.WriteableBitmap bitmap = new System.Windows.Media.Imaging.WriteableBitmap(
+                width,
+                height,
+                dpiX,
+                dpiY,
+                System.Windows.Media.PixelFormats.Gray8,
+                null
+                );
 
-            int destStride = ((width * format.BitsPerPixel) + 7) / 8;
-            int bufferSize = destStride * height;
-
-            IntPtr buffer = PSApi.Memory.Allocate((ulong)bufferSize, PSApi.MemoryAllocationFlags.Default);
-
-            byte* destScan0 = (byte*)buffer;
-
-            for (int y = 0; y < height; y++)
+            bitmap.Lock();
+            try
             {
-                byte* src = GetRowAddressUnchecked(y);
-                byte* dst = destScan0 + (y * destStride);
+                byte* destScan0 = (byte*)bitmap.BackBuffer;
+                int destStride = bitmap.BackBufferStride;
 
-                for (int x = 0; x < width; x++)
+                for (int y = 0; y < height; y++)
                 {
-                    *dst = *src;
+                    byte* src = GetRowAddressUnchecked(y);
+                    byte* dst = destScan0 + (y * destStride);
 
-                    src++;
-                    dst++;
+                    for (int x = 0; x < width; x++)
+                    {
+                        *dst = *src;
+
+                        src++;
+                        dst++;
+                    }
                 }
             }
+            finally
+            {
+                bitmap.Unlock();
+            }
 
-            return System.Windows.Media.Imaging.BitmapSource.Create(width, height, dpiX, dpiY, format, null, buffer, bufferSize, destStride);
+            bitmap.Freeze();
+
+            return bitmap;
         }
 #endif
 
