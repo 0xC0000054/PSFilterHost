@@ -56,7 +56,7 @@ namespace PSFilterHostDll.Imaging
                     ulong length = (ulong)width * 4UL;
                     for (int y = 0; y < height; y++)
                     {
-                        BGRASurfaceMemory.Copy(surface.GetRowAddressUnchecked(y), scan0 + (y * stride), length);
+                        ImageSurfaceMemory.Copy(surface.GetRowAddressUnchecked(y), scan0 + (y * stride), length);
                     }
                 }
                 finally
