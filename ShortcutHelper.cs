@@ -15,13 +15,13 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 
-#if !NET_40_OR_GREATER
+#if NET20 || NET35
 using System.Security.Permissions;
 #endif
 
 namespace PSFilterHostDll
 {
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
     [SecurityCritical]
 #else
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]

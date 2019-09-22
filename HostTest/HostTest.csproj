@@ -1,19 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A181C7AE-5434-4A56-9976-03A8B82F63B8}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HostTest</RootNamespace>
-    <AssemblyName>HostTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFramework>net452</TargetFramework>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -29,46 +21,24 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CodeAnalysisRuleSet>..\PSFilterHost.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisLogFile>bin\Debug\HostTest.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
@@ -76,168 +46,117 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
     <AssemblyName>$(AssemblyName)64</AssemblyName>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisLogFile>bin\Release\HostTest.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
     <AssemblyName>$(AssemblyName)64</AssemblyName>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup />
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF $(PlatformName) == x86 (
+call "$(DevEnvDir)..\tools\VsDevCmd.bat"
+editbin.exe /NXCOMPAT:NO /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AbortMessageFilter.cs" />
-    <Compile Include="AboutBox.cs">
+    <Compile Update="AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutBox.Designer.cs">
+    <Compile Update="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="BitmapFrameExtensions.cs" />
-    <Compile Include="CanvasDirtyChangedEventArgs.cs" />
-    <Compile Include="CanvasZoomChangedEventArgs.cs" />
-    <Compile Include="ColorProfileHelper.cs" />
-    <Compile Include="ColorToolStripButton.cs">
+    <Compile Update="ColorToolStripButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialogs\PlatformFolderBrowserDialog.cs">
+    <Compile Update="Dialogs\PlatformFolderBrowserDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Dialogs\VistaFolderBrowserDialog.cs">
+    <Compile Update="Dialogs\VistaFolderBrowserDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="DpiAwareToolStripRenderer.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Update="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Canvas.cs">
+    <Compile Update="Canvas.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CanvasHistoryState.cs" />
-    <Compile Include="HistoryItem.cs" />
-    <Compile Include="HistoryItemState.cs" />
-    <Compile Include="HistoryStack.cs" />
-    <Compile Include="MenuStripEx.cs">
+    <Compile Update="MenuStripEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="MetadataHelper.cs" />
-    <Compile Include="NativeConstants.cs" />
-    <Compile Include="NativeEnums.cs" />
-    <Compile Include="NativeInterfaces.cs" />
-    <Compile Include="NativeStructs.cs" />
-    <Compile Include="PaintDotNet\ColorPicker\ColorGradientControl.cs">
+    <Compile Update="PaintDotNet\ColorPicker\ColorGradientControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\ColorPicker\ColorPickerForm.cs">
+    <Compile Update="PaintDotNet\ColorPicker\ColorPickerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\ColorPicker\ColorRectangleControl.cs">
+    <Compile Update="PaintDotNet\ColorPicker\ColorRectangleControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\ColorPicker\ColorWheel.cs">
+    <Compile Update="PaintDotNet\ColorPicker\ColorWheel.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\ColorPicker\HsvColor.cs" />
-    <Compile Include="PaintDotNet\ColorPicker\IndexEventArgs.cs" />
-    <Compile Include="PaintDotNet\ColorPicker\RgbColor.cs" />
-    <Compile Include="PaintDotNet\ColorPicker\SwatchControl.cs">
+    <Compile Update="PaintDotNet\ColorPicker\SwatchControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\ColorPicker\Utility.cs" />
-    <Compile Include="PixelFormatExtensions.cs" />
-    <Compile Include="SafeDCHandle.cs" />
-    <Compile Include="SafeNativeMethods.cs" />
-    <Compile Include="StringLogicalComparer.cs" />
-    <Compile Include="PaintDotNet\TaskDialog\ButtonBase.cs">
+    <Compile Update="PaintDotNet\TaskDialog\ButtonBase.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\TaskDialog\CommandButton.cs">
+    <Compile Update="PaintDotNet\TaskDialog\CommandButton.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\EtchedLine.cs">
+    <Compile Update="PaintDotNet\EtchedLine.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\HeaderLabel.cs">
+    <Compile Update="PaintDotNet\HeaderLabel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PaintDotNet\NativeConstants.cs" />
-    <Compile Include="PaintDotNet\TaskDialog\TaskButton.cs" />
-    <Compile Include="PaintDotNet\TaskDialog\TaskDialog.cs" />
-    <Compile Include="PaintDotNet\UI.cs" />
-    <Compile Include="PaintDotNet\VisualStyleClass.cs" />
-    <Compile Include="TempDirectory.cs" />
-    <Compile Include="ToolStripItemCollectionExtensions.cs" />
-    <Compile Include="ToolStripMenuItemEx.cs">
+    <Compile Update="ToolStripMenuItemEx.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Tools\CursorChangedEventArgs.cs" />
-    <Compile Include="Tools\EllipseSelectTool.cs" />
-    <Compile Include="Tools\RectangleSelectTool.cs" />
-    <Compile Include="Tools\SelectionBase.cs" />
-    <Compile Include="Tools\SelectionPathChangedEventArgs.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ToolStripItemComparer.cs" />
-    <Compile Include="WIC\Interop\GenericAccessRights.cs" />
-    <Compile Include="WIC\Interop\PropVariant.cs" />
-    <Compile Include="WIC\Interop\WinCodec.cs" />
-    <Compile Include="WIC\Interop\WinCodecSdk.cs" />
-    <Compile Include="WIC\WICHelpers.cs" />
-    <EmbeddedResource Include="AboutBox.resx">
+    <EmbeddedResource Update="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Update="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Canvas.resx">
+    <EmbeddedResource Update="Canvas.resx">
       <DependentUpon>Canvas.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PaintDotNet\ColorPicker\ColorPickerForm.resx">
+    <EmbeddedResource Update="PaintDotNet\ColorPicker\ColorPickerForm.resx">
       <DependentUpon>ColorPickerForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="app.manifest" />
     <None Include="Resources\OpenFile.png" />
   </ItemGroup>
@@ -275,10 +194,7 @@
     <None Include="Resources\MenuFileCloseIcon.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PSFilterHost.csproj">
-      <Project>{8D7D5B1D-9A0A-4B86-9ED9-6D7D7B195827}</Project>
-      <Name>PSFilterHost</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\PSFilterHost.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Annotate_info.png" />
@@ -287,38 +203,6 @@
     <None Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
+    <Compile Remove="obj\**" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>IF $(PlatformName) == x86 (
-call "$(DevEnvDir)..\tools\VsDevCmd.bat"
-editbin.exe /NXCOMPAT:NO /LARGEADDRESSAWARE "$(TargetPath)" )</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

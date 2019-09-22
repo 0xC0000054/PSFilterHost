@@ -28,7 +28,7 @@ namespace PSFilterHostDll
     /// <summary>
     /// Enumerates through a directory using the native API.
     /// </summary>
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
     [SecurityCritical()]
 #else
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]

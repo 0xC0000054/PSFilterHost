@@ -11,7 +11,7 @@
 **
 ===========================================================*/
 
-#if !NET_35_OR_GREATER
+#if NET20
 using System.Diagnostics;
 
 namespace System.Collections.Generic

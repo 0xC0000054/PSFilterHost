@@ -1,19 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8D7D5B1D-9A0A-4B86-9ED9-6D7D7B195827}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PSFilterHostDll</RootNamespace>
-    <AssemblyName>PSFilterHost</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworks>net20;net35;net452</TargetFrameworks>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,307 +14,91 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>bin\$(Configuration)\PSFilterHost.XML</DocumentationFile>
+    <PostBuildEvent />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\PSFilterHost.XML</DocumentationFile>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
     <CodeAnalysisRuleSet>PSFilterHost.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DefineConstants />
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <DocumentationFile>bin\Release\PSFilterHost.XML</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) == 2.0">$(DefineConstants);GDIPLUS</DefineConstants>
-    <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= 3.5">$(DefineConstants);NET_35_OR_GREATER</DefineConstants>
-    <DefineConstants Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= 4.0">$(DefineConstants);NET_40_OR_GREATER</DefineConstants>
+    <DefineConstants Condition=" '$(TargetFramework)' == 'net20' ">GDIPLUS</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NET_35_OR_GREATER</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Debug\PSFilterHost.XML</DocumentationFile>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisLogFile>bin\Debug\PSFilterHost.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>;NET_35_OR_GREATER</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>bin\Release\PSFilterHost.XML</DocumentationFile>
-    <Optimize>true</Optimize>
-    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants></DefineConstants>
     <CodeAnalysisLogFile>bin\Release\PSFilterHost.dll.CodeAnalysisLog.xml</CodeAnalysisLogFile>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <PostBuildEvent />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" Condition=" $(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0' " />
-    <Reference Include="System" />
-    <Reference Include="System.Drawing" />
+    <Reference Include="PresentationCore" Condition=" '$(TargetFramework)' != 'net20' " />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" Condition="$(TargetFrameworkVersion.Replace('v', '')) &gt;= '3.0'" />
+    <Reference Include="WindowsBase" Condition=" '$(TargetFramework)' != 'net20' "/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Framework Replacements\CoreFx\BitHelper.cs" />
-    <Compile Include="Framework Replacements\CoreFx\HashHelpers.cs" />
-    <Compile Include="Framework Replacements\CoreFx\HashSet.cs" />
-    <Compile Include="Framework Replacements\Enumerable.cs" />
-    <Compile Include="Framework Replacements\ExtensionAttribute.cs" />
-    <Compile Include="ColorPickerResult.cs" />
-    <Compile Include="ColorProfileHelper.cs" />
-    <Compile Include="EnableInfoParser.cs" />
-    <Compile Include="FileEnumerator.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="HashCodeHelper.cs" />
-    <Compile Include="HostColorManagement.cs" />
-    <Compile Include="HostInformation.cs" />
-    <Compile Include="HostRulerUnit.cs" />
-    <Compile Include="Imaging\ColorBgra16.cs" />
-    <Compile Include="Imaging\ColorBgra8.cs" />
-    <Compile Include="Imaging\ImageSurfaceMemory.cs" />
-    <Compile Include="Imaging\MemoryBlock.cs" />
-    <Compile Include="Imaging\SurfaceBase.cs" />
-    <Compile Include="Imaging\SurfaceBGRA32.cs" />
-    <Compile Include="Imaging\SurfaceBGRA64.cs" />
-    <Compile Include="Imaging\SurfaceFactory.cs" />
-    <Compile Include="Imaging\SurfaceGray16.cs" />
-    <Compile Include="Imaging\SurfaceGray8.cs" />
-    <Compile Include="Interop\NativeConstants.cs" />
-    <Compile Include="Interop\NativeEnums.cs" />
-    <Compile Include="Interop\NativeInterfaces.cs" />
-    <Compile Include="Interop\NativeStructs.cs" />
-    <Compile Include="Interop\SafeHandles\SafeFindHandle.cs" />
-    <Compile Include="Interop\SafeHandles\SafeLibraryHandle.cs" />
-    <Compile Include="Interop\SafeNativeMethods.cs" />
-    <Compile Include="Interop\SafeHandles\SafeProfileHandle.cs" />
-    <Compile Include="Interop\SafeHandles\SafeTransformHandle.cs" />
-    <Compile Include="Interop\UnsafeNativeMethods.cs" />
-    <Compile Include="Interop\Win32FindData.cs" />
-    <Compile Include="OS.cs" />
-    <Compile Include="PickColor.cs" />
-    <Compile Include="PluginSettingsRegistry.cs" />
-    <Compile Include="PluginSettingsRegistryItem.cs" />
-    <Compile Include="PSApi\ActivePICASuites.cs" />
-    <Compile Include="PSApi\BufferSuite.cs" />
-    <Compile Include="PSApi\BuiltInColorPicker.cs" />
-    <Compile Include="PSApi\CallbackColorPicker.cs" />
-    <Compile Include="PSApi\ChannelPortsSuite.cs" />
-    <Compile Include="PSApi\ColorConversion\CMYK.cs" />
-    <Compile Include="PSApi\ColorConversion\ColorConverter.cs" />
-    <Compile Include="PSApi\ColorConversion\HSB.cs" />
-    <Compile Include="PSApi\ColorConversion\HSL.cs" />
-    <Compile Include="PSApi\ColorConversion\Lab.cs" />
-    <Compile Include="PSApi\ColorConversion\RGB.cs" />
-    <Compile Include="PSApi\ColorConversion\XYZ.cs" />
-    <Compile Include="PSApi\ColorProfileConverter.cs" />
-    <Compile Include="PSApi\DebugUtils.cs" />
-    <Compile Include="PSApi\DescriptorSuite.cs" />
-    <Compile Include="PSApi\DoubleExtensions.cs" />
-    <Compile Include="PSApi\EndianBinaryReader.cs" />
-    <Compile Include="PSApi\Endianess.cs" />
-    <Compile Include="PSApi\Fixed16.cs" />
-    <Compile Include="PSApi\HandleSuite.cs" />
-    <Compile Include="PSApi\IColorPicker.cs" />
-    <Compile Include="PSApi\IFilterImageProvider.cs" />
-    <Compile Include="PSApi\ImageMetadata.cs" />
-    <Compile Include="PSApi\ImageServicesSuite.cs" />
-    <Compile Include="PSApi\IntPtrEqualityComparer.cs" />
-    <Compile Include="PSApi\IntPtrExtensions.cs" />
-    <Compile Include="PSApi\IPICASuiteDataProvider.cs" />
-    <Compile Include="PSApi\IPropertySuite.cs" />
-    <Compile Include="PSApi\IPTCData.cs" />
-    <Compile Include="PSApi\MetadataConverter.cs" />
-    <Compile Include="PSApi\PEFile.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\ActionDescriptorSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\ActionListSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\ActionReferenceSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\IActionDescriptorSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\IActionListSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\IActionReferenceSuite.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\PSActionDescriptor.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\PSActionList.cs" />
-    <Compile Include="PSApi\PICA\Action Suites\PSActionReference.cs" />
-    <Compile Include="PSApi\PICA\ActionSuiteProvider.cs" />
-    <Compile Include="PSApi\PICA\ASZStringSuite.cs" />
-    <Compile Include="PSApi\PICA\DescriptorRegistrySuite.cs" />
-    <Compile Include="PSApi\PICA\ErrorSuite.cs" />
-    <Compile Include="PSApi\PICA\IASZStringSuite.cs" />
-    <Compile Include="PSApi\PICA\PICABufferSuite.cs" />
-    <Compile Include="PSApi\PICA\PICAColorSpaceSuite.cs" />
-    <Compile Include="PSApi\PICA\PICAHandleSuite.cs" />
-    <Compile Include="PSApi\PICA\PICASPPluginsSuite.cs" />
-    <Compile Include="PSApi\PICA\PICASuiteDelegates.cs" />
-    <Compile Include="PSApi\PICA\PICASuiteStructs.cs" />
-    <Compile Include="PSApi\PICA\PICAUIHooksSuite.cs" />
-    <Compile Include="PSApi\PICA\PSDescriptorRegistry.cs" />
-    <Compile Include="PSApi\PICA\PSErrorSuite.cs" />
-    <Compile Include="PSApi\PluginLoader.cs" />
-    <Compile Include="PSApi\PluginModule.cs" />
-    <Compile Include="PSApi\PropertySuite.cs" />
-    <Compile Include="PSApi\PSBoolean.cs" />
-    <Compile Include="PSApi\ReadImageDocument.cs" />
-    <Compile Include="PSApi\ResourceSuite.cs" />
-    <Compile Include="PSApi\SPBasicSuiteProvider.cs" />
-    <Compile Include="PSApi\StringUtil.cs" />
-    <Compile Include="PSApi\TestAbortProc.cs" />
-    <Compile Include="ReadOnlyDictionary.cs" />
-    <Compile Include="ShortcutHelper.cs" />
-    <Compile Include="FilterCollection.cs" />
-    <Compile Include="FilterProgressEventArgs.cs" />
-    <Compile Include="FilterRunExecption.cs" />
-    <Compile Include="PSApi\Memory.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="AbortFunc.cs" />
-    <Compile Include="PSApi\AboutRecord.cs" />
-    <Compile Include="PSApi\AdvanceStateProc.cs" />
-    <Compile Include="AETEValue.cs" />
-    <Compile Include="PSApi\BufferProcs.cs" />
-    <Compile Include="PSApi\ChannelPortsProcs.cs" />
-    <Compile Include="PSApi\ColorPicker.cs">
+    <Compile Update="PSApi\ColorPicker.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="PSApi\ColorServicesConvert.cs" />
-    <Compile Include="PSApi\ColorServicesProc.cs" />
-    <Compile Include="PSApi\DebugFlags.cs" />
-    <Compile Include="PSApi\DescriptorTypes.cs" />
-    <Compile Include="PSApi\DictionaryExtensions.cs" />
-    <Compile Include="PSApi\DisplayPixelsProc.cs" />
-    <Compile Include="PSApi\FilterCase.cs" />
-    <Compile Include="PSApi\FilterCaseInfo.cs" />
-    <Compile Include="PSApi\FilterRecord.cs" />
-    <Compile Include="PSApi\FilterSelector.cs" />
-    <Compile Include="GlobalParameters.cs" />
-    <Compile Include="PSApi\HandleProc.cs" />
-    <Compile Include="PSApi\HostProcs.cs" />
-    <Compile Include="PSApi\ImageModes.cs" />
-    <Compile Include="PSApi\ImageServicesProc.cs" />
-    <Compile Include="ImageSizeTooLargeException.cs" />
-    <Compile Include="PSApi\LoadPsFilter.cs" />
-    <Compile Include="ParameterData.cs" />
-    <Compile Include="PSApi\PIDescriptorParameters.cs" />
-    <Compile Include="PSApi\PIProperty.cs" />
-    <Compile Include="PSApi\PlatformData.cs" />
-    <Compile Include="PluginData.cs" />
-    <Compile Include="PSApi\PluginAETE.cs" />
-    <Compile Include="PSApi\PlugInInfo.cs" />
-    <Compile Include="PSApi\PlugInMonitor.cs" />
-    <Compile Include="PSApi\PluginPhase.cs" />
-    <Compile Include="PSApi\Point.cs" />
-    <Compile Include="PSApi\ProcessEventProc.cs" />
-    <Compile Include="PSApi\ProgressProc.cs" />
-    <Compile Include="PSApi\PropertyProcs.cs" />
-    <Compile Include="PSApi\PSConstants.cs" />
-    <Compile Include="PSApi\PSError.cs" />
-    <Compile Include="PSApi\PSPixelMap.cs" />
-    <Compile Include="PSApi\PSProperties.cs" />
-    <Compile Include="PSApi\ReadImageDocumentDesc.cs" />
-    <Compile Include="PSApi\Rect.cs" />
-    <Compile Include="PSApi\RegionExtensions.cs" />
-    <Compile Include="PSApi\ResourceProc.cs" />
-    <Compile Include="PSApi\RGBColor.cs" />
-    <Compile Include="PSApi\SPBasicSuite.cs" />
-    <Compile Include="PSApi\VPoint.cs" />
-    <Compile Include="PSApi\VRect.cs" />
-    <Compile Include="PseudoResourceCollection.cs" />
-    <Compile Include="PSFilterHost.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PSResource.cs" />
-    <Compile Include="ShellLink.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Resources\sRGB.icm" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+  <ItemGroup>
+    <Compile Remove="Doc\**" />
+    <EmbeddedResource Remove="Doc\**" />
+    <None Remove="Doc\**" />
+    <Compile Remove="HostTest\**" />
+    <EmbeddedResource Remove="HostTest\**" />
+    <None Remove="HostTest\**" />
+    <None Remove=".editorconfig" />
+    <None Remove=".gitattributes" />
+    <None Remove=".gitignore" />
+    <None Remove="License-pdn.txt" />
+    <None Remove="License.txt" />
+    <None Remove="PSFilterHost.ruleset" />
+    <None Remove="README.md" />
+    <None Remove="Readme.txt" />
+  </ItemGroup>
 </Project>

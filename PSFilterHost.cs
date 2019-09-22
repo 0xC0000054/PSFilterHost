@@ -23,7 +23,7 @@ using System.Threading;
 using System.Windows.Media.Imaging;
 #endif
 
-#if !NET_40_OR_GREATER
+#if NET20 || NET35
 using System.Security.Permissions;
 #endif
 
@@ -62,7 +62,7 @@ namespace PSFilterHostDll
         /// </summary>
         public event EventHandler<FilterProgressEventArgs> UpdateProgress;
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image and parent window handle.
         /// </summary>
@@ -96,7 +96,7 @@ namespace PSFilterHostDll
         }
 #endif
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Initializes a new instance of the <see cref="PSFilterHost"/> class, with the specified source image, primary color, secondary color, selection and parent window handle.
         /// </summary>
@@ -323,7 +323,7 @@ namespace PSFilterHostDll
             hostColorProfiles = colorProfiles;
         }
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Queries the directory for filters to load.
         /// </summary>
@@ -368,7 +368,7 @@ namespace PSFilterHostDll
             return new FilterCollection(filters);
         }
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Enumerates the directory for filters to load, with a <see cref="Boolean"/> indicating if subdirectories are included in the search
         /// </summary>
@@ -408,7 +408,7 @@ namespace PSFilterHostDll
             return EnumerateFilters(path, searchSubdirectories ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
         }
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Enumerates the directory for filters to load, with a <see cref="SearchOption"/> indicating if subdirectories are included in the search.
         /// </summary>
@@ -490,7 +490,7 @@ namespace PSFilterHostDll
             return RunFilter(pluginData, filterParameters == null);
         }
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Executes the specified filter, optionally displaying the user interface.
         /// </summary>
@@ -646,7 +646,7 @@ namespace PSFilterHostDll
             return result;
         }
 
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
         /// <summary>
         /// Displays the about box of the specified filter.
         /// </summary>

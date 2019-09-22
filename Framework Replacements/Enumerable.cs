@@ -10,7 +10,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#if !NET_35_OR_GREATER
+#if NET20
 namespace System.Linq
 {
     internal static class Enumerable

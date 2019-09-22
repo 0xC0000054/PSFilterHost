@@ -12,7 +12,7 @@
 
 using Microsoft.Win32.SafeHandles;
 
-#if !NET_40_OR_GREATER
+#if NET20 || NET35
 using System.Security.Permissions;
 #endif
 /* The following code is quoted from Mike Stall's blog
@@ -22,7 +22,7 @@ using System.Security.Permissions;
 
 namespace PSFilterHostDll.Interop
 {
-#if NET_40_OR_GREATER
+#if !NET20 && !NET35
     [System.Security.SecurityCritical()]
 #else
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
