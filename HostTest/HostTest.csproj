@@ -25,6 +25,7 @@
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
