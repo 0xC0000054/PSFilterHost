@@ -27,7 +27,7 @@ namespace PSFilterHostDll.Imaging
     /// <summary>
     /// Surface class for 64 bits per pixel BGRA image data. Each channel is allocated 16 bits per pixel.
     /// </summary>
-    internal sealed class SurfaceBGRA64 : SurfaceBase
+    internal sealed class SurfaceBGRA64 : SurfaceBGRABase
     {
         public SurfaceBGRA64(int width, int height) : this(width, height, 96.0, 96.0)
         {
@@ -258,7 +258,7 @@ namespace PSFilterHostDll.Imaging
                 {
                     int index = (m + 1) + ((dstX - roi.Left) * 4);
                     double x = m - srcColumnFrac;
-                    rColCache[index] = R(x);
+                    rColCache[index] = BicubicUtil.R(x);
                 }
             }
 
@@ -277,7 +277,7 @@ namespace PSFilterHostDll.Imaging
                 for (int n = -1; n <= 2; ++n)
                 {
                     double x = srcRowFrac - n;
-                    rRowCache[n + 1] = R(x);
+                    rRowCache[n + 1] = BicubicUtil.R(x);
                 }
 
                 rColCache = (double*)rColCacheIP.ToPointer();
@@ -374,7 +374,7 @@ namespace PSFilterHostDll.Imaging
                 {
                     int index = (m + 1) + ((dstX - roi.Left) * 4);
                     double x = m - srcColumnFrac;
-                    rColCache[index] = R(x);
+                    rColCache[index] = BicubicUtil.R(x);
                 }
             }
 
@@ -393,7 +393,7 @@ namespace PSFilterHostDll.Imaging
                 for (int n = -1; n <= 2; ++n)
                 {
                     double x = srcRowFrac - n;
-                    rRowCache[n + 1] = R(x);
+                    rRowCache[n + 1] = BicubicUtil.R(x);
                 }
 
                 // See Perf Note below

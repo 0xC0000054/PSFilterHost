@@ -177,6 +177,14 @@ namespace PSFilterHostDll.Imaging
             return GetPointAddressUnchecked(x, y);
         }
 
+        public unsafe byte* GetPointAddressClamped(int x, int y)
+        {
+            int clampedX = Int32Util.Clamp(x, 0, width - 1);
+            int clampedY = Int32Util.Clamp(y, 0, height - 1);
+
+            return GetPointAddressUnchecked(clampedX, clampedY);
+        }
+
         public unsafe byte* GetPointAddressUnchecked(int x, int y)
         {
             return (((byte*)scan0.VoidStar + (y * stride)) + (x * bytesPerPixel));
@@ -188,68 +196,17 @@ namespace PSFilterHostDll.Imaging
         /// <param name="source">The Surface to read pixels from.</param>
         public void FitSurface(SurfaceBase source)
         {
-            // This method was implemented with correctness, not performance, in mind.
-            // Based on: "Bicubic Interpolation for Image Scaling" by Paul Bourke,
-            // http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
-
-            float leftF = (1 * (float)(width - 1)) / (float)(source.width - 1);
-            float topF = (1 * (height - 1)) / (float)(source.height - 1);
-            float rightF = ((float)(source.width - 3) * (float)(width - 1)) / (float)(source.width - 1);
-            float bottomF = ((float)(source.Height - 3) * (float)(height - 1)) / (float)(source.height - 1);
-
-            int left = (int)Math.Ceiling((double)leftF);
-            int top = (int)Math.Ceiling((double)topF);
-            int right = (int)Math.Floor((double)rightF);
-            int bottom = (int)Math.Floor((double)bottomF);
-
-            Rectangle[] rois = new Rectangle[] {
-                                                   Rectangle.FromLTRB(left, top, right, bottom),
-                                                   new Rectangle(0, 0, width, top),
-                                                   new Rectangle(0, top, left, height - top),
-                                                   new Rectangle(right, top, width - right, height - top),
-                                                   new Rectangle(left, bottom, right - left, height - bottom)
-                                               };
-            Rectangle dstRoi = Bounds;
-            for (int i = 0; i < rois.Length; ++i)
+            if (width == source.width && height == source.height)
             {
-                rois[i].Intersect(dstRoi);
-
-                if (rois[i].Width > 0 && rois[i].Height > 0)
-                {
-                    if (i == 0)
-                    {
-                        BicubicFitSurfaceUnchecked(source, rois[i]);
-                    }
-                    else
-                    {
-                        BicubicFitSurfaceChecked(source, rois[i]);
-                    }
-                }
-            }
-        }
-
-        protected static double CubeClamped(double x)
-        {
-            if (x >= 0)
-            {
-                return x * x * x;
+                CopySurface(source);
             }
             else
             {
-                return 0;
+                FitSurfaceImpl(source);
             }
         }
 
-        /// <summary>
-        /// Implements R() as defined at http://astronomy.swin.edu.au/%7Epbourke/colour/bicubic/
-        /// </summary>
-        protected static double R(double x)
-        {
-            return (CubeClamped(x + 2) - (4 * CubeClamped(x + 1)) + (6 * CubeClamped(x)) - (4 * CubeClamped(x - 1))) / 6;
-        }
-
-        protected abstract unsafe void BicubicFitSurfaceUnchecked(SurfaceBase source, Rectangle dstRoi);
-        protected abstract unsafe void BicubicFitSurfaceChecked(SurfaceBase source, Rectangle dstRoi);
+        protected abstract unsafe void FitSurfaceImpl(SurfaceBase source);
 
         public virtual unsafe bool HasTransparency()
         {
