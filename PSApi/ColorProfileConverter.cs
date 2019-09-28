@@ -15,6 +15,7 @@ using PSFilterHostDll.Interop;
 using PSFilterHostDll.Properties;
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
@@ -276,10 +277,11 @@ namespace PSFilterHostDll.PSApi
         /// </summary>
         /// <param name="srcPtr">The pointer to the start of the gray scale image data.</param>
         /// <param name="srcStride">The stride of the gray scale image data.</param>
+        /// <param name="origin">The starting row and column offset in the image data buffer.</param>
         /// <param name="destSurface">The destination surface.</param>
         /// <returns><c>true</c> if the image data was successfully converted; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="destSurface"/> is null.</exception>
-        public bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, SurfaceBGRA32 destSurface)
+        public unsafe bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, Point origin, SurfaceBGRA32 destSurface)
         {
             if (destSurface == null)
             {
@@ -291,9 +293,11 @@ namespace PSFilterHostDll.PSApi
                 return false;
             }
 
+            byte* srcDataStart = (byte*)srcPtr + (origin.Y * srcStride) + origin.X;
+
             return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
                 transform,
-                srcPtr,
+                (IntPtr)srcDataStart,
                 NativeEnums.Mscms.BMFORMAT.BM_GRAY,
                 (uint)destSurface.Width,
                 (uint)destSurface.Height,

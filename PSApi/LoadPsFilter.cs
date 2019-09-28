@@ -3415,7 +3415,8 @@ namespace PSFilterHostDll.PSApi
             if (srcPixelMap.imageMode == PSConstants.plugInModeGrayScale)
             {
                 // Perform color correction if required and fall back to the uncorrected data if it fails.
-                if (!colorProfileConverter.ColorCorrectionRequired || !colorProfileConverter.ColorCorrectGrayScale(srcPixelMap.baseAddr, srcPixelMap.rowBytes, displaySurface))
+                if (!colorProfileConverter.ColorCorrectionRequired ||
+                    !colorProfileConverter.ColorCorrectGrayScale(srcPixelMap.baseAddr, srcPixelMap.rowBytes, new Point(left, top), displaySurface))
                 {
                     for (int y = top; y < bottom; y++)
                     {
