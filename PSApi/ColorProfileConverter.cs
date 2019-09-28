@@ -28,6 +28,7 @@ namespace PSFilterHostDll.PSApi
         private SafeProfileHandle documentProfile;
         private SafeProfileHandle monitorProfile;
         private SafeTransformHandle transform;
+        private SurfaceBGR24 interleavedRGBSurface;
         private bool colorCorrectionRequired;
         private bool disposed;
 
@@ -281,7 +282,7 @@ namespace PSFilterHostDll.PSApi
         /// <param name="destSurface">The destination surface.</param>
         /// <returns><c>true</c> if the image data was successfully converted; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="destSurface"/> is null.</exception>
-        public unsafe bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, Point origin, SurfaceBGRA32 destSurface)
+        public unsafe bool ColorCorrectGrayScale(IntPtr srcPtr, int srcStride, Point origin, IDisplayPixelsSurface destSurface)
         {
             if (destSurface == null)
             {
@@ -303,7 +304,7 @@ namespace PSFilterHostDll.PSApi
                 (uint)destSurface.Height,
                 (uint)srcStride,
                 destSurface.Scan0.Pointer,
-                NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS,
+                destSurface.MscmsFormat,
                 (uint)destSurface.Stride,
                 IntPtr.Zero,
                 IntPtr.Zero
@@ -311,22 +312,26 @@ namespace PSFilterHostDll.PSApi
         }
 
         /// <summary>
-        /// Performs color correction on the specified 8-bit BGRA image data.
+        /// Performs color correction on the RGB image data.
         /// </summary>
-        /// <param name="sourceSurface">The source surface.</param>
+        /// <param name="srcPtr">The pointer to the start of the image data..</param>
+        /// <param name="srcRowBytes">The source row bytes.</param>
+        /// <param name="srcColBytes">The source column bytes.</param>
+        /// <param name="srcPlaneBytes">The source plane bytes.</param>
+        /// <param name="origin">The origin.</param>
         /// <param name="destinationSurface">The destination surface.</param>
         /// <returns><c>true</c> if the image data was successfully converted; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="sourceSurface"/> is null.
-        /// or
         /// <paramref name="destinationSurface"/> is null.
         /// </exception>
-        public bool ColorCorrectBGRASurface(SurfaceBGRA32 sourceSurface, SurfaceBGRA32 destinationSurface)
+        public unsafe bool ColorCorrectRGB(
+            IntPtr srcPtr,
+            int srcRowBytes,
+            int srcColBytes,
+            int srcPlaneBytes,
+            Point origin,
+            IDisplayPixelsSurface destinationSurface)
         {
-            if (sourceSurface == null)
-            {
-                throw new ArgumentNullException(nameof(sourceSurface));
-            }
             if (destinationSurface == null)
             {
                 throw new ArgumentNullException(nameof(destinationSurface));
@@ -337,19 +342,95 @@ namespace PSFilterHostDll.PSApi
                 return false;
             }
 
-            return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
-                transform,
-                sourceSurface.Scan0.Pointer,
-                NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS,
-                (uint)sourceSurface.Width,
-                (uint)sourceSurface.Height,
-                (uint)sourceSurface.Stride,
-                destinationSurface.Scan0.Pointer,
-                NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS,
-                (uint)destinationSurface.Stride,
-                IntPtr.Zero,
-                IntPtr.Zero
-                );
+            if (srcColBytes == 1)
+            {
+                // As the Windows Color System APIs do not support planar order image data we have to convert the
+                // image data to interleaved and then use a second surface for the final color correction.
+
+                if (interleavedRGBSurface == null ||
+                    interleavedRGBSurface.Width != destinationSurface.Width ||
+                    interleavedRGBSurface.Height != destinationSurface.Height)
+                {
+                    interleavedRGBSurface?.Dispose();
+                    interleavedRGBSurface = new SurfaceBGR24(destinationSurface.Width, destinationSurface.Height);
+                }
+
+                int top = origin.Y;
+                int left = origin.X;
+                int bottom = top + interleavedRGBSurface.Height;
+                int right = left + interleavedRGBSurface.Width;
+
+                byte* baseAddr = (byte*)srcPtr;
+
+                int greenPlaneOffset = srcPlaneBytes;
+                int bluePlaneOffset = srcPlaneBytes * 2;
+
+                for (int y = top; y < bottom; y++)
+                {
+                    byte* redPlane = baseAddr + (y * srcRowBytes) + left;
+                    byte* greenPlane = redPlane + greenPlaneOffset;
+                    byte* bluePlane = redPlane + bluePlaneOffset;
+
+                    byte* dst = interleavedRGBSurface.GetRowAddressUnchecked(y - top);
+
+                    for (int x = left; x < right; x++)
+                    {
+                        dst[2] = *redPlane;
+                        dst[1] = *greenPlane;
+                        dst[0] = *bluePlane;
+
+                        redPlane++;
+                        greenPlane++;
+                        bluePlane++;
+                        dst += 3;
+                    }
+                }
+
+                return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
+                    transform,
+                    interleavedRGBSurface.Scan0.Pointer,
+                    interleavedRGBSurface.MscmsFormat,
+                    (uint)destinationSurface.Width,
+                    (uint)destinationSurface.Height,
+                    (uint)interleavedRGBSurface.Stride,
+                    destinationSurface.Scan0.Pointer,
+                    destinationSurface.MscmsFormat,
+                    (uint)destinationSurface.Stride,
+                    IntPtr.Zero,
+                    IntPtr.Zero
+                    );
+            }
+            else
+            {
+                NativeEnums.Mscms.BMFORMAT srcFormat;
+                switch (srcColBytes)
+                {
+                    case 3:
+                        srcFormat = NativeEnums.Mscms.BMFORMAT.BM_BGRTRIPLETS;
+                        break;
+                    case 4:
+                        srcFormat = NativeEnums.Mscms.BMFORMAT.BM_xBGRQUADS;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unsupported column bytes value.");
+                }
+
+                byte* srcDataStart = (byte*)srcPtr + (origin.Y * srcRowBytes) + (origin.X * srcColBytes);
+
+                return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
+                    transform,
+                    (IntPtr)srcDataStart,
+                    srcFormat,
+                    (uint)destinationSurface.Width,
+                    (uint)destinationSurface.Height,
+                    (uint)srcRowBytes,
+                    destinationSurface.Scan0.Pointer,
+                    destinationSurface.MscmsFormat,
+                    (uint)destinationSurface.Stride,
+                    IntPtr.Zero,
+                    IntPtr.Zero
+                    );
+            }
         }
 
         /// <summary>
@@ -364,15 +445,23 @@ namespace PSFilterHostDll.PSApi
                     documentProfile.Dispose();
                     documentProfile = null;
                 }
+
                 if (monitorProfile != null)
                 {
                     monitorProfile.Dispose();
                     monitorProfile = null;
                 }
+
                 if (transform != null)
                 {
                     transform.Dispose();
                     transform = null;
+                }
+
+                if (interleavedRGBSurface != null)
+                {
+                    interleavedRGBSurface.Dispose();
+                    interleavedRGBSurface = null;
                 }
 
                 disposed = true;

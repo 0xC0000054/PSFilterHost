@@ -20,13 +20,14 @@
 /////////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Drawing;
+using PSFilterHostDll.Interop;
 
 namespace PSFilterHostDll.Imaging
 {
     /// <summary>
     /// Surface class for 32 bits per pixel BGRA image data. Each channel is allocated 8 bits per pixel.
     /// </summary>
-    internal sealed class SurfaceBGRA32 : SurfaceBGRABase
+    internal sealed class SurfaceBGRA32 : SurfaceBGRABase, IColorManagedSurface, IDisplayPixelsSurface
     {
         public SurfaceBGRA32(int width, int height) : this(width, height, 96.0, 96.0)
         {
@@ -40,10 +41,14 @@ namespace PSFilterHostDll.Imaging
 
         public override int BitsPerChannel => 8;
 
-        public unsafe Bitmap CreateAliasedBitmap()
+        public NativeEnums.Mscms.BMFORMAT MscmsFormat => NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS;
+
+        Bitmap IDisplayPixelsSurface.CreateAliasedBitmap()
         {
             return new Bitmap(width, height, (int)stride, System.Drawing.Imaging.PixelFormat.Format32bppArgb, scan0.Pointer);
         }
+
+        bool IDisplayPixelsSurface.SupportsTransparency => true;
 
 #if GDIPLUS
         [System.Diagnostics.CodeAnalysis.SuppressMessage(

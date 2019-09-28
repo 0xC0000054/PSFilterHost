@@ -24,7 +24,7 @@ using System.Drawing;
 
 namespace PSFilterHostDll.Imaging
 {
-    internal abstract class SurfaceBase : IDisposable
+    internal abstract class SurfaceBase : IDisposable, ISurfaceBase
     {
         protected readonly int width;
         protected readonly int height;
@@ -67,12 +67,32 @@ namespace PSFilterHostDll.Imaging
         /// <param name="bytesPerPixel">The bytes per pixel.</param>
         /// <param name="dpiX">The horizontal resolution of the surface.</param>
         /// <param name="dpiY">The vertical resolution of the surface.</param>
-        public SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY)
+        protected SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY)
+            : this(width, height, bytesPerPixel, dpiX, dpiY, SurfaceCreationOptions.Default)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SurfaceBase" /> class.
+        /// </summary>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
+        /// <param name="bytesPerPixel">The bytes per pixel.</param>
+        /// <param name="dpiX">The horizontal resolution of the surface.</param>
+        /// <param name="dpiY">The vertical resolution of the surface.</param>
+        /// <param name="options">The surface creation options.</param>
+        protected SurfaceBase(int width, int height, int bytesPerPixel, double dpiX, double dpiY, SurfaceCreationOptions options)
         {
             this.width = width;
             this.height = height;
             this.bytesPerPixel = bytesPerPixel;
             stride = width * bytesPerPixel;
+            if ((options & SurfaceCreationOptions.GdiPlusCompatableStride) == SurfaceCreationOptions.GdiPlusCompatableStride)
+            {
+                // GDI+ expects the stride to be a multiple of four.
+                stride = (stride + 3) & ~3;
+            }
+
             this.dpiX = dpiX;
             this.dpiY = dpiY;
             scan0 = new MemoryBlock(stride * height);

@@ -88,11 +88,10 @@ namespace PSFilterHostDll.PSApi
         private SurfaceBase source;
         private SurfaceBase dest;
         private SurfaceGray8 mask;
-        private SurfaceBGRA32 displaySurface;
+        private IDisplayPixelsSurface displaySurface;
         private SurfaceGray8 tempMask;
         private SurfaceBase tempSurface;
         private Bitmap checkerBoardBitmap;
-        private SurfaceBGRA32 colorCorrectedDisplaySurface;
 
         private PluginPhase previousPhase;
         private PluginModule module;
@@ -3268,9 +3267,12 @@ namespace PSFilterHostDll.PSApi
             return PSError.noErr;
         }
 
-        private void SetupDisplaySurface(int width, int height, bool haveMask, int displayImageMode)
+        private void SetupDisplaySurface(int width, int height, bool haveTransparencyMask, int displayImageMode)
         {
-            if ((displaySurface == null) || width != displaySurface.Width || height != displaySurface.Height)
+            if ((displaySurface == null) ||
+                width != displaySurface.Width ||
+                height != displaySurface.Height ||
+                haveTransparencyMask != displaySurface.SupportsTransparency)
             {
                 if (displaySurface != null)
                 {
@@ -3278,41 +3280,15 @@ namespace PSFilterHostDll.PSApi
                     displaySurface = null;
                 }
 
-                displaySurface = new SurfaceBGRA32(width, height);
 
-                if (!haveMask)
+                if (haveTransparencyMask)
                 {
-                    displaySurface.SetAlphaToOpaque();
+                    displaySurface = new SurfaceBGRA32(width, height);
                 }
-
-                // As some plug-ins may use planar order RGB data and the Windows Color System APIs do not support that format
-                // we first have to convert the data to interleaved BGR(A) and then use a second surface for color correction.
-                if (displayImageMode == PSConstants.plugInModeRGBColor && colorProfileConverter.ColorCorrectionRequired)
+                else
                 {
-                    if (colorCorrectedDisplaySurface != null)
-                    {
-                        colorCorrectedDisplaySurface.Dispose();
-                        colorCorrectedDisplaySurface = null;
-                    }
-
-                    colorCorrectedDisplaySurface = new SurfaceBGRA32(width, height);
+                    displaySurface = new SurfaceBGR24(width, height);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets the preview bitmap for the RGB image modes and applies color correction if necessary.
-        /// </summary>
-        /// <returns>The resulting bitmap.</returns>
-        private Bitmap GetRGBPreviewBitmap()
-        {
-            if (colorProfileConverter.ColorCorrectionRequired && colorProfileConverter.ColorCorrectBGRASurface(displaySurface, colorCorrectedDisplaySurface))
-            {
-                return colorCorrectedDisplaySurface.CreateAliasedBitmap();
-            }
-            else
-            {
-                return displaySurface.CreateAliasedBitmap();
             }
         }
 
@@ -3329,7 +3305,7 @@ namespace PSFilterHostDll.PSApi
             // Skip the rendering of the checker board if the surface does not contain any transparency.
             if (allOpaque)
             {
-                using (Bitmap bmp = GetRGBPreviewBitmap())
+                using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
                 {
                     gr.DrawImageUnscaled(bmp, dstCol, dstRow);
                 }
@@ -3354,7 +3330,7 @@ namespace PSFilterHostDll.PSApi
                         using (Graphics tempGr = Graphics.FromImage(temp))
                         {
                             tempGr.DrawImageUnscaledAndClipped(checkerBoardBitmap, rect);
-                            using (Bitmap bmp = GetRGBPreviewBitmap())
+                            using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
                             {
                                 tempGr.DrawImageUnscaled(bmp, rect);
                             }
@@ -3435,48 +3411,58 @@ namespace PSFilterHostDll.PSApi
             }
             else
             {
-                if (srcPixelMap.colBytes == 1)
+                // Perform color correction if required and fall back to the uncorrected data if it fails.
+                if (!colorProfileConverter.ColorCorrectionRequired ||
+                    !colorProfileConverter.ColorCorrectRGB(srcPixelMap.baseAddr,
+                                                           srcPixelMap.rowBytes,
+                                                           srcPixelMap.colBytes,
+                                                           srcPixelMap.planeBytes,
+                                                           new Point(left, top),
+                                                           displaySurface))
                 {
-                    int greenPlaneOffset = srcPixelMap.planeBytes;
-                    int bluePlaneOffset = srcPixelMap.planeBytes * 2;
-                    for (int y = top; y < bottom; y++)
+                    if (srcPixelMap.colBytes == 1)
                     {
-                        byte* redPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
-                        byte* greenPlane = redPlane + greenPlaneOffset;
-                        byte* bluePlane = redPlane + bluePlaneOffset;
-
-                        byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
-
-                        for (int x = 0; x < width; x++)
+                        int greenPlaneOffset = srcPixelMap.planeBytes;
+                        int bluePlaneOffset = srcPixelMap.planeBytes * 2;
+                        for (int y = top; y < bottom; y++)
                         {
-                            dst[2] = *redPlane;
-                            dst[1] = *greenPlane;
-                            dst[0] = *bluePlane;
+                            byte* redPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
+                            byte* greenPlane = redPlane + greenPlaneOffset;
+                            byte* bluePlane = redPlane + bluePlaneOffset;
 
-                            redPlane++;
-                            greenPlane++;
-                            bluePlane++;
-                            dst += 4;
+                            byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[2] = *redPlane;
+                                dst[1] = *greenPlane;
+                                dst[0] = *bluePlane;
+
+                                redPlane++;
+                                greenPlane++;
+                                bluePlane++;
+                                dst += 4;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    for (int y = top; y < bottom; y++)
+                    else
                     {
-                        byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
-                        byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
-
-                        for (int x = 0; x < width; x++)
+                        for (int y = top; y < bottom; y++)
                         {
-                            dst[0] = src[2];
-                            dst[1] = src[1];
-                            dst[2] = src[0];
+                            byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
+                            byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
-                            src += srcPixelMap.colBytes;
-                            dst += 4;
+                            for (int x = 0; x < width; x++)
+                            {
+                                dst[0] = src[2];
+                                dst[1] = src[1];
+                                dst[2] = src[0];
+
+                                src += srcPixelMap.colBytes;
+                                dst += 4;
+                            }
                         }
-                    }
+                    } 
                 }
             }
 
@@ -3517,7 +3503,7 @@ namespace PSFilterHostDll.PSApi
                     }
                     else
                     {
-                        using (Bitmap bmp = GetRGBPreviewBitmap())
+                        using (Bitmap bmp = displaySurface.CreateAliasedBitmap())
                         {
                             gr.DrawImageUnscaled(bmp, dstCol, dstRow);
                         }
@@ -4032,12 +4018,6 @@ namespace PSFilterHostDll.PSApi
                     {
                         propertySuite.Dispose();
                         propertySuite = null;
-                    }
-
-                    if (colorCorrectedDisplaySurface != null)
-                    {
-                        colorCorrectedDisplaySurface.Dispose();
-                        colorCorrectedDisplaySurface = null;
                     }
 
                     if (colorProfileConverter != null)
