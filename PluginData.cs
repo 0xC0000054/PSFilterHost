@@ -88,6 +88,101 @@ namespace PSFilterHostDll
         /// </value>
         public bool HasAboutBox => hasAboutBox;
 
+        /// <summary>
+        /// Gets the mode that indicates how the filter processes transparency.
+        /// </summary>
+        /// <param name="imageMode">The image mode.</param>
+        /// <param name="hasSelection"><c>true</c> if the host has an active selection; otherwise, <c>false</c>.</param>
+        /// <param name="hasTransparency">A <see cref="Func{TResult}"/> delegate that allows the method to determine if the image has transparency.</param>
+        /// <returns>One of the <see cref="FilterCase"/> values indicating how the filter processes transparency.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="hasTransparency"/> is null.</exception>
+        /// <exception cref="ArgumentException"><paramref name="imageMode"/> is not a supported value.</exception>
+        internal FilterCase GetFilterTransparencyMode(ImageModes imageMode, bool hasSelection, Func<bool> hasTransparency)
+        {
+            if (hasTransparency == null)
+            {
+                throw new ArgumentNullException(nameof(hasTransparency));
+            }
+
+            FilterCase filterCase;
+
+            if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
+            {
+                // Some filters do not handle transparency correctly despite what their FilterInfo says.
+                if (filterInfo == null ||
+                    category.Equals("Axion", StringComparison.Ordinal) ||
+                    (category.Equals("Vizros 4", StringComparison.Ordinal) && title.StartsWith("Lake", StringComparison.Ordinal)) ||
+                    (category.Equals("Nik Collection", StringComparison.Ordinal) && title.StartsWith("Dfine 2", StringComparison.Ordinal)))
+                {
+                    if (hasTransparency())
+                    {
+                        filterCase = FilterCase.FloatingSelection;
+                    }
+                    else
+                    {
+                        filterCase = hasSelection ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
+                    }
+                }
+                else
+                {
+                    filterCase = hasSelection ? FilterCase.EditableTransparencyWithSelection : FilterCase.EditableTransparencyNoSelection;
+
+                    int filterCaseIndex = (int)filterCase - 1;
+
+                    // If the EditableTransparency cases are not supported use the other modes.
+                    if (!filterInfo[filterCaseIndex].IsSupported)
+                    {
+                        if (hasTransparency())
+                        {
+                            if (filterInfo[filterCaseIndex + 2].IsSupported)
+                            {
+                                switch (filterCase)
+                                {
+                                    case FilterCase.EditableTransparencyNoSelection:
+                                        filterCase = FilterCase.ProtectedTransparencyNoSelection;
+                                        break;
+                                    case FilterCase.EditableTransparencyWithSelection:
+                                        filterCase = FilterCase.ProtectedTransparencyWithSelection;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // If the protected transparency modes are not supported treat the transparency as a floating selection.
+                                filterCase = FilterCase.FloatingSelection;
+                            }
+                        }
+                        else
+                        {
+                            switch (filterCase)
+                            {
+                                case FilterCase.EditableTransparencyNoSelection:
+                                    filterCase = FilterCase.FlatImageNoSelection;
+                                    break;
+                                case FilterCase.EditableTransparencyWithSelection:
+                                    filterCase = FilterCase.FlatImageWithSelection;
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                switch (imageMode)
+                {
+                    case ImageModes.GrayScale:
+                    case ImageModes.Gray16:
+                        filterCase = hasSelection ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
+                        break;
+                    default:
+                        throw new ArgumentException(string.Format(System.Globalization.CultureInfo.InvariantCulture, "Image mode {0} is not supported.", imageMode));
+                }
+            }
+
+            return filterCase;
+        }
+
 #if !GDIPLUS
         /// <summary>
         /// Checks if the filter supports processing images in the current <see cref="System.Windows.Media.PixelFormat"/>.

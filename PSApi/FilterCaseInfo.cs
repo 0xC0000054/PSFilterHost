@@ -60,6 +60,14 @@ namespace PSFilterHostDll.PSApi
         public FilterCaseInfoFlags flags1;
         public byte flags2;
 
+        public bool IsSupported
+        {
+            get
+            {
+                return inputHandling != FilterDataHandling.CantFilter && outputHandling != FilterDataHandling.CantFilter;
+            }
+        }
+
         public const int SizeOf = 4;
     }
 }
