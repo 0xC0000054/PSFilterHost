@@ -37,8 +37,6 @@ namespace PSFilterHostDll.Imaging
         {
         }
 
-        public override int ChannelCount => 4;
-
         public override int BitsPerChannel => 16;
 
         /// <summary>

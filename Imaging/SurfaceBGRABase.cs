@@ -34,6 +34,8 @@ namespace PSFilterHostDll.Imaging
         {
         }
 
+        public sealed override int ChannelCount => 4;
+
         protected sealed override void FitSurfaceImpl(SurfaceBase source)
         {
             // This method was implemented with correctness, not performance, in mind.

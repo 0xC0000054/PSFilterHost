@@ -37,8 +37,6 @@ namespace PSFilterHostDll.Imaging
         {
         }
 
-        public override int ChannelCount => 4;
-
         public override int BitsPerChannel => 8;
 
         public NativeEnums.Mscms.BMFORMAT MscmsFormat => NativeEnums.Mscms.BMFORMAT.BM_xRGBQUADS;
