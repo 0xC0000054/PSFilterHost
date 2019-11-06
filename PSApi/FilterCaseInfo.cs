@@ -53,12 +53,29 @@ namespace PSFilterHostDll.PSApi
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1), Serializable]
-    internal struct FilterCaseInfo
+    internal readonly struct FilterCaseInfo
     {
-        public FilterDataHandling inputHandling;
-        public FilterDataHandling outputHandling;
-        public FilterCaseInfoFlags flags1;
-        public byte flags2;
+        public readonly FilterDataHandling inputHandling;
+        public readonly FilterDataHandling outputHandling;
+        public readonly FilterCaseInfoFlags flags1;
+        public readonly byte flags2;
+
+        public const int SizeOf = 4;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FilterCaseInfo"/> structure.
+        /// </summary>
+        /// <param name="inputHandling">The input handling.</param>
+        /// <param name="outputHandling">The output handling.</param>
+        /// <param name="flags1">The flags1.</param>
+        /// <param name="flags2">The flags2.</param>
+        public FilterCaseInfo(FilterDataHandling inputHandling, FilterDataHandling outputHandling, FilterCaseInfoFlags flags1, byte flags2)
+        {
+            this.inputHandling = inputHandling;
+            this.outputHandling = outputHandling;
+            this.flags1 = flags1;
+            this.flags2 = flags2;
+        }
 
         public bool IsSupported
         {
@@ -67,7 +84,5 @@ namespace PSFilterHostDll.PSApi
                 return inputHandling != FilterDataHandling.CantFilter && outputHandling != FilterDataHandling.CantFilter;
             }
         }
-
-        public const int SizeOf = 4;
     }
 }

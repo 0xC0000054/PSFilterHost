@@ -91,13 +91,10 @@ namespace PSFilterHostDll.PSApi
                         flags1.HasValue &&
                         flags2.HasValue)
                     {
-                        info[i] = new FilterCaseInfo
-                        {
-                            inputHandling = (FilterDataHandling)inputHandling.Value,
-                            outputHandling = (FilterDataHandling)outputHandling.Value,
-                            flags1 = (FilterCaseInfoFlags)flags1.Value,
-                            flags2 = flags2.Value
-                        };
+                        info[i] = new FilterCaseInfo((FilterDataHandling)inputHandling.Value,
+                                                     (FilterDataHandling)outputHandling.Value,
+                                                     (FilterCaseInfoFlags)flags1.Value,
+                                                     flags2.Value);
                     }
                     else
                     {
