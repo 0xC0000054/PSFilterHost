@@ -3190,7 +3190,7 @@ namespace PSFilterHostDll.PSApi
             return PSError.noErr;
         }
 
-        private void SetupDisplaySurface(int width, int height, bool haveTransparencyMask, int displayImageMode)
+        private void SetupDisplaySurface(int width, int height, bool haveTransparencyMask)
         {
             if ((displaySurface == null) ||
                 width != displaySurface.Width ||
@@ -3292,7 +3292,7 @@ namespace PSFilterHostDll.PSApi
 
             try
             {
-                SetupDisplaySurface(width, height, hasTransparencyMask, srcPixelMap.imageMode);
+                SetupDisplaySurface(width, height, hasTransparencyMask);
             }
             catch (OutOfMemoryException)
             {
