@@ -362,11 +362,15 @@ namespace HostTest
             }
         }
 
-        private void EnableFiltersForImageFormat()
+        private void EnableFiltersForHostState()
         {
             if (srcImage != null)
             {
-                PixelFormat format = srcImage.Format;
+                HostState hostState = new HostState
+                {
+                    HasMultipleLayers = false,
+                    HasSelection = canvas.ClipPath != null
+                };
 
                 ToolStripItemCollection items = filtersToolStripMenuItem.DropDownItems;
                 for (int i = 0; i < items.Count; i++)
@@ -383,7 +387,7 @@ namespace HostTest
                         {
                             PluginData data = (PluginData)nodes[j].Tag;
 
-                            bool enabled = data.SupportsImageMode(format);
+                            bool enabled = data.SupportsHostState(srcImage, hostState);
                             catEnabled |= enabled;
                             nodes[j].Enabled = enabled;
                         }
@@ -398,7 +402,7 @@ namespace HostTest
                         {
                             PluginData data = (PluginData)repeatMenuItem.Tag;
 
-                            repeatMenuItem.Enabled = data.SupportsImageMode(format);
+                            repeatMenuItem.Enabled = data.SupportsHostState(srcImage, hostState);
                         }
                     }
                 }
@@ -941,6 +945,8 @@ namespace HostTest
                     imageType = "RGB/";
                 }
 
+                canvas.SuspendSelectionEvents();
+
                 canvas.ClearSelection();
 
                 panel1.SuspendLayout();
@@ -990,6 +996,7 @@ namespace HostTest
                     zoomToActualSizeBtn.Enabled = canvas.CanZoomToActualSize();
                 }
 
+                canvas.ResumeSelectionEvents();
                 panel1.ResumeLayout(true);
 
                 disabledIncompatableFilters = false;
@@ -1562,7 +1569,7 @@ namespace HostTest
                         aboutPluginsMenuItem.Available = false;
                     }
 
-                    EnableFiltersForImageFormat();
+                    EnableFiltersForHostState();
 
                     toolStripStatusLabel1.Text = string.Empty;
                     currentPluginDirectory = args.Path;
@@ -1614,7 +1621,7 @@ namespace HostTest
                 Cursor = Cursors.WaitCursor;
                 try
                 {
-                    EnableFiltersForImageFormat();
+                    EnableFiltersForHostState();
                 }
                 finally
                 {
@@ -1631,6 +1638,16 @@ namespace HostTest
                 ToolStripDropDownItem item = (ToolStripDropDownItem)sender;
                 DpiAwareToolStripRenderer.ScaleScrollButtonArrows(item.DropDown as ToolStripDropDownMenu);
             }
+        }
+
+        private void canvas_SelectionCreated(object sender, EventArgs e)
+        {
+            disabledIncompatableFilters = false;
+        }
+
+        private void canvas_SelectionDestroyed(object sender, EventArgs e)
+        {
+            disabledIncompatableFilters = false;
         }
     }
 }

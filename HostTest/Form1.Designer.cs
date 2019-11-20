@@ -295,6 +295,8 @@
             this.canvas.TabIndex = 9;
             this.canvas.ZoomChanged += new System.EventHandler<HostTest.CanvasZoomChangedEventArgs>(this.canvas_ZoomChanged);
             this.canvas.DirtyChanged += new System.EventHandler<HostTest.CanvasDirtyChangedEventArgs>(this.canvas_DirtyChanged);
+            this.canvas.SelectionCreated += new System.EventHandler(this.canvas_SelectionCreated);
+            this.canvas.SelectionDestroyed += new System.EventHandler(this.canvas_SelectionDestroyed);
             //
             // pointerSelectBtn
             //

@@ -11,12 +11,18 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Diagnostics;
 using System.Runtime.Serialization;
+using PSFilterHostDll.EnableInfo;
 using PSFilterHostDll.PSApi;
 
-#if !GDIPLUS
+#if GDIPLUS
+using System.Drawing;
+#else
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 #endif
 
 namespace PSFilterHostDll
@@ -40,6 +46,12 @@ namespace PSFilterHostDll
         private string[] moduleEntryPoints;
         [OptionalField(VersionAdded = 2)]
         private bool hasAboutBox;
+        [NonSerialized]
+        private bool enableInfoParsed;
+        [NonSerialized]
+        private Expression enableInfoExpression;
+        [NonSerialized]
+        private Dictionary<EnableInfoVariables, bool> enableInfoCache;
 
         /// <summary>
         /// Gets the filename of the filter.
@@ -183,12 +195,258 @@ namespace PSFilterHostDll
             return filterCase;
         }
 
+#if GDIPLUS
+        /// <summary>
+        /// Determines whether the filter can process the specified image and host application state.
+        /// </summary>
+        /// <param name="image">The image.</param>
+        /// <param name="hostState">The current state of the host application.</param>
+        /// <returns>
+        /// <c>true</c> if the filter can process the image and host application state; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para>
+        ///     <paramref name="image"/> is null.
+        /// </para>
+        /// <para>
+        ///     -or-
+        /// </para>
+        /// <para>
+        ///     <paramref name="hostState"/> is null.
+        /// </para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///    A filter can specify the image and host application conditions it requires to execute.
+        ///    For example, a filter may specify that the image must be at least 128 pixels in width
+        ///    or that the host must have an active selection.
+        /// </para>
+        /// <para>
+        ///    The host can use this method to prevent a filter from being selected in its user interface
+        ///    when the conditions the filter requires to execute are not met.
+        /// <note type="note">
+        ///    Some filters may remain enabled in the host's user interface and display an error message at runtime.
+        /// </note>
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="HostState"/>
+        public bool SupportsHostState(Bitmap image, HostState hostState)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+            if (hostState == null)
+            {
+                throw new ArgumentNullException(nameof(hostState));
+            }
+
+            const ImageModes imageMode = ImageModes.RGB;
+            FilterCase filterCase = GetFilterTransparencyMode(imageMode, hostState.HasSelection, () => TransparencyDetection.ImageHasTransparency(image));
+
+            return IsHostStateSupported(image.Width, image.Height, imageMode, filterCase, hostState);
+        }
+#else
+        /// <summary>
+        /// Determines whether the filter can process the specified image and host application state.
+        /// </summary>
+        /// <param name="image">The image.</param>
+        /// <param name="hostState">The current state of the host application.</param>
+        /// <returns>
+        /// <c>true</c> if the filter can process the image and host application state; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <para>
+        ///     <paramref name="image"/> is null.
+        /// </para>
+        /// <para>
+        ///     -or-
+        /// </para>
+        /// <para>
+        ///     <paramref name="hostState"/> is null.
+        /// </para>
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        ///    A filter can specify the image and host application conditions it requires to execute.
+        ///    For example, a filter may specify that the image must be at least 128 pixels in width
+        ///    or that the host must have an active selection.
+        /// </para>
+        /// <para>
+        ///    The host can use this method to prevent a filter from being selected in its user interface
+        ///    when the conditions the filter requires to execute are not met.
+        /// <note type="note">
+        ///    Some filters may remain enabled in the host's user interface and display an error message at runtime.
+        /// </note>
+        /// </para>
+        /// </remarks>
+        /// <seealso cref="HostState"/>
+        public bool SupportsHostState(BitmapSource image, HostState hostState)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+            if (hostState == null)
+            {
+                throw new ArgumentNullException(nameof(hostState));
+            }
+
+            ImageModes imageMode = ImageModes.RGB;
+
+            PixelFormat format = image.Format;
+
+            if (format == PixelFormats.BlackWhite ||
+                format == PixelFormats.Gray2 ||
+                format == PixelFormats.Gray4 ||
+                format == PixelFormats.Gray8)
+            {
+                imageMode = ImageModes.GrayScale;
+            }
+            else if (format == PixelFormats.Gray16 || format == PixelFormats.Gray32Float)
+            {
+                imageMode = ImageModes.Gray16;
+            }
+            else if (format == PixelFormats.Rgb48 ||
+                     format == PixelFormats.Rgba64 ||
+                     format == PixelFormats.Rgba128Float ||
+                     format == PixelFormats.Rgb128Float ||
+                     format == PixelFormats.Prgba64 ||
+                     format == PixelFormats.Prgba128Float)
+            {
+                imageMode = ImageModes.RGB48;
+            }
+
+            FilterCase filterCase = GetFilterTransparencyMode(imageMode, hostState.HasSelection, () => TransparencyDetection.ImageHasTransparency(image));
+
+            return IsHostStateSupported(image.PixelWidth, image.PixelHeight, imageMode, filterCase, hostState);
+        }
+#endif
+
+        private bool IsHostStateSupported(int imageWidth, int imageHeight, ImageModes imageMode, FilterCase filterCase, HostState hostState)
+        {
+            if (!supportedModes.HasValue)
+            {
+                if (string.Equals(enableInfo, "true", StringComparison.OrdinalIgnoreCase))
+                {
+                    // All image modes are supported.
+                    supportedModes = ushort.MaxValue;
+                }
+                else
+                {
+                    supportedModes = 0;
+                }
+            }
+
+            bool result;
+            switch (imageMode)
+            {
+                case ImageModes.GrayScale:
+                    result = (supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale;
+                    break;
+                case ImageModes.Gray16:
+                    result = (supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16;
+                    break;
+                case ImageModes.RGB:
+                    result = (supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor;
+                    break;
+                case ImageModes.RGB48:
+                    result = (supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48;
+                    break;
+                default:
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Image mode {0} is not supported.", imageMode));
+            }
+
+            if (!string.IsNullOrEmpty(enableInfo))
+            {
+                int targetChannelCount;
+                int trueChannelCount;
+                bool hasTransparencyMask = false;
+
+                switch (imageMode)
+                {
+                    case ImageModes.Bitmap:
+                    case ImageModes.GrayScale:
+                    case ImageModes.Indexed:
+                    case ImageModes.Multichannel:
+                    case ImageModes.Duotone:
+                    case ImageModes.Gray16:
+                        targetChannelCount = 1;
+                        trueChannelCount = 1;
+                        break;
+                    case ImageModes.CMYK:
+                        targetChannelCount = 4;
+                        trueChannelCount = 4;
+                        break;
+                    case ImageModes.HSL:
+                    case ImageModes.HSB:
+                    case ImageModes.Lab:
+                        targetChannelCount = 3;
+                        trueChannelCount = 3;
+                        break;
+                    case ImageModes.RGB:
+                    case ImageModes.RGB48:
+                        targetChannelCount = 3;
+                        if (filterCase == FilterCase.EditableTransparencyNoSelection ||
+                            filterCase == FilterCase.EditableTransparencyWithSelection ||
+                            filterCase == FilterCase.ProtectedTransparencyNoSelection ||
+                            filterCase == FilterCase.ProtectedTransparencyWithSelection)
+                        {
+                            trueChannelCount = 4;
+                            hasTransparencyMask = true;
+                        }
+                        else
+                        {
+                            trueChannelCount = 3;
+                        }
+                        break;
+                    default:
+                        throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Image mode {0} is not supported.", imageMode));
+                }
+
+                EnableInfoVariables variables = new EnableInfoVariables(imageWidth, imageHeight, imageMode, hasTransparencyMask, targetChannelCount,
+                                                                        trueChannelCount, hostState);
+
+                if (!enableInfoCache.TryGetValue(variables, out result))
+                {
+                    try
+                    {
+                        if (!enableInfoParsed)
+                        {
+                            enableInfoParsed = true;
+
+                            enableInfoExpression = EnableInfoParser.Parse(enableInfo);
+                        }
+
+                        if (enableInfoExpression != null)
+                        {
+                            result = new EnableInfoInterpreter(variables).Evaluate(enableInfoExpression);
+
+                            enableInfoCache.Add(variables, result);
+                        }
+                    }
+                    catch (EnableInfoException)
+                    {
+                        // Ignore any errors that occur when parsing or evaluating the enable info expression.
+                    }
+                }
+            }
+
+            if (filterInfo != null)
+            {
+                result &= filterInfo[(int)filterCase - 1].IsSupported;
+            }
+
+            return result;
+        }
+
 #if !GDIPLUS
         /// <summary>
         /// Checks if the filter supports processing images in the current <see cref="System.Windows.Media.PixelFormat"/>.
         /// </summary>
         /// <param name="mode">The <see cref="System.Windows.Media.PixelFormat"/> of the image to process.</param>
         /// <returns><c>true</c> if the filter can process the image; otherwise <c>false</c>.</returns>
+        [Obsolete("Please use SupportsHostState(BitmapSource, HostState) instead.", false)]
         public bool SupportsImageMode(PixelFormat mode)
         {
             if (!supportedModes.HasValue)
@@ -225,7 +483,7 @@ namespace PSFilterHostDll
                 }
                 else
                 {
-                    EnableInfoParser parser = new EnableInfoParser();
+                    LegacyEnableInfoParser parser = new LegacyEnableInfoParser();
                     supportedModes = parser.GetSupportedModes(enableInfo);
                 }
             }
@@ -246,7 +504,7 @@ namespace PSFilterHostDll
         {
             if (!string.IsNullOrEmpty(enableInfo))
             {
-                EnableInfoParser parser = new EnableInfoParser(grayScale);
+                LegacyEnableInfoParser parser = new LegacyEnableInfoParser(grayScale);
                 return parser.Parse(enableInfo);
             }
 
@@ -302,12 +560,14 @@ namespace PSFilterHostDll
             this.supportedModes = supportedModes;
             moduleEntryPoints = null;
             this.hasAboutBox = hasAboutBox;
+            enableInfoCache = new Dictionary<EnableInfoVariables, bool>();
         }
 
         [OnDeserializing]
         private void OnDeserializing(StreamingContext context)
         {
             hasAboutBox = true;
+            enableInfoCache = new Dictionary<EnableInfoVariables, bool>();
         }
 
         [OnDeserialized]

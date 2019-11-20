@@ -14,9 +14,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace PSFilterHostDll
+namespace PSFilterHostDll.EnableInfo
 {
-    internal sealed class EnableInfoParser
+    internal sealed class LegacyEnableInfoParser
     {
         private enum TokenType
         {
@@ -59,11 +59,11 @@ namespace PSFilterHostDll
         private const string GrayScaleMode = "GrayScaleMode";
         private const string Gray16Mode = "Gray16Mode";
 
-        public EnableInfoParser() : this(false)
+        public LegacyEnableInfoParser() : this(false)
         {
         }
 
-        public EnableInfoParser(bool grayScale)
+        public LegacyEnableInfoParser(bool grayScale)
         {
             index = 0;
             imageMode = grayScale ? Gray16Mode : RGB48Mode;

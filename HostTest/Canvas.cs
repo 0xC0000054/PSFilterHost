@@ -51,12 +51,15 @@ namespace HostTest
         private bool isDirty;
         private float selectionFactor;
         private GraphicsPath normalizedPath;
-
+        private bool selectionCreatedEventFired;
+        private int suspendSelectionEventCounter;
         private bool resetClip;
         private int suspendPaintCounter;
 
         public event EventHandler<CanvasZoomChangedEventArgs> ZoomChanged;
         public event EventHandler<CanvasDirtyChangedEventArgs> DirtyChanged;
+        public event EventHandler SelectionCreated;
+        public event EventHandler SelectionDestroyed;
 
         static Canvas()
         {
@@ -208,6 +211,33 @@ namespace HostTest
             Cursor = e.NewCursor;
         }
 
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            if (path != null && !selectionCreatedEventFired)
+            {
+                OnSelectionCreated();
+                selectionCreatedEventFired = true;
+            }
+        }
+
+        private void OnSelectionCreated()
+        {
+            if (suspendSelectionEventCounter == 0)
+            {
+                SelectionCreated?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private void OnSelectionDestroyed()
+        {
+            if (suspendSelectionEventCounter == 0)
+            {
+                SelectionDestroyed?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
         /// <summary>
         /// Renders the selection.
         /// </summary>
@@ -245,6 +275,12 @@ namespace HostTest
                     selectionRegion.Dispose();
                     selectionRegion = null;
                 }
+
+                if (selectionCreatedEventFired)
+                {
+                    OnSelectionDestroyed();
+                    selectionCreatedEventFired = false;
+                }
             }
             Invalidate();
         }
@@ -265,6 +301,22 @@ namespace HostTest
         public void ClearSelection()
         {
             RenderSelection(null, true);
+        }
+
+        /// <summary>
+        /// Suspends the SelectionCreated and SelectionDestroyed events.
+        /// </summary>
+        public void SuspendSelectionEvents()
+        {
+            suspendSelectionEventCounter++;
+        }
+
+        /// <summary>
+        /// Resumes the SelectionCreated and SelectionDestroyed events.
+        /// </summary>
+        public void ResumeSelectionEvents()
+        {
+            suspendSelectionEventCounter--;
         }
 
         /// <summary>
