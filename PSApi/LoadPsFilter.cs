@@ -3311,6 +3311,8 @@ namespace PSFilterHostDll.PSApi
                 bottom = height;
             }
 
+            int destColBytes = displaySurface.ChannelCount;
+
             if (srcPixelMap.imageMode == PSConstants.plugInModeGrayScale)
             {
                 // Perform color correction if required and fall back to the uncorrected data if it fails.
@@ -3327,7 +3329,7 @@ namespace PSFilterHostDll.PSApi
                             dst[0] = dst[1] = dst[2] = *src;
 
                             src += srcPixelMap.colBytes;
-                            dst += 4;
+                            dst += destColBytes;
                         }
                     }
                 }
@@ -3364,7 +3366,7 @@ namespace PSFilterHostDll.PSApi
                                 redPlane++;
                                 greenPlane++;
                                 bluePlane++;
-                                dst += 4;
+                                dst += destColBytes;
                             }
                         }
                     }
@@ -3382,7 +3384,7 @@ namespace PSFilterHostDll.PSApi
                                 dst[2] = src[0];
 
                                 src += srcPixelMap.colBytes;
-                                dst += 4;
+                                dst += destColBytes;
                             }
                         }
                     }
@@ -3417,7 +3419,7 @@ namespace PSFilterHostDll.PSApi
                                     }
 
                                     src += srcMask->colBytes;
-                                    dst += 4;
+                                    dst += destColBytes;
                                 }
                             }
                         }
