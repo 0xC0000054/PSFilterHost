@@ -2393,6 +2393,8 @@ namespace PSFilterHostDll.PSApi
                 }
 
                 int nplanes = hiplane - loplane + 1;
+                int width = rect.right - rect.left;
+                int height = rect.bottom - rect.top;
 
                 int ofs = loplane;
                 switch (loplane)
@@ -2404,27 +2406,10 @@ namespace PSFilterHostDll.PSApi
                         ofs = 0;
                         break;
                 }
-                Rectangle lockRect = Rectangle.FromLTRB(rect.left, rect.top, rect.right, rect.bottom);
 
-                if (lockRect.Left < 0 || lockRect.Top < 0)
-                {
-                    if (lockRect.Left < 0 && lockRect.Top < 0)
-                    {
-                        lockRect.X = lockRect.Y = 0;
-                        lockRect.Width -= -rect.left;
-                        lockRect.Height -= -rect.top;
-                    }
-                    else if (lockRect.Left < 0)
-                    {
-                        lockRect.X = 0;
-                        lockRect.Width -= -rect.left;
-                    }
-                    else if (lockRect.Top < 0)
-                    {
-                        lockRect.Y = 0;
-                        lockRect.Height -= -rect.top;
-                    }
-                }
+                FilterPadding padding = GetFilterPadding(rect, width, height, dest, null);
+
+                Rectangle lockRect = new Rectangle(rect.left + padding.left, rect.top + padding.top, width - padding.Horizontal, height - padding.Vertical);
 
                 void* ptr = outData.ToPointer();
 
@@ -2441,7 +2426,7 @@ namespace PSFilterHostDll.PSApi
 
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* src = (byte*)ptr + ((y - top) * outRowBytes);
+                            byte* src = (byte*)ptr + ((y - top + padding.top) * outRowBytes) + padding.left;
                             byte* dst = dest.GetPointAddressUnchecked(left, y);
 
                             for (int x = left; x < right; x++)
@@ -2458,7 +2443,7 @@ namespace PSFilterHostDll.PSApi
 
                         for (int y = top; y < bottom; y++)
                         {
-                            ushort* src = (ushort*)ptr + ((y - top) * stride16);
+                            ushort* src = (ushort*)ptr + ((y - top + padding.top) * stride16) + padding.left;
                             ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
 
                             for (int x = left; x < right; x++)
@@ -2475,7 +2460,7 @@ namespace PSFilterHostDll.PSApi
 
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* src = (byte*)ptr + ((y - top) * outRowBytes);
+                            byte* src = (byte*)ptr + ((y - top + padding.top) * outRowBytes) + padding.left;
                             byte* dst = dest.GetPointAddressUnchecked(left, y);
 
                             for (int x = left; x < right; x++)
@@ -2512,7 +2497,7 @@ namespace PSFilterHostDll.PSApi
 
                         for (int y = top; y < bottom; y++)
                         {
-                            ushort* src = (ushort*)ptr + ((y - top) * stride16);
+                            ushort* src = (ushort*)ptr + ((y - top + padding.top) * stride16) + padding.left;
                             ushort* dst = (ushort*)dest.GetPointAddressUnchecked(left, y);
 
                             for (int x = left; x < right; x++)
