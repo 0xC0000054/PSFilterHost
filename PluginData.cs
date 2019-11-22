@@ -296,10 +296,14 @@ namespace PSFilterHostDll
 
             PixelFormat format = image.Format;
 
-            if (format == PixelFormats.BlackWhite ||
-                format == PixelFormats.Gray2 ||
-                format == PixelFormats.Gray4 ||
-                format == PixelFormats.Gray8)
+            if (format == PixelFormats.Cmyk32)
+            {
+                imageMode = ImageModes.CMYK;
+            }
+            else if (format == PixelFormats.BlackWhite ||
+                     format == PixelFormats.Gray2 ||
+                     format == PixelFormats.Gray4 ||
+                     format == PixelFormats.Gray8)
             {
                 imageMode = ImageModes.GrayScale;
             }
@@ -341,6 +345,9 @@ namespace PSFilterHostDll
             bool result;
             switch (imageMode)
             {
+                case ImageModes.CMYK:
+                    result = (supportedModes.Value & PSConstants.flagSupportsCMYKColor) == PSConstants.flagSupportsCMYKColor;
+                    break;
                 case ImageModes.GrayScale:
                     result = (supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale;
                     break;
@@ -454,7 +461,11 @@ namespace PSFilterHostDll
                 DetectSupportedModes();
             }
 
-            if (mode == PixelFormats.BlackWhite || mode == PixelFormats.Gray2 || mode == PixelFormats.Gray4 || mode == PixelFormats.Gray8)
+            if (mode == PixelFormats.Cmyk32)
+            {
+                return (supportedModes.Value & PSConstants.flagSupportsCMYKColor) == PSConstants.flagSupportsCMYKColor;
+            }
+            else if (mode == PixelFormats.BlackWhite || mode == PixelFormats.Gray2 || mode == PixelFormats.Gray4 || mode == PixelFormats.Gray8)
             {
                 return ((supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
             }

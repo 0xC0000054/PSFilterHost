@@ -931,12 +931,16 @@ namespace HostTest
 
                 imageFileName = Path.GetFileName(path);
 
-                if (format == PixelFormats.BlackWhite ||
-                    format == PixelFormats.Gray2 ||
-                    format == PixelFormats.Gray4 ||
-                    format == PixelFormats.Gray8 ||
-                    format == PixelFormats.Gray16 ||
-                    format == PixelFormats.Gray32Float)
+                if (format == PixelFormats.Cmyk32)
+                {
+                    imageType = "CMYK/";
+                }
+                else if (format == PixelFormats.BlackWhite ||
+                         format == PixelFormats.Gray2 ||
+                         format == PixelFormats.Gray4 ||
+                         format == PixelFormats.Gray8 ||
+                         format == PixelFormats.Gray16 ||
+                         format == PixelFormats.Gray32Float)
                 {
                     imageType = "Gray/";
                 }

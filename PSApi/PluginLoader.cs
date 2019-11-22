@@ -469,10 +469,11 @@ namespace PSFilterHostDll.PSApi
 #else
 
                     if ((dataPtr[0] & PSConstants.flagSupportsRGBColor) != PSConstants.flagSupportsRGBColor &&
-                        (dataPtr[0] & PSConstants.flagSupportsGrayScale) != PSConstants.flagSupportsGrayScale)
+                        (dataPtr[0] & PSConstants.flagSupportsGrayScale) != PSConstants.flagSupportsGrayScale &&
+                        (dataPtr[0] & PSConstants.flagSupportsCMYKColor) != PSConstants.flagSupportsCMYKColor)
                     {
 #if DEBUG
-                        System.Diagnostics.Debug.WriteLine(string.Format("{0} does not support the plugInModeRGBColor or plugInModeGrayScale image modes.", query.fileName));
+                        System.Diagnostics.Debug.WriteLine(string.Format("{0} does not support the host image modes.", query.fileName));
 #endif
                         return true;
                     }
@@ -640,12 +641,12 @@ namespace PSFilterHostDll.PSApi
                 return true;
             }
 #else
-
             if ((info->supportsMode & PSConstants.supportsRGBColor) != PSConstants.supportsRGBColor &&
-                (info->supportsMode & PSConstants.supportsGrayScale) != PSConstants.supportsGrayScale)
+                (info->supportsMode & PSConstants.supportsGrayScale) != PSConstants.supportsGrayScale &&
+                (info->supportsMode & PSConstants.supportsCMYKColor) != PSConstants.supportsCMYKColor)
             {
 #if DEBUG
-                System.Diagnostics.Debug.WriteLine(string.Format("{0} does not support the plugInModeRGBColor or plugInModeGrayScale image modes.", query.fileName));
+                System.Diagnostics.Debug.WriteLine(string.Format("{0} does not support the host image modes.", query.fileName));
 #endif
                 return true;
             }
@@ -660,6 +661,11 @@ namespace PSFilterHostDll.PSApi
             if ((info->supportsMode & PSConstants.supportsRGBColor) == PSConstants.supportsRGBColor)
             {
                 supportedModes |= PSConstants.flagSupportsRGBColor;
+            }
+
+            if ((info->supportsMode & PSConstants.supportsCMYKColor) == PSConstants.supportsCMYKColor)
+            {
+                supportedModes |= PSConstants.flagSupportsCMYKColor;
             }
 
             if (info->requireHost != PSConstants.kPhotoshopSignature && info->requireHost != PSConstants.AnyHostSignature)

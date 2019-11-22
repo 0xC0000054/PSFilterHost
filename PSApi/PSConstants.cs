@@ -76,7 +76,9 @@ namespace PSFilterHostDll.PSApi
 
         public const int plugInModeRGBColor = 3;
         public const int plugInModeGrayScale = 1;
+        public const int plugInModeCMYKColor = 4;
 
+        public const int flagSupportsCMYKColor = 8;
         public const int flagSupportsRGBColor = 16;
         public const int flagSupportsGrayScale = 64;
         public const int flagSupportsRGB48 = 4096;
@@ -84,6 +86,7 @@ namespace PSFilterHostDll.PSApi
 
         public const int supportsRGBColor = 8;
         public const int supportsGrayScale = 2;
+        public const int supportsCMYKColor = 16;
 
         internal static class PICA
         {
@@ -133,6 +136,22 @@ namespace PSFilterHostDll.PSApi
             /// The index of the alpha channel.
             /// </summary>
             public const int Alpha = 4;
+            /// <summary>
+            /// The index of the cyan channel.
+            /// </summary>
+            public const int Cyan = 1;
+            /// <summary>
+            /// The index of the magenta channel.
+            /// </summary>
+            public const int Magenta = 2;
+            /// <summary>
+            /// The index of the yellow channel.
+            /// </summary>
+            public const int Yellow = 3;
+            /// <summary>
+            /// The index of the black channel.
+            /// </summary>
+            public const int Black = 4;
             /// <summary>
             /// The index of the selection mask.
             /// </summary>

@@ -77,7 +77,17 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("AlphaChannelName", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Black.
+        /// </summary>
+        internal static string BlackChannelName
+        {
+            get {
+                return ResourceManager.GetString("BlackChannelName", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to The filter does not support processing completely transparent images..
         /// </summary>
@@ -95,7 +105,17 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("BlueChannelName", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        /// Looks up a localized string similar to 32-bit CMYK.
+        /// </summary>
+        internal static string CMYKMode
+        {
+            get {
+                return ResourceManager.GetString("CMYKMode", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Unable to create the color transform..
         /// </summary>
@@ -104,7 +124,17 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("CreateTransformError", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Cyan.
+        /// </summary>
+        internal static string CyanChannelName
+        {
+            get {
+                return ResourceManager.GetString("CyanChannelName", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Could not find a part of the path &apos;{0}&apos;..
         /// </summary>
@@ -257,7 +287,17 @@ namespace PSFilterHostDll.Properties {
                 return ResourceManager.GetString("InvalidSamplePoint", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to Magenta.
+        /// </summary>
+        internal static string MagentaChannelName
+        {
+            get {
+                return ResourceManager.GetString("MagentaChannelName", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Selection Mask.
         /// </summary>
@@ -372,6 +412,16 @@ namespace PSFilterHostDll.Properties {
         internal static string VolumeLockedError {
             get {
                 return ResourceManager.GetString("VolumeLockedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Yellow.
+        /// </summary>
+        internal static string YellowChannelName
+        {
+            get {
+                return ResourceManager.GetString("YellowChannelName", resourceCulture);
             }
         }
     }

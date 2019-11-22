@@ -13,6 +13,7 @@
 using PSFilterHostDll.Properties;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace PSFilterHostDll.PSApi
@@ -151,10 +152,45 @@ namespace PSFilterHostDll.PSApi
                         doc->targetTransparency = doc->mergedTransparency = alphaPtr;
                     }
                 }
-                else
+                else if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
                 {
                     IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Gray, Resources.GrayChannelName, doc->depth, doc->bounds);
                     doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
+                }
+                else if (imageMode == ImageModes.CMYK)
+                {
+                    IntPtr channel = CreateReadChannelDesc(PSConstants.ChannelPorts.Cyan, Resources.CyanChannelName, doc->depth, doc->bounds);
+
+                    ReadChannelDesc* ch = (ReadChannelDesc*)channel.ToPointer();
+
+                    for (int i = PSConstants.ChannelPorts.Magenta; i <= PSConstants.ChannelPorts.Black; i++)
+                    {
+                        string name = null;
+                        switch (i)
+                        {
+                            case PSConstants.ChannelPorts.Magenta:
+                                name = Resources.MagentaChannelName;
+                                break;
+                            case PSConstants.ChannelPorts.Yellow:
+                                name = Resources.YellowChannelName;
+                                break;
+                            case PSConstants.ChannelPorts.Black:
+                                name = Resources.BlackChannelName;
+                                break;
+                        }
+
+                        IntPtr ptr = CreateReadChannelDesc(i, name, doc->depth, doc->bounds);
+
+                        ch->next = ptr;
+
+                        ch = (ReadChannelDesc*)ptr.ToPointer();
+                    }
+
+                    doc->targetCompositeChannels = doc->mergedCompositeChannels = channel;
+                }
+                else
+                {
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
                 }
 
                 if (hasSelection)

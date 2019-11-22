@@ -1060,7 +1060,20 @@ namespace PSFilterHostDll.PSApi
                 filterRecord->outNonLayerPlanes = filterRecord->inNonLayerPlanes;
                 filterRecord->outColumnBytes = filterRecord->inColumnBytes;
             }
-            else
+            else if (imageMode == ImageModes.CMYK)
+            {
+                filterRecord->inLayerPlanes = 0;
+                filterRecord->inTransparencyMask = 0;
+                filterRecord->inNonLayerPlanes = 4;
+
+                filterRecord->inColumnBytes = 1;
+
+                filterRecord->outLayerPlanes = filterRecord->inLayerPlanes;
+                filterRecord->outTransparencyMask = filterRecord->inTransparencyMask;
+                filterRecord->outNonLayerPlanes = filterRecord->inNonLayerPlanes;
+                filterRecord->outColumnBytes = filterRecord->inColumnBytes;
+            }
+            else if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
             {
                 switch (filterCase)
                 {
@@ -1100,6 +1113,10 @@ namespace PSFilterHostDll.PSApi
                     filterRecord->outNonLayerPlanes = filterRecord->inNonLayerPlanes;
                     filterRecord->outColumnBytes = filterRecord->inColumnBytes;
                 }
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Image mode {0} is not supported.", imageMode));
             }
 
             filterRecord->inLayerMasks = 0;
@@ -1462,6 +1479,8 @@ namespace PSFilterHostDll.PSApi
                 case ImageModes.Gray16:
                     imageMode = Resources.Gray16Mode;
                     break;
+                case ImageModes.CMYK:
+                    return Resources.CMYKMode;
                 default:
                     imageMode = mode.ToString("G");
                     break;
@@ -1963,6 +1982,43 @@ namespace PSFilterHostDll.PSApi
                     }
 
                     break;
+                case ImageModes.CMYK:
+
+                    for (int y = top; y < bottom; y++)
+                    {
+                        byte* src = tempSurface.GetPointAddressUnchecked(left, y);
+                        byte* dst = (byte*)ptr + (((y - top) + padding.top) * stride) + padding.left;
+
+                        for (int x = left; x < right; x++)
+                        {
+                            switch (nplanes)
+                            {
+                                case 1:
+                                    *dst = src[channelOffset];
+                                    break;
+                                case 2:
+                                    dst[0] = src[channelOffset];
+                                    dst[1] = src[channelOffset + 1];
+                                    break;
+                                case 3:
+                                    dst[0] = src[0];
+                                    dst[1] = src[1];
+                                    dst[2] = src[2];
+                                    break;
+                                case 4:
+                                    dst[0] = src[0];
+                                    dst[1] = src[1];
+                                    dst[2] = src[2];
+                                    dst[3] = src[3];
+                                    break;
+                            }
+
+                            src += 4;
+                            dst += nplanes;
+                        }
+                    }
+
+                    break;
                 case ImageModes.RGB:
 
                     for (int y = top; y < bottom; y++)
@@ -2147,6 +2203,43 @@ namespace PSFilterHostDll.PSApi
 
                             src++;
                             dst++;
+                        }
+                    }
+
+                    break;
+                case ImageModes.CMYK:
+
+                    for (int y = top; y < bottom; y++)
+                    {
+                        byte* src = dest.GetPointAddressUnchecked(left, y);
+                        byte* dst = (byte*)ptr + (((y - top) + padding.top) * stride) + padding.left;
+
+                        for (int x = left; x < right; x++)
+                        {
+                            switch (nplanes)
+                            {
+                                case 1:
+                                    *dst = src[channelOffset];
+                                    break;
+                                case 2:
+                                    dst[0] = src[channelOffset];
+                                    dst[1] = src[channelOffset + 1];
+                                    break;
+                                case 3:
+                                    dst[0] = src[0];
+                                    dst[1] = src[1];
+                                    dst[2] = src[2];
+                                    break;
+                                case 4:
+                                    dst[0] = src[0];
+                                    dst[1] = src[1];
+                                    dst[2] = src[2];
+                                    dst[3] = src[3];
+                                    break;
+                            }
+
+                            src += 4;
+                            dst += nplanes;
                         }
                     }
 
@@ -2397,14 +2490,17 @@ namespace PSFilterHostDll.PSApi
                 int height = rect.bottom - rect.top;
 
                 int ofs = loplane;
-                switch (loplane)
+                if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
                 {
-                    case 0:
-                        ofs = 2;
-                        break;
-                    case 2:
-                        ofs = 0;
-                        break;
+                    switch (loplane)
+                    {
+                        case 0:
+                            ofs = 2;
+                            break;
+                        case 2:
+                            ofs = 0;
+                            break;
+                    }
                 }
 
                 FilterPadding padding = GetFilterPadding(rect, width, height, dest, null);
@@ -2452,6 +2548,43 @@ namespace PSFilterHostDll.PSApi
 
                                 src++;
                                 dst++;
+                            }
+                        }
+
+                        break;
+                    case ImageModes.CMYK:
+
+                        for (int y = top; y < bottom; y++)
+                        {
+                            byte* src = (byte*)ptr + ((y - top) * outRowBytes);
+                            byte* dst = dest.GetPointAddressUnchecked(left, y);
+
+                            for (int x = left; x < right; x++)
+                            {
+                                switch (nplanes)
+                                {
+                                    case 1:
+                                        dst[ofs] = *src;
+                                        break;
+                                    case 2:
+                                        dst[ofs] = src[0];
+                                        dst[ofs + 1] = src[1];
+                                        break;
+                                    case 3:
+                                        dst[0] = src[0];
+                                        dst[1] = src[1];
+                                        dst[2] = src[2];
+                                        break;
+                                    case 4:
+                                        dst[0] = src[0];
+                                        dst[1] = src[1];
+                                        dst[2] = src[2];
+                                        dst[3] = src[3];
+                                        break;
+                                }
+
+                                src += nplanes;
+                                dst += 4;
                             }
                         }
 
@@ -2787,6 +2920,12 @@ namespace PSFilterHostDll.PSApi
                                     info.colorComponents[1] = pixel[1];
                                     info.colorComponents[2] = pixel[0];
                                     info.colorComponents[3] = 0;
+                                    break;
+                                case ImageModes.CMYK:
+                                    info.colorComponents[0] = pixel[0];
+                                    info.colorComponents[1] = pixel[1];
+                                    info.colorComponents[2] = pixel[2];
+                                    info.colorComponents[3] = pixel[3];
                                     break;
                             }
                         }
@@ -3267,7 +3406,9 @@ namespace PSFilterHostDll.PSApi
 #endif
 
             if (platformContext == IntPtr.Zero || srcPixelMap.rowBytes == 0 || srcPixelMap.baseAddr == IntPtr.Zero ||
-                (srcPixelMap.imageMode != PSConstants.plugInModeRGBColor && srcPixelMap.imageMode != PSConstants.plugInModeGrayScale))
+                (srcPixelMap.imageMode != PSConstants.plugInModeRGBColor &&
+                srcPixelMap.imageMode != PSConstants.plugInModeGrayScale &&
+                srcPixelMap.imageMode != PSConstants.plugInModeCMYKColor))
             {
                 return PSError.filterBadParameters;
             }
@@ -3317,6 +3458,80 @@ namespace PSFilterHostDll.PSApi
 
                             src += srcPixelMap.colBytes;
                             dst += destColBytes;
+                        }
+                    }
+                }
+            }
+            else if (srcPixelMap.imageMode == PSConstants.plugInModeCMYKColor)
+            {
+                // Perform color correction if required and fall back to the uncorrected data if it fails.
+                if (!colorProfileConverter.ColorCorrectionRequired ||
+                    !colorProfileConverter.ColorCorrectCMYK(srcPixelMap.baseAddr, srcPixelMap.rowBytes, srcPixelMap.colBytes,
+                                                            srcPixelMap.planeBytes, new Point(left, top), displaySurface))
+                {
+                    if (srcPixelMap.colBytes == 1)
+                    {
+                        int magentaPlaneOffset = srcPixelMap.planeBytes;
+                        int yellowPlaneOffset = magentaPlaneOffset + srcPixelMap.planeBytes;
+                        int blackPlaneOffset = yellowPlaneOffset + srcPixelMap.planeBytes;
+
+                        for (int y = top; y < bottom; y++)
+                        {
+                            byte* cyanPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
+                            byte* magentaPlane = cyanPlane + magentaPlaneOffset;
+                            byte* yellowPlane = cyanPlane + yellowPlaneOffset;
+                            byte* blackPlane = cyanPlane + blackPlaneOffset;
+
+                            byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                byte cyan = *cyanPlane;
+                                byte magenta = *magentaPlane;
+                                byte yellow = *yellowPlane;
+                                byte black = *blackPlane;
+
+                                int nRed = 255 - Math.Min(255, cyan * (255 - black) / 255 + black);
+                                int nGreen = 255 - Math.Min(255, magenta * (255 - black) / 255 + black);
+                                int nBlue = 255 - Math.Min(255, yellow * (255 - black) / 255 + black);
+
+                                dst[2] = (byte)nRed;
+                                dst[1] = (byte)nGreen;
+                                dst[0] = (byte)nBlue;
+
+                                cyanPlane++;
+                                magentaPlane++;
+                                yellowPlane++;
+                                blackPlane++;
+                                dst += destColBytes;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int y = top; y < bottom; y++)
+                        {
+                            byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
+                            byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
+
+                            for (int x = 0; x < width; x++)
+                            {
+                                byte cyan = src[0];
+                                byte magenta = src[1];
+                                byte yellow = src[2];
+                                byte black = src[3];
+
+                                int nRed = 255 - Math.Min(255, cyan * (255 - black) / 255 + black);
+                                int nGreen = 255 - Math.Min(255, magenta * (255 - black) / 255 + black);
+                                int nBlue = 255 - Math.Min(255, yellow * (255 - black) / 255 + black);
+
+                                dst[2] = (byte)nRed;
+                                dst[1] = (byte)nGreen;
+                                dst[0] = (byte)nBlue;
+
+                                src += srcPixelMap.colBytes;
+                                dst += destColBytes;
+                            }
                         }
                     }
                 }
@@ -3601,12 +3816,18 @@ namespace PSFilterHostDll.PSApi
             }
             else
             {
-                if (imageMode != ImageModes.GrayScale && imageMode != ImageModes.Gray16)
+                switch (imageMode)
                 {
-                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
+                    case ImageModes.GrayScale:
+                    case ImageModes.Gray16:
+                        filterRecord->planes = 1;
+                        break;
+                    case ImageModes.CMYK:
+                        filterRecord->planes = 4;
+                        break;
+                    default:
+                        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
                 }
-
-                filterRecord->planes = 1;
             }
 
             propertySuite.NumberOfChannels = filterRecord->planes;
@@ -3806,6 +4027,7 @@ namespace PSFilterHostDll.PSApi
             {
                 case ImageModes.GrayScale:
                 case ImageModes.RGB:
+                case ImageModes.CMYK:
                     filterRecord->depth = 8;
                     break;
 

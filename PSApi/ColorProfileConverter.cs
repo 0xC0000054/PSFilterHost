@@ -28,6 +28,7 @@ namespace PSFilterHostDll.PSApi
         private SafeProfileHandle documentProfile;
         private SafeProfileHandle monitorProfile;
         private SafeTransformHandle transform;
+        private SurfaceCMYK32 interleavedCMYKSurface;
         private SurfaceBGR24 interleavedRGBSurface;
         private bool colorCorrectionRequired;
         private bool disposed;
@@ -274,6 +275,116 @@ namespace PSFilterHostDll.PSApi
         public bool ColorCorrectionRequired => colorCorrectionRequired;
 
         /// <summary>
+        /// Performs color correction on the specified 8-bit CMYK image data and converts it to RGB..
+        /// </summary>
+        /// <param name="srcPtr">The pointer to the start of the image data..</param>
+        /// <param name="srcRowBytes">The source row bytes.</param>
+        /// <param name="srcColBytes">The source column bytes.</param>
+        /// <param name="srcPlaneBytes">The source plane bytes.</param>
+        /// <param name="origin">The origin.</param>
+        /// <param name="destinationSurface">The destination surface.</param>
+        /// <returns><c>true</c> if the image data was successfully converted; otherwise, <c>false</c>.</returns>
+        public unsafe bool ColorCorrectCMYK(
+            IntPtr srcPtr,
+            int srcRowBytes,
+            int srcColBytes,
+            int srcPlaneBytes,
+            Point origin,
+            IDisplayPixelsSurface destinationSurface)
+        {
+            if (destinationSurface == null)
+            {
+                throw new ArgumentNullException(nameof(destinationSurface));
+            }
+
+            if (transform == null)
+            {
+                return false;
+            }
+
+            if (srcColBytes == 1)
+            {
+                // As the Windows Color System APIs do not support planar order image data we have to convert the
+                // image data to interleaved and then use a second surface for the final color correction.
+
+                if (interleavedCMYKSurface == null ||
+                    interleavedCMYKSurface.Width != destinationSurface.Width ||
+                    interleavedCMYKSurface.Height != destinationSurface.Height)
+                {
+                    interleavedCMYKSurface?.Dispose();
+                    interleavedCMYKSurface = new SurfaceCMYK32(destinationSurface.Width, destinationSurface.Height);
+                }
+
+                int top = origin.Y;
+                int left = origin.X;
+                int bottom = top + interleavedCMYKSurface.Height;
+                int right = left + interleavedCMYKSurface.Width;
+
+                byte* baseAddr = (byte*)srcPtr;
+
+                int magentaPlaneOffset = srcPlaneBytes;
+                int yellowPlaneOffset = magentaPlaneOffset + srcPlaneBytes;
+                int blackPlaneOffset = yellowPlaneOffset + srcPlaneBytes;
+
+                for (int y = top; y < bottom; y++)
+                {
+                    byte* cyanPlane = baseAddr + (y * srcRowBytes) + left;
+                    byte* magentaPlane = cyanPlane + magentaPlaneOffset;
+                    byte* yellowPlane = cyanPlane + yellowPlaneOffset;
+                    byte* blackPlane = cyanPlane + blackPlaneOffset;
+
+                    byte* dst = interleavedCMYKSurface.GetRowAddressUnchecked(y - top);
+
+                    for (int x = left; x < right; x++)
+                    {
+                        dst[0] = *cyanPlane;
+                        dst[1] = *magentaPlane;
+                        dst[2] = *yellowPlane;
+                        dst[3] = *blackPlane;
+
+                        cyanPlane++;
+                        magentaPlane++;
+                        yellowPlane++;
+                        blackPlane++;
+                        dst += 4;
+                    }
+                }
+
+                return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
+                    transform,
+                    interleavedCMYKSurface.Scan0.Pointer,
+                    interleavedCMYKSurface.MscmsFormat,
+                    (uint)destinationSurface.Width,
+                    (uint)destinationSurface.Height,
+                    (uint)interleavedCMYKSurface.Stride,
+                    destinationSurface.Scan0.Pointer,
+                    destinationSurface.MscmsFormat,
+                    (uint)destinationSurface.Stride,
+                    IntPtr.Zero,
+                    IntPtr.Zero
+                    );
+            }
+            else
+            {
+                byte* srcDataStart = (byte*)srcPtr + (origin.Y * srcRowBytes) + (origin.X * srcColBytes);
+
+                return UnsafeNativeMethods.Mscms.TranslateBitmapBits(
+                    transform,
+                    (IntPtr)srcDataStart,
+                    NativeEnums.Mscms.BMFORMAT.BM_KYMCQUADS,
+                    (uint)destinationSurface.Width,
+                    (uint)destinationSurface.Height,
+                    (uint)srcRowBytes,
+                    destinationSurface.Scan0.Pointer,
+                    destinationSurface.MscmsFormat,
+                    (uint)destinationSurface.Stride,
+                    IntPtr.Zero,
+                    IntPtr.Zero
+                    );
+            }
+        }
+
+        /// <summary>
         /// Performs color correction on the specified 8-bit gray scale image data and converts it to RGB.
         /// </summary>
         /// <param name="srcPtr">The pointer to the start of the gray scale image data.</param>
@@ -456,6 +567,12 @@ namespace PSFilterHostDll.PSApi
                 {
                     transform.Dispose();
                     transform = null;
+                }
+
+                if (interleavedCMYKSurface != null)
+                {
+                    interleavedCMYKSurface.Dispose();
+                    interleavedCMYKSurface = null;
                 }
 
                 if (interleavedRGBSurface != null)

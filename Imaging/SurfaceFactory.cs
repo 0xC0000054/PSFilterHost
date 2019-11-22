@@ -81,10 +81,19 @@ namespace PSFilterHostDll.Imaging
             int width = bitmap.PixelWidth;
             int height = bitmap.PixelHeight;
 
-            if (format == PixelFormats.BlackWhite ||
-                format == PixelFormats.Gray2 ||
-                format == PixelFormats.Gray4 ||
-                format == PixelFormats.Gray8)
+            if (format == PixelFormats.Cmyk32)
+            {
+                imageMode = ImageModes.CMYK;
+                SurfaceCMYK32 surface = new SurfaceCMYK32(width, height, bitmap.DpiX, bitmap.DpiY);
+
+                bitmap.CopyPixels(Int32Rect.Empty, surface.Scan0.Pointer, (int)surface.Scan0.Length, width * 4);
+
+                return surface;
+            }
+            else if (format == PixelFormats.BlackWhite ||
+                     format == PixelFormats.Gray2 ||
+                     format == PixelFormats.Gray4 ||
+                     format == PixelFormats.Gray8)
             {
                 imageMode = ImageModes.GrayScale;
                 SurfaceGray8 surface = new SurfaceGray8(width, height, bitmap.DpiX, bitmap.DpiY);

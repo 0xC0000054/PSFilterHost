@@ -223,4 +223,19 @@
   <data name="OpenMonitorColorProfileError" xml:space="preserve">
     <value>Unable to open the monitor color profile.</value>
   </data>
+  <data name="BlackChannelName" xml:space="preserve">
+    <value>Black</value>
+  </data>
+  <data name="CMYKMode" xml:space="preserve">
+    <value>32-bit CMYK</value>
+  </data>
+  <data name="CyanChannelName" xml:space="preserve">
+    <value>Cyan</value>
+  </data>
+  <data name="MagentaChannelName" xml:space="preserve">
+    <value>Magenta</value>
+  </data>
+  <data name="YellowChannelName" xml:space="preserve">
+    <value>Yellow</value>
+  </data>
 </root>
