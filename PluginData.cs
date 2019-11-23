@@ -185,6 +185,7 @@ namespace PSFilterHostDll
                 {
                     case ImageModes.GrayScale:
                     case ImageModes.Gray16:
+                    case ImageModes.CMYK:
                         filterCase = hasSelection ? FilterCase.FlatImageWithSelection : FilterCase.FlatImageNoSelection;
                         break;
                     default:
