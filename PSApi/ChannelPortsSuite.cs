@@ -148,6 +148,35 @@ namespace PSFilterHostDll.PSApi
                     }
 
                     break;
+                case ImageModes.CMYK:
+
+                    for (int y = srcRect.top; y < srcRect.bottom; y++)
+                    {
+                        byte* src = source.GetPointAddressUnchecked(srcRect.left, y);
+                        byte* dst = dstPtr + (y * stride) + offset;
+                        for (int x = srcRect.left; x < srcRect.right; x++)
+                        {
+                            switch (channel)
+                            {
+                                case PSConstants.ChannelPorts.Cyan:
+                                    *dst = src[0];
+                                    break;
+                                case PSConstants.ChannelPorts.Magenta:
+                                    *dst = src[1];
+                                    break;
+                                case PSConstants.ChannelPorts.Yellow:
+                                    *dst = src[2];
+                                    break;
+                                case PSConstants.ChannelPorts.Black:
+                                    *dst = src[3];
+                                    break;
+                            }
+                            src += 4;
+                            dst += bpp;
+                        }
+                    }
+
+                    break;
                 case ImageModes.Gray16:
 
                     for (int y = srcRect.top; y < srcRect.bottom; y++)
