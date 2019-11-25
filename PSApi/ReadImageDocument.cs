@@ -251,8 +251,27 @@ namespace PSFilterHostDll.PSApi
             desc->depth = depth;
             desc->bounds = bounds;
 
-            desc->target = (channel < PSConstants.ChannelPorts.Alpha);
-            desc->shown = (channel < PSConstants.ChannelPorts.SelectionMask);
+            switch (channel)
+            {
+                case PSConstants.ChannelPorts.Gray:
+                case PSConstants.ChannelPorts.Red:
+                case PSConstants.ChannelPorts.Green:
+                case PSConstants.ChannelPorts.Blue:
+                case PSConstants.ChannelPorts.Cyan:
+                case PSConstants.ChannelPorts.Magenta:
+                case PSConstants.ChannelPorts.Yellow:
+                case PSConstants.ChannelPorts.Black:
+                    desc->target = true;
+                    break;
+                case PSConstants.ChannelPorts.Alpha:
+                case PSConstants.ChannelPorts.SelectionMask:
+                    desc->target = false;
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown ChannelPorts constant.");
+
+            }
+            desc->shown = channel != PSConstants.ChannelPorts.SelectionMask;
 
             desc->tileOrigin.h = 0;
             desc->tileOrigin.v = 0;
@@ -277,9 +296,23 @@ namespace PSFilterHostDll.PSApi
                 case PSConstants.ChannelPorts.Alpha:
                     desc->channelType = ChannelTypes.Transparency;
                     break;
+                case PSConstants.ChannelPorts.Cyan:
+                    desc->channelType = ChannelTypes.Cyan;
+                    break;
+                case PSConstants.ChannelPorts.Magenta:
+                    desc->channelType = ChannelTypes.Magenta;
+                    break;
+                case PSConstants.ChannelPorts.Yellow:
+                    desc->channelType = ChannelTypes.Yellow;
+                    break;
+                case PSConstants.ChannelPorts.Black:
+                    desc->channelType = ChannelTypes.Black;
+                    break;
                 case PSConstants.ChannelPorts.SelectionMask:
                     desc->channelType = ChannelTypes.SelectionMask;
                     break;
+                default:
+                    throw new InvalidOperationException("Unknown ChannelPorts constant.");
             }
             desc->name = namePtr;
 

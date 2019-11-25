@@ -139,23 +139,23 @@ namespace PSFilterHostDll.PSApi
             /// <summary>
             /// The index of the cyan channel.
             /// </summary>
-            public const int Cyan = 1;
+            public const int Cyan = 5;
             /// <summary>
             /// The index of the magenta channel.
             /// </summary>
-            public const int Magenta = 2;
+            public const int Magenta = 6;
             /// <summary>
             /// The index of the yellow channel.
             /// </summary>
-            public const int Yellow = 3;
+            public const int Yellow = 7;
             /// <summary>
             /// The index of the black channel.
             /// </summary>
-            public const int Black = 4;
+            public const int Black = 8;
             /// <summary>
             /// The index of the selection mask.
             /// </summary>
-            public const int SelectionMask = 5;
+            public const int SelectionMask = 9;
         }
 
         /// <summary>
