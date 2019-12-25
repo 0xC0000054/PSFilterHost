@@ -735,19 +735,16 @@ namespace PSFilterHostDll.PSApi
                     QueryFilter queryFilter = new QueryFilter(path);
 
                     GCHandle handle = GCHandle.Alloc(queryFilter, GCHandleType.Normal);
-                    bool needsRelease = false;
-                    System.Runtime.CompilerServices.RuntimeHelpers.PrepareConstrainedRegions();
                     try
                     {
-                        dll.DangerousAddRef(ref needsRelease);
                         IntPtr callback = GCHandle.ToIntPtr(handle);
-                        if (UnsafeNativeMethods.EnumResourceNamesW(dll.DangerousGetHandle(), "PiPl", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiPL), callback))
+                        if (UnsafeNativeMethods.EnumResourceNamesW(dll, "PiPl", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiPL), callback))
                         {
                             queryFilter = (QueryFilter)GCHandle.FromIntPtr(callback).Target;
 
                             pluginData.AddRange(queryFilter.plugins);
                         }
-                        else if (UnsafeNativeMethods.EnumResourceNamesW(dll.DangerousGetHandle(), "PiMI", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiMI), callback))
+                        else if (UnsafeNativeMethods.EnumResourceNamesW(dll, "PiMI", new UnsafeNativeMethods.EnumResNameDelegate(EnumPiMI), callback))
                         {
                             // If there are no PiPL resources scan for Photoshop 2.5's PiMI resources.
                             queryFilter = (QueryFilter)GCHandle.FromIntPtr(callback).Target;
@@ -767,11 +764,6 @@ namespace PSFilterHostDll.PSApi
                         if (handle.IsAllocated)
                         {
                             handle.Free();
-                        }
-
-                        if (needsRelease)
-                        {
-                            dll.DangerousRelease();
                         }
                     }
                 }

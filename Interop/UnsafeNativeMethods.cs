@@ -29,7 +29,7 @@ namespace PSFilterHostDll.Interop
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool EnumResourceNamesW(
-            [In()] IntPtr hModule,
+            [In()] SafeLibraryHandle hModule,
             [In(), MarshalAs(UnmanagedType.LPWStr)] string lpszType,
             [In()] EnumResNameDelegate lpEnumFunc,
             [In()] IntPtr lParam
