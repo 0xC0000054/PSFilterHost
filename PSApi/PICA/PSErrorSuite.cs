@@ -27,7 +27,7 @@ namespace PSFilterHostDll.PSApi.PICA
     internal delegate int ErrorSuiteSetErrorFromCString(IntPtr str);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int ErrorSuiteSetErrorFromZString(IntPtr str);
+    internal delegate int ErrorSuiteSetErrorFromZString(ASZString str);
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct PSErrorSuite1

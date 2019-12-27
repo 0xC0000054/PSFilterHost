@@ -22,13 +22,13 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <param name="list">The list to convert.</param>
         /// <param name="descriptor">The <see cref="ActionDescriptorList"/> that contains the value of the specified list.</param>
         /// <returns><c>true</c> if the list was converted to an action descriptor; otherwise, <c>false</c> if the list is invalid.</returns>
-        bool ConvertToActionDescriptor(IntPtr list, out ActionDescriptorList descriptor);
+        bool ConvertToActionDescriptor(PIActionList list, out ActionDescriptorList descriptor);
 
         /// <summary>
         /// Creates a list from an action descriptor.
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
         /// <returns>The new list.</returns>
-        IntPtr CreateFromActionDescriptor(ActionDescriptorList descriptor);
+        PIActionList CreateFromActionDescriptor(ActionDescriptorList descriptor);
     }
 }

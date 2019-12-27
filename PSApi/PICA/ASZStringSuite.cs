@@ -159,10 +159,10 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly ASZStringLengthAsPascalString lengthAsPascalString;
         private readonly ASZStringAsPascalString asPascalString;
 
-        private Dictionary<IntPtr, ZString> strings;
+        private Dictionary<ASZString, ZString> strings;
         private int stringsIndex;
 
-        private static readonly IntPtr Empty = IntPtr.Zero;
+        private static readonly ASZString Empty = new ASZString(0);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ASZStringSuite"/> class.
@@ -193,7 +193,7 @@ namespace PSFilterHostDll.PSApi.PICA
             lengthAsPascalString = new ASZStringLengthAsPascalString(LengthAsPascalString);
             asPascalString = new ASZStringAsPascalString(AsPascalString);
 
-            strings = new Dictionary<IntPtr, ZString>(IntPtrEqualityComparer.Instance);
+            strings = new Dictionary<ASZString, ZString>();
             stringsIndex = 0;
         }
 
@@ -233,7 +233,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return suite;
         }
 
-        bool IASZStringSuite.ConvertToActionDescriptor(IntPtr zstring, out ActionDescriptorZString descriptor)
+        bool IASZStringSuite.ConvertToActionDescriptor(ASZString zstring, out ActionDescriptorZString descriptor)
         {
             descriptor = null;
 
@@ -253,9 +253,9 @@ namespace PSFilterHostDll.PSApi.PICA
             return true;
         }
 
-        IntPtr IASZStringSuite.CreateFromActionDescriptor(ActionDescriptorZString descriptor)
+        ASZString IASZStringSuite.CreateFromActionDescriptor(ActionDescriptorZString descriptor)
         {
-            IntPtr newZString = Empty;
+            ASZString newZString = Empty;
 
             if (descriptor != null)
             {
@@ -267,7 +267,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return newZString;
         }
 
-        bool IASZStringSuite.ConvertToString(IntPtr zstring, out string value)
+        bool IASZStringSuite.ConvertToString(ASZString zstring, out string value)
         {
             value = null;
 
@@ -291,14 +291,14 @@ namespace PSFilterHostDll.PSApi.PICA
             return true;
         }
 
-        IntPtr IASZStringSuite.CreateFromString(string value)
+        ASZString IASZStringSuite.CreateFromString(string value)
         {
             if (value == null)
             {
                 throw new ArgumentNullException(nameof(value));
             }
 
-            IntPtr newZString;
+            ASZString newZString;
 
             if (value.Length == 0)
             {
@@ -314,14 +314,14 @@ namespace PSFilterHostDll.PSApi.PICA
             return newZString;
         }
 
-        private IntPtr GenerateDictionaryKey()
+        private ASZString GenerateDictionaryKey()
         {
             stringsIndex++;
 
-            return new IntPtr(stringsIndex);
+            return new ASZString(stringsIndex);
         }
 
-        private int MakeString(IntPtr src, UIntPtr byteCount, ref IntPtr newZString, ZStringFormat format)
+        private int MakeString(IntPtr src, UIntPtr byteCount, ref ASZString newZString, ZStringFormat format)
         {
             if (src != IntPtr.Zero)
             {
@@ -357,22 +357,22 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASBadParameter;
         }
 
-        private int MakeFromUnicode(IntPtr src, UIntPtr byteCount, ref IntPtr newZString)
+        private int MakeFromUnicode(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
         {
             return MakeString(src, byteCount, ref newZString, ZStringFormat.Unicode);
         }
 
-        private int MakeFromCString(IntPtr src, UIntPtr byteCount, ref IntPtr newZString)
+        private int MakeFromCString(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
         {
             return MakeString(src, byteCount, ref newZString, ZStringFormat.Ansi);
         }
 
-        private int MakeFromPascalString(IntPtr src, UIntPtr byteCount, ref IntPtr newZString)
+        private int MakeFromPascalString(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
         {
             return MakeString(src, byteCount, ref newZString, ZStringFormat.Pascal);
         }
 
-        private int MakeRomanizationOfInteger(int value, ref IntPtr newZString)
+        private int MakeRomanizationOfInteger(int value, ref ASZString newZString)
         {
             try
             {
@@ -388,22 +388,22 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int MakeRomanizationOfFixed(int value, short places, bool trim, bool isSigned, ref IntPtr newZString)
+        private int MakeRomanizationOfFixed(int value, short places, bool trim, bool isSigned, ref ASZString newZString)
         {
             return PSError.kASNotImplmented;
         }
 
-        private int MakeRomanizationOfDouble(double value, ref IntPtr newZString)
+        private int MakeRomanizationOfDouble(double value, ref ASZString newZString)
         {
             return PSError.kASNotImplmented;
         }
 
-        private IntPtr GetEmpty()
+        private ASZString GetEmpty()
         {
             return Empty;
         }
 
-        private int Copy(IntPtr source, ref IntPtr zstrCopy)
+        private int Copy(ASZString source, ref ASZString zstrCopy)
         {
             if (source == Empty)
             {
@@ -434,12 +434,12 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int Replace(IntPtr zstr, uint index, IntPtr replacement)
+        private int Replace(ASZString zstr, uint index, ASZString replacement)
         {
             return PSError.kASNotImplmented;
         }
 
-        private int TrimEllipsis(IntPtr zstr)
+        private int TrimEllipsis(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -463,7 +463,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int TrimSpaces(IntPtr zstr)
+        private int TrimSpaces(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -487,7 +487,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int RemoveAccelerators(IntPtr zstr)
+        private int RemoveAccelerators(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -547,7 +547,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int AddRef(IntPtr zstr)
+        private int AddRef(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -566,7 +566,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int Release(IntPtr zstr)
+        private int Release(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -578,7 +578,7 @@ namespace PSFilterHostDll.PSApi.PICA
                     if (item.RefCount == 0)
                     {
                         strings.Remove(zstr);
-                        if (stringsIndex == zstr.ToInt32())
+                        if (stringsIndex == zstr.Index)
                         {
                             stringsIndex--;
                         }
@@ -597,7 +597,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private bool IsAllWhiteSpace(IntPtr zstr)
+        private bool IsAllWhiteSpace(ASZString zstr)
         {
             if (zstr != Empty)
             {
@@ -622,17 +622,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return true;
         }
 
-        private bool IsEmpty(IntPtr zstr)
+        private bool IsEmpty(ASZString zstr)
         {
             return zstr == Empty;
         }
 
-        private bool WillReplace(IntPtr zstr, uint index)
+        private bool WillReplace(ASZString zstr, uint index)
         {
             return false;
         }
 
-        private uint LengthAsUnicodeCString(IntPtr zstr)
+        private uint LengthAsUnicodeCString(ASZString zstr)
         {
             if (zstr == Empty)
             {
@@ -659,7 +659,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsUnicodeCString(IntPtr zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private int AsUnicodeCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {
@@ -703,7 +703,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASBadParameter;
         }
 
-        private uint LengthAsCString(IntPtr zstr)
+        private uint LengthAsCString(ASZString zstr)
         {
             if (zstr == Empty)
             {
@@ -729,7 +729,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsCString(IntPtr zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private int AsCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {
@@ -772,7 +772,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASBadParameter;
         }
 
-        private uint LengthAsPascalString(IntPtr zstr)
+        private uint LengthAsPascalString(ASZString zstr)
         {
             if (zstr == Empty)
             {
@@ -798,7 +798,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsPascalString(IntPtr zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private int AsPascalString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {

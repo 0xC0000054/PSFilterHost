@@ -136,7 +136,7 @@ namespace PSFilterHostDll.PSApi.PICA
         private readonly IActionReferenceSuite actionReferenceSuite;
         private readonly IASZStringSuite zstringSuite;
 
-        private Dictionary<IntPtr, ActionListItemCollection> actionLists;
+        private Dictionary<PIActionList, ActionListItemCollection> actionLists;
         private int actionListsIndex;
         private IActionDescriptorSuite actionDescriptorSuite;
 
@@ -204,11 +204,11 @@ namespace PSFilterHostDll.PSApi.PICA
             this.actionReferenceSuite = actionReferenceSuite;
             this.zstringSuite = zstringSuite;
 
-            actionLists = new Dictionary<IntPtr, ActionListItemCollection>(IntPtrEqualityComparer.Instance);
+            actionLists = new Dictionary<PIActionList, ActionListItemCollection>();
             actionListsIndex = 0;
         }
 
-        bool IActionListSuite.ConvertToActionDescriptor(IntPtr list, out ActionDescriptorList descriptor)
+        bool IActionListSuite.ConvertToActionDescriptor(PIActionList list, out ActionDescriptorList descriptor)
         {
             descriptor = null;
 
@@ -223,14 +223,14 @@ namespace PSFilterHostDll.PSApi.PICA
             return false;
         }
 
-        IntPtr IActionListSuite.CreateFromActionDescriptor(ActionDescriptorList descriptor)
+        PIActionList IActionListSuite.CreateFromActionDescriptor(ActionDescriptorList descriptor)
         {
             if (descriptor == null)
             {
                 throw new ArgumentNullException(nameof(descriptor));
             }
 
-            IntPtr list = GenerateDictionaryKey();
+            PIActionList list = GenerateDictionaryKey();
             actionLists.Add(list, new ActionListItemCollection(descriptor.Items));
 
             return list;
@@ -304,14 +304,14 @@ namespace PSFilterHostDll.PSApi.PICA
             return suite;
         }
 
-        private IntPtr GenerateDictionaryKey()
+        private PIActionList GenerateDictionaryKey()
         {
             actionListsIndex++;
 
-            return new IntPtr(actionListsIndex);
+            return new PIActionList(actionListsIndex);
         }
 
-        private int Make(ref IntPtr list)
+        private int Make(ref PIActionList list)
         {
             try
             {
@@ -326,10 +326,10 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int Free(IntPtr list)
+        private int Free(PIActionList list)
         {
             actionLists.Remove(list);
-            if (actionListsIndex == list.ToInt32())
+            if (actionListsIndex == list.Index)
             {
                 actionListsIndex--;
             }
@@ -337,7 +337,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int GetType(IntPtr list, uint index, ref uint type)
+        private int GetType(PIActionList list, uint index, ref uint type)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -350,7 +350,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetCount(IntPtr list, ref uint count)
+        private int GetCount(PIActionList list, ref uint count)
         {
             ActionListItemCollection items = actionLists[list];
 
@@ -360,7 +360,7 @@ namespace PSFilterHostDll.PSApi.PICA
         }
 
         #region List write methods
-        private int PutInteger(IntPtr list, int data)
+        private int PutInteger(PIActionList list, int data)
         {
             try
             {
@@ -374,7 +374,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutFloat(IntPtr list, double data)
+        private int PutFloat(PIActionList list, double data)
         {
             try
             {
@@ -388,7 +388,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutUnitFloat(IntPtr list, uint unit, double data)
+        private int PutUnitFloat(PIActionList list, uint unit, double data)
         {
             try
             {
@@ -404,7 +404,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutString(IntPtr list, IntPtr cstrValue)
+        private int PutString(PIActionList list, IntPtr cstrValue)
         {
             if (cstrValue == IntPtr.Zero)
             {
@@ -427,7 +427,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutBoolean(IntPtr list, byte data)
+        private int PutBoolean(PIActionList list, byte data)
         {
             try
             {
@@ -441,7 +441,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutList(IntPtr list, IntPtr data)
+        private int PutList(PIActionList list, PIActionList data)
         {
             try
             {
@@ -463,7 +463,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutObject(IntPtr list, uint type, IntPtr descriptor)
+        private int PutObject(PIActionList list, uint type, PIActionDescriptor descriptor)
         {
             if (actionDescriptorSuite == null)
             {
@@ -492,12 +492,12 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutGlobalObject(IntPtr list, uint type, IntPtr descriptor)
+        private int PutGlobalObject(PIActionList list, uint type, PIActionDescriptor descriptor)
         {
             return PutObject(list, type, descriptor);
         }
 
-        private int PutEnumerated(IntPtr list, uint type, uint data)
+        private int PutEnumerated(PIActionList list, uint type, uint data)
         {
             try
             {
@@ -512,7 +512,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutReference(IntPtr list, IntPtr reference)
+        private int PutReference(PIActionList list, PIActionReference reference)
         {
             try
             {
@@ -534,7 +534,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutClass(IntPtr list, uint data)
+        private int PutClass(PIActionList list, uint data)
         {
             try
             {
@@ -548,7 +548,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutGlobalClass(IntPtr list, uint data)
+        private int PutGlobalClass(PIActionList list, uint data)
         {
             try
             {
@@ -562,7 +562,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutAlias(IntPtr list, IntPtr aliasHandle)
+        private int PutAlias(PIActionList list, IntPtr aliasHandle)
         {
             try
             {
@@ -589,7 +589,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutIntegers(IntPtr list, uint count, IntPtr arrayPointer)
+        private int PutIntegers(PIActionList list, uint count, IntPtr arrayPointer)
         {
             if (arrayPointer == IntPtr.Zero)
             {
@@ -618,7 +618,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutData(IntPtr list, int length, IntPtr blob)
+        private int PutData(PIActionList list, int length, IntPtr blob)
         {
             if (blob == IntPtr.Zero || length < 0)
             {
@@ -641,7 +641,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PutZString(IntPtr list, IntPtr zstring)
+        private int PutZString(PIActionList list, ASZString zstring)
         {
             try
             {
@@ -665,7 +665,7 @@ namespace PSFilterHostDll.PSApi.PICA
         #endregion
 
         #region List read methods
-        private int GetInteger(IntPtr list, uint index, ref int data)
+        private int GetInteger(PIActionList list, uint index, ref int data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -678,7 +678,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetFloat(IntPtr list, uint index, ref double data)
+        private int GetFloat(PIActionList list, uint index, ref double data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -691,7 +691,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetUnitFloat(IntPtr list, uint index, ref uint unit, ref double data)
+        private int GetUnitFloat(PIActionList list, uint index, ref uint unit, ref double data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -714,7 +714,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetStringLength(IntPtr list, uint index, ref uint length)
+        private int GetStringLength(PIActionList list, uint index, ref uint length)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -729,7 +729,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetString(IntPtr list, uint index, IntPtr cstrValue, uint maxLength)
+        private int GetString(PIActionList list, uint index, IntPtr cstrValue, uint maxLength)
         {
             if (cstrValue == IntPtr.Zero)
             {
@@ -756,7 +756,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetBoolean(IntPtr list, uint index, ref byte data)
+        private int GetBoolean(PIActionList list, uint index, ref byte data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -769,7 +769,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetList(IntPtr list, uint index, ref IntPtr data)
+        private int GetList(PIActionList list, uint index, ref PIActionList data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -792,7 +792,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetObject(IntPtr list, uint index, ref uint retType, ref IntPtr descriptor)
+        private int GetObject(PIActionList list, uint index, ref uint retType, ref PIActionDescriptor descriptor)
         {
             if (actionDescriptorSuite == null)
             {
@@ -829,12 +829,12 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetGlobalObject(IntPtr list, uint index, ref uint retType, ref IntPtr descriptor)
+        private int GetGlobalObject(PIActionList list, uint index, ref uint retType, ref PIActionDescriptor descriptor)
         {
             return GetObject(list, index, ref retType, ref descriptor);
         }
 
-        private int GetEnumerated(IntPtr list, uint index, ref uint type, ref uint data)
+        private int GetEnumerated(PIActionList list, uint index, ref uint type, ref uint data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -856,7 +856,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetReference(IntPtr list, uint index, ref IntPtr reference)
+        private int GetReference(PIActionList list, uint index, ref PIActionReference reference)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -878,7 +878,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetClass(IntPtr list, uint index, ref uint data)
+        private int GetClass(PIActionList list, uint index, ref uint data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -891,12 +891,12 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetGlobalClass(IntPtr list, uint index, ref uint data)
+        private int GetGlobalClass(PIActionList list, uint index, ref uint data)
         {
             return GetClass(list, index, ref data);
         }
 
-        private int GetAlias(IntPtr list, uint index, ref IntPtr data)
+        private int GetAlias(PIActionList list, uint index, ref IntPtr data)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -918,7 +918,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetIntegers(IntPtr list, uint count, IntPtr data)
+        private int GetIntegers(PIActionList list, uint count, IntPtr data)
         {
             if (data == IntPtr.Zero)
             {
@@ -954,7 +954,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetDataLength(IntPtr list, uint index, ref int length)
+        private int GetDataLength(PIActionList list, uint index, ref int length)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
@@ -969,7 +969,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetData(IntPtr list, uint index, IntPtr blob)
+        private int GetData(PIActionList list, uint index, IntPtr blob)
         {
             if (blob == IntPtr.Zero)
             {
@@ -989,7 +989,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetZString(IntPtr list, uint index, ref IntPtr zstring)
+        private int GetZString(PIActionList list, uint index, ref ASZString zstring)
         {
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)

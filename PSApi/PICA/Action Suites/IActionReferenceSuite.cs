@@ -22,13 +22,13 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <param name="reference">The reference to convert.</param>
         /// <param name="descriptor">The <see cref="ActionDescriptorReference"/> that contains the value of the specified reference.</param>
         /// <returns><c>true</c> if the reference was converted to an action descriptor; otherwise, <c>false</c> if the reference is invalid.</returns>
-        bool ConvertToActionDescriptor(IntPtr reference, out ActionDescriptorReference descriptor);
+        bool ConvertToActionDescriptor(PIActionReference reference, out ActionDescriptorReference descriptor);
 
         /// <summary>
         /// Creates a reference from an action descriptor.
         /// </summary>
         /// <param name="descriptor">The descriptor.</param>
         /// <returns>The new reference.</returns>
-        IntPtr CreateFromActionDescriptor(ActionDescriptorReference descriptor);
+        PIActionReference CreateFromActionDescriptor(ActionDescriptorReference descriptor);
     }
 }
