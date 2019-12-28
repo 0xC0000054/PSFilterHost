@@ -28,7 +28,7 @@ namespace HostTest
         {
             if (m.Msg == WM_CHAR || m.Msg == WM_SYSKEYCHAR || m.Msg == WM_IME_CHAR)
             {
-                escapePressed = (m.WParam == EscapeKey);
+                escapePressed = m.WParam == EscapeKey;
             }
 
             return false;

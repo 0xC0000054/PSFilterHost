@@ -129,19 +129,19 @@ namespace PSFilterHostDll.PSApi
                     // Swap the version structure to big-endian.
                     *ptr = version.tag.signature;
                     ptr += 1;
-                    *((ushort*)ptr) = SwapUInt16(version.tag.type);
+                    *(ushort*)ptr = SwapUInt16(version.tag.type);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(version.tag.length);
+                    *(ushort*)ptr = SwapUInt16(version.tag.length);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(version.version);
+                    *(ushort*)ptr = SwapUInt16(version.version);
                     ptr += 2;
 
                     // Swap the tag structure to big-endian.
                     *ptr = tag.signature;
                     ptr += 1;
-                    *((ushort*)ptr) = SwapUInt16(tag.type);
+                    *(ushort*)ptr = SwapUInt16(tag.type);
                     ptr += 2;
-                    *((ushort*)ptr) = SwapUInt16(tag.length);
+                    *(ushort*)ptr = SwapUInt16(tag.length);
                 }
             }
         }

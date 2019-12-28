@@ -102,7 +102,7 @@ namespace PSFilterHostDll.PSApi
                     return false;
                 }
 
-                return (name.Equals(other.name, StringComparison.Ordinal) && version == other.version);
+                return name.Equals(other.name, StringComparison.Ordinal) && version == other.version;
             }
 
             public static bool operator ==(PICASuiteKey left, PICASuiteKey right)

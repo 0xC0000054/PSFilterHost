@@ -40,7 +40,7 @@ namespace PSFilterHostDll.PSApi
     {
         private static bool RectNonEmpty(Rect16 rect)
         {
-            return (rect.left < rect.right && rect.top < rect.bottom);
+            return rect.left < rect.right && rect.top < rect.bottom;
         }
 
         private static readonly int OTOFHandleSize = IntPtr.Size + 4;
@@ -477,7 +477,7 @@ namespace PSFilterHostDll.PSApi
                                        NativeConstants.PAGE_EXECUTE_READWRITE |
                                        NativeConstants.PAGE_EXECUTE_WRITECOPY;
 
-            return ((mbi.Protect & ExecuteProtect) != 0);
+            return (mbi.Protect & ExecuteProtect) != 0;
         }
 
         /// <summary>
@@ -1381,10 +1381,10 @@ namespace PSFilterHostDll.PSApi
 
                 FilterCaseInfoFlags filterCaseFlags = info.flags1;
 
-                copyToDest = ((filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None);
-                writesOutsideSelection = ((filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None);
+                copyToDest = (filterCaseFlags & FilterCaseInfoFlags.DontCopyToDestination) == FilterCaseInfoFlags.None;
+                writesOutsideSelection = (filterCaseFlags & FilterCaseInfoFlags.WritesOutsideSelection) != FilterCaseInfoFlags.None;
 
-                bool worksWithBlankData = ((filterCaseFlags & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None);
+                bool worksWithBlankData = (filterCaseFlags & FilterCaseInfoFlags.WorksWithBlankData) != FilterCaseInfoFlags.None;
 
                 if ((filterCase == FilterCase.EditableTransparencyNoSelection || filterCase == FilterCase.EditableTransparencyWithSelection) && !worksWithBlankData)
                 {
@@ -1602,7 +1602,7 @@ namespace PSFilterHostDll.PSApi
         /// </returns>
         private static bool IsSinglePlane(short loPlane, short hiPlane)
         {
-            return (((hiPlane - loPlane) + 1) == 1);
+            return (hiPlane - loPlane + 1) == 1;
         }
 
         /// <summary>
@@ -1623,9 +1623,9 @@ namespace PSFilterHostDll.PSApi
             int height = rect.bottom - rect.top;
             int nplanes = hiplane - loplane + 1;
 
-            long bufferSize = ((width * nplanes) * height);
+            long bufferSize = width * nplanes * height;
 
-            return (bufferSize != size);
+            return bufferSize != size;
         }
 
         private unsafe short AdvanceStateProc()
@@ -1934,7 +1934,7 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            bool validImageBounds = (inRect.left < source.Width && inRect.top < source.Height);
+            bool validImageBounds = inRect.left < source.Width && inRect.top < source.Height;
             short padErr = SetFilterPadding(inDataPtr, stride, inRect, nplanes, channelOffset, filterRecord->inputPadding, padding, tempSurface);
             if (padErr != PSError.noErr || !validImageBounds)
             {
@@ -1987,7 +1987,7 @@ namespace PSFilterHostDll.PSApi
                     for (int y = top; y < bottom; y++)
                     {
                         byte* src = tempSurface.GetPointAddressUnchecked(left, y);
-                        byte* dst = (byte*)ptr + (((y - top) + padding.top) * stride) + padding.left;
+                        byte* dst = (byte*)ptr + ((y - top + padding.top) * stride) + padding.left;
 
                         for (int x = left; x < right; x++)
                         {
@@ -2161,7 +2161,7 @@ namespace PSFilterHostDll.PSApi
             }
 
             short padErr = SetFilterPadding(outDataPtr, stride, outRect, nplanes, channelOffset, filterRecord->outputPadding, padding, dest);
-            if (padErr != PSError.noErr || (outRect.left >= dest.Width || outRect.top >= dest.Height))
+            if (padErr != PSError.noErr || outRect.left >= dest.Width || outRect.top >= dest.Height)
             {
                 return padErr;
             }
@@ -2212,7 +2212,7 @@ namespace PSFilterHostDll.PSApi
                     for (int y = top; y < bottom; y++)
                     {
                         byte* src = dest.GetPointAddressUnchecked(left, y);
-                        byte* dst = (byte*)ptr + (((y - top) + padding.top) * stride) + padding.left;
+                        byte* dst = (byte*)ptr + ((y - top + padding.top) * stride) + padding.left;
 
                         for (int x = left; x < right; x++)
                         {
@@ -2430,7 +2430,7 @@ namespace PSFilterHostDll.PSApi
             filterRecord->maskData = maskDataPtr;
             filterRecord->maskRowBytes = width;
 
-            bool validImageBounds = (maskRect.left < source.Width && maskRect.top < source.Height);
+            bool validImageBounds = maskRect.left < source.Width && maskRect.top < source.Height;
             short err = SetFilterPadding(maskDataPtr, width, maskRect, 1, 0, filterRecord->maskPadding, padding, mask);
             if (err != PSError.noErr || !validImageBounds)
             {
@@ -2879,7 +2879,7 @@ namespace PSFilterHostDll.PSApi
 
                     Point16* point = (Point16*)info.selectorParameter.globalSamplePoint.ToPointer();
 
-                    if ((point->h >= 0 && point->h < source.Width) && (point->v >= 0 && point->v < source.Height))
+                    if (point->h >= 0 && point->h < source.Width && point->v >= 0 && point->v < source.Height)
                     {
                         ColorSpace sourceSpace = ColorSpace.RGBSpace;
 

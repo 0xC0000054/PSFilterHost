@@ -95,9 +95,9 @@ namespace PSFilterHostDll.PSApi
 
             private static bool IsHexadecimalChar(char value)
             {
-                return (value >= '0' && value <= '9' ||
-                        value >= 'A' && value <= 'F' ||
-                        value >= 'a' && value <= 'f');
+                return value >= '0' && value <= '9' ||
+                       value >= 'A' && value <= 'F' ||
+                       value >= 'a' && value <= 'f';
             }
 
             private static unsafe byte? ParseField(byte* data, int startOffset, out int fieldLength)
@@ -195,8 +195,8 @@ namespace PSFilterHostDll.PSApi
             short version = *(short*)ptr;
             ptr += 2;
 
-            int major = (version & 0xff);
-            int minor = ((version >> 8) & 0xff);
+            int major = version & 0xff;
+            int minor = (version >> 8) & 0xff;
 
             short lang = *(short*)ptr;
             ptr += 2;
@@ -424,7 +424,7 @@ namespace PSFilterHostDll.PSApi
                 byte* dataPtr = propPtr + PIProperty.SizeOf;
                 if (propKey == PIPropertyID.PIKindProperty)
                 {
-                    if (*((uint*)dataPtr) != PSConstants.filterKind)
+                    if (*(uint*)dataPtr != PSConstants.filterKind)
                     {
 #if DEBUG
                         System.Diagnostics.Debug.WriteLine(string.Format("{0} is not a valid Photoshop filter.", query.fileName));
@@ -439,8 +439,8 @@ namespace PSFilterHostDll.PSApi
                 else if (propKey == PIPropertyID.PIVersionProperty)
                 {
                     int packedVersion = *(int*)dataPtr;
-                    int major = (packedVersion >> 16);
-                    int minor = (packedVersion & 0xffff);
+                    int major = packedVersion >> 16;
+                    int minor = packedVersion & 0xffff;
 
                     if (major > PSConstants.latestFilterVersion ||
                         major == PSConstants.latestFilterVersion && minor > PSConstants.latestFilterSubVersion)
@@ -536,7 +536,7 @@ namespace PSFilterHostDll.PSApi
 
                 // The property data is padded to a 4 byte boundary.
                 int propertyDataPaddedLength = (propertyLength + 3) & ~3;
-                propPtr += (PIProperty.SizeOf + propertyDataPaddedLength);
+                propPtr += PIProperty.SizeOf + propertyDataPaddedLength;
             }
 
             PluginData pluginData = new PluginData(query.fileName, entryPoint, category, title, filterInfo, aete, enableInfo, supportedModes, hasAboutBox);

@@ -762,7 +762,7 @@ namespace HostTest
 
                 float factor = zoomFactors[index];
 
-                return ((image.Width * factor) >= 1f && (image.Height * factor) >= 1f);
+                return (image.Width * factor) >= 1f && (image.Height * factor) >= 1f;
             }
 
             return false;
@@ -776,7 +776,7 @@ namespace HostTest
         /// </returns>
         public bool CanZoomIn()
         {
-            return (zoomFactor < maxZoom);
+            return zoomFactor < maxZoom;
         }
 
         /// <summary>
@@ -845,7 +845,7 @@ namespace HostTest
 
                 float ratio = ratioX < ratioY ? ratioX : ratioY;
 
-                return (zoomFactor != ratio);
+                return zoomFactor != ratio;
             }
 
             return false;
@@ -859,10 +859,10 @@ namespace HostTest
 
         public bool CanZoomToActualSize()
         {
-            return (zoomFactor != 1f);
+            return zoomFactor != 1f;
         }
 
-        public bool IsActualSize => (zoomFactor == 1f);
+        public bool IsActualSize => zoomFactor == 1f;
 
         private void OnZoomChanged()
         {

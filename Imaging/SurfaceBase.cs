@@ -184,7 +184,7 @@ namespace PSFilterHostDll.Imaging
 #endif
         public unsafe byte* GetRowAddressUnchecked(int y)
         {
-            return ((byte*)scan0.VoidStar + (y * stride));
+            return (byte*)scan0.VoidStar + (y * stride);
         }
 
         public unsafe byte* GetPointAddress(int x, int y)
@@ -207,7 +207,7 @@ namespace PSFilterHostDll.Imaging
 
         public unsafe byte* GetPointAddressUnchecked(int x, int y)
         {
-            return (((byte*)scan0.VoidStar + (y * stride)) + (x * bytesPerPixel));
+            return (byte*)scan0.VoidStar + (y * stride) + (x * bytesPerPixel);
         }
 
         /// <summary>

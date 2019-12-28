@@ -68,7 +68,7 @@ namespace HostTest
                 }
                 else
                 {
-                    arrowX = (Bounds.Width - arrowWidth) - textPadding;
+                    arrowX = Bounds.Width - arrowWidth - textPadding;
                 }
 
                 Rectangle arrowRect = new Rectangle(arrowX, 0, arrowWidth, Bounds.Height - Padding.Vertical);

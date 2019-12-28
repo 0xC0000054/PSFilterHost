@@ -123,7 +123,7 @@ namespace PSFilterHostDll
                 return false;
             }
 
-            return (key == other.key && index == other.index);
+            return key == other.key && index == other.index;
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace PSFilterHostDll
         /// <returns>True if this instance is equal; otherwise false.</returns>
         internal bool Equals(uint otherKey, int otherIndex)
         {
-            return (key == otherKey && index == otherIndex);
+            return key == otherKey && index == otherIndex;
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace PSFilterHostDll
         /// <returns>True if this instance is equal; otherwise false.</returns>
         internal bool Equals(uint otherKey)
         {
-            return (key == otherKey);
+            return key == otherKey;
         }
 
         private PSResource(SerializationInfo info, StreamingContext context)

@@ -125,7 +125,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private static bool IsValidColorSpace(ColorSpace colorSpace)
         {
-            return (colorSpace >= ColorSpace.RGBSpace && colorSpace <= ColorSpace.XYZSpace);
+            return colorSpace >= ColorSpace.RGBSpace && colorSpace <= ColorSpace.XYZSpace;
         }
 
         private int Make(ref ColorID colorID)

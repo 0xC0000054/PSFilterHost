@@ -199,7 +199,7 @@ namespace PSFilterHostDll.PSApi
                                     NativeConstants.PAGE_EXECUTE_READWRITE |
                                     NativeConstants.PAGE_EXECUTE_WRITECOPY;
 
-            return ((mbi.Protect & ReadProtect) != 0);
+            return (mbi.Protect & ReadProtect) != 0;
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace PSFilterHostDll.PSApi
                                      NativeConstants.PAGE_EXECUTE_READWRITE |
                                      NativeConstants.PAGE_EXECUTE_WRITECOPY;
 
-            return ((mbi.Protect & WriteProtect) != 0);
+            return (mbi.Protect & WriteProtect) != 0;
         }
 
         internal unsafe IntPtr NewHandle(int size)

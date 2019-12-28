@@ -1057,11 +1057,11 @@ namespace HostTest
 
                 if (littleEndian)
                 {
-                    return (uint)(byte1 | (((byte2 << 8) | (byte3 << 16)) | (byte4 << 24)));
+                    return (uint)(byte1 | (byte2 << 8) | (byte3 << 16) | (byte4 << 24));
                 }
                 else
                 {
-                    return (uint)((((byte1 << 24) | (byte2 << 16)) | (byte3 << 8)) | byte4);
+                    return (uint)((byte1 << 24) | (byte2 << 16) | (byte3 << 8) | byte4);
                 }
             }
 

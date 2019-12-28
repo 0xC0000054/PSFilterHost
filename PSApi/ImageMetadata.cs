@@ -84,7 +84,7 @@ namespace PSFilterHostDll.PSApi
                 if (extractedExif)
                 {
                     bytes = exifBytes;
-                    return (bytes != null);
+                    return bytes != null;
                 }
             }
             else
@@ -92,7 +92,7 @@ namespace PSFilterHostDll.PSApi
                 if (extractedXMP)
                 {
                     bytes = xmpBytes;
-                    return (bytes != null);
+                    return bytes != null;
                 }
             }
 
@@ -174,7 +174,7 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            return (bytes != null);
+            return bytes != null;
         }
 
         public void Dispose()

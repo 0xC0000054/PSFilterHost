@@ -229,7 +229,7 @@ namespace PSFilterHostDll.PSApi
             if (UnsafeNativeMethods.Mscms.GetColorProfileHeader(documentProfile, out header1) &&
                 UnsafeNativeMethods.Mscms.GetColorProfileHeader(monitorProfile, out header2))
             {
-                result = (
+                result = 
                     header1.phSize != header2.phSize ||
                     header1.phCMMType != header2.phCMMType ||
                     header1.phVersion != header2.phVersion ||
@@ -250,8 +250,7 @@ namespace PSFilterHostDll.PSApi
                     header1.phIlluminantX != header2.phIlluminantX ||
                     header1.phIlluminantY != header2.phIlluminantY ||
                     header1.phIlluminantZ != header2.phIlluminantZ ||
-                    header1.phCreator != header2.phCreator
-                    );
+                    header1.phCreator != header2.phCreator;
             }
 
             return result;

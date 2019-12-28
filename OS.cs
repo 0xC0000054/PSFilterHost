@@ -28,7 +28,7 @@ namespace PSFilterHostDll
                 if (!checkedIsWindows7OrLater)
                 {
                     OperatingSystem os = Environment.OSVersion;
-                    isWindows7OrLater = (os.Platform == PlatformID.Win32NT && ((os.Version.Major == 6 && os.Version.Minor >= 1) || os.Version.Major > 6));
+                    isWindows7OrLater = os.Platform == PlatformID.Win32NT && ((os.Version.Major == 6 && os.Version.Minor >= 1) || os.Version.Major > 6);
                     checkedIsWindows7OrLater = true;
                 }
 
@@ -43,7 +43,7 @@ namespace PSFilterHostDll
                 if (!checkedIsWindows8OrLater)
                 {
                     OperatingSystem os = Environment.OSVersion;
-                    isWindows8OrLater = (os.Platform == PlatformID.Win32NT && ((os.Version.Major == 6 && os.Version.Minor >= 2) || os.Version.Major > 6));
+                    isWindows8OrLater = os.Platform == PlatformID.Win32NT && ((os.Version.Major == 6 && os.Version.Minor >= 2) || os.Version.Major > 6);
                     checkedIsWindows8OrLater = true;
                 }
 

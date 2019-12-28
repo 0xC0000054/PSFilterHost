@@ -86,7 +86,7 @@ namespace PSFilterHostDll.EnableInfo
                         supports16Bit = ParseInFunction();
                         break;
                     case TokenType.BooleanConstant: // enable all modes
-                        supports16Bit = (token.value == "true" && length == 4);
+                        supports16Bit = token.value == "true" && length == 4;
                         break;
                     case TokenType.Or: // the || PSHOP_ImageDepth == 16 case
                         supports16Bit = ParseOr();
@@ -114,7 +114,7 @@ namespace PSFilterHostDll.EnableInfo
                         supportsMode = ParseInFunction();
                         break;
                     case TokenType.BooleanConstant: // enable all modes
-                        supportsMode = (token.value == "true" && length == 4);
+                        supportsMode = token.value == "true" && length == 4;
                         break;
                 }
             }

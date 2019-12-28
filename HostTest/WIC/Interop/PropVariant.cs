@@ -337,11 +337,11 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
                     Marshal.GetNativeVariantForObject(obj, pNativeData);
                 }
             }
-            else if ((obj.GetType().Equals(typeof(byte[]))) || (obj.GetType().Equals(typeof(sbyte[]))) ||
-                (obj.GetType().Equals(typeof(Int16[]))) || (obj.GetType().Equals(typeof(UInt16[]))) ||
-                (obj.GetType().Equals(typeof(Int32[]))) || (obj.GetType().Equals(typeof(UInt32[]))) ||
-                (obj.GetType().Equals(typeof(Int64[]))) || (obj.GetType().Equals(typeof(UInt64[]))) ||
-                (obj.GetType().Equals(typeof(float[]))) || (obj.GetType().Equals(typeof(double[]))))
+            else if (obj.GetType().Equals(typeof(byte[])) || obj.GetType().Equals(typeof(sbyte[])) ||
+                obj.GetType().Equals(typeof(Int16[])) || obj.GetType().Equals(typeof(UInt16[])) ||
+                obj.GetType().Equals(typeof(Int32[])) || obj.GetType().Equals(typeof(UInt32[])) ||
+                obj.GetType().Equals(typeof(Int64[])) || obj.GetType().Equals(typeof(UInt64[])) ||
+                obj.GetType().Equals(typeof(float[])) || obj.GetType().Equals(typeof(double[])))
             {
                 int count = ((Array)obj).Length;
                 int elementSize = Marshal.SizeOf(obj.GetType().GetElementType());
@@ -362,7 +362,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
                 upv.vectorValue.ptr = pNativeBuffer;
                 if (null == propVariantReference)
                 {
-                    upv.vt = (ushort)(new PropVariant(obj)).GetUnmanagedType();
+                    upv.vt = (ushort)new PropVariant(obj).GetUnmanagedType();
                 }
                 else
                 {
@@ -387,7 +387,7 @@ namespace Microsoft.Test.Tools.WicCop.InteropServices.ComTypes
                 upv.vectorValue.ptr = pNativeBuffer;
                 if (null == propVariantReference)
                 {
-                    upv.vt = (ushort)(new PropVariant(obj)).GetUnmanagedType();
+                    upv.vt = (ushort)new PropVariant(obj).GetUnmanagedType();
                 }
                 else
                 {

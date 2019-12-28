@@ -45,7 +45,7 @@ namespace HostTest
         {
             if (index < (historyList.Count - 1))
             {
-                historyList.RemoveRange(index + 1, (historyList.Count - 1) - index);
+                historyList.RemoveRange(index + 1, historyList.Count - 1 - index);
             }
 
             historyList.Add(new HistoryItem(tempDirectory.GetRandomFileName(), historyState, image));
@@ -118,9 +118,9 @@ namespace HostTest
             }
         }
 
-        public bool CanUndo => (index > 0);
+        public bool CanUndo => index > 0;
 
-        public bool CanRedo => (index < (historyList.Count - 1));
+        public bool CanRedo => index < (historyList.Count - 1);
 
         private void OnHistoryChanged()
         {

@@ -18,17 +18,17 @@ namespace HostTest
     {
         public static bool IsAlphaFormat(this PixelFormat format)
         {
-            return (format == PixelFormats.Bgra32 ||
-                    format == PixelFormats.Rgba64 ||
-                    format == PixelFormats.Rgba128Float ||
-                    format == PixelFormats.Pbgra32 ||
-                    format == PixelFormats.Prgba64 ||
-                    format == PixelFormats.Prgba128Float);
+            return format == PixelFormats.Bgra32 ||
+                   format == PixelFormats.Rgba64 ||
+                   format == PixelFormats.Rgba128Float ||
+                   format == PixelFormats.Pbgra32 ||
+                   format == PixelFormats.Prgba64 ||
+                   format == PixelFormats.Prgba128Float;
         }
 
         public static int GetBitsPerChannel(this PixelFormat format)
         {
-            return (format.BitsPerPixel / format.Masks.Count);
+            return format.BitsPerPixel / format.Masks.Count;
         }
     }
 }

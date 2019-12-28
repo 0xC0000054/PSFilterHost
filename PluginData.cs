@@ -468,7 +468,7 @@ namespace PSFilterHostDll
             }
             else if (mode == PixelFormats.BlackWhite || mode == PixelFormats.Gray2 || mode == PixelFormats.Gray4 || mode == PixelFormats.Gray8)
             {
-                return ((supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale);
+                return (supportedModes.Value & PSConstants.flagSupportsGrayScale) == PSConstants.flagSupportsGrayScale;
             }
             else if (mode == PixelFormats.Gray16 || mode == PixelFormats.Gray32Float)
             {
@@ -481,7 +481,7 @@ namespace PSFilterHostDll
             }
             else
             {
-                return ((supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor);
+                return (supportedModes.Value & PSConstants.flagSupportsRGBColor) == PSConstants.flagSupportsRGBColor;
             }
         }
 
@@ -522,10 +522,10 @@ namespace PSFilterHostDll
 
             if (grayScale)
             {
-                return ((supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16);
+                return (supportedModes.Value & PSConstants.flagSupportsGray16) == PSConstants.flagSupportsGray16;
             }
 
-            return ((supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48);
+            return (supportedModes.Value & PSConstants.flagSupportsRGB48) == PSConstants.flagSupportsRGB48;
         }
 #endif
         /// <summary>
@@ -595,7 +595,7 @@ namespace PSFilterHostDll
         /// </returns>
         internal bool IsValid()
         {
-            return (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(entryPoint));
+            return !string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(entryPoint);
         }
 
         /// <summary>
@@ -662,10 +662,10 @@ namespace PSFilterHostDll
                 return true;
             }
 
-            return (string.Equals(fileName, other.fileName, StringComparison.OrdinalIgnoreCase) &&
-                    string.Equals(entryPoint, other.entryPoint, StringComparison.Ordinal) &&
-                    string.Equals(category, other.category, StringComparison.Ordinal) &&
-                    string.Equals(title, other.title, StringComparison.Ordinal));
+            return string.Equals(fileName, other.fileName, StringComparison.OrdinalIgnoreCase) &&
+                   string.Equals(entryPoint, other.entryPoint, StringComparison.Ordinal) &&
+                   string.Equals(category, other.category, StringComparison.Ordinal) &&
+                   string.Equals(title, other.title, StringComparison.Ordinal);
         }
 
         /// <summary>
