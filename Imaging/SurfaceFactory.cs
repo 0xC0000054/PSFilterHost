@@ -245,6 +245,8 @@ namespace PSFilterHostDll.Imaging
                     return new SurfaceGray8(width, height, dpiX, dpiY);
                 case ImageModes.RGB:
                     return new SurfaceBGRA32(width, height, dpiX, dpiY);
+                case ImageModes.CMYK:
+                    return new SurfaceCMYK32(width, height, dpiX, dpiY);
                 case ImageModes.Gray16:
                     return new SurfaceGray16(width, height, dpiX, dpiY);
                 case ImageModes.RGB48:
