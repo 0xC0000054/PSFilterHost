@@ -104,8 +104,8 @@ namespace PSFilterHostDll.PSApi
         private Region selectedRegion;
 
         private ImageModes imageMode;
-        private byte[] backgroundColor;
-        private byte[] foregroundColor;
+        private HostRGBColor backgroundColor;
+        private HostRGBColor foregroundColor;
 
         private FilterDataHandling inputHandling;
         private FilterDataHandling outputHandling;
@@ -380,8 +380,8 @@ namespace PSFilterHostDll.PSApi
                 }
             }
 
-            foregroundColor = new byte[4] { primary.R, primary.G, primary.B, 0 };
-            backgroundColor = new byte[4] { secondary.R, secondary.G, secondary.B, 0 };
+            foregroundColor = new HostRGBColor(primary);
+            backgroundColor = new HostRGBColor(secondary);
 
             unsafe
             {
@@ -2708,14 +2708,14 @@ namespace PSFilterHostDll.PSApi
                                         ptr[0] = ptr[1] = ptr[2] = 255;
                                         break;
                                     case FilterDataHandling.BackgroundZap:
-                                        ptr[2] = backgroundColor[0];
-                                        ptr[1] = backgroundColor[1];
-                                        ptr[0] = backgroundColor[2];
+                                        ptr[2] = backgroundColor.R;
+                                        ptr[1] = backgroundColor.G;
+                                        ptr[0] = backgroundColor.B;
                                         break;
                                     case FilterDataHandling.ForegroundZap:
-                                        ptr[2] = foregroundColor[0];
-                                        ptr[1] = foregroundColor[1];
-                                        ptr[0] = foregroundColor[2];
+                                        ptr[2] = foregroundColor.R;
+                                        ptr[1] = foregroundColor.G;
+                                        ptr[0] = foregroundColor.B;
                                         break;
                                     default:
                                         break;
@@ -2726,7 +2726,7 @@ namespace PSFilterHostDll.PSApi
                         }
                     }
                 }
-                else
+                else if (imageMode == ImageModes.RGB)
                 {
                     for (int y = 0; y < height; y++)
                     {
@@ -2756,14 +2756,14 @@ namespace PSFilterHostDll.PSApi
                                         ptr[0] = ptr[1] = ptr[2] = 255;
                                         break;
                                     case FilterDataHandling.BackgroundZap:
-                                        ptr[2] = backgroundColor[0];
-                                        ptr[1] = backgroundColor[1];
-                                        ptr[0] = backgroundColor[2];
+                                        ptr[2] = backgroundColor.R;
+                                        ptr[1] = backgroundColor.G;
+                                        ptr[0] = backgroundColor.B;
                                         break;
                                     case FilterDataHandling.ForegroundZap:
-                                        ptr[2] = foregroundColor[0];
-                                        ptr[1] = foregroundColor[1];
-                                        ptr[0] = foregroundColor[2];
+                                        ptr[2] = foregroundColor.R;
+                                        ptr[1] = foregroundColor.G;
+                                        ptr[0] = foregroundColor.B;
                                         break;
                                     default:
                                         break;
@@ -2773,6 +2773,10 @@ namespace PSFilterHostDll.PSApi
                             ptr += 4;
                         }
                     }
+                }
+                else
+                {
+                    throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
                 }
             }
         }
@@ -2852,17 +2856,17 @@ namespace PSFilterHostDll.PSApi
                     {
                         case SpecialColorID.BackgroundColor:
 
-                            for (int i = 0; i < 4; i++)
-                            {
-                                info.colorComponents[i] = (short)backgroundColor[i];
-                            }
+                            info.colorComponents[0] = backgroundColor.R;
+                            info.colorComponents[1] = backgroundColor.G;
+                            info.colorComponents[2] = backgroundColor.B;
+                            info.colorComponents[3] = 0;
                             break;
                         case SpecialColorID.ForegroundColor:
 
-                            for (int i = 0; i < 4; i++)
-                            {
-                                info.colorComponents[i] = (short)foregroundColor[i];
-                            }
+                            info.colorComponents[0] = foregroundColor.R;
+                            info.colorComponents[1] = foregroundColor.G;
+                            info.colorComponents[2] = foregroundColor.B;
+                            info.colorComponents[3] = 0;
                             break;
                         default:
                             err = PSError.paramErr;
@@ -3930,30 +3934,51 @@ namespace PSFilterHostDll.PSApi
             // Dividing 65535 by 255 produces a integer value of 257, floating point math is not required.
             const int RGBColorMultiplier = 257;
 
-            filterRecord->background.red = (ushort)(backgroundColor[0] * RGBColorMultiplier);
-            filterRecord->background.green = (ushort)(backgroundColor[1] * RGBColorMultiplier);
-            filterRecord->background.blue = (ushort)(backgroundColor[2] * RGBColorMultiplier);
+            filterRecord->background.red = (ushort)(backgroundColor.R * RGBColorMultiplier);
+            filterRecord->background.green = (ushort)(backgroundColor.G * RGBColorMultiplier);
+            filterRecord->background.blue = (ushort)(backgroundColor.B * RGBColorMultiplier);
 
-            filterRecord->foreground.red = (ushort)(foregroundColor[0] * RGBColorMultiplier);
-            filterRecord->foreground.green = (ushort)(foregroundColor[1] * RGBColorMultiplier);
-            filterRecord->foreground.blue = (ushort)(foregroundColor[2] * RGBColorMultiplier);
+            filterRecord->foreground.red = (ushort)(foregroundColor.R * RGBColorMultiplier);
+            filterRecord->foreground.green = (ushort)(foregroundColor.G * RGBColorMultiplier);
+            filterRecord->foreground.blue = (ushort)(foregroundColor.B * RGBColorMultiplier);
 
             // The backColor and foreColor fields are always in the native color space of the image.
-            if (imageMode == ImageModes.GrayScale || imageMode == ImageModes.Gray16)
+            if (imageMode == ImageModes.RGB || imageMode == ImageModes.RGB48)
             {
-                const int redLuma = 19595;
-                const int greenLuma = 38470;
-                const int blueLuma = 7471;
+                filterRecord->backColor[0] = backgroundColor.R;
+                filterRecord->backColor[1] = backgroundColor.G;
+                filterRecord->backColor[2] = backgroundColor.B;
+                filterRecord->backColor[3] = 0;
 
-                filterRecord->backColor[0] = (byte)((backgroundColor[0] * redLuma + backgroundColor[1] * greenLuma + backgroundColor[2] * blueLuma) >> 16);
-                filterRecord->foreColor[0] = (byte)((foregroundColor[0] * redLuma + foregroundColor[1] * greenLuma + foregroundColor[2] * blueLuma) >> 16);
+                filterRecord->foreColor[0] = foregroundColor.R;
+                filterRecord->foreColor[1] = foregroundColor.G;
+                filterRecord->foreColor[2] = foregroundColor.B;
+                filterRecord->foreColor[3] = 0;
             }
             else
             {
-                for (int i = 0; i < 4; i++)
+                ColorSpace nativeSpace;
+                switch (imageMode)
                 {
-                    filterRecord->backColor[i] = backgroundColor[i];
-                    filterRecord->foreColor[i] = foregroundColor[i];
+                    case ImageModes.GrayScale:
+                    case ImageModes.Gray16:
+                        nativeSpace = ColorSpace.GraySpace;
+                        break;
+                    case ImageModes.CMYK:
+                        nativeSpace = ColorSpace.CMYKSpace;
+                        break;
+                    default:
+                        throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unsupported image mode: {0}", imageMode));
+                }
+
+                if (!backgroundColor.ConvertToNativeSpace(nativeSpace, filterRecord->backColor))
+                {
+                    throw new FilterRunException(string.Format(CultureInfo.InvariantCulture, "Cannot convert the background color to {0}", nativeSpace));
+                }
+
+                if (!foregroundColor.ConvertToNativeSpace(nativeSpace, filterRecord->foreColor))
+                {
+                    throw new FilterRunException(string.Format(CultureInfo.InvariantCulture, "Cannot convert the foreground color to {0}", nativeSpace));
                 }
             }
 
@@ -4385,6 +4410,47 @@ namespace PSFilterHostDll.PSApi
             public bool IsEmpty => left == 0 && top == 0 && right == 0 && bottom == 0;
 
             public int Vertical => top + bottom;
+        }
+
+        private readonly struct HostRGBColor
+        {
+#if GDIPLUS
+            public HostRGBColor(Color color)
+#else
+            public HostRGBColor(System.Windows.Media.Color color)
+#endif
+            {
+                R = color.R;
+                G = color.G;
+                B = color.B;
+            }
+
+            public byte R { get; }
+
+            public byte G { get; }
+
+            public byte B { get; }
+
+            public unsafe bool ConvertToNativeSpace(ColorSpace nativeSpace, byte* nativeSpaceBuffer)
+            {
+                byte c0 = R;
+                byte c1 = G;
+                byte c2 = B;
+                byte c3 = 0;
+
+                int error = ColorServicesConvert.Convert(ColorSpace.RGBSpace, nativeSpace, ref c0, ref c1, ref c2, ref c3);
+                if (error != PSError.kSPNoError)
+                {
+                    return false;
+                }
+
+                nativeSpaceBuffer[0] = c0;
+                nativeSpaceBuffer[1] = c1;
+                nativeSpaceBuffer[2] = c2;
+                nativeSpaceBuffer[3] = c3;
+
+                return true;
+            }
         }
     }
 }
