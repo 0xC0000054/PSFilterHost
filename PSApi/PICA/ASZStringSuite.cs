@@ -416,7 +416,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 {
                     try
                     {
-                        ZString zstring = new ZString(string.Copy(existing.Data));
+                        ZString zstring = new ZString(existing.Data);
                         zstrCopy = GenerateDictionaryKey();
                         strings.Add(zstrCopy, zstring);
                     }
