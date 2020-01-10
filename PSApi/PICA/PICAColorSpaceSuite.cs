@@ -339,7 +339,14 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int ExtractColorName(ColorID colorID, ref ASZString colorName)
         {
-            colorName = zstringSuite.CreateFromString(string.Empty);
+            try
+            {
+                colorName = zstringSuite.CreateFromString(string.Empty);
+            }
+            catch (OutOfMemoryException)
+            {
+                return PSError.memFullErr;
+            }
 
             return PSError.kSPNoError;
         }
