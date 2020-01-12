@@ -395,7 +395,18 @@ namespace PSFilterHostDll.PSApi.PICA
 
         private int MakeRomanizationOfDouble(double value, ref ASZString newZString)
         {
-            return PSError.kASNotImplmented;
+            try
+            {
+                ZString zstring = new ZString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                newZString = GenerateDictionaryKey();
+                strings.Add(newZString, zstring);
+            }
+            catch (OutOfMemoryException)
+            {
+                return PSError.kASOutOfMemory;
+            }
+
+            return PSError.kASNoError;
         }
 
         private ASZString GetEmpty()
