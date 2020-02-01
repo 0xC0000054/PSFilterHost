@@ -46,12 +46,6 @@ namespace PSFilterHostDll
         private string[] moduleEntryPoints;
         [OptionalField(VersionAdded = 2)]
         private bool hasAboutBox;
-        [NonSerialized]
-        private bool enableInfoParsed;
-        [NonSerialized]
-        private Expression enableInfoExpression;
-        [NonSerialized]
-        private Dictionary<EnableInfoVariables, bool> enableInfoCache;
 
         /// <summary>
         /// Gets the filename of the filter.
@@ -415,28 +409,10 @@ namespace PSFilterHostDll
                 EnableInfoVariables variables = new EnableInfoVariables(imageWidth, imageHeight, imageMode, hasTransparencyMask, targetChannelCount,
                                                                         trueChannelCount, hostState);
 
-                if (!enableInfoCache.TryGetValue(variables, out result))
+                bool? enableInfoResult = EnableInfoResultCache.Instance.TryGetValue(enableInfo, variables);
+                if (enableInfoResult.HasValue)
                 {
-                    try
-                    {
-                        if (!enableInfoParsed)
-                        {
-                            enableInfoParsed = true;
-
-                            enableInfoExpression = EnableInfoParser.Parse(enableInfo);
-                        }
-
-                        if (enableInfoExpression != null)
-                        {
-                            result = new EnableInfoInterpreter(variables).Evaluate(enableInfoExpression);
-
-                            enableInfoCache.Add(variables, result);
-                        }
-                    }
-                    catch (EnableInfoException)
-                    {
-                        // Ignore any errors that occur when parsing or evaluating the enable info expression.
-                    }
+                    result = enableInfoResult.Value;
                 }
             }
 
@@ -572,14 +548,12 @@ namespace PSFilterHostDll
             this.supportedModes = supportedModes;
             moduleEntryPoints = null;
             this.hasAboutBox = hasAboutBox;
-            enableInfoCache = new Dictionary<EnableInfoVariables, bool>();
         }
 
         [OnDeserializing]
         private void OnDeserializing(StreamingContext context)
         {
             hasAboutBox = true;
-            enableInfoCache = new Dictionary<EnableInfoVariables, bool>();
         }
 
         [OnDeserialized]
