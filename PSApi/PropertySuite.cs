@@ -448,7 +448,7 @@ namespace PSFilterHostDll.PSApi
                         size = HandleSuite.Instance.GetHandleSize(complexProperty);
                         if (size > 0)
                         {
-                            string caption = IPTCData.CaptionFromMemory(HandleSuite.Instance.LockHandle(complexProperty, 0));
+                            string caption = IPTCData.CaptionFromMemory(HandleSuite.Instance.LockHandle(complexProperty, 0), size);
                             HandleSuite.Instance.UnlockHandle(complexProperty);
 
                             if (!string.IsNullOrEmpty(caption))

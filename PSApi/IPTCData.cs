@@ -71,23 +71,92 @@ namespace PSFilterHostDll.PSApi
         /// Converts the caption from unmanaged memory.
         /// </summary>
         /// <param name="data">The data.</param>
-        internal static string CaptionFromMemory(IntPtr data)
+        /// <param name="size">The data size in bytes.</param>
+        internal static string CaptionFromMemory(IntPtr data, int size)
         {
             if (data != IntPtr.Zero)
             {
-                IPTCCaption captionHeader = new IPTCCaption(data);
                 string caption = string.Empty;
 
-                if (captionHeader.tag.length > 0)
+                byte[] bytes = TryGetCaptionBytes(data, size);
+
+                if (bytes != null && bytes.Length > 0)
                 {
-                    byte[] bytes = new byte[captionHeader.tag.length];
-
-                    Marshal.Copy(new IntPtr(data.ToInt64() + IPTCCaption.SizeOf), bytes, 0, bytes.Length);
-
                     caption = Encoding.ASCII.GetString(bytes);
                 }
 
                 return caption;
+            }
+
+            return null;
+        }
+
+        private unsafe static byte[] TryGetCaptionBytes(IntPtr data, long size)
+        {
+            byte* ptr = (byte*)data;
+            long offset = 0;
+
+            while (offset < size)
+            {
+                if (ptr[offset] != IPTCTagSignature)
+                {
+                    break;
+                }
+                offset++;
+
+                if ((offset + 4) > size)
+                {
+                    break;
+                }
+
+                byte record = ptr[offset];
+                byte dataSet = ptr[offset + 1];
+
+                offset += 2;
+
+                uint length = (uint)((ptr[offset] << 8) | ptr[offset + 1]);
+
+                offset += 2;
+
+                if (length > 32767)
+                {
+                    int lengthFieldByteCount = (int)(length & 0x7fff);
+
+                    if (lengthFieldByteCount < 1 ||
+                        lengthFieldByteCount > 4 ||
+                        (offset + lengthFieldByteCount) > size)
+                    {
+                        break;
+                    }
+
+                    length = ptr[offset];
+
+                    for (int i = 1; i < lengthFieldByteCount; i++)
+                    {
+                        length = (length << 8) | ptr[offset + i];
+                    }
+
+                    offset += lengthFieldByteCount;
+                }
+
+                if (record == IPTCRecord.App2 && dataSet == App2DataSets.Caption)
+                {
+                    if (length > MaxCaptionLength ||
+                        (offset + length) > size)
+                    {
+                        break;
+                    }
+
+                    byte[] bytes = new byte[length];
+
+                    Marshal.Copy(new IntPtr(ptr + offset), bytes, 0, (int)length);
+
+                    return bytes;
+                }
+                else
+                {
+                    offset += length;
+                }
             }
 
             return null;
@@ -151,42 +220,6 @@ namespace PSFilterHostDll.PSApi
             public IPTCTag tag;
 
             public static readonly int SizeOf = Marshal.SizeOf(typeof(IPTCCaption));
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="IPTCCaption"/> structure.
-            /// </summary>
-            /// <param name="data">The pointer to the unmanaged caption header.</param>
-            /// <exception cref="ArgumentNullException"><paramref name="data"/> is null.</exception>
-            public unsafe IPTCCaption(IntPtr data)
-            {
-                if (data == IntPtr.Zero)
-                {
-                    throw new ArgumentNullException(nameof(data));
-                }
-
-                byte* ptr = (byte*)data.ToPointer();
-
-                // Swap the version structure to little-endian.
-                version.tag.signature = *ptr;
-                ptr += 1;
-                version.tag.record = *ptr;
-                ptr += 1;
-                version.tag.dataSet = *ptr;
-                ptr += 1;
-                version.tag.length = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-                version.version = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
-
-                // Swap the tag structure to little-endian.
-                tag.signature = *ptr;
-                ptr += 1;
-                tag.record = *ptr;
-                ptr += 1;
-                tag.dataSet = *ptr;
-                ptr += 1;
-                tag.length = SwapUInt16(*(ushort*)ptr);
-            }
 
             /// <summary>
             /// Writes the structure to the specified byte array in big-endian format.
