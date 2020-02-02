@@ -59,6 +59,12 @@ namespace PSFilterHostDll.PSApi
         {
             public IPTCTag tag;
             public ushort version;
+
+            public IPTCRecordVersion(ushort version)
+            {
+                tag = new IPTCTag(RecordVersionType, sizeof(ushort));
+                this.version = version;
+            }
         }
 
         /// <summary>
@@ -146,17 +152,6 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        private static unsafe IPTCRecordVersion CreateVersionRecord()
-        {
-            IPTCRecordVersion record = new IPTCRecordVersion
-            {
-                tag = new IPTCTag(RecordVersionType, sizeof(ushort)),
-                version = IPTCVersion
-            };
-
-            return record;
-        }
-
         /// <summary>
         /// Creates the IPTC-NAA caption record.
         /// </summary>
@@ -173,7 +168,7 @@ namespace PSFilterHostDll.PSApi
                 {
                     IPTCCaption captionHeader = new IPTCCaption
                     {
-                        version = CreateVersionRecord(),
+                        version = new IPTCRecordVersion(IPTCVersion),
                         tag = new IPTCTag(CaptionType, (ushort)captionLength)
                     };
 
