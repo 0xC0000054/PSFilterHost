@@ -95,11 +95,6 @@ namespace PSFilterHostDll.PSApi
             return null;
         }
 
-        private static ushort SwapUInt16(ushort value)
-        {
-            return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
-        }
-
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct IPTCTag
         {
@@ -225,6 +220,11 @@ namespace PSFilterHostDll.PSApi
                     ptr += 2;
                     *(ushort*)ptr = SwapUInt16(tag.length);
                 }
+            }
+
+            private static ushort SwapUInt16(ushort value)
+            {
+                return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
             }
         }
     }
