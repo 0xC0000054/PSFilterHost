@@ -19,8 +19,6 @@ namespace PSFilterHostDll.PSApi
     internal sealed class IPTCData
     {
         private const byte IPTCTagSignature = 0x1c;
-        private const ushort RecordVersionType = 0x0200;
-        private const ushort CaptionType = 0x0278;
         private const ushort IPTCVersion = 2;
         private const int MaxCaptionLength = 2000;
 
@@ -54,7 +52,7 @@ namespace PSFilterHostDll.PSApi
                         IPTCCaption captionHeader = new IPTCCaption
                         {
                             version = new IPTCRecordVersion(IPTCVersion),
-                            tag = new IPTCTag(CaptionType, (ushort)captionLength)
+                            tag = new IPTCTag(IPTCRecord.App2, App2DataSets.Caption, (ushort)captionLength)
                         };
 
                         captionRecordBytes = new byte[IPTCCaption.SizeOf + captionLength];
@@ -103,9 +101,13 @@ namespace PSFilterHostDll.PSApi
             /// </summary>
             public byte signature;
             /// <summary>
-            /// The type of an IPTC tag.
+            /// The record type of an IPTC tag.
             /// </summary>
-            public ushort type;
+            public byte record;
+            /// <summary>
+            /// The data set of an IPTC tag.
+            /// </summary>
+            public byte dataSet;
             /// <summary>
             /// The length of the following data.
             /// </summary>
@@ -114,10 +116,11 @@ namespace PSFilterHostDll.PSApi
             /// <summary>
             /// Initializes a new instance of the <see cref="IPTCTag"/> structure.
             /// </summary>
-            public IPTCTag(ushort type, ushort length)
+            public IPTCTag(byte record, byte dataSet, ushort length)
             {
                 signature = IPTCTagSignature;
-                this.type = type;
+                this.record = record;
+                this.dataSet = dataSet;
                 this.length = length;
             }
         }
@@ -133,7 +136,7 @@ namespace PSFilterHostDll.PSApi
 
             public IPTCRecordVersion(ushort version)
             {
-                tag = new IPTCTag(RecordVersionType, sizeof(ushort));
+                tag = new IPTCTag(IPTCRecord.App2, App2DataSets.RecordVersion, sizeof(ushort));
                 this.version = version;
             }
         }
@@ -166,8 +169,10 @@ namespace PSFilterHostDll.PSApi
                 // Swap the version structure to little-endian.
                 version.tag.signature = *ptr;
                 ptr += 1;
-                version.tag.type = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
+                version.tag.record = *ptr;
+                ptr += 1;
+                version.tag.dataSet = *ptr;
+                ptr += 1;
                 version.tag.length = SwapUInt16(*(ushort*)ptr);
                 ptr += 2;
                 version.version = SwapUInt16(*(ushort*)ptr);
@@ -176,8 +181,10 @@ namespace PSFilterHostDll.PSApi
                 // Swap the tag structure to little-endian.
                 tag.signature = *ptr;
                 ptr += 1;
-                tag.type = SwapUInt16(*(ushort*)ptr);
-                ptr += 2;
+                tag.record = *ptr;
+                ptr += 1;
+                tag.dataSet = *ptr;
+                ptr += 1;
                 tag.length = SwapUInt16(*(ushort*)ptr);
             }
 
@@ -206,8 +213,10 @@ namespace PSFilterHostDll.PSApi
                     // Swap the version structure to big-endian.
                     *ptr = version.tag.signature;
                     ptr += 1;
-                    *(ushort*)ptr = SwapUInt16(version.tag.type);
-                    ptr += 2;
+                    *ptr = version.tag.record;
+                    ptr += 1;
+                    *ptr = version.tag.dataSet;
+                    ptr += 1;
                     *(ushort*)ptr = SwapUInt16(version.tag.length);
                     ptr += 2;
                     *(ushort*)ptr = SwapUInt16(version.version);
@@ -216,8 +225,10 @@ namespace PSFilterHostDll.PSApi
                     // Swap the tag structure to big-endian.
                     *ptr = tag.signature;
                     ptr += 1;
-                    *(ushort*)ptr = SwapUInt16(tag.type);
-                    ptr += 2;
+                    *ptr = tag.record;
+                    ptr += 1;
+                    *ptr = tag.dataSet;
+                    ptr += 1;
                     *(ushort*)ptr = SwapUInt16(tag.length);
                 }
             }
@@ -226,6 +237,17 @@ namespace PSFilterHostDll.PSApi
             {
                 return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
             }
+        }
+
+        private sealed class IPTCRecord
+        {
+            public const byte App2 = 2;
+        }
+
+        private sealed class App2DataSets
+        {
+            public const byte RecordVersion = 0;
+            public const byte Caption = 120;
         }
     }
 }
