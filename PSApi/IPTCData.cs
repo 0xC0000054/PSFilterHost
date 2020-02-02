@@ -16,13 +16,89 @@ using System.Text;
 
 namespace PSFilterHostDll.PSApi
 {
-    internal static class IPTCData
+    internal sealed class IPTCData
     {
         private const byte IPTCTagSignature = 0x1c;
         private const ushort RecordVersionType = 0x0200;
         private const ushort CaptionType = 0x0278;
         private const ushort IPTCVersion = 2;
         private const int MaxCaptionLength = 2000;
+
+        private byte[] captionRecordBytes;
+        private bool createdCaptionRecord;
+
+        public IPTCData()
+        {
+            captionRecordBytes = null;
+            createdCaptionRecord = false;
+        }
+
+        /// <summary>
+        /// Creates the IPTC-NAA caption record.
+        /// </summary>
+        /// <param name="value">A string containing the caption.</param>
+        /// <param name="captionRecord">The byte array containing the caption data.</param>
+        /// <returns><c>true</c> if the <paramref name="value"/> was converted successfully; otherwise, <c>false</c></returns>
+        internal bool TryCreateCaptionRecord(string value, out byte[] captionRecord)
+        {
+            if (!createdCaptionRecord)
+            {
+                createdCaptionRecord = true;
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    int captionLength = Encoding.ASCII.GetByteCount(value);
+
+                    if (captionLength < MaxCaptionLength)
+                    {
+                        IPTCCaption captionHeader = new IPTCCaption
+                        {
+                            version = new IPTCRecordVersion(IPTCVersion),
+                            tag = new IPTCTag(CaptionType, (ushort)captionLength)
+                        };
+
+                        captionRecordBytes = new byte[IPTCCaption.SizeOf + captionLength];
+
+                        captionHeader.Write(captionRecordBytes);
+                        Encoding.ASCII.GetBytes(value, 0, value.Length, captionRecordBytes, IPTCCaption.SizeOf);
+                    }
+                }
+            }
+
+            captionRecord = captionRecordBytes;
+            return captionRecordBytes != null;
+        }
+
+        /// <summary>
+        /// Converts the caption from unmanaged memory.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        internal static string CaptionFromMemory(IntPtr data)
+        {
+            if (data != IntPtr.Zero)
+            {
+                IPTCCaption captionHeader = new IPTCCaption(data);
+                string caption = string.Empty;
+
+                if (captionHeader.tag.length > 0)
+                {
+                    byte[] bytes = new byte[captionHeader.tag.length];
+
+                    Marshal.Copy(new IntPtr(data.ToInt64() + IPTCCaption.SizeOf), bytes, 0, bytes.Length);
+
+                    caption = Encoding.ASCII.GetString(bytes);
+                }
+
+                return caption;
+            }
+
+            return null;
+        }
+
+        private static ushort SwapUInt16(ushort value)
+        {
+            return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
+        }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         private struct IPTCTag
@@ -150,70 +226,6 @@ namespace PSFilterHostDll.PSApi
                     *(ushort*)ptr = SwapUInt16(tag.length);
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates the IPTC-NAA caption record.
-        /// </summary>
-        /// <param name="value">A string containing the caption.</param>
-        /// <param name="captionRecord">The byte array containing the caption data.</param>
-        /// <returns><c>true</c> if the <paramref name="value"/> was converted successfully; otherwise, <c>false</c></returns>
-        internal static bool TryCreateCaptionRecord(string value, out byte[] captionRecord)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                int captionLength = Encoding.ASCII.GetByteCount(value);
-
-                if (captionLength < MaxCaptionLength)
-                {
-                    IPTCCaption captionHeader = new IPTCCaption
-                    {
-                        version = new IPTCRecordVersion(IPTCVersion),
-                        tag = new IPTCTag(CaptionType, (ushort)captionLength)
-                    };
-
-                    captionRecord = new byte[IPTCCaption.SizeOf + captionLength];
-
-                    captionHeader.Write(captionRecord);
-                    Encoding.ASCII.GetBytes(value, 0, value.Length, captionRecord, IPTCCaption.SizeOf);
-
-                    return true;
-                }
-            }
-
-            captionRecord = null;
-            return false;
-        }
-
-        /// <summary>
-        /// Converts the caption from unmanaged memory.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        internal static string CaptionFromMemory(IntPtr data)
-        {
-            if (data != IntPtr.Zero)
-            {
-                IPTCCaption captionHeader = new IPTCCaption(data);
-                string caption = string.Empty;
-
-                if (captionHeader.tag.length > 0)
-                {
-                    byte[] bytes = new byte[captionHeader.tag.length];
-
-                    Marshal.Copy(new IntPtr(data.ToInt64() + IPTCCaption.SizeOf), bytes, 0, bytes.Length);
-
-                    caption = Encoding.ASCII.GetString(bytes);
-                }
-
-                return caption;
-            }
-
-            return null;
-        }
-
-        private static ushort SwapUInt16(ushort value)
-        {
-            return (ushort)(((value & 0xff) << 8) | ((value >> 8) & 0xff));
         }
     }
 }

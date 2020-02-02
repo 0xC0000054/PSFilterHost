@@ -25,6 +25,7 @@ namespace PSFilterHostDll.PSApi
         private readonly int documentWidth;
         private readonly int documentHeight;
         private ImageMetadata imageMetadata;
+        private readonly IPTCData iptcData;
         private HostInformation hostInfo;
         private int numberOfChannels;
         private string hostSerial;
@@ -58,6 +59,7 @@ namespace PSFilterHostDll.PSApi
             documentHeight = source.PixelHeight;
 #endif
             imageMetadata = new ImageMetadata(source);
+            iptcData = new IPTCData();
             hostInfo = new HostInformation();
             numberOfChannels = 0;
             hostSerial = "0";
@@ -180,7 +182,7 @@ namespace PSFilterHostDll.PSApi
                         simpleProperty = new IntPtr(new Fixed16(PSConstants.Properties.BigNudgeDistance).Value);
                         break;
                     case PSProperties.Caption:
-                        if (IPTCData.TryCreateCaptionRecord(hostInfo.Caption, out bytes))
+                        if (iptcData.TryCreateCaptionRecord(hostInfo.Caption, out bytes))
                         {
                             complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
 
