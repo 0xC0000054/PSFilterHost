@@ -624,7 +624,7 @@ namespace PSFilterHostDll.PSApi
                 {
                     if (BufferSuite.Instance.AllocatedBySuite(dataPtr))
                     {
-                        pluginDataSize = Memory.Size(dataPtr);
+                        pluginDataSize = BufferSuite.Instance.GetBufferSize(dataPtr);
                     }
                     else
                     {
