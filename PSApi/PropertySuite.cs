@@ -28,7 +28,7 @@ namespace PSFilterHostDll.PSApi
         private readonly IPTCData iptcData;
         private HostInformation hostInfo;
         private int numberOfChannels;
-        private string hostSerial;
+        private readonly string hostSerial;
         private bool disposed;
 
         /// <summary>
