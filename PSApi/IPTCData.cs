@@ -91,7 +91,7 @@ namespace PSFilterHostDll.PSApi
             return null;
         }
 
-        private unsafe static byte[] TryGetCaptionBytes(IntPtr data, long size)
+        private static unsafe byte[] TryGetCaptionBytes(IntPtr data, long size)
         {
             byte* ptr = (byte*)data;
             long offset = 0;
