@@ -91,6 +91,16 @@ namespace PSFilterHostDll.PSApi
             return 0;
         }
 
+        public IntPtr LockBuffer(IntPtr bufferID)
+        {
+            return BufferLockProc(bufferID, 0);
+        }
+
+        public void UnlockBuffer(IntPtr bufferID)
+        {
+            BufferUnlockProc(bufferID);
+        }
+
         private short AllocateBufferProc(int size, ref IntPtr bufferID)
         {
 #if DEBUG
