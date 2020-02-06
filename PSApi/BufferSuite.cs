@@ -136,7 +136,7 @@ namespace PSFilterHostDll.PSApi
         private void BufferFreeProc(IntPtr bufferID)
         {
 #if DEBUG
-            DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}, Size: {1}", bufferID.ToHexString(), Memory.Size(bufferID)));
+            DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}, Size: {1}", bufferID.ToHexString(), GetBufferSize(bufferID)));
 #endif
             Memory.Free(bufferID);
 
@@ -146,7 +146,7 @@ namespace PSFilterHostDll.PSApi
         private IntPtr BufferLockProc(IntPtr bufferID, byte moveHigh)
         {
 #if DEBUG
-            DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}", bufferID.ToHexString()));
+            DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Buffer: 0x{0}, moveHigh: {1}", bufferID.ToHexString(), moveHigh != 0));
 #endif
 
             return bufferID;
