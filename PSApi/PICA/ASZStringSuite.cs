@@ -673,7 +673,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsUnicodeCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private unsafe int AsUnicodeCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {
@@ -693,18 +693,21 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    byte[] bytes = Encoding.Unicode.GetBytes(value);
+                    int byteCount = Encoding.Unicode.GetByteCount(value);
 
-                    int lengthInChars = bytes.Length / UnicodeEncoding.CharSize;
-                    int lengthWithTerminator = lengthInChars + 1;
+                    int lengthInChars = byteCount / UnicodeEncoding.CharSize;
+                    uint lengthWithTerminator = (uint)lengthInChars + 1;
 
                     if (strSize < lengthWithTerminator)
                     {
                         return PSError.kASBufferTooSmallErr;
                     }
 
-                    Marshal.Copy(bytes, 0, str, bytes.Length);
-                    Marshal.WriteInt16(str, bytes.Length, 0);
+                    fixed (char* ptr = value)
+                    {
+                        Encoding.Unicode.GetBytes(ptr, value.Length, (byte*)str, byteCount);
+                    }
+                    Marshal.WriteInt16(str, byteCount, 0);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -743,7 +746,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private unsafe int AsCString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {
@@ -763,17 +766,20 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    int byteCount = Encoding.ASCII.GetByteCount(value);
 
-                    int lengthWithTerminator = bytes.Length + 1;
+                    uint lengthWithTerminator = (uint)byteCount + 1;
 
                     if (strSize < lengthWithTerminator)
                     {
                         return PSError.kASBufferTooSmallErr;
                     }
 
-                    Marshal.Copy(bytes, 0, str, bytes.Length);
-                    Marshal.WriteByte(str, bytes.Length, 0);
+                    fixed (char* ptr = value)
+                    {
+                        Encoding.ASCII.GetBytes(ptr, value.Length, (byte*)str, byteCount);
+                    }
+                    Marshal.WriteByte(str, byteCount, 0);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -812,7 +818,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return 0;
         }
 
-        private int AsPascalString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
+        private unsafe int AsPascalString(ASZString zstr, IntPtr str, uint strSize, bool checkStrSize)
         {
             if (str != IntPtr.Zero)
             {
@@ -832,19 +838,22 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    byte[] bytes = Encoding.ASCII.GetBytes(value);
+                    int byteCount = Encoding.ASCII.GetByteCount(value);
 
-                    int lengthWithPrefixByte = bytes.Length + 1;
+                    uint lengthWithPrefixByte = (uint)byteCount + 1;
 
                     if (strSize < lengthWithPrefixByte)
                     {
                         return PSError.kASBufferTooSmallErr;
                     }
 
-                    Marshal.WriteByte(str, (byte)bytes.Length);
-                    if (bytes.Length > 0)
+                    Marshal.WriteByte(str, (byte)byteCount);
+                    if (byteCount > 0)
                     {
-                        Marshal.Copy(bytes, 0, new IntPtr(str.ToInt64() + 1L), bytes.Length);
+                        fixed (char* ptr = value)
+                        {
+                            Encoding.ASCII.GetBytes(ptr, value.Length, (byte*)str + 1, byteCount);
+                        }
                     }
                 }
                 catch (OutOfMemoryException)
