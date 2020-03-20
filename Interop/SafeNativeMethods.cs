@@ -142,10 +142,5 @@ namespace PSFilterHostDll.Interop
         [DllImport("user32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool GetMonitorInfoW([In()] IntPtr hMonitor, [In(), Out()] ref NativeStructs.MONITORINFOEX lpmi);
-
-        [DllImport("kernel32.dll", ExactSpelling = true)]
-#pragma warning disable IDE1006 // Naming Styles
-        internal static extern int lstrlenA([In()] IntPtr ptr);
-#pragma warning restore IDE1006 // Naming Styles
     }
 }

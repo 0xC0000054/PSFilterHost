@@ -413,11 +413,18 @@ namespace PSFilterHostDll.PSApi.PICA
 
             try
             {
-                int length = SafeNativeMethods.lstrlenA(cstrValue);
-                byte[] data = new byte[length];
-                Marshal.Copy(cstrValue, data, 0, length);
+                if (StringUtil.TryGetCStringLength(cstrValue, out int length))
+                {
+                    byte[] data = new byte[length];
+                    Marshal.Copy(cstrValue, data, 0, length);
 
-                actionLists[list].Add(new ActionListItem(DescriptorTypes.Char, data));
+                    actionLists[list].Add(new ActionListItem(DescriptorTypes.Char, data));
+                }
+                else
+                {
+                    // The string length exceeds int.MaxValue.
+                    return PSError.memFullErr;
+                }
             }
             catch (OutOfMemoryException)
             {
