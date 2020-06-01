@@ -61,11 +61,7 @@ namespace PSFilterHostDll.PSApi
             }
             finally
             {
-                if (stream != null)
-                {
-                    stream.Dispose();
-                    stream = null;
-                }
+                stream?.Dispose();
             }
 
             return false;
