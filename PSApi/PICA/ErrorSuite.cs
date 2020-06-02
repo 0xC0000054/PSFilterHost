@@ -82,7 +82,7 @@ namespace PSFilterHostDll.PSApi.PICA
         {
             if (str != IntPtr.Zero)
             {
-                errorMessage = Marshal.PtrToStringAnsi(str);
+                errorMessage = StringUtil.FromCString(str, StringUtil.StringTrimOption.WhiteSpaceAndNullTerminator);
 
                 return PSError.kSPNoError;
             }
