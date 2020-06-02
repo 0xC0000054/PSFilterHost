@@ -479,17 +479,17 @@ namespace PSFilterHostDll.PSApi
                     suitePointer = activePICASuites.AllocateSuite(suiteKey, errorProcs);
                 }
 #if PICASUITEDEBUG
-				else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
-				{
-					if (version != 4)
-					{
-						return PSError.kSPSuiteNotFoundError;
-					}
+                else if (suiteName.Equals(PSConstants.PICA.SPPluginsSuite, StringComparison.Ordinal))
+                {
+                    if (version != 4)
+                    {
+                        return PSError.kSPSuiteNotFoundError;
+                    }
 
-					SPPluginsSuite4 plugs = PICASPPluginsSuite.CreateSPPluginsSuite4();
+                    SPPluginsSuite4 plugs = PICASPPluginsSuite.CreateSPPluginsSuite4();
 
-					suitePointer = this.activePICASuites.AllocateSuite(suiteKey, plugs);
-				}
+                    suitePointer = this.activePICASuites.AllocateSuite(suiteKey, plugs);
+                }
 #endif
                 else
                 {
