@@ -78,18 +78,6 @@ namespace PSFilterHostDll.PSApi.PICA
                 set => data = value;
             }
 
-            private static unsafe string PtrToStringPascal(IntPtr ptr, int length)
-            {
-                if (length > 0)
-                {
-                    int stringLength = Marshal.ReadByte(ptr);
-
-                    return new string((sbyte*)ptr.ToPointer(), 1, stringLength);
-                }
-
-                return string.Empty;
-            }
-
             /// <summary>
             /// Initializes a new instance of the <see cref="ZString"/> class.
             /// </summary>
@@ -99,7 +87,7 @@ namespace PSFilterHostDll.PSApi.PICA
             /// <exception cref="ArgumentNullException"><paramref name="ptr"/> is null.</exception>
             /// <exception cref="InvalidEnumArgumentException"><paramref name="format"/> does not specify a valid <see cref="ZStringFormat"/> value.</exception>
             /// <exception cref="OutOfMemoryException">Insufficient memory to create the ZString.</exception>
-            public ZString(IntPtr ptr, int length, ZStringFormat format)
+            public unsafe ZString(IntPtr ptr, int length, ZStringFormat format)
             {
                 if (ptr == IntPtr.Zero)
                 {
@@ -111,13 +99,13 @@ namespace PSFilterHostDll.PSApi.PICA
                 switch (format)
                 {
                     case ZStringFormat.Ansi:
-                        data = Marshal.PtrToStringAnsi(ptr, length).TrimEnd('\0');
+                        data = StringUtil.FromCString((byte*)ptr, length, StringUtil.StringTrimOption.NullTerminator);
                         break;
                     case ZStringFormat.Unicode:
-                        data = Marshal.PtrToStringUni(ptr, length).TrimEnd('\0');
+                        data = StringUtil.FromCStringUni((char*)ptr, length, StringUtil.StringTrimOption.NullTerminator);
                         break;
                     case ZStringFormat.Pascal:
-                        data = PtrToStringPascal(ptr, length);
+                        data = StringUtil.FromPascalString((byte*)ptr, StringUtil.StringTrimOption.None);
                         break;
                     default:
                         throw new InvalidEnumArgumentException(nameof(format), (int)format, typeof(ZStringFormat));
