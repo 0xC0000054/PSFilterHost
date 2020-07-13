@@ -29,9 +29,9 @@ namespace PSFilterHostDll.PSApi
         private const byte False = 0;
         private const byte True = 1;
 
-        private PSBoolean(byte value)
+        private PSBoolean(bool value)
         {
-            this.value = value;
+            this.value = value ? True : False;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -122,7 +122,7 @@ namespace PSFilterHostDll.PSApi
 
         public static implicit operator PSBoolean(bool value)
         {
-            return new PSBoolean(value ? True : False);
+            return new PSBoolean(value);
         }
     }
 }
