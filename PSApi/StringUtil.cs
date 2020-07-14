@@ -67,6 +67,7 @@ namespace PSFilterHostDll.PSApi
         /// Creates a <see cref="string"/> from a Pascal string.
         /// </summary>
         /// <param name="pascalString">The pascal string to convert.</param>
+        /// <param name="option">The string trim options.</param>
         /// <returns>
         /// A managed string that holds a copy of the Pascal string.
         /// If <paramref name="pascalString"/> is null, the method returns null.
