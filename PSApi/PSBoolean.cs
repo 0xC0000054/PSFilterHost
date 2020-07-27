@@ -29,7 +29,7 @@ namespace PSFilterHostDll.PSApi
         private const byte False = 0;
         private const byte True = 1;
 
-        private PSBoolean(bool value)
+        public PSBoolean(bool value)
         {
             this.value = value ? True : False;
         }
