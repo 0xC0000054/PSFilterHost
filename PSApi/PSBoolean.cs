@@ -60,7 +60,7 @@ namespace PSFilterHostDll.PSApi
         /// </returns>
         public override bool Equals(object obj)
         {
-            return obj is PSBoolean boolean && Equals(boolean);
+            return obj is PSBoolean other && Equals(other);
         }
 
         /// <summary>
