@@ -21,6 +21,7 @@ using PSFilterHostDll.PSApi;
 #if GDIPLUS
 using System.Drawing;
 #else
+using System.ComponentModel;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 #endif
@@ -430,6 +431,7 @@ namespace PSFilterHostDll
         /// </summary>
         /// <param name="mode">The <see cref="System.Windows.Media.PixelFormat"/> of the image to process.</param>
         /// <returns><c>true</c> if the filter can process the image; otherwise <c>false</c>.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("Please use SupportsHostState(BitmapSource, HostState) instead.", false)]
         public bool SupportsImageMode(PixelFormat mode)
         {
