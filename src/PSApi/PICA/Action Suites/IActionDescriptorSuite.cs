@@ -10,8 +10,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using System;
-
 namespace PSFilterHostDll.PSApi.PICA
 {
     internal interface IActionDescriptorSuite

@@ -10,7 +10,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-using PSFilterHostDll.Interop;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
