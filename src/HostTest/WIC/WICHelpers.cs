@@ -4,7 +4,7 @@
 // https://github.com/0xC0000054/PSFilterHost
 //
 // This software is provided under the Microsoft Public License:
-//   Copyright (C) 2012-2020 Nicholas Hayes
+//   Copyright (C) 2012-2021 Nicholas Hayes
 //
 // Portions Copyright (C) Microsoft Corporation. All Rights Reserved.
 //
