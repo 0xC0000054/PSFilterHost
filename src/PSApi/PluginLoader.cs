@@ -434,7 +434,7 @@ namespace PSFilterHostDll.PSApi
                 }
                 else if (propKey == platformEntryPoint)
                 {
-                    entryPoint = StringUtil.FromCString(dataPtr, propertyLength, StringUtil.StringTrimOption.NullTerminator);
+                    entryPoint = StringUtil.FromCString(dataPtr);
                 }
                 else if (propKey == PIPropertyID.PIVersionProperty)
                 {
@@ -503,14 +503,14 @@ namespace PSFilterHostDll.PSApi
                     if (term->version == PSConstants.LatestTerminologyVersion)
                     {
 #if DEBUG
-                        string aeteName = StringUtil.FromCString(new IntPtr(dataPtr + PITerminology.SizeOf), StringUtil.StringTrimOption.NullTerminator);
+                        string aeteName = StringUtil.FromCString(dataPtr + PITerminology.SizeOf);
 #endif
                         aete = ParseAETEResource(hModule, term->terminologyID);
                     }
                 }
                 else if (propKey == PIPropertyID.EnableInfo)
                 {
-                    enableInfo = StringUtil.FromCString(dataPtr, propertyLength, StringUtil.StringTrimOption.NullTerminator);
+                    enableInfo = StringUtil.FromCString(dataPtr);
                 }
                 else if (propKey == PIPropertyID.PIRequiredHostProperty)
                 {
