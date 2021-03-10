@@ -68,9 +68,12 @@ namespace PSFilterHostDll
         public string Title => title;
 
         /// <summary>
-        /// Gets the filter information that describes how images with transparency should be processed.
+        /// Gets a value indicating whether this instance has information that describes how images with transparency should be processed.
         /// </summary>
-        internal FilterCaseInfo[] FilterInfo => filterInfo;
+        /// <value>
+        ///   <c>true</c> if this instance has information that describes how images with transparency should be processed.; otherwise, <c>false</c>.
+        /// </value>
+        internal bool HasFilterInfo => filterInfo != null;
 
         /// <summary>
         /// Gets the scripting information used by the plug-in.
@@ -93,6 +96,30 @@ namespace PSFilterHostDll
         /// 	<c>true</c> if this filter has an about box; otherwise, <c>false</c>.
         /// </value>
         public bool HasAboutBox => hasAboutBox;
+
+        /// <summary>
+        /// Gets the filter information that describes how images with transparency should be processed.
+        /// </summary>
+        /// <param name="filterCase">The filter case.</param>
+        /// <returns>The <see cref="FilterCaseInfo"/> for the specified filter case.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="filterCase"/> is not a valid <see cref="FilterCase"/> value.</exception>
+        /// <exception cref="InvalidOperationException">Cannot call this method when a HasFilterInfo is false.</exception>
+        internal FilterCaseInfo GetFilterInfo(FilterCase filterCase)
+        {
+            if (filterCase < FilterCase.FlatImageNoSelection || filterCase > FilterCase.ProtectedTransparencyWithSelection)
+            {
+                throw new ArgumentOutOfRangeException(nameof(filterCase));
+            }
+
+            if (!HasFilterInfo)
+            {
+                throw new InvalidOperationException("Cannot call this method when HasFilterInfo is false.");
+            }
+
+            int index = (int)filterCase - 1;
+
+            return filterInfo[index];
+        }
 
         /// <summary>
         /// Gets the mode that indicates how the filter processes transparency.

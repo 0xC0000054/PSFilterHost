@@ -1384,9 +1384,9 @@ namespace PSFilterHostDll.PSApi
 
             SetFilterTransparencyMode(pdata);
 
-            if (pdata.FilterInfo != null)
+            if (pdata.HasFilterInfo)
             {
-                FilterCaseInfo info = pdata.FilterInfo[(int)filterCase - 1];
+                FilterCaseInfo info = pdata.GetFilterInfo(filterCase);
                 inputHandling = info.inputHandling;
                 outputHandling = info.outputHandling;
 
