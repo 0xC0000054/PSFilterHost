@@ -3415,9 +3415,9 @@ namespace PSFilterHostDll.PSApi
         private unsafe short DisplayPixelsProc(ref PSPixelMap srcPixelMap, ref VRect srcRect, int dstRow, int dstCol, IntPtr platformContext)
         {
 #if DEBUG
-            DebugUtils.Ping(DebugFlags.DisplayPixels, string.Format("source: version = {0} bounds = {1}, ImageMode = {2}, colBytes = {3}, rowBytes = {4},planeBytes = {5}, BaseAddress = 0x{6}, mat = 0x{7}, masks = 0x{8}", new object[]{ srcPixelMap.version, srcPixelMap.bounds, ((ImageModes)srcPixelMap.imageMode).ToString("G"),
-                srcPixelMap.colBytes, srcPixelMap.rowBytes, srcPixelMap.planeBytes, srcPixelMap.baseAddr.ToHexString(), srcPixelMap.mat.ToHexString(), srcPixelMap.masks.ToHexString()}));
-            DebugUtils.Ping(DebugFlags.DisplayPixels, string.Format("srcRect = {0} dstCol (x, width) = {1}, dstRow (y, height) = {2}", srcRect, dstCol, dstRow));
+            DebugUtils.Ping(DebugFlags.DisplayPixels, string.Format(
+                "source = [ {0} ], srcRect = {1} dstCol (x, width) = {2}, dstRow (y, height) = {3}",
+                new object[] { srcPixelMap, srcRect, dstCol, dstRow }));
 #endif
 
             if (platformContext == IntPtr.Zero || srcPixelMap.rowBytes == 0 || srcPixelMap.baseAddr == IntPtr.Zero ||
