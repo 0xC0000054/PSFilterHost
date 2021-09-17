@@ -221,6 +221,24 @@ namespace PSFilterHostDll.PSApi
                                     break;
                             }
                         }
+                        else if (imageMode == ImageModes.CMYK)
+                        {
+                            switch (index)
+                            {
+                                case 0:
+                                    name = Resources.CyanChannelName;
+                                    break;
+                                case 1:
+                                    name = Resources.YellowChannelName;
+                                    break;
+                                case 2:
+                                    name = Resources.MagentaChannelName;
+                                    break;
+                                case 3:
+                                    name = Resources.BlackChannelName;
+                                    break;
+                            }
+                        }
                         else
                         {
                             switch (index)
