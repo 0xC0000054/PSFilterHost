@@ -101,11 +101,6 @@ namespace PSFilterHostDll.PSApi
             public const string HandleSuite = "Photoshop Handle Suite for Plug-ins";
             public const string PropertySuite = "Photoshop Property Suite for Plug-ins";
             public const string UIHooksSuite = "Photoshop UIHooks Suite for Plug-ins";
-
-#if PICASUITEDEBUG
-            public const string ASZStringDictonarySuite = "AS ZString Dictionary Suite";
-            public const string SPPluginsSuite = "SP Plug-ins Suite";
-#endif
         }
 
         public const int LatestTerminologyVersion = 0;
