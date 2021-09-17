@@ -785,7 +785,7 @@ namespace PSFilterHostDll.PSApi.PICA
                 try
                 {
                     data = GenerateDictionaryKey();
-                    actionLists.Add(list, value);
+                    actionLists.Add(data, value);
                 }
                 catch (OutOfMemoryException)
                 {
