@@ -155,7 +155,7 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <summary>
         /// Initializes a new instance of the <see cref="ASZStringSuite"/> class.
         /// </summary>
-        public ASZStringSuite()
+        public unsafe ASZStringSuite()
         {
             makeFromUnicode = new ASZStringMakeFromUnicode(MakeFromUnicode);
             makeFromCString = new ASZStringMakeFromCString(MakeFromCString);
@@ -312,64 +312,69 @@ namespace PSFilterHostDll.PSApi.PICA
             return new ASZString(stringsIndex);
         }
 
-        private int MakeString(IntPtr src, UIntPtr byteCount, ref ASZString newZString, ZStringFormat format)
+        private unsafe int MakeString(IntPtr src, UIntPtr byteCount, ASZString* newZString, ZStringFormat format)
         {
-            if (src != IntPtr.Zero)
+            if (src == IntPtr.Zero || newZString == null)
             {
-                ulong stringLength = byteCount.ToUInt64();
-
-                if (stringLength == 0)
-                {
-                    newZString = Empty;
-                }
-                else
-                {
-                    // The framework cannot create a string longer than Int32.MaxValue.
-                    if (stringLength > int.MaxValue)
-                    {
-                        return PSError.kASOutOfMemory;
-                    }
-
-                    try
-                    {
-                        ZString zstring = new ZString(src, (int)stringLength, format);
-                        newZString = GenerateDictionaryKey();
-                        strings.Add(newZString, zstring);
-                    }
-                    catch (OutOfMemoryException)
-                    {
-                        return PSError.kASOutOfMemory;
-                    }
-                }
-
-                return PSError.kASNoError;
+                return PSError.kASBadParameter;
             }
 
-            return PSError.kASBadParameter;
+            ulong stringLength = byteCount.ToUInt64();
+
+            if (stringLength == 0)
+            {
+                *newZString = Empty;
+            }
+            else
+            {
+                // The framework cannot create a string longer than Int32.MaxValue.
+                if (stringLength > int.MaxValue)
+                {
+                    return PSError.kASOutOfMemory;
+                }
+
+                try
+                {
+                    ZString zstring = new ZString(src, (int)stringLength, format);
+                    *newZString = GenerateDictionaryKey();
+                    strings.Add(*newZString, zstring);
+                }
+                catch (OutOfMemoryException)
+                {
+                    return PSError.kASOutOfMemory;
+                }
+            }
+
+            return PSError.kASNoError;
         }
 
-        private int MakeFromUnicode(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
+        private unsafe int MakeFromUnicode(IntPtr src, UIntPtr byteCount, ASZString* newZString)
         {
-            return MakeString(src, byteCount, ref newZString, ZStringFormat.Unicode);
+            return MakeString(src, byteCount, newZString, ZStringFormat.Unicode);
         }
 
-        private int MakeFromCString(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
+        private unsafe int MakeFromCString(IntPtr src, UIntPtr byteCount, ASZString* newZString)
         {
-            return MakeString(src, byteCount, ref newZString, ZStringFormat.Ansi);
+            return MakeString(src, byteCount, newZString, ZStringFormat.Ansi);
         }
 
-        private int MakeFromPascalString(IntPtr src, UIntPtr byteCount, ref ASZString newZString)
+        private unsafe int MakeFromPascalString(IntPtr src, UIntPtr byteCount, ASZString* newZString)
         {
-            return MakeString(src, byteCount, ref newZString, ZStringFormat.Pascal);
+            return MakeString(src, byteCount, newZString, ZStringFormat.Pascal);
         }
 
-        private int MakeRomanizationOfInteger(int value, ref ASZString newZString)
+        private unsafe int MakeRomanizationOfInteger(int value, ASZString* newZString)
         {
+            if (newZString == null)
+            {
+                return PSError.kASBadParameter;
+            }
+
             try
             {
                 ZString zstring = new ZString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                newZString = GenerateDictionaryKey();
-                strings.Add(newZString, zstring);
+                *newZString = GenerateDictionaryKey();
+                strings.Add(*newZString, zstring);
             }
             catch (OutOfMemoryException)
             {
@@ -379,18 +384,28 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kASNoError;
         }
 
-        private int MakeRomanizationOfFixed(int value, short places, bool trim, bool isSigned, ref ASZString newZString)
+        private unsafe int MakeRomanizationOfFixed(int value, short places, bool trim, bool isSigned, ASZString* newZString)
         {
+            if (newZString == null)
+            {
+                return PSError.kASBadParameter;
+            }
+
             return PSError.kASNotImplmented;
         }
 
-        private int MakeRomanizationOfDouble(double value, ref ASZString newZString)
+        private unsafe int MakeRomanizationOfDouble(double value, ASZString* newZString)
         {
+            if (newZString == null)
+            {
+                return PSError.kASBadParameter;
+            }
+
             try
             {
                 ZString zstring = new ZString(value.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                newZString = GenerateDictionaryKey();
-                strings.Add(newZString, zstring);
+                *newZString = GenerateDictionaryKey();
+                strings.Add(*newZString, zstring);
             }
             catch (OutOfMemoryException)
             {
@@ -405,11 +420,16 @@ namespace PSFilterHostDll.PSApi.PICA
             return Empty;
         }
 
-        private int Copy(ASZString source, ref ASZString zstrCopy)
+        private unsafe int Copy(ASZString source, ASZString* zstrCopy)
         {
+            if (zstrCopy == null)
+            {
+                return PSError.kASBadParameter;
+            }
+
             if (source == Empty)
             {
-                zstrCopy = Empty;
+                *zstrCopy = Empty;
             }
             else
             {
@@ -419,8 +439,8 @@ namespace PSFilterHostDll.PSApi.PICA
                     try
                     {
                         ZString zstring = new ZString(existing.Data);
-                        zstrCopy = GenerateDictionaryKey();
-                        strings.Add(zstrCopy, zstring);
+                        *zstrCopy = GenerateDictionaryKey();
+                        strings.Add(*zstrCopy, zstring);
                     }
                     catch (OutOfMemoryException)
                     {

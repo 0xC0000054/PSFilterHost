@@ -25,7 +25,7 @@ namespace PSFilterHostDll.PSApi.PICA
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     internal delegate int DescriptorRegistryErase(IntPtr key);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate int DescriptorRegistryGet(IntPtr key, ref PIActionDescriptor descriptor);
+    internal unsafe delegate int DescriptorRegistryGet(IntPtr key, PIActionDescriptor* descriptor);
 
     internal struct PSDescriptorRegistryProcs
     {

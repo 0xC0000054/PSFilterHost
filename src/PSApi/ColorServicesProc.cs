@@ -58,10 +58,10 @@ namespace PSFilterHostDll.PSApi
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    internal delegate short ColorServicesProc(ref ColorServicesInfo info);
+    internal unsafe delegate short ColorServicesProc(ColorServicesInfo* info);
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ColorServicesInfo
+    internal unsafe struct ColorServicesInfo
     {
         public int infoSize;
         public ColorServicesSelector selector;
@@ -71,8 +71,7 @@ namespace PSFilterHostDll.PSApi
         public PSBoolean resultInGamut;
         public IntPtr reservedSourceSpaceInfo;
         public IntPtr reservedResultSpaceInfo;
-        [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.I2, SizeConst = 4)]
-        public short[] colorComponents;
+        public fixed short colorComponents[4];
         public IntPtr reserved;
         public SelectorParameters selectorParameter;
     }

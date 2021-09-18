@@ -20,7 +20,7 @@ namespace PSFilterHostDll.PSApi
         private readonly PIResampleProc interpolate1DProc;
         private readonly PIResampleProc interpolate2DProc;
 
-        public ImageServicesSuite()
+        public unsafe ImageServicesSuite()
         {
             interpolate1DProc = new PIResampleProc(Interpolate1DProc);
             interpolate2DProc = new PIResampleProc(Interpolate2DProc);
@@ -40,21 +40,33 @@ namespace PSFilterHostDll.PSApi
             return imageServicesProcsPtr;
         }
 
-        private short Interpolate1DProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method)
+        private unsafe short Interpolate1DProc(PSImagePlane* source, PSImagePlane* destination, Rect16* area, IntPtr coords, short method)
         {
 #if DEBUG
             DebugUtils.Ping(DebugFlags.ImageServices, string.Format("srcBounds: {0}, dstBounds: {1}, area: {2}, method: {3}",
-                    new object[] { source.bounds.ToString(), destination.bounds.ToString(), area.ToString(), ((InterpolationModes)method).ToString() }));
+                new object[] { DebugUtils.PointerToString(source), DebugUtils.PointerToString(destination),
+                               DebugUtils.PointerToString(area), ((InterpolationModes)method).ToString() }));
 #endif
+            if (source == null || destination == null || area == null)
+            {
+                return PSError.paramErr;
+            }
+
             return PSError.memFullErr;
         }
 
-        private unsafe short Interpolate2DProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method)
+        private unsafe short Interpolate2DProc(PSImagePlane* source, PSImagePlane* destination, Rect16* area, IntPtr coords, short method)
         {
 #if DEBUG
             DebugUtils.Ping(DebugFlags.ImageServices, string.Format("srcBounds: {0}, dstBounds: {1}, area: {2}, method: {3}",
-                    new object[] { source.bounds.ToString(), destination.bounds.ToString(), area.ToString(), ((InterpolationModes)method).ToString() }));
+                new object[] { DebugUtils.PointerToString(source), DebugUtils.PointerToString(destination),
+                               DebugUtils.PointerToString(area), ((InterpolationModes)method).ToString() }));
 #endif
+
+            if (source == null || destination == null || area == null)
+            {
+                return PSError.paramErr;
+            }
 
             return PSError.memFullErr;
         }

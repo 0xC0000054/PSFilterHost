@@ -149,7 +149,7 @@ namespace PSFilterHostDll.PSApi.PICA
         /// or
         /// <paramref name="zstringSuite"/> is null.
         /// </exception>
-        public ActionListSuite(IActionReferenceSuite actionReferenceSuite, IASZStringSuite zstringSuite)
+        public unsafe ActionListSuite(IActionReferenceSuite actionReferenceSuite, IASZStringSuite zstringSuite)
         {
             if (actionReferenceSuite == null)
             {
@@ -310,12 +310,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return new PIActionList(actionListsIndex);
         }
 
-        private int Make(ref PIActionList list)
+        private unsafe int Make(PIActionList* list)
         {
+            if (list == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             try
             {
-                list = GenerateDictionaryKey();
-                actionLists.Add(list, new ActionListItemCollection());
+                *list = GenerateDictionaryKey();
+                actionLists.Add(*list, new ActionListItemCollection());
             }
             catch (OutOfMemoryException)
             {
@@ -336,12 +341,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int GetType(PIActionList list, uint index, ref uint type)
+        private unsafe int GetType(PIActionList list, uint index, uint* type)
         {
+            if (type == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
-                type = items[(int)index].Type;
+                *type = items[(int)index].Type;
 
                 return PSError.kSPNoError;
             }
@@ -349,11 +359,16 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetCount(PIActionList list, ref uint count)
+        private unsafe int GetCount(PIActionList list, uint* count)
         {
+            if (count == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
 
-            count = (uint)items.Count;
+            *count = (uint)items.Count;
 
             return PSError.kSPNoError;
         }
@@ -671,12 +686,17 @@ namespace PSFilterHostDll.PSApi.PICA
         #endregion
 
         #region List read methods
-        private int GetInteger(PIActionList list, uint index, ref int data)
+        private unsafe int GetInteger(PIActionList list, uint index, int* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
-                data = (int)items[(int)index].Value;
+                *data = (int)items[(int)index].Value;
 
                 return PSError.kSPNoError;
             }
@@ -684,12 +704,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetFloat(PIActionList list, uint index, ref double data)
+        private unsafe int GetFloat(PIActionList list, uint index, double* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
-                data = (double)items[(int)index].Value;
+                *data = (double)items[(int)index].Value;
 
                 return PSError.kSPNoError;
             }
@@ -697,22 +722,24 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetUnitFloat(PIActionList list, uint index, ref uint unit, ref double data)
+        private unsafe int GetUnitFloat(PIActionList list, uint index, uint* unit, double* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 UnitFloat unitFloat = (UnitFloat)items[(int)index].Value;
 
-                try
+                if (unit != null)
                 {
-                    unit = unitFloat.Unit;
-                }
-                catch (NullReferenceException)
-                {
+                    *unit = unitFloat.Unit;
                 }
 
-                data = unitFloat.Value;
+                *data = unitFloat.Value;
 
                 return PSError.kSPNoError;
             }
@@ -720,14 +747,19 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetStringLength(PIActionList list, uint index, ref uint length)
+        private unsafe int GetStringLength(PIActionList list, uint index, uint* length)
         {
+            if (length == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 byte[] bytes = (byte[])items[(int)index].Value;
 
-                length = (uint)bytes.Length;
+                *length = (uint)bytes.Length;
 
                 return PSError.kSPNoError;
             }
@@ -762,12 +794,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetBoolean(PIActionList list, uint index, ref byte data)
+        private unsafe int GetBoolean(PIActionList list, uint index, byte* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
-                data = (byte)items[(int)index].Value;
+                *data = (byte)items[(int)index].Value;
 
                 return PSError.kSPNoError;
             }
@@ -775,8 +812,13 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetList(PIActionList list, uint index, ref PIActionList data)
+        private unsafe int GetList(PIActionList list, uint index, PIActionList* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
@@ -784,8 +826,8 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    data = GenerateDictionaryKey();
-                    actionLists.Add(data, value);
+                    *data = GenerateDictionaryKey();
+                    actionLists.Add(*data, value);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -798,7 +840,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetObject(PIActionList list, uint index, ref uint retType, ref PIActionDescriptor descriptor)
+        private unsafe int GetObject(PIActionList list, uint index, uint* retType, PIActionDescriptor* descriptor)
         {
             if (actionDescriptorSuite == null)
             {
@@ -806,23 +848,24 @@ namespace PSFilterHostDll.PSApi.PICA
                 return PSError.kSPLogicError;
             }
 
+            if (descriptor == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 ActionListDescriptor item = (ActionListDescriptor)items[(int)index].Value;
 
-                try
+                if (retType != null)
                 {
-                    retType = item.Type;
-                }
-                catch (NullReferenceException)
-                {
-                    // ignore it
+                    *retType = item.Type;
                 }
 
                 try
                 {
-                    descriptor = actionDescriptorSuite.CreateDescriptor(item.DescriptorValues);
+                    *descriptor = actionDescriptorSuite.CreateDescriptor(item.DescriptorValues);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -835,26 +878,28 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetGlobalObject(PIActionList list, uint index, ref uint retType, ref PIActionDescriptor descriptor)
+        private unsafe int GetGlobalObject(PIActionList list, uint index, uint* retType, PIActionDescriptor* descriptor)
         {
-            return GetObject(list, index, ref retType, ref descriptor);
+            return GetObject(list, index, retType, descriptor);
         }
 
-        private int GetEnumerated(PIActionList list, uint index, ref uint type, ref uint data)
+        private unsafe int GetEnumerated(PIActionList list, uint index, uint* type, uint* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 EnumeratedValue enumerated = (EnumeratedValue)items[(int)index].Value;
-                try
+                if (type != null)
                 {
-                    type = enumerated.Type;
-                }
-                catch (NullReferenceException)
-                {
+                    *type = enumerated.Type;
                 }
 
-                data = enumerated.Value;
+                *data = enumerated.Value;
 
                 return PSError.kSPNoError;
             }
@@ -862,8 +907,13 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetReference(PIActionList list, uint index, ref PIActionReference reference)
+        private unsafe int GetReference(PIActionList list, uint index, PIActionReference* reference)
         {
+            if (reference == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
@@ -871,7 +921,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    reference = actionReferenceSuite.CreateFromActionDescriptor(value);
+                    *reference = actionReferenceSuite.CreateFromActionDescriptor(value);
                 }
                 catch (OutOfMemoryException)
                 {
@@ -884,12 +934,17 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetClass(PIActionList list, uint index, ref uint data)
+        private unsafe int GetClass(PIActionList list, uint index, uint* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
-                data = (uint)items[(int)index].Value;
+                *data = (uint)items[(int)index].Value;
 
                 return PSError.kSPNoError;
             }
@@ -897,26 +952,31 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetGlobalClass(PIActionList list, uint index, ref uint data)
+        private unsafe int GetGlobalClass(PIActionList list, uint index, uint* data)
         {
-            return GetClass(list, index, ref data);
+            return GetClass(list, index, data);
         }
 
-        private int GetAlias(PIActionList list, uint index, ref IntPtr data)
+        private unsafe int GetAlias(PIActionList list, uint index, IntPtr* data)
         {
+            if (data == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 byte[] bytes = (byte[])items[(int)index].Value;
-                data = HandleSuite.Instance.NewHandle(bytes.Length);
+                *data = HandleSuite.Instance.NewHandle(bytes.Length);
 
-                if (data == IntPtr.Zero)
+                if (*data == IntPtr.Zero)
                 {
                     return PSError.memFullErr;
                 }
 
-                Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(data, 0), bytes.Length);
-                HandleSuite.Instance.UnlockHandle(data);
+                Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(*data, 0), bytes.Length);
+                HandleSuite.Instance.UnlockHandle(*data);
 
                 return PSError.kSPNoError;
             }
@@ -960,14 +1020,19 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetDataLength(PIActionList list, uint index, ref int length)
+        private unsafe int GetDataLength(PIActionList list, uint index, int* length)
         {
+            if (length == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
                 byte[] bytes = (byte[])items[(int)index].Value;
 
-                length = bytes.Length;
+                *length = bytes.Length;
 
                 return PSError.kSPNoError;
             }
@@ -995,8 +1060,13 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPBadParameterError;
         }
 
-        private int GetZString(PIActionList list, uint index, ref ASZString zstring)
+        private unsafe int GetZString(PIActionList list, uint index, ASZString* zstring)
         {
+            if (zstring == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             ActionListItemCollection items = actionLists[list];
             if (index < items.Count)
             {
@@ -1004,7 +1074,7 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 try
                 {
-                    zstring = zstringSuite.CreateFromActionDescriptor(value);
+                    *zstring = zstringSuite.CreateFromActionDescriptor(value);
                 }
                 catch (OutOfMemoryException)
                 {

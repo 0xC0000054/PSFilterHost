@@ -27,10 +27,14 @@ namespace PSFilterHostDll.PSApi
         public Rect16 bounds;
         public int rowBytes;
         public int colBytes;
+
+#if DEBUG
+        public override string ToString() => bounds.ToString();
+#endif
     }
 
     [UnmanagedFunctionPointerAttribute(CallingConvention.Cdecl), System.Security.SuppressUnmanagedCodeSecurity]
-    internal delegate short PIResampleProc(ref PSImagePlane source, ref PSImagePlane destination, ref Rect16 area, IntPtr coords, short method);
+    internal unsafe delegate short PIResampleProc(PSImagePlane* source, PSImagePlane* destination, Rect16* area, IntPtr coords, short method);
 
     [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     internal struct ImageServicesProcs

@@ -32,7 +32,7 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <param name="name">The plug-in name.</param>
         /// <param name="zstringSuite">The ASZString suite.</param>
         /// <exception cref="ArgumentNullException"><paramref name="zstringSuite"/> is null.</exception>
-        public PICAUIHooksSuite(IntPtr parentWindowHandle, string name, IASZStringSuite zstringSuite)
+        public unsafe PICAUIHooksSuite(IntPtr parentWindowHandle, string name, IASZStringSuite zstringSuite)
         {
             if (zstringSuite == null)
             {
@@ -63,11 +63,16 @@ namespace PSFilterHostDll.PSApi.PICA
             return 60U;
         }
 
-        private int GetPluginName(IntPtr pluginRef, ref ASZString name)
+        private unsafe int GetPluginName(IntPtr pluginRef, ASZString* name)
         {
+            if (name == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             try
             {
-                name = zstringSuite.CreateFromString(pluginName);
+                *name = zstringSuite.CreateFromString(pluginName);
             }
             catch (OutOfMemoryException)
             {

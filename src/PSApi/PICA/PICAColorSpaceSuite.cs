@@ -88,7 +88,7 @@ namespace PSFilterHostDll.PSApi.PICA
         /// <param name="zstringSuite">The ASZString suite.</param>
         /// <param name="colorPicker">The color picker.</param>
         /// <exception cref="ArgumentNullException"><paramref name="zstringSuite"/> is null.</exception>
-        public PICAColorSpaceSuite(IASZStringSuite zstringSuite, IColorPicker colorPicker)
+        public unsafe PICAColorSpaceSuite(IASZStringSuite zstringSuite, IColorPicker colorPicker)
         {
             if (zstringSuite == null)
             {
@@ -128,13 +128,18 @@ namespace PSFilterHostDll.PSApi.PICA
             return colorSpace >= ColorSpace.RGBSpace && colorSpace <= ColorSpace.XYZSpace;
         }
 
-        private int Make(ref ColorID colorID)
+        private unsafe int Make(ColorID* colorID)
         {
+            if (colorID == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             try
             {
                 colorsIndex++;
-                colorID = new ColorID(colorsIndex);
-                colors.Add(colorID, new Color());
+                *colorID = new ColorID(colorsIndex);
+                colors.Add(*colorID, new Color());
             }
             catch (OutOfMemoryException)
             {
@@ -144,10 +149,15 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int Delete(ref ColorID colorID)
+        private unsafe int Delete(ColorID* colorID)
         {
-            colors.Remove(colorID);
-            if (colorsIndex == colorID.Index)
+            if (colorID == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            colors.Remove(*colorID);
+            if (colorsIndex == colorID->Index)
             {
                 colorsIndex--;
             }
@@ -167,25 +177,25 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int ExtractComponents(ColorID colorID, ColorSpace colorSpace, ref byte c0, ref byte c1, ref byte c2, ref byte c3, ref byte gamutFlag)
+        private unsafe int ExtractComponents(ColorID colorID, ColorSpace colorSpace, byte* c0, byte* c1, byte* c2, byte* c3, byte* gamutFlag)
         {
-            if (!IsValidColorSpace(colorSpace))
+            if (!IsValidColorSpace(colorSpace) || c0 == null || c1 == null || c2 == null || c3 == null)
             {
                 return PSError.kSPBadParameterError;
             }
 
             Color item = colors[colorID];
 
-            c0 = item.Component0;
-            c1 = item.Component1;
-            c2 = item.Component2;
-            c3 = item.Component3;
+            *c0 = item.Component0;
+            *c1 = item.Component1;
+            *c2 = item.Component2;
+            *c3 = item.Component3;
 
             int error = PSError.kSPNoError;
 
             if (item.ColorSpace != colorSpace)
             {
-                error = ColorServicesConvert.Convert(item.ColorSpace, colorSpace, ref c0, ref c1, ref c2, ref c3);
+                error = ColorServicesConvert.Convert(item.ColorSpace, colorSpace, ref *c0, ref *c1, ref *c2, ref *c3);
             }
 
             return error;
@@ -217,8 +227,13 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int ExtractXYZ(ColorID colorID, ref CS_XYZ xyz)
+        private unsafe int ExtractXYZ(ColorID colorID, CS_XYZ* xyz)
         {
+            if (xyz == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             Color item = colors[colorID];
 
             byte c0 = item.Component0;
@@ -235,9 +250,9 @@ namespace PSFilterHostDll.PSApi.PICA
                 }
             }
 
-            xyz.x = c0;
-            xyz.y = c1;
-            xyz.z = c2;
+            xyz->x = c0;
+            xyz->y = c1;
+            xyz->z = c2;
 
             return PSError.kSPNoError;
         }
@@ -323,25 +338,40 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPUnimplementedError;
         }
 
-        private int GetNativeSpace(ColorID colorID, ref ColorSpace nativeSpace)
+        private unsafe int GetNativeSpace(ColorID colorID, ColorSpace* nativeSpace)
         {
-            nativeSpace = colors[colorID].ColorSpace;
+            if (nativeSpace == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            *nativeSpace = colors[colorID].ColorSpace;
 
             return PSError.kSPNoError;
         }
 
-        private int IsBookColor(ColorID colorID, ref bool isBookColor)
+        private unsafe int IsBookColor(ColorID colorID, byte* isBookColor)
         {
-            isBookColor = false;
+            if (isBookColor == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
+            *isBookColor = 0;
 
             return PSError.kSPNoError;
         }
 
-        private int ExtractColorName(ColorID colorID, ref ASZString colorName)
+        private unsafe int ExtractColorName(ColorID colorID, ASZString* colorName)
         {
+            if (colorName == null)
+            {
+                return PSError.kSPBadParameterError;
+            }
+
             try
             {
-                colorName = zstringSuite.CreateFromString(string.Empty);
+                *colorName = zstringSuite.CreateFromString(string.Empty);
             }
             catch (OutOfMemoryException)
             {
@@ -351,7 +381,7 @@ namespace PSFilterHostDll.PSApi.PICA
             return PSError.kSPNoError;
         }
 
-        private int PickColor(ref ColorID colorID, ASZString promptString)
+        private unsafe int PickColor(ColorID* colorID, ASZString promptString)
         {
             int error;
 
@@ -364,10 +394,10 @@ namespace PSFilterHostDll.PSApi.PICA
 
                 if (colorPicker.ShowDialog(prompt, ref red, ref green, ref blue))
                 {
-                    error = Make(ref colorID);
+                    error = Make(colorID);
                     if (error == PSError.kSPNoError)
                     {
-                        colors[colorID] = new Color(ColorSpace.RGBSpace, red, green, blue, 0);
+                        colors[*colorID] = new Color(ColorSpace.RGBSpace, red, green, blue, 0);
                     }
                 }
                 else

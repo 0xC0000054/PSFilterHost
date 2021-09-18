@@ -12,6 +12,7 @@
 
 using PSFilterHostDll.Properties;
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -37,9 +38,9 @@ namespace PSFilterHostDll.PSApi
         /// <param name="source">The source image.</param>
         /// <param name="imageMode">The image mode.</param>
 #if GDIPLUS
-        public PropertySuite(System.Drawing.Bitmap source, ImageModes imageMode)
+        public unsafe PropertySuite(System.Drawing.Bitmap source, ImageModes imageMode)
 #else
-        public PropertySuite(System.Windows.Media.Imaging.BitmapSource source, ImageModes imageMode)
+        public unsafe PropertySuite(System.Windows.Media.Imaging.BitmapSource source, ImageModes imageMode)
 #endif
 
         {
@@ -160,7 +161,38 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        private unsafe short PropertyGetProc(uint signature, uint key, int index, ref IntPtr simpleProperty, ref IntPtr complexProperty)
+        private static unsafe short CreateComplexPropertyHandle(IntPtr* complexProperty, byte[] bytes)
+        {
+            if (complexProperty == null)
+            {
+                return PSError.paramErr;
+            }
+
+            *complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
+
+            if (*complexProperty == IntPtr.Zero)
+            {
+                return PSError.memFullErr;
+            }
+
+            Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(*complexProperty, 0), bytes.Length);
+            HandleSuite.Instance.UnlockHandle(*complexProperty);
+
+            return PSError.noErr;
+        }
+
+        private static unsafe short GetSimpleProperty(IntPtr* simpleProperty, int value)
+        {
+            if (simpleProperty == null)
+            {
+                return PSError.paramErr;
+            }
+
+            *simpleProperty = new IntPtr(value);
+            return PSError.noErr;
+        }
+
+        private unsafe short PropertyGetProc(uint signature, uint key, int index, IntPtr* simpleProperty, IntPtr* complexProperty)
         {
 #if DEBUG
             DebugUtils.Ping(DebugFlags.PropertySuite, string.Format("Sig: {0}, Key: {1}, Index: {2}", DebugUtils.PropToString(signature), DebugUtils.PropToString(key), index));
@@ -179,28 +211,18 @@ namespace PSFilterHostDll.PSApi
                 {
                     case PSProperties.BigNudgeH:
                     case PSProperties.BigNudgeV:
-                        simpleProperty = new IntPtr(new Fixed16(PSConstants.Properties.BigNudgeDistance).Value);
+                        err = GetSimpleProperty(simpleProperty, new Fixed16(PSConstants.Properties.BigNudgeDistance).Value);
                         break;
                     case PSProperties.Caption:
                         if (iptcData.TryCreateCaptionRecord(hostInfo.Caption, out bytes))
                         {
-                            complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-                            if (complexProperty != IntPtr.Zero)
-                            {
-                                Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                                HandleSuite.Instance.UnlockHandle(complexProperty);
-                            }
-                            else
-                            {
-                                err = PSError.memFullErr;
-                            }
+                            err = CreateComplexPropertyHandle(complexProperty, bytes);
                         }
                         else
                         {
-                            if (complexProperty != IntPtr.Zero)
+                            if (complexProperty != null)
                             {
-                                complexProperty = HandleSuite.Instance.NewHandle(0);
+                                *complexProperty = HandleSuite.Instance.NewHandle(0);
                             }
                         }
                         break;
@@ -260,121 +282,83 @@ namespace PSFilterHostDll.PSApi
 
                         bytes = Encoding.ASCII.GetBytes(name);
 
-                        complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-                        if (complexProperty != IntPtr.Zero)
-                        {
-                            Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                            HandleSuite.Instance.UnlockHandle(complexProperty);
-                        }
-                        else
-                        {
-                            err = PSError.memFullErr;
-                        }
+                        err = CreateComplexPropertyHandle(complexProperty, bytes);
                         break;
                     case PSProperties.Copyright:
                     case PSProperties.Copyright2:
-                        simpleProperty = new IntPtr(hostInfo.Copyright ? 1 : 0);
+                        err = GetSimpleProperty(simpleProperty, hostInfo.Copyright ? 1 : 0);
                         break;
                     case PSProperties.EXIFData:
                     case PSProperties.XMPData:
-
                         if (imageMetadata.Extract(out bytes, key == PSProperties.EXIFData))
                         {
-                            complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-                            if (complexProperty != IntPtr.Zero)
-                            {
-                                Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                                HandleSuite.Instance.UnlockHandle(complexProperty);
-                            }
-                            else
-                            {
-                                err = PSError.memFullErr;
-                            }
+                            err = CreateComplexPropertyHandle(complexProperty, bytes);
                         }
                         else
                         {
-                            if (complexProperty != IntPtr.Zero)
+                            if (complexProperty != null)
                             {
                                 // If the complexProperty is not IntPtr.Zero we return a valid zero byte handle,
                                 // otherwise some filters will crash with an access violation.
-                                complexProperty = HandleSuite.Instance.NewHandle(0);
+                                *complexProperty = HandleSuite.Instance.NewHandle(0);
                             }
                         }
                         break;
                     case PSProperties.GridMajor:
-                        simpleProperty = new IntPtr(new Fixed16(PSConstants.Properties.GridMajor).Value);
+                        err = GetSimpleProperty(simpleProperty, new Fixed16(PSConstants.Properties.GridMajor).Value);
                         break;
                     case PSProperties.GridMinor:
-                        simpleProperty = new IntPtr(PSConstants.Properties.GridMinor);
+                        err = GetSimpleProperty(simpleProperty, PSConstants.Properties.GridMinor);
                         break;
                     case PSProperties.ImageMode:
-                        simpleProperty = new IntPtr((int)imageMode);
+                        err = GetSimpleProperty(simpleProperty, (int)imageMode);
                         break;
                     case PSProperties.InterpolationMethod:
-                        simpleProperty = new IntPtr(PSConstants.Properties.InterpolationMethod.NearestNeghbor);
+                        err = GetSimpleProperty(simpleProperty, PSConstants.Properties.InterpolationMethod.NearestNeghbor);
                         break;
                     case PSProperties.NumberOfChannels:
-                        simpleProperty = new IntPtr(numberOfChannels);
+                        err = GetSimpleProperty(simpleProperty, numberOfChannels);
                         break;
                     case PSProperties.NumberOfPaths:
-                        simpleProperty = new IntPtr(0);
+                        err = GetSimpleProperty(simpleProperty, 0);
                         break;
                     case PSProperties.PathName:
-                        if (complexProperty != IntPtr.Zero)
+                        if (complexProperty != null)
                         {
-                            complexProperty = HandleSuite.Instance.NewHandle(0);
+                            *complexProperty = HandleSuite.Instance.NewHandle(0);
                         }
                         break;
                     case PSProperties.WorkPathIndex:
                     case PSProperties.ClippingPathIndex:
                     case PSProperties.TargetPathIndex:
-                        simpleProperty = new IntPtr(PSConstants.Properties.NoPathIndex);
+                        err = GetSimpleProperty(simpleProperty, PSConstants.Properties.NoPathIndex);
                         break;
                     case PSProperties.RulerUnits:
-                        simpleProperty = new IntPtr((int)hostInfo.RulerUnit);
+                        err = GetSimpleProperty(simpleProperty, (int)hostInfo.RulerUnit);
                         break;
                     case PSProperties.RulerOriginH:
                     case PSProperties.RulerOriginV:
-                        simpleProperty = new IntPtr(new Fixed16(0).Value);
+                        err = GetSimpleProperty(simpleProperty, new Fixed16(0).Value);
                         break;
                     case PSProperties.Watermark:
-                        simpleProperty = new IntPtr(hostInfo.Watermark ? 1 : 0);
+                        err = GetSimpleProperty(simpleProperty, hostInfo.Watermark ? 1 : 0);
                         break;
                     case PSProperties.SerialString:
                         bytes = Encoding.ASCII.GetBytes(hostSerial);
-                        complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
 
-                        if (complexProperty != IntPtr.Zero)
-                        {
-                            Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                            HandleSuite.Instance.UnlockHandle(complexProperty);
-                        }
-                        else
-                        {
-                            err = PSError.memFullErr;
-                        }
+                        err = CreateComplexPropertyHandle(complexProperty, bytes);
                         break;
                     case PSProperties.URL:
                         if (hostInfo.Url != null)
                         {
                             bytes = Encoding.ASCII.GetBytes(hostInfo.Url.ToString());
-                            complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
-
-                            if (complexProperty != IntPtr.Zero)
-                            {
-                                Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                                HandleSuite.Instance.UnlockHandle(complexProperty);
-                            }
-                            else
-                            {
-                                err = PSError.memFullErr;
-                            }
+                            err = CreateComplexPropertyHandle(complexProperty, bytes);
                         }
                         else
                         {
-                            if (complexProperty != IntPtr.Zero)
+                            if (complexProperty != null)
                             {
-                                complexProperty = HandleSuite.Instance.NewHandle(0);
+                                *complexProperty = HandleSuite.Instance.NewHandle(0);
                             }
                         }
                         break;
@@ -398,35 +382,24 @@ namespace PSFilterHostDll.PSApi
                         {
                             bytes = Encoding.ASCII.GetBytes(title);
                         }
-                        complexProperty = HandleSuite.Instance.NewHandle(bytes.Length);
 
-                        if (complexProperty != IntPtr.Zero)
-                        {
-                            Marshal.Copy(bytes, 0, HandleSuite.Instance.LockHandle(complexProperty, 0), bytes.Length);
-                            HandleSuite.Instance.UnlockHandle(complexProperty);
-                        }
-                        else
-                        {
-                            err = PSError.memFullErr;
-                        }
-
+                        err = CreateComplexPropertyHandle(complexProperty, bytes);
                         break;
                     case PSProperties.WatchSuspension:
-                        simpleProperty = new IntPtr(0);
+                        err = GetSimpleProperty(simpleProperty, 0);
                         break;
                     case PSProperties.DocumentWidth:
-                        simpleProperty = new IntPtr(documentWidth);
+                        err = GetSimpleProperty(simpleProperty, documentWidth);
                         break;
                     case PSProperties.DocumentHeight:
-                        simpleProperty = new IntPtr(documentHeight);
+                        err = GetSimpleProperty(simpleProperty, documentHeight);
                         break;
                     case PSProperties.ToolTips:
-                        simpleProperty = new IntPtr(1);
+                        err = GetSimpleProperty(simpleProperty, 1);
                         break;
                     case PSProperties.HighDPI:
-                        simpleProperty = new IntPtr(hostInfo.HighDpi ? 1 : 0);
+                        err = GetSimpleProperty(simpleProperty, hostInfo.HighDpi ? 1 : 0);
                         break;
-
                     default:
                         return PSError.errPlugInPropertyUndefined;
                 }

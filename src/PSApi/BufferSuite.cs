@@ -28,7 +28,7 @@ namespace PSFilterHostDll.PSApi
         private readonly BufferSpaceProc spaceProc;
         private readonly Dictionary<IntPtr, int> bufferIDs;
 
-        private BufferSuite()
+        private unsafe BufferSuite()
         {
             allocProc = new AllocateBufferProc(AllocateBufferProc);
             freeProc = new FreeBufferProc(BufferFreeProc);
@@ -101,12 +101,12 @@ namespace PSFilterHostDll.PSApi
             BufferUnlockProc(bufferID);
         }
 
-        private short AllocateBufferProc(int size, ref IntPtr bufferID)
+        private unsafe short AllocateBufferProc(int size, IntPtr* bufferID)
         {
 #if DEBUG
             DebugUtils.Ping(DebugFlags.BufferSuite, string.Format("Size: {0}", size));
 #endif
-            if (size < 0)
+            if (size < 0 || bufferID == null)
             {
                 return PSError.paramErr;
             }
@@ -114,17 +114,17 @@ namespace PSFilterHostDll.PSApi
             short err = PSError.noErr;
             try
             {
-                bufferID = Memory.Allocate(size, false);
+                *bufferID = Memory.Allocate(size, false);
 
-                bufferIDs.Add(bufferID, size);
+                bufferIDs.Add(*bufferID, size);
             }
             catch (OutOfMemoryException)
             {
                 // Free the buffer memory if the framework throws an OutOfMemoryException when adding to the bufferIDs list.
-                if (bufferID != IntPtr.Zero)
+                if (*bufferID != IntPtr.Zero)
                 {
-                    Memory.Free(bufferID);
-                    bufferID = IntPtr.Zero;
+                    Memory.Free(*bufferID);
+                    *bufferID = IntPtr.Zero;
                 }
 
                 err = PSError.memFullErr;

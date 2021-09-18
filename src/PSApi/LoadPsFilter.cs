@@ -299,9 +299,9 @@ namespace PSFilterHostDll.PSApi
         /// <param name="owner">The handle of the parent window</param>
         /// <exception cref="System.ArgumentNullException">The sourceImage is null.</exception>
 #if GDIPLUS
-        internal LoadPsFilter(Bitmap sourceImage, Color primary, Color secondary, Region selection, IntPtr owner)
+        internal unsafe LoadPsFilter(Bitmap sourceImage, Color primary, Color secondary, Region selection, IntPtr owner)
 #else
-        internal LoadPsFilter(BitmapSource sourceImage, System.Windows.Media.Color primary, System.Windows.Media.Color secondary, Region selection, IntPtr owner)
+        internal unsafe LoadPsFilter(BitmapSource sourceImage, System.Windows.Media.Color primary, System.Windows.Media.Color secondary, Region selection, IntPtr owner)
 #endif
         {
             if (sourceImage == null)
@@ -412,7 +412,7 @@ namespace PSFilterHostDll.PSApi
         /// This overload is only used when showing the about box.
         /// </summary>
         /// <param name="owner">The parent window handle.</param>
-        private LoadPsFilter(IntPtr owner)
+        private unsafe LoadPsFilter(IntPtr owner)
         {
             parentWindowHandle = owner;
 
@@ -2811,21 +2811,21 @@ namespace PSFilterHostDll.PSApi
             }
         }
 
-        private unsafe short ColorServicesProc(ref ColorServicesInfo info)
+        private unsafe short ColorServicesProc(ColorServicesInfo* info)
         {
 #if DEBUG
-            DebugUtils.Ping(DebugFlags.ColorServices, string.Format("selector: {0}", info.selector));
+            DebugUtils.Ping(DebugFlags.ColorServices, info != null ? string.Format("selector: {0}",  info->selector) : "<null>");
 #endif
             short err = PSError.noErr;
-            switch (info.selector)
+            switch (info->selector)
             {
                 case ColorServicesSelector.ChooseColor:
 
-                    string prompt = StringUtil.FromPascalString(info.selectorParameter.pickerPrompt, string.Empty);
+                    string prompt = StringUtil.FromPascalString(info->selectorParameter.pickerPrompt, string.Empty);
 
-                    if (info.sourceSpace != ColorSpace.RGBSpace)
+                    if (info->sourceSpace != ColorSpace.RGBSpace)
                     {
-                        err = ColorServicesConvert.Convert(info.sourceSpace, ColorSpace.RGBSpace, ref info.colorComponents);
+                        err = ColorServicesConvert.Convert(info->sourceSpace, ColorSpace.RGBSpace, info->colorComponents);
 
                         if (err != PSError.noErr)
                         {
@@ -2833,22 +2833,22 @@ namespace PSFilterHostDll.PSApi
                         }
                     }
 
-                    byte red = (byte)info.colorComponents[0];
-                    byte green = (byte)info.colorComponents[1];
-                    byte blue = (byte)info.colorComponents[2];
+                    byte red = (byte)info->colorComponents[0];
+                    byte green = (byte)info->colorComponents[1];
+                    byte blue = (byte)info->colorComponents[2];
 
                     if (colorPicker.ShowDialog(prompt, ref red, ref green, ref blue))
                     {
-                        info.colorComponents[0] = red;
-                        info.colorComponents[1] = green;
-                        info.colorComponents[2] = blue;
+                        info->colorComponents[0] = red;
+                        info->colorComponents[1] = green;
+                        info->colorComponents[2] = blue;
 
-                        if (info.resultSpace == ColorSpace.ChosenSpace)
+                        if (info->resultSpace == ColorSpace.ChosenSpace)
                         {
-                            info.resultSpace = ColorSpace.RGBSpace;
+                            info->resultSpace = ColorSpace.RGBSpace;
                         }
 
-                        err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
+                        err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info->resultSpace, info->colorComponents);
                     }
                     else
                     {
@@ -2858,26 +2858,26 @@ namespace PSFilterHostDll.PSApi
                     break;
                 case ColorServicesSelector.ConvertColor:
 
-                    err = ColorServicesConvert.Convert(info.sourceSpace, info.resultSpace, ref info.colorComponents);
+                    err = ColorServicesConvert.Convert(info->sourceSpace, info->resultSpace, info->colorComponents);
 
                     break;
                 case ColorServicesSelector.GetSpecialColor:
 
-                    switch (info.selectorParameter.specialColorID)
+                    switch (info->selectorParameter.specialColorID)
                     {
                         case SpecialColorID.BackgroundColor:
 
-                            info.colorComponents[0] = backgroundColor.R;
-                            info.colorComponents[1] = backgroundColor.G;
-                            info.colorComponents[2] = backgroundColor.B;
-                            info.colorComponents[3] = 0;
+                            info->colorComponents[0] = backgroundColor.R;
+                            info->colorComponents[1] = backgroundColor.G;
+                            info->colorComponents[2] = backgroundColor.B;
+                            info->colorComponents[3] = 0;
                             break;
                         case SpecialColorID.ForegroundColor:
 
-                            info.colorComponents[0] = foregroundColor.R;
-                            info.colorComponents[1] = foregroundColor.G;
-                            info.colorComponents[2] = foregroundColor.B;
-                            info.colorComponents[3] = 0;
+                            info->colorComponents[0] = foregroundColor.R;
+                            info->colorComponents[1] = foregroundColor.G;
+                            info->colorComponents[2] = foregroundColor.B;
+                            info->colorComponents[3] = 0;
                             break;
                         default:
                             err = PSError.paramErr;
@@ -2886,13 +2886,13 @@ namespace PSFilterHostDll.PSApi
 
                     if (err == PSError.noErr)
                     {
-                        err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info.resultSpace, ref info.colorComponents);
+                        err = ColorServicesConvert.Convert(ColorSpace.RGBSpace, info->resultSpace, info->colorComponents);
                     }
 
                     break;
                 case ColorServicesSelector.SamplePoint:
 
-                    Point16* point = (Point16*)info.selectorParameter.globalSamplePoint.ToPointer();
+                    Point16* point = (Point16*)info->selectorParameter.globalSamplePoint.ToPointer();
 
                     if (point->h >= 0 && point->h < source.Width && point->v >= 0 && point->v < source.Height)
                     {
@@ -2903,18 +2903,18 @@ namespace PSFilterHostDll.PSApi
                             // As this function only handles 8-bit data return 255 if the source image is 16-bit, same as Adobe(R) Photoshop(R).
                             if (imageMode == ImageModes.Gray16)
                             {
-                                info.colorComponents[0] = 255;
-                                info.colorComponents[1] = 0;
-                                info.colorComponents[2] = 0;
-                                info.colorComponents[3] = 0;
+                                info->colorComponents[0] = 255;
+                                info->colorComponents[1] = 0;
+                                info->colorComponents[2] = 0;
+                                info->colorComponents[3] = 0;
                                 sourceSpace = ColorSpace.GraySpace;
                             }
                             else
                             {
-                                info.colorComponents[0] = 255;
-                                info.colorComponents[1] = 255;
-                                info.colorComponents[2] = 255;
-                                info.colorComponents[3] = 0;
+                                info->colorComponents[0] = 255;
+                                info->colorComponents[1] = 255;
+                                info->colorComponents[2] = 255;
+                                info->colorComponents[3] = 0;
                             }
                         }
                         else
@@ -2924,27 +2924,27 @@ namespace PSFilterHostDll.PSApi
                             switch (imageMode)
                             {
                                 case ImageModes.GrayScale:
-                                    info.colorComponents[0] = pixel[0];
-                                    info.colorComponents[1] = 0;
-                                    info.colorComponents[2] = 0;
-                                    info.colorComponents[3] = 0;
+                                    info->colorComponents[0] = pixel[0];
+                                    info->colorComponents[1] = 0;
+                                    info->colorComponents[2] = 0;
+                                    info->colorComponents[3] = 0;
                                     sourceSpace = ColorSpace.GraySpace;
                                     break;
                                 case ImageModes.RGB:
-                                    info.colorComponents[0] = pixel[2];
-                                    info.colorComponents[1] = pixel[1];
-                                    info.colorComponents[2] = pixel[0];
-                                    info.colorComponents[3] = 0;
+                                    info->colorComponents[0] = pixel[2];
+                                    info->colorComponents[1] = pixel[1];
+                                    info->colorComponents[2] = pixel[0];
+                                    info->colorComponents[3] = 0;
                                     break;
                                 case ImageModes.CMYK:
-                                    info.colorComponents[0] = pixel[0];
-                                    info.colorComponents[1] = pixel[1];
-                                    info.colorComponents[2] = pixel[2];
-                                    info.colorComponents[3] = pixel[3];
+                                    info->colorComponents[0] = pixel[0];
+                                    info->colorComponents[1] = pixel[1];
+                                    info->colorComponents[2] = pixel[2];
+                                    info->colorComponents[3] = pixel[3];
                                     break;
                             }
                         }
-                        err = ColorServicesConvert.Convert(sourceSpace, info.resultSpace, ref info.colorComponents);
+                        err = ColorServicesConvert.Convert(sourceSpace, info->resultSpace, info->colorComponents);
                     }
                     else
                     {
@@ -3412,26 +3412,30 @@ namespace PSFilterHostDll.PSApi
             return PSError.noErr;
         }
 
-        private unsafe short DisplayPixelsProc(ref PSPixelMap srcPixelMap, ref VRect srcRect, int dstRow, int dstCol, IntPtr platformContext)
+        private unsafe short DisplayPixelsProc(PSPixelMap* srcPixelMap, VRect* srcRect, int dstRow, int dstCol, IntPtr platformContext)
         {
 #if DEBUG
             DebugUtils.Ping(DebugFlags.DisplayPixels, string.Format(
                 "source = [ {0} ], srcRect = {1} dstCol (x, width) = {2}, dstRow (y, height) = {3}",
-                new object[] { srcPixelMap, srcRect, dstCol, dstRow }));
+                new object[] { DebugUtils.PointerToString(srcPixelMap), DebugUtils.PointerToString(srcRect), dstCol, dstRow }));
 #endif
+            if (srcPixelMap == null || srcRect == null || platformContext == IntPtr.Zero)
+            {
+                return PSError.paramErr;
+            }
 
-            if (platformContext == IntPtr.Zero || srcPixelMap.rowBytes == 0 || srcPixelMap.baseAddr == IntPtr.Zero ||
-                (srcPixelMap.imageMode != PSConstants.plugInModeRGBColor &&
-                srcPixelMap.imageMode != PSConstants.plugInModeGrayScale &&
-                srcPixelMap.imageMode != PSConstants.plugInModeCMYKColor))
+            if (srcPixelMap->rowBytes == 0 || srcPixelMap->baseAddr == IntPtr.Zero ||
+                (srcPixelMap->imageMode != PSConstants.plugInModeRGBColor &&
+                srcPixelMap->imageMode != PSConstants.plugInModeGrayScale &&
+                srcPixelMap->imageMode != PSConstants.plugInModeCMYKColor))
             {
                 return PSError.filterBadParameters;
             }
 
-            int width = srcRect.right - srcRect.left;
-            int height = srcRect.bottom - srcRect.top;
+            int width = srcRect->right - srcRect->left;
+            int height = srcRect->bottom - srcRect->top;
 
-            bool hasTransparencyMask = srcPixelMap.version >= 1 && srcPixelMap.masks != IntPtr.Zero;
+            bool hasTransparencyMask = srcPixelMap->version >= 1 && srcPixelMap->masks != IntPtr.Zero;
 
             try
             {
@@ -3442,13 +3446,13 @@ namespace PSFilterHostDll.PSApi
                 return PSError.memFullErr;
             }
 
-            byte* baseAddr = (byte*)srcPixelMap.baseAddr.ToPointer();
+            byte* baseAddr = (byte*)srcPixelMap->baseAddr.ToPointer();
 
-            int top = srcRect.top;
-            int bottom = srcRect.bottom;
-            int left = srcRect.left;
+            int top = srcRect->top;
+            int bottom = srcRect->bottom;
+            int left = srcRect->left;
             // Some plug-ins set the srcRect incorrectly for 100% zoom.
-            if (srcPixelMap.bounds.Equals(srcRect) && (top > 0 || left > 0))
+            if (srcPixelMap->bounds.Equals(*srcRect) && (top > 0 || left > 0))
             {
                 top = left = 0;
                 bottom = height;
@@ -3456,43 +3460,43 @@ namespace PSFilterHostDll.PSApi
 
             int destColBytes = displaySurface.ChannelCount;
 
-            if (srcPixelMap.imageMode == PSConstants.plugInModeGrayScale)
+            if (srcPixelMap->imageMode == PSConstants.plugInModeGrayScale)
             {
                 // Perform color correction if required and fall back to the uncorrected data if it fails.
                 if (!colorProfileConverter.ColorCorrectionRequired ||
-                    !colorProfileConverter.ColorCorrectGrayScale(srcPixelMap.baseAddr, srcPixelMap.rowBytes, new Point(left, top), displaySurface))
+                    !colorProfileConverter.ColorCorrectGrayScale(srcPixelMap->baseAddr, srcPixelMap->rowBytes, new Point(left, top), displaySurface))
                 {
                     for (int y = top; y < bottom; y++)
                     {
-                        byte* src = baseAddr + (y * srcPixelMap.rowBytes) + left;
+                        byte* src = baseAddr + (y * srcPixelMap->rowBytes) + left;
                         byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
                         for (int x = 0; x < width; x++)
                         {
                             dst[0] = dst[1] = dst[2] = *src;
 
-                            src += srcPixelMap.colBytes;
+                            src += srcPixelMap->colBytes;
                             dst += destColBytes;
                         }
                     }
                 }
             }
-            else if (srcPixelMap.imageMode == PSConstants.plugInModeCMYKColor)
+            else if (srcPixelMap->imageMode == PSConstants.plugInModeCMYKColor)
             {
                 // Perform color correction if required and fall back to the uncorrected data if it fails.
                 if (!colorProfileConverter.ColorCorrectionRequired ||
-                    !colorProfileConverter.ColorCorrectCMYK(srcPixelMap.baseAddr, srcPixelMap.rowBytes, srcPixelMap.colBytes,
-                                                            srcPixelMap.planeBytes, new Point(left, top), displaySurface))
+                    !colorProfileConverter.ColorCorrectCMYK(srcPixelMap->baseAddr, srcPixelMap->rowBytes, srcPixelMap->colBytes,
+                                                            srcPixelMap->planeBytes, new Point(left, top), displaySurface))
                 {
-                    if (srcPixelMap.colBytes == 1)
+                    if (srcPixelMap->colBytes == 1)
                     {
-                        int magentaPlaneOffset = srcPixelMap.planeBytes;
-                        int yellowPlaneOffset = magentaPlaneOffset + srcPixelMap.planeBytes;
-                        int blackPlaneOffset = yellowPlaneOffset + srcPixelMap.planeBytes;
+                        int magentaPlaneOffset = srcPixelMap->planeBytes;
+                        int yellowPlaneOffset = magentaPlaneOffset + srcPixelMap->planeBytes;
+                        int blackPlaneOffset = yellowPlaneOffset + srcPixelMap->planeBytes;
 
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* cyanPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
+                            byte* cyanPlane = baseAddr + (y * srcPixelMap->rowBytes) + left;
                             byte* magentaPlane = cyanPlane + magentaPlaneOffset;
                             byte* yellowPlane = cyanPlane + yellowPlaneOffset;
                             byte* blackPlane = cyanPlane + blackPlaneOffset;
@@ -3526,7 +3530,7 @@ namespace PSFilterHostDll.PSApi
                     {
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
+                            byte* src = baseAddr + (y * srcPixelMap->rowBytes) + (left * srcPixelMap->colBytes);
                             byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
                             for (int x = 0; x < width; x++)
@@ -3544,7 +3548,7 @@ namespace PSFilterHostDll.PSApi
                                 dst[1] = (byte)nGreen;
                                 dst[0] = (byte)nBlue;
 
-                                src += srcPixelMap.colBytes;
+                                src += srcPixelMap->colBytes;
                                 dst += destColBytes;
                             }
                         }
@@ -3555,20 +3559,20 @@ namespace PSFilterHostDll.PSApi
             {
                 // Perform color correction if required and fall back to the uncorrected data if it fails.
                 if (!colorProfileConverter.ColorCorrectionRequired ||
-                    !colorProfileConverter.ColorCorrectRGB(srcPixelMap.baseAddr,
-                                                           srcPixelMap.rowBytes,
-                                                           srcPixelMap.colBytes,
-                                                           srcPixelMap.planeBytes,
+                    !colorProfileConverter.ColorCorrectRGB(srcPixelMap->baseAddr,
+                                                           srcPixelMap->rowBytes,
+                                                           srcPixelMap->colBytes,
+                                                           srcPixelMap->planeBytes,
                                                            new Point(left, top),
                                                            displaySurface))
                 {
-                    if (srcPixelMap.colBytes == 1)
+                    if (srcPixelMap->colBytes == 1)
                     {
-                        int greenPlaneOffset = srcPixelMap.planeBytes;
-                        int bluePlaneOffset = srcPixelMap.planeBytes * 2;
+                        int greenPlaneOffset = srcPixelMap->planeBytes;
+                        int bluePlaneOffset = srcPixelMap->planeBytes * 2;
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* redPlane = baseAddr + (y * srcPixelMap.rowBytes) + left;
+                            byte* redPlane = baseAddr + (y * srcPixelMap->rowBytes) + left;
                             byte* greenPlane = redPlane + greenPlaneOffset;
                             byte* bluePlane = redPlane + bluePlaneOffset;
 
@@ -3591,7 +3595,7 @@ namespace PSFilterHostDll.PSApi
                     {
                         for (int y = top; y < bottom; y++)
                         {
-                            byte* src = baseAddr + (y * srcPixelMap.rowBytes) + (left * srcPixelMap.colBytes);
+                            byte* src = baseAddr + (y * srcPixelMap->rowBytes) + (left * srcPixelMap->colBytes);
                             byte* dst = displaySurface.GetRowAddressUnchecked(y - top);
 
                             for (int x = 0; x < width; x++)
@@ -3600,7 +3604,7 @@ namespace PSFilterHostDll.PSApi
                                 dst[1] = src[1];
                                 dst[2] = src[0];
 
-                                src += srcPixelMap.colBytes;
+                                src += srcPixelMap->colBytes;
                                 dst += destColBytes;
                             }
                         }
@@ -3611,13 +3615,13 @@ namespace PSFilterHostDll.PSApi
             short error = PSError.noErr;
             using (Graphics gr = Graphics.FromHdc(platformContext))
             {
-                if (srcPixelMap.imageMode == PSConstants.plugInModeRGBColor)
+                if (srcPixelMap->imageMode == PSConstants.plugInModeRGBColor)
                 {
                     // Apply the transparency mask if present.
                     if (hasTransparencyMask)
                     {
                         bool allOpaque = true;
-                        PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap.masks.ToPointer();
+                        PSPixelMask* srcMask = (PSPixelMask*)srcPixelMap->masks.ToPointer();
                         if (srcMask->maskData != IntPtr.Zero && srcMask->colBytes != 0 && srcMask->rowBytes != 0)
                         {
                             byte* maskData = (byte*)srcMask->maskData.ToPointer();
