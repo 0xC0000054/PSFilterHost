@@ -278,18 +278,26 @@ namespace PSFilterHostDll
                 }
                 else
                 {
-                    int error = Marshal.GetLastWin32Error();
-
-                    if (error == NativeConstants.ERROR_FILE_NOT_FOUND || error == NativeConstants.ERROR_PATH_NOT_FOUND)
+                    // Some plug-in installers that create shortcuts to their plug-ins will install
+                    // both the 64-bit and X86 plug-in into a subdirectory of the 64-bit Program Files.
+                    //
+                    // These shortcuts will fail to resolve because the WoW64 subsystem redirects the shortcut
+                    // from the 64-bit Program Files to a nonexistent folder in Program Files (x86).
+                    if (IntPtr.Size == 4)
                     {
-                        string fixedPath;
-                        if (ShortcutHelper.FixWoW64ShortcutPath(path, out fixedPath))
+                        int error = Marshal.GetLastWin32Error();
+
+                        if (error == NativeConstants.ERROR_FILE_NOT_FOUND || error == NativeConstants.ERROR_PATH_NOT_FOUND)
                         {
-                            attributes = UnsafeNativeMethods.GetFileAttributesW(fixedPath);
-                            if (attributes != NativeConstants.INVALID_FILE_ATTRIBUTES)
+                            string fixedPath;
+                            if (ShortcutHelper.FixWoW64ShortcutPath(path, out fixedPath))
                             {
-                                isDirectory = (attributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY;
-                                return fixedPath;
+                                attributes = UnsafeNativeMethods.GetFileAttributesW(fixedPath);
+                                if (attributes != NativeConstants.INVALID_FILE_ATTRIBUTES)
+                                {
+                                    isDirectory = (attributes & NativeConstants.FILE_ATTRIBUTE_DIRECTORY) == NativeConstants.FILE_ATTRIBUTE_DIRECTORY;
+                                    return fixedPath;
+                                }
                             }
                         }
                     }
